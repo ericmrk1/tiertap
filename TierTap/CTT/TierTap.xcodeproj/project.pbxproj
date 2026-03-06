@@ -46,7 +46,6 @@
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
-		WCH0E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */; };
 		WCH2E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */; };
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
@@ -147,7 +146,6 @@
 		WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
 		WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLiveView.swift; sourceTree = "<group>"; };
-		WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCashOutView.swift; sourceTree = "<group>"; };
 		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -315,7 +313,6 @@
 				WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */,
 				WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */,
 				WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */,
-				WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -522,7 +519,6 @@
 				WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */,
 				WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */,
 				WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */,
-				WCH0E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift in Sources */,
 				WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */,
 				WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */,
 				WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */,

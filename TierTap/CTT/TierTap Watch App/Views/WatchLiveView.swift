@@ -1,20 +1,23 @@
 import SwiftUI
 
+/// Remote control for the live session running on iPhone: rebuy and stop.
 struct WatchLiveView: View {
     @EnvironmentObject var store: SessionStore
     @State private var elapsed: TimeInterval = 0
-    @State private var showAddBuyIn = false
-    @State private var showCashOut = false
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    let quickAmounts = [100, 200, 300, 500]
+    let rebuyAmounts = [100, 200, 300, 500]
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 HStack {
+                    Image("TierTap_C_PokerChip")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
                     Circle().fill(Color.red).frame(width: 6, height: 6)
                     Text("LIVE").font(.caption2.bold()).foregroundColor(.red)
                 }
@@ -30,37 +33,24 @@ struct WatchLiveView: View {
                     .font(.system(.title2, design: .monospaced))
                     .foregroundColor(.green)
 
-                Text("Buy-in: $\(s.totalBuyIn)")
+                Text("In: $\(s.totalBuyIn)")
                     .font(.caption)
 
-                if showAddBuyIn {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Add buy-in").font(.caption2)
-                        HStack(spacing: 6) {
-                            ForEach(quickAmounts, id: \.self) { amt in
-                                Button("$\(amt)") {
-                                    store.addBuyIn(amt)
-                                    showAddBuyIn = false
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(.green)
-                            }
+                Text("Rebuy").font(.caption2)
+                HStack(spacing: 6) {
+                    ForEach(rebuyAmounts, id: \.self) { amt in
+                        Button("$\(amt)") {
+                            store.addBuyIn(amt)
                         }
+                        .buttonStyle(.bordered)
+                        .tint(.green)
                     }
-                } else {
-                    Button {
-                        showAddBuyIn = true
-                    } label: {
-                        Label("Add buy-in", systemImage: "plus.circle")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.green)
                 }
 
                 Button {
-                    showCashOut = true
+                    store.closeSessionCashOutOnly(cashOut: s.totalBuyIn)
                 } label: {
-                    Label("Cash out", systemImage: "stop.circle.fill")
+                    Label("Stop session", systemImage: "stop.circle.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -68,16 +58,12 @@ struct WatchLiveView: View {
             }
             .padding()
         }
-        .navigationTitle("Session")
+        .navigationTitle("Remote")
         .onReceive(ticker) { _ in
             elapsed = Date().timeIntervalSince(s.startTime)
         }
         .onAppear {
             elapsed = Date().timeIntervalSince(s.startTime)
-        }
-        .sheet(isPresented: $showCashOut) {
-            WatchCashOutView()
-                .environmentObject(store)
         }
     }
 }
