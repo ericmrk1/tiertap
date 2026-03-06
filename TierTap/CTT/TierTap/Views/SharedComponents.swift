@@ -516,3 +516,56 @@ private struct ConfettiPiece: View {
             }
     }
 }
+
+#if os(iOS)
+extension UIImage {
+    /// Returns a copy with black/near-black pixels made transparent so the background shows through.
+    func withBlackPixelsMadeTransparent(threshold: UInt8 = 40) -> UIImage? {
+        guard let cgImage = cgImage else { return nil }
+        let width = cgImage.width
+        let height = cgImage.height
+        let bytesPerPixel = 4
+        let bytesPerRow = bytesPerPixel * width
+        let bitsPerComponent = 8
+
+        guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                data: nil,
+                width: width,
+                height: height,
+                bitsPerComponent: bitsPerComponent,
+                bytesPerRow: bytesPerRow,
+                space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+              ) else { return nil }
+
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        guard let data = context.data else { return nil }
+
+        let buffer = data.bindMemory(to: UInt8.self, capacity: width * height * bytesPerPixel)
+        for y in 0..<height {
+            for x in 0..<width {
+                let offset = (y * width + x) * bytesPerPixel
+                let r = buffer[offset]
+                let g = buffer[offset + 1]
+                let b = buffer[offset + 2]
+                if r <= threshold && g <= threshold && b <= threshold {
+                    buffer[offset] = 0
+                    buffer[offset + 1] = 0
+                    buffer[offset + 2] = 0
+                    buffer[offset + 3] = 0
+                }
+            }
+        }
+
+        guard let outCGImage = context.makeImage() else { return nil }
+        return UIImage(cgImage: outCGImage, scale: scale, orientation: imageOrientation)
+    }
+}
+
+enum TransparentLogoCache {
+    static var image: UIImage? = {
+        UIImage(named: "LogoSplash")?.withBlackPixelsMadeTransparent()
+    }()
+}
+#endif

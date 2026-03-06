@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct HomeView: View {
     @EnvironmentObject var store: SessionStore
@@ -15,30 +16,25 @@ struct HomeView: View {
         [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
     }
 
+    /// Logo with black pixels made transparent so the gradient shows through.
+    private var logoImage: Image {
+        if let processed = TransparentLogoCache.image {
+            return Image(uiImage: processed)
+        }
+        return Image("LogoSplash")
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 24) {
-                    VStack(spacing: 8) {
-                        Image("TierTapLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 44)
-                        Text("Table Games Edition")
-                            .font(.caption).foregroundColor(.gray)
-                        HStack(spacing: 16) {
-                            Image(systemName: "suit.club.fill").foregroundColor(.green).font(.title2)
-                            Image(systemName: "suit.spade.fill").foregroundColor(.white.opacity(0.9)).font(.title2)
-                            Image(systemName: "suit.heart.fill").foregroundColor(.red).font(.title2)
-                            Image(systemName: "suit.diamond.fill").foregroundColor(.red).font(.title2)
-                            Image(systemName: "dice.fill").foregroundColor(.white.opacity(0.9)).font(.title2)
-                            Image(systemName: "trophy.fill").foregroundColor(.yellow).font(.title2)
-                            Image(systemName: "star.fill").foregroundColor(.yellow).font(.title2)
-                        }
-                        .padding(.top, 4)
-                    }
-                    .padding(.top, 8)
+                    logoImage
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 240)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
 
                     if let live = store.liveSession {
                         LiveNowCard(session: live)
