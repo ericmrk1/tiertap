@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */; };
 		2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2D86C8432C78C1F310B3E /* HistoryView.swift */; };
+		2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
@@ -21,29 +22,35 @@
 		8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AACDC5094128715EAA64A9 /* LiveSessionView.swift */; };
 		8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692681C1D425214EB9F4B3A2 /* TierTapApp.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
+		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
 		C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
 		CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */; };
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
+		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
+		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
+		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
+		LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */; };
 		ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */; };
 		ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */; };
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
+		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
+		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
+		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		WCH0E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */; };
 		WCH2E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */; };
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
 		WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */; };
 		WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
+		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
-		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
-		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +102,7 @@
 		2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTap.entitlements; sourceTree = "<group>"; };
 		2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch App.entitlements"; sourceTree = "<group>"; };
+		2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCalendarView.swift; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -106,26 +114,32 @@
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
+		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPastSessionView.swift; sourceTree = "<group>"; };
 		BE9B9607B2D22C77E1D06D68 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoLocationPickerView.swift; sourceTree = "<group>"; };
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
+		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
 		F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseoutView.swift; sourceTree = "<group>"; };
+		LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuin.swift; sourceTree = "<group>"; };
+		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
 		ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
+		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
 		WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchApp.swift; sourceTree = "<group>"; };
 		WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
 		WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLiveView.swift; sourceTree = "<group>"; };
 		WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCashOutView.swift; sourceTree = "<group>"; };
-		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
 		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,12 +181,17 @@
 			isa = PBXGroup;
 			children = (
 				B89A89EFB8A3238E20A9044B /* SharedComponents.swift */,
+				RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */,
+				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
 				7E68A7C0EAF309AC9F041237 /* HomeView.swift */,
 				9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */,
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
 				BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
+				2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */,
+				EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */,
+				CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */,
 				282155DBCB51F96C8840E98B /* SessionDetailView.swift */,
 				CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */,
 				ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */,
@@ -187,6 +206,7 @@
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
+				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -217,6 +237,7 @@
 			children = (
 				9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */,
 				ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */,
+				LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -228,14 +249,6 @@
 				59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */,
 			);
 			path = LiveActivity;
-			sourceTree = "<group>";
-		};
-		SYNC4E2F3A4B5C6D7E8F9A0B1 /* WatchConnectivity */ = {
-			isa = PBXGroup;
-			children = (
-				SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */,
-			);
-			path = WatchConnectivity;
 			sourceTree = "<group>";
 		};
 		F83566B140DB1139A064E7D0 /* TierTap */ = {
@@ -252,6 +265,14 @@
 				BE9B9607B2D22C77E1D06D68 /* Info.plist */,
 			);
 			path = TierTap;
+			sourceTree = "<group>";
+		};
+		SYNC4E2F3A4B5C6D7E8F9A0B1 /* WatchConnectivity */ = {
+			isa = PBXGroup;
+			children = (
+				SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */,
+			);
+			path = WatchConnectivity;
 			sourceTree = "<group>";
 		};
 		WCHF1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */ = {
@@ -437,6 +458,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */,
+				RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */,
+				ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */,
+				CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */,
+				LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */,
 				C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */,
 				CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */,
 				4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */,
@@ -447,6 +472,8 @@
 				8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
+				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,
+				EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */,
 				5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */,
 				CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */,
 				674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */,
@@ -456,6 +483,7 @@
 				ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
+				SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,8 +713,8 @@
 				DEVELOPMENT_TEAM = LVWH8T63HA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTap;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.app.tiertap;
 				MARKETING_VERSION = 1.0;
@@ -713,8 +741,8 @@
 				DEVELOPMENT_TEAM = LVWH8T63HA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTap;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.app.tiertap;
 				MARKETING_VERSION = 1.0;

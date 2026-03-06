@@ -10,7 +10,7 @@ struct SessionDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
                         if session.requiresMoreInfo {
@@ -119,7 +119,7 @@ struct SessionDetailView: View {
             }
             .navigationTitle("Session Detail")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

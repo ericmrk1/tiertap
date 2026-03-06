@@ -3,7 +3,6 @@ import SwiftUI
 struct RiskOfRuinView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) var dismiss
 
     private var result: RiskOfRuinResult {
         let currentBet: Int? = sessionStore.liveSession.map { max($0.totalBuyIn, $0.avgBetActual ?? 0) }
@@ -19,7 +18,7 @@ struct RiskOfRuinView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
                         chanceOfBustingCard
@@ -33,31 +32,32 @@ struct RiskOfRuinView: View {
             }
             .navigationTitle("Risk of Ruin")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }.foregroundColor(.green)
-                }
-            }
         }
     }
 
     private var chanceOfBustingCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Label("Chance of busting out", systemImage: "exclamationmark.triangle.fill")
                     .font(.headline).foregroundColor(.white)
                 Spacer()
             }
-            HStack(alignment: .firstTextBaseline) {
-                Text(rorPercentString)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundColor(rorColor)
-                Text("risk of ruin")
-                    .font(.subheadline).foregroundColor(.gray)
+            HStack {
+                Spacer()
+                ZStack {
+                    Circle()
+                        .fill(Color(.systemGray6).opacity(0.35))
+                        .overlay(Circle().stroke(rorColor.opacity(0.6), lineWidth: 3))
+                    Text(rorPercentString)
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .foregroundColor(rorColor)
+                }
+                .frame(width: 160, height: 160)
+                Spacer()
             }
-            Text("Probability of losing your entire bankroll based on your session history and current bankroll/unit settings.")
+            Text("risk of ruin — probability of losing your entire bankroll based on your session history and current bankroll/unit settings.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()

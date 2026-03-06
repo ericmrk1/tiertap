@@ -116,7 +116,7 @@ class SessionStore: ObservableObject {
         guard var s = liveSession else { return }
         s.cashOut = cashOut; s.avgBetActual = avgBetActual
         s.avgBetRated = avgBetRated; s.endingTierPoints = endingTier
-        s.endTime = Date(); s.isLive = false; s.status = .complete
+        s.endTime = s.endTime ?? Date(); s.isLive = false; s.status = .complete
         sessions.insert(s, at: 0)
         liveSession = nil
         saveSessions(); clearLive()
@@ -156,6 +156,28 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    /// Freeze the live session end time so duration stops increasing (e.g. while user fills closeout form).
+    func stopLiveSessionTimer() {
+        guard var s = liveSession, s.endTime == nil else { return }
+        s.endTime = Date()
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
+    /// Un-freeze the live session timer so duration resumes increasing.
+    func resumeLiveSessionTimer() {
+        guard var s = liveSession, s.endTime != nil else { return }
+        s.endTime = nil
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
     // MARK: Past
     func addPastSession(_ session: Session) {
         var s = session; s.isLive = false; s.status = .complete
@@ -179,6 +201,14 @@ class SessionStore: ObservableObject {
 
     func deleteSession(at offsets: IndexSet) {
         sessions.remove(atOffsets: offsets)
+        saveSessions()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
+    func deleteSession(_ session: Session) {
+        sessions.removeAll { $0.id == session.id }
         saveSessions()
         #if os(iOS)
         pushContext()
@@ -209,4 +239,34 @@ class SessionStore: ObservableObject {
         if let d = try? JSONEncoder().encode(liveSession) { defaults.set(d, forKey: liveKey) }
     }
     private func clearLive() { defaults.removeObject(forKey: liveKey) }
+
+    // MARK: - Defaults / Helpers
+
+    /// Returns the most recent avg bet actual / rated for a given game from history.
+    /// Used to pre-populate closeout forms so user doesn't have to retype common bet sizes.
+    func defaultAvgBets(for game: String) -> (actual: Int?, rated: Int?) {
+        guard !game.isEmpty else { return (nil, nil) }
+        let matching = sessions
+            .filter { $0.game == game }
+            .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+
+        let actual = matching.first(where: { $0.avgBetActual != nil })?.avgBetActual
+        let rated = matching.first(where: { $0.avgBetRated != nil })?.avgBetRated
+        return (actual, rated)
+    }
+
+    /// Returns a reasonable default ending tier points for a given casino, based on history.
+    /// Prefers the most recent session with an explicit ending tier; falls back to that
+    /// session's starting tier points if needed.
+    func defaultEndingTierPoints(for casino: String) -> Int? {
+        guard !casino.isEmpty else { return nil }
+        let matching = sessions
+            .filter { $0.casino == casino }
+            .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+
+        if let withEnding = matching.first(where: { $0.endingTierPoints != nil }) {
+            return withEnding.endingTierPoints
+        }
+        return matching.first?.startingTierPoints
+    }
 }

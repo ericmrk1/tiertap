@@ -10,8 +10,51 @@ struct CheckInView: View {
     @State private var initialBuyIn = ""
     @State private var showGamePicker = false
     @State private var showExistingAlert = false
+    @State private var showBuyInPicker = false
+    @State private var showCasinoLocationPicker = false
 
-    let quickBuyIns = [100, 200, 300, 500, 1000]
+    /// Games to show as main grid: favorites only; fallback to pinned if no favorites set.
+    private var displayGames: [String] {
+        if !settingsStore.favoriteGames.isEmpty { return settingsStore.favoriteGames }
+        return GamesList.pinned
+    }
+
+    private var isGameInDisplayList: Bool {
+        selectedGame.isEmpty || displayGames.contains(selectedGame)
+    }
+
+    /// Build a large set of common buy-in amounts from settings denominations + common squares,
+    /// and extend in regular increments up to 100k so the grid can keep scrolling upward.
+    private var buyInGridAmounts: [Int] {
+        let base = settingsStore.effectiveDenominations
+        let denoms = base.isEmpty ? [100, 200, 300, 500, 1000, 2000, 5000, 10_000] : base
+        var set: Set<Int> = Set(denoms)
+
+        // Core multiples/halves around the configured denominations.
+        for d in denoms {
+            set.insert(d)
+            set.insert(d * 2)
+            set.insert(d * 3)
+            if d >= 100 { set.insert(d / 2) }
+        }
+
+        // Extra "nice" chips.
+        set.insert(25); set.insert(50); set.insert(75); set.insert(150); set.insert(250); set.insert(750)
+
+        // Ensure amounts continue in clean increments up to 100k so the grid keeps scrolling.
+        let maxTarget = 100_000
+        let step = 1_000
+        let currentMax = set.max() ?? 0
+        if currentMax < maxTarget {
+            var next = max(step, ((currentMax + step - 1) / step) * step)
+            while next <= maxTarget {
+                set.insert(next)
+                next += step
+            }
+        }
+
+        return set.sorted()
+    }
 
     var isValid: Bool {
         !selectedGame.isEmpty && !casino.isEmpty &&
@@ -21,57 +64,96 @@ struct CheckInView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Game
-                        VStack(alignment: .leading, spacing: 10) {
-                            Label("Casino Game", systemImage: "suit.club.fill")
-                                .font(.headline).foregroundColor(.white)
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                                ForEach(GamesList.pinned, id: \.self) { g in
-                                    GameButton(title: g, isSelected: selectedGame == g) { selectedGame = g }
+                        // Gaming Details section: Game on the left, Location on the right
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Gaming Details")
+                                .font(.headline)
+                                .foregroundColor(.white)
+
+                            HStack(alignment: .top, spacing: 12) {
+                                // Game — favorites only; More games to browse/select any (including favorites)
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Label("Casino Game", systemImage: "suit.club.fill")
+                                        .font(.headline).foregroundColor(.white)
+                                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                                        ForEach(displayGames, id: \.self) { g in
+                                            GameButton(title: g, isSelected: selectedGame == g) { selectedGame = g }
+                                        }
+                                    }
+                                    Button { showGamePicker = true } label: {
+                                        HStack {
+                                            Image(systemName: "magnifyingglass")
+                                            Text(isGameInDisplayList && selectedGame.isEmpty
+                                                 ? "More games..." : selectedGame)
+                                                .lineLimit(1)
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                        }
+                                        .padding(12)
+                                        .background(!isGameInDisplayList
+                                                    ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(!isGameInDisplayList ? .white : .gray)
+                                        .cornerRadius(10)
+                                    }
                                 }
-                            }
-                            Button { showGamePicker = true } label: {
-                                HStack {
-                                    Image(systemName: "magnifyingglass")
-                                    Text(GamesList.pinned.contains(selectedGame) || selectedGame.isEmpty
-                                         ? "More games..." : selectedGame)
-                                        .lineLimit(1)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
+                                .padding()
+                                .background(Color(.systemGray6).opacity(0.15))
+                                .cornerRadius(16)
+                                .frame(maxWidth: .infinity)
+
+                                // Casino — favorites chips + text field + location-based picker
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Label("Casino Location", systemImage: "building.columns")
+                                        .font(.headline).foregroundColor(.white)
+                                    if !settingsStore.favoriteCasinos.isEmpty {
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 8) {
+                                                ForEach(settingsStore.favoriteCasinos, id: \.self) { name in
+                                                    Button(name) { casino = name }
+                                                        .font(.subheadline)
+                                                        .padding(.horizontal, 12).padding(.vertical, 8)
+                                                        .background(casino == name ? Color.green : Color(.systemGray6).opacity(0.25))
+                                                        .foregroundColor(casino == name ? .black : .white)
+                                                        .cornerRadius(10)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    TextField("Enter casino name", text: $casino)
+                                        .textFieldStyle(DarkTextFieldStyle())
+                                    Button {
+                                        showCasinoLocationPicker = true
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "location.circle")
+                                            Text("Find casino near me")
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
+                                        }
+                                        .padding(12)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                    }
                                 }
-                                .padding(12)
-                                .background(!GamesList.pinned.contains(selectedGame) && !selectedGame.isEmpty
-                                            ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
-                                .foregroundColor(!GamesList.pinned.contains(selectedGame) && !selectedGame.isEmpty
-                                                ? .white : .gray)
-                                .cornerRadius(10)
+                                .padding()
+                                .background(Color(.systemGray6).opacity(0.15))
+                                .cornerRadius(16)
+                                .frame(maxWidth: .infinity)
                             }
                         }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
 
-                        // Casino
-                        VStack(alignment: .leading, spacing: 10) {
-                            Label("Casino Location", systemImage: "building.columns")
-                                .font(.headline).foregroundColor(.white)
-                            TextField("Enter casino name", text: $casino)
-                                .textFieldStyle(DarkTextFieldStyle())
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        // Starting Tier
+                        // Starting Tier — scrollable wheel (up to 6 figures) + optional text
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Starting Tier Points", systemImage: "star.circle")
                                 .font(.headline).foregroundColor(.white)
-                            Text("Check your casino loyalty app and enter your current tier points.")
+                            Text("Check your casino loyalty app. Use wheel or type exact.")
                                 .font(.caption).foregroundColor(.gray)
-                            TextField("e.g. 12500", text: $startingTier)
+                            TierPointsWheel(selectedValue: $startingTier)
+                            TextField("Or type exact value", text: $startingTier)
                                 .textFieldStyle(DarkTextFieldStyle())
                                 .keyboardType(.numberPad)
                         }
@@ -79,20 +161,22 @@ struct CheckInView: View {
                         .background(Color(.systemGray6).opacity(0.15))
                         .cornerRadius(16)
 
-                        // Buy-In
+                        // Buy-In — popup first, then big grid of common amounts
                         VStack(alignment: .leading, spacing: 10) {
                             Label("Initial Buy-In", systemImage: "dollarsign.circle")
                                 .font(.headline).foregroundColor(.white)
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
-                                    ForEach(quickBuyIns, id: \.self) { amt in
-                                        Button("$\(amt)") { initialBuyIn = "\(amt)" }
-                                            .padding(.horizontal, 14).padding(.vertical, 8)
-                                            .background(initialBuyIn == "\(amt)" ? Color.green : Color(.systemGray6).opacity(0.25))
-                                            .foregroundColor(initialBuyIn == "\(amt)" ? .black : .white)
-                                            .cornerRadius(8).font(.subheadline)
-                                    }
+                            Button { showBuyInPicker = true } label: {
+                                HStack {
+                                    Text(initialBuyIn.isEmpty ? "Choose amount" : "$\(initialBuyIn)")
+                                        .font(.title3.bold())
+                                    Spacer()
+                                    Image(systemName: "square.grid.2x2.fill")
                                 }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
                             }
                             TextField("Or enter amount", text: $initialBuyIn)
                                 .textFieldStyle(DarkTextFieldStyle())
@@ -117,7 +201,7 @@ struct CheckInView: View {
                         Button {
                             if store.liveSession != nil { showExistingAlert = true } else { go() }
                         } label: {
-                            Text("Start Tracking")
+                            Text("Let’s F@#$@ Go!")
                                 .frame(maxWidth: .infinity).padding()
                                 .background(isValid ? Color.green : Color.gray)
                                 .foregroundColor(isValid ? .black : .white)
@@ -130,7 +214,7 @@ struct CheckInView: View {
             }
             .navigationTitle("Check In")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -139,6 +223,17 @@ struct CheckInView: View {
             }
             .sheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showCasinoLocationPicker) {
+                CasinoLocationPickerView(selectedCasino: $casino)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showBuyInPicker) {
+                BuyInGridSheet(amounts: buyInGridAmounts, selected: $initialBuyIn)
+                    .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])
             }
             .alert("Active Session", isPresented: $showExistingAlert) {

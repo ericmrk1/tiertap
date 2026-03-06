@@ -5,24 +5,20 @@ struct HomeView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @State private var showCheckIn = false
     @State private var showLive = false
+    @State private var showBuyInSheet = false
     @State private var showAddPast = false
     @State private var showHistory = false
-    @State private var showRiskOfRuin = false
-    @State private var showSettings = false
+
+    /// Quick-add buy-in denominations for the live buy-in sheet.
+    private var quickBuyIns: [Int] {
+        [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
+    }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 24) {
-                    HStack {
-                        Spacer()
-                        Button { showSettings = true } label: {
-                            Image(systemName: "gearshape.fill")
-                                .font(.title3).foregroundColor(.gray)
-                        }
-                        .padding(.trailing, 20).padding(.top, 8)
-                    }
                     VStack(spacing: 8) {
                         Image(systemName: "suit.club.fill")
                             .font(.system(size: 52)).foregroundColor(.green)
@@ -49,12 +45,25 @@ struct HomeView: View {
                                     .background(Color.green).foregroundColor(.black)
                                     .cornerRadius(14).font(.headline)
                             }
+                            Button {
+                                showBuyInSheet = true
+                            } label: {
+                                Label("Add Buy-In", systemImage: "plus.circle")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
+                                    .padding(.horizontal)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(16).font(.title3.bold())
+                            }
                         } else {
                             Button { showCheckIn = true } label: {
                                 Label("Check In", systemImage: "plus.circle.fill")
-                                    .frame(maxWidth: .infinity).padding()
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal)
                                     .background(Color.green).foregroundColor(.black)
-                                    .cornerRadius(14).font(.headline)
+                                    .cornerRadius(16).font(.title2.bold())
                             }
                         }
                         HStack(spacing: 12) {
@@ -71,12 +80,6 @@ struct HomeView: View {
                                     .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                             }
                         }
-                        Button { showRiskOfRuin = true } label: {
-                            Label("Risk of Ruin", systemImage: "chart.bar.doc.horizontal")
-                                .frame(maxWidth: .infinity).padding()
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                        }
                     }
                     .padding(.horizontal).padding(.bottom, 44)
                 }
@@ -85,10 +88,13 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showCheckIn) { CheckInView().environmentObject(store).environmentObject(settingsStore) }
         .sheet(isPresented: $showLive) { LiveSessionView().environmentObject(store).environmentObject(settingsStore) }
+        .sheet(isPresented: $showBuyInSheet) {
+            BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
+                store.addBuyIn(amount)
+            }
+        }
         .sheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showHistory) { HistoryView().environmentObject(store) }
-        .sheet(isPresented: $showRiskOfRuin) { RiskOfRuinView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showSettings) { SettingsView().environmentObject(store).environmentObject(settingsStore) }
+        .sheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
     }
 }
 

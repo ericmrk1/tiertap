@@ -4,6 +4,7 @@ struct AddPastSessionView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
+
     @State private var selectedGame = ""
     @State private var casino = ""
     @State private var date = Date()
@@ -15,7 +16,9 @@ struct AddPastSessionView: View {
     @State private var endingTier = ""
     @State private var avgBetActual = ""
     @State private var avgBetRated = ""
+
     @State private var showGamePicker = false
+    @State private var showCasinoPicker = false
 
     var isValid: Bool {
         !selectedGame.isEmpty && !casino.isEmpty &&
@@ -25,116 +28,269 @@ struct AddPastSessionView: View {
         Int(avgBetActual) != nil && Int(avgBetRated) != nil
     }
 
+    /// Quick denominations pulled from Settings, falling back to sensible defaults.
+    private var quickDenominations: [Int] {
+        let base = settingsStore.effectiveDenominations
+        return base.isEmpty ? [20, 100, 500, 1000, 10_000] : base
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
-                    VStack(spacing: 20) {
-                        // Game
-                        VStack(alignment: .leading, spacing: 10) {
-                            Label("Casino Game", systemImage: "suit.club.fill")
-                                .font(.headline).foregroundColor(.white)
-                            Button { showGamePicker = true } label: {
-                                HStack {
-                                    Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                }
-                                .padding(12)
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .foregroundColor(selectedGame.isEmpty ? .gray : .white)
-                                .cornerRadius(10)
-                            }
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        // Casino + Time
-                        VStack(spacing: 12) {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Casino").font(.subheadline.bold()).foregroundColor(.white)
-                                TextField("Casino name", text: $casino).textFieldStyle(DarkTextFieldStyle())
-                            }
-                            DatePicker("Date", selection: $date, displayedComponents: .date).colorScheme(.dark)
-                            DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute).colorScheme(.dark)
-                            DatePicker("End Time", selection: $endTime, displayedComponents: .hourAndMinute).colorScheme(.dark)
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        // Financial
-                        VStack(spacing: 12) {
-                            Text("Financial").font(.headline).foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            InputRow(label: "Total Buy-In ($)", placeholder: "Total bought in", value: $totalBuyIn)
-                            InputRow(label: "Cash Out ($)", placeholder: "Amount cashed out", value: $cashOut)
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        // Tier Points
-                        VStack(spacing: 12) {
-                            Text("Tier Points").font(.headline).foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            InputRow(label: "Starting Tier Points", placeholder: "Points at session start", value: $startingTier)
-                            InputRow(label: "Ending Tier Points", placeholder: "Points at session end", value: $endingTier)
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        // Bets
-                        VStack(spacing: 12) {
-                            Text("Average Bets").font(.headline).foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Actual average bet", value: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Rated average bet", value: $avgBetRated)
-                            if settingsStore.unitSize > 0,
-                               (Int(totalBuyIn) ?? 0) > settingsStore.unitSize || (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .foregroundColor(.orange)
-                                    Text("Buy-in or bet exceeds unit size ($\(settingsStore.unitSize)). Set unit in Settings to match your bankroll plan.")
-                                        .font(.caption).foregroundColor(.orange)
-                                }
-                                .padding(8)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.orange.opacity(0.15))
-                                .cornerRadius(8)
-                            }
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        Button { save() } label: {
-                            Text("Save Session")
-                                .frame(maxWidth: .infinity).padding()
-                                .background(isValid ? Color.green : Color.gray)
-                                .foregroundColor(isValid ? .black : .white)
-                                .cornerRadius(14).font(.headline)
-                        }
-                        .disabled(!isValid)
+                    VStack(spacing: 16) {
+                        gameSection
+                        casinoAndTimeSection
+                        moneyAndBetsSection
+                        tierPointsSection
+                        saveButton
                     }
                     .padding()
                 }
             }
             .navigationTitle("Add Past Session")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }.foregroundColor(.green)
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(.green)
                 }
             }
             .sheet(isPresented: $showGamePicker) {
-                GamePickerView(selectedGame: $selectedGame).presentationDetents([.medium, .large])
+                GamePickerView(selectedGame: $selectedGame)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.medium, .large])
             }
+            .sheet(isPresented: $showCasinoPicker) {
+                CasinoLocationPickerView(selectedCasino: $casino)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.medium, .large])
+            }
+            .onChange(of: selectedGame) { newGame in
+                guard !newGame.isEmpty else { return }
+                // Try to pre-populate avg bets from history for this game.
+                let defaults = store.defaultAvgBets(for: newGame)
+                if avgBetActual.isEmpty, let a = defaults.actual {
+                    avgBetActual = "\(a)"
+                }
+                if avgBetRated.isEmpty, let r = defaults.rated {
+                    avgBetRated = "\(r)"
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var gameSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Casino Game", systemImage: "suit.club.fill")
+                .font(.headline).foregroundColor(.white)
+            Button { showGamePicker = true } label: {
+                HStack {
+                    Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+                .padding(12)
+                .background(Color(.systemGray6).opacity(0.25))
+                .foregroundColor(selectedGame.isEmpty ? .gray : .white)
+                .cornerRadius(10)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var casinoAndTimeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Casino").font(.subheadline.bold()).foregroundColor(.white)
+                TextField("Casino name", text: $casino)
+                    .textFieldStyle(DarkTextFieldStyle())
+                favoriteCasinosButtons
+                Button {
+                    showCasinoPicker = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.and.ellipse")
+                        Text("Choose from nearby casinos & favorites")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                    }
+                    .font(.caption)
+                    .padding(10)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding(.top, 4)
+            }
+            DatePicker("Date", selection: $date, displayedComponents: .date)
+                .colorScheme(.dark)
+            HStack(spacing: 12) {
+                DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+                DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var favoriteCasinosButtons: some View {
+        if !settingsStore.favoriteCasinos.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(settingsStore.favoriteCasinos, id: \.self) { name in
+                        Button(name) {
+                            casino = name
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(casino == name ? Color.green : Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(casino == name ? .black : .white)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            .padding(.top, 4)
+        }
+    }
+
+    @ViewBuilder private var moneyAndBetsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Money & Bets")
+                .font(.headline)
+                .foregroundColor(.white)
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    compactNumberField(label: "Total Buy-In ($)", placeholder: "Total bought in", text: $totalBuyIn)
+                    compactNumberField(label: "Cash Out ($)", placeholder: "Amount cashed out", text: $cashOut)
+                }
+                GridRow {
+                    compactNumberField(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", text: $avgBetActual)
+                    compactNumberField(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", text: $avgBetRated)
+                }
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Common amounts").font(.caption.bold()).foregroundColor(.gray)
+                CommonAmountButtons(amounts: quickDenominations, selected: $avgBetActual)
+                CommonAmountButtons(amounts: quickDenominations, selected: $avgBetRated)
+            }
+            quickAddButtons
+            unitSizeWarning
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var quickAddButtons: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Quick add amounts")
+                .font(.caption.bold())
+                .foregroundColor(.gray)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickDenominations, id: \.self) { amt in
+                        Button("+$\(amt)") {
+                            let current = Int(totalBuyIn) ?? 0
+                            totalBuyIn = String(current + amt)
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.green.opacity(0.2))
+                        .foregroundColor(.green)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickDenominations, id: \.self) { amt in
+                        Button("+$\(amt) cash out") {
+                            let current = Int(cashOut) ?? 0
+                            cashOut = String(current + amt)
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var unitSizeWarning: some View {
+        if settingsStore.unitSize > 0,
+           (Int(totalBuyIn) ?? 0) > settingsStore.unitSize ||
+           (Int(avgBetActual) ?? 0) > settingsStore.unitSize ||
+           (Int(avgBetRated) ?? 0) > settingsStore.unitSize {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+                Text("Buy-in or bet exceeds unit size ($\(settingsStore.unitSize)). Set unit in Settings to match your bankroll plan.")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.orange.opacity(0.15))
+            .cornerRadius(8)
+        }
+    }
+
+    @ViewBuilder private var tierPointsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Tier Points")
+                .font(.headline)
+                .foregroundColor(.white)
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    compactNumberField(label: "Starting Tier Points", placeholder: "At session start", text: $startingTier)
+                    compactNumberField(label: "Ending Tier Points", placeholder: "At session end", text: $endingTier)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private var saveButton: some View {
+        Button { save() } label: {
+            Text("Save Session")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isValid ? Color.green : Color.gray)
+                .foregroundColor(isValid ? .black : .white)
+                .cornerRadius(14)
+                .font(.headline)
+        }
+        .disabled(!isValid)
+    }
+
+    private func compactNumberField(label: String, placeholder: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.white)
+            TextField(placeholder, text: text)
+                .textFieldStyle(DarkTextFieldStyle())
+                .keyboardType(.numberPad)
         }
     }
 

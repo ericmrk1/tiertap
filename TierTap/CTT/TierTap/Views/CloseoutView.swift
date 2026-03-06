@@ -9,8 +9,15 @@ struct CloseoutView: View {
     @State private var avgBetRated = ""
     @State private var endingTier = ""
     @State private var showLowAlert = false
+    @State private var showCelebration = false
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
+
+    /// Quick denominations for adjusting cash-out, falling back to sensible defaults.
+    private var cashOutQuickAmounts: [Int] {
+        let base = settingsStore.effectiveDenominations
+        return base.isEmpty ? [25, 50, 100, 200, 500, 1000] : base
+    }
 
     var isValid: Bool {
         Int(cashOut) != nil && Int(avgBetActual) != nil &&
@@ -30,96 +37,203 @@ struct CloseoutView: View {
         return (Double(e) / (Double(r) * previewHours)) * 100
     }
 
+    var timerStopped: Bool { s.endTime != nil }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
+                if showCelebration {
+                    ConfettiCelebrationView()
+                }
                 ScrollView {
-                    VStack(spacing: 20) {
-                        // Header
-                        VStack(spacing: 6) {
-                            Text(s.casino).font(.title2.bold()).foregroundColor(.white)
-                            Text(s.game).foregroundColor(.gray)
-                            HStack(spacing: 16) {
-                                Label(Session.durationString(s.duration), systemImage: "clock")
-                                Label("Buy-in: $\(s.totalBuyIn)", systemImage: "dollarsign.circle")
+                    VStack(spacing: 12) {
+                        // Top: Stop/Resume Timer primary button + compact header (one line)
+                        VStack(spacing: 8) {
+                            Button {
+                                if timerStopped {
+                                    store.resumeLiveSessionTimer()
+                                } else {
+                                    store.stopLiveSessionTimer()
+                                }
+                            } label: {
+                                Label(timerStopped ? "Resume Timer" : "Stop Timer",
+                                      systemImage: timerStopped ? "play.circle.fill" : "stop.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(timerStopped ? Color.green : Color.red)
+                                    .foregroundColor(timerStopped ? .black : .white)
+                                    .cornerRadius(12)
                             }
-                            .font(.caption).foregroundColor(.green)
-                        }
-                        .frame(maxWidth: .infinity).padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
 
-                        // Inputs
-                        VStack(spacing: 14) {
+                            HStack {
+                                if timerStopped {
+                                    Label("Timer stopped", systemImage: "stop.circle.fill")
+                                        .font(.caption).foregroundColor(.orange)
+                                } else {
+                                    Label("Timer running", systemImage: "play.circle.fill")
+                                        .font(.caption).foregroundColor(.green)
+                                }
+                                Spacer()
+                                Text(s.casino).font(.subheadline.bold()).foregroundColor(.white)
+                                Text("·").foregroundColor(.gray)
+                                Text(Session.durationString(s.duration)).font(.caption.monospacedDigit()).foregroundColor(.green)
+                                Text("·").foregroundColor(.gray)
+                                Text("$\(s.totalBuyIn)").font(.caption).foregroundColor(.gray)
+                            }
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(Color(.systemGray6).opacity(0.15))
+                            .cornerRadius(12)
+                        }
+
+                        // Inputs (compact)
+                        VStack(spacing: 8) {
                             InputRow(label: "Cash Out ($)", placeholder: "Amount leaving with", value: $cashOut)
-                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Your actual avg bet (no decimals)", value: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Your rated avg bet (no decimals)", value: $avgBetRated)
-                            InputRow(label: "Ending Tier Points", placeholder: "Check your loyalty app now", value: $endingTier)
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Adjust cash out")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        ForEach(cashOutQuickAmounts, id: \.self) { amt in
+                                            Button("+$\(amt)") {
+                                                let current = Int(cashOut) ?? s.totalBuyIn
+                                                cashOut = String(current + amt)
+                                            }
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(Color.green.opacity(0.2))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(8)
+                                        }
+                                    }
+                                }
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        ForEach(cashOutQuickAmounts, id: \.self) { amt in
+                                            Button("−$\(amt)") {
+                                                let current = Int(cashOut) ?? s.totalBuyIn
+                                                cashOut = String(max(0, current - amt))
+                                            }
+                                            .font(.caption)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(Color(.systemGray6).opacity(0.25))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(8)
+                                        }
+                                    }
+                                }
+                                HStack(spacing: 8) {
+                                    Button("Lost everything") {
+                                        cashOut = "0"
+                                    }
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.red.opacity(0.25))
+                                    .foregroundColor(.red)
+                                    .cornerRadius(8)
+
+                                    Button("Double or nothing") {
+                                        cashOut = String(s.totalBuyIn * 2)
+                                    }
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+
+                                    Button("Triple") {
+                                        cashOut = String(s.totalBuyIn * 3)
+                                    }
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                }
+                            }
+                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", value: $avgBetActual)
+                            CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetActual)
+                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", value: $avgBetRated)
+                            CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetRated)
+                            InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier)
                             if settingsStore.unitSize > 0,
                                (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || s.totalBuyIn > settingsStore.unitSize {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .foregroundColor(.orange)
-                                    Text("Bet or buy-in exceeds unit size ($\(settingsStore.unitSize)). Adjust in Settings to match your bankroll plan.")
-                                        .font(.caption).foregroundColor(.orange)
+                                HStack(spacing: 6) {
+                                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange).font(.caption2)
+                                    Text("Exceeds unit $\(settingsStore.unitSize).").font(.caption2).foregroundColor(.orange)
                                 }
-                                .padding(8)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(6)
                                 .background(Color.orange.opacity(0.15))
-                                .cornerRadius(8)
+                                .cornerRadius(6)
                             }
                         }
 
-                        // Live preview
+                        // Summary inline when valid (compact)
                         if isValid {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Session Summary").font(.headline).foregroundColor(.white)
-                                Divider().background(Color.gray.opacity(0.3))
-                                if let wl = previewWL {
-                                    SummaryRow(label: "Win/Loss",
-                                               value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
-                                               color: wl >= 0 ? .green : .red)
+                            HStack(alignment: .top, spacing: 16) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    if let wl = previewWL {
+                                        Text("W/L").font(.caption2).foregroundColor(.gray)
+                                        Text(wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))")
+                                            .font(.subheadline.bold())
+                                            .foregroundColor(wl >= 0 ? .green : .red)
+                                    }
                                 }
-                                SummaryRow(label: "Total Buy-In", value: "$\(s.totalBuyIn)", color: .white)
-                                SummaryRow(label: "Hours Played", value: String(format: "%.2f", previewHours), color: .white)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Buy-in").font(.caption2).foregroundColor(.gray)
+                                    Text("$\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
+                                }
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Hrs").font(.caption2).foregroundColor(.gray)
+                                    Text(String(format: "%.2f", previewHours)).font(.subheadline).foregroundColor(.white)
+                                }
                                 if let e = previewTierEarned {
-                                    SummaryRow(label: "Tier Points Earned",
-                                               value: "\(e >= 0 ? "+" : "")\(e)",
-                                               color: e >= 0 ? .green : .orange)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Pts").font(.caption2).foregroundColor(.gray)
+                                        Text("\(e >= 0 ? "+" : "")\(e)").font(.subheadline).foregroundColor(e >= 0 ? .green : .orange)
+                                    }
                                 }
                                 if let t = previewTPH {
-                                    SummaryRow(label: "Tiers / Hour", value: String(format: "%.1f", t), color: .white)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Pts/hr").font(.caption2).foregroundColor(.gray)
+                                        Text(String(format: "%.1f", t)).font(.subheadline).foregroundColor(.white)
+                                    }
                                 }
-                                if let t100 = previewT100 {
-                                    SummaryRow(label: "Tiers per $100 Rated Bet-Hour",
-                                               value: String(format: "%.2f", t100), color: .white)
-                                }
+                                Spacer(minLength: 0)
                             }
-                            .padding()
+                            .padding(12)
                             .background(Color(.systemGray6).opacity(0.15))
-                            .cornerRadius(16)
+                            .cornerRadius(12)
                         }
 
-                        VStack(spacing: 10) {
+                        // Actions
+                        VStack(spacing: 8) {
                             Button {
                                 if let et = Int(endingTier), et < s.startingTierPoints {
                                     showLowAlert = true
                                 } else { save() }
                             } label: {
                                 Text("Save Session")
-                                    .frame(maxWidth: .infinity).padding()
+                                    .frame(maxWidth: .infinity).padding(.vertical, 12)
                                     .background(isValid ? Color.green : Color.gray)
                                     .foregroundColor(isValid ? .black : .white)
-                                    .cornerRadius(14).font(.headline)
+                                    .cornerRadius(12).font(.headline)
                             }
                             .disabled(!isValid)
 
                             Button { dismiss() } label: {
                                 Text("Cancel — Return to Session")
-                                    .frame(maxWidth: .infinity).padding()
-                                    .background(Color(.systemGray6).opacity(0.2))
-                                    .foregroundColor(.white).cornerRadius(14)
+                                    .font(.subheadline)
+                                    .frame(maxWidth: .infinity).padding(.vertical, 10)
+                                    .foregroundColor(.white.opacity(0.9))
                             }
                         }
                     }
@@ -128,7 +242,7 @@ struct CloseoutView: View {
             }
             .navigationTitle("End Session")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .alert("Tier Points Decreased", isPresented: $showLowAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -137,12 +251,46 @@ struct CloseoutView: View {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(s.startingTierPoints)). Save anyway?")
             }
         }
+        .onAppear {
+            if cashOut.isEmpty {
+                cashOut = "\(s.totalBuyIn)"
+            }
+            // Default ending tier to this session's starting tier if available,
+            // falling back to recent history for this casino.
+            if endingTier.isEmpty {
+                if s.startingTierPoints > 0 {
+                    endingTier = "\(s.startingTierPoints)"
+                } else if let hist = store.defaultEndingTierPoints(for: s.casino) {
+                    endingTier = "\(hist)"
+                }
+            }
+            // Pre-populate avg bets based on recent history for this game.
+            if avgBetActual.isEmpty || avgBetRated.isEmpty {
+                let defaults = store.defaultAvgBets(for: s.game)
+                if avgBetActual.isEmpty, let a = defaults.actual {
+                    avgBetActual = "\(a)"
+                }
+                if avgBetRated.isEmpty, let r = defaults.rated {
+                    avgBetRated = "\(r)"
+                }
+            }
+        }
     }
 
     func save() {
         guard let co = Int(cashOut), let aba = Int(avgBetActual),
               let abr = Int(avgBetRated), let et = Int(endingTier) else { return }
-        store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et)
-        dismiss()
+        let netPositive = (co - s.totalBuyIn) > 0
+        if netPositive {
+            CelebrationPlayer.shared.celebrateWin()
+            showCelebration = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et)
+                dismiss()
+            }
+        } else {
+            store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et)
+            dismiss()
+        }
     }
 }

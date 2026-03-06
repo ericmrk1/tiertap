@@ -7,10 +7,10 @@ struct TierTapApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            RootTabView()
                 .environmentObject(store)
                 .environmentObject(settingsStore)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(ColorScheme.dark)
         }
     }
 }

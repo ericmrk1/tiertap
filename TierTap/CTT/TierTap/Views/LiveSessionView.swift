@@ -5,19 +5,22 @@ struct LiveSessionView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var elapsed: TimeInterval = 0
-    @State private var showAddBuyIn = false
-    @State private var customBuyIn = ""
+    @State private var showBuyInSheet = false
     @State private var showCloseout = false
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    let quickBuyIns = [100, 200, 300, 500]
+
+    /// Quick-add buy-in denominations for the live buy-in sheet.
+    private var quickBuyIns: [Int] {
+        [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
+    }
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 0) {
                     // Timer Hero
                     VStack(spacing: 6) {
@@ -61,41 +64,17 @@ struct LiveSessionView: View {
                                             .font(.caption).foregroundColor(.gray)
                                     }
                                 }
-                                if showAddBuyIn {
-                                    VStack(spacing: 8) {
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack(spacing: 8) {
-                                                ForEach(quickBuyIns, id: \.self) { amt in
-                                                    Button("$\(amt)") {
-                                                        store.addBuyIn(amt); showAddBuyIn = false
-                                                    }
-                                                    .padding(.horizontal, 14).padding(.vertical, 8)
-                                                    .background(Color.green.opacity(0.2))
-                                                    .foregroundColor(.green).cornerRadius(8).font(.subheadline)
-                                                }
-                                            }
-                                        }
-                                        HStack {
-                                            TextField("Custom amount", text: $customBuyIn)
-                                                .textFieldStyle(DarkTextFieldStyle())
-                                                .keyboardType(.numberPad)
-                                            Button("Add") {
-                                                if let a = Int(customBuyIn), a > 0 {
-                                                    store.addBuyIn(a); customBuyIn = ""; showAddBuyIn = false
-                                                }
-                                            }
-                                            .padding(.horizontal, 16).padding(.vertical, 12)
-                                            .background(Color.green).foregroundColor(.black).cornerRadius(10)
-                                            .disabled((Int(customBuyIn) ?? 0) <= 0)
-                                        }
-                                    }
-                                } else {
-                                    Button { withAnimation { showAddBuyIn = true } } label: {
-                                        Label("Add Buy-In", systemImage: "plus.circle")
-                                            .frame(maxWidth: .infinity).padding(10)
-                                            .background(Color(.systemGray6).opacity(0.25))
-                                            .foregroundColor(.green).cornerRadius(10)
-                                    }
+                                Button {
+                                    showBuyInSheet = true
+                                } label: {
+                                    Label("Add Buy-In", systemImage: "plus.circle")
+                                        .font(.headline)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 14)
+                                        .padding(.horizontal)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.green)
+                                        .cornerRadius(14)
                                 }
                             }
                             .padding()
@@ -120,7 +99,7 @@ struct LiveSessionView: View {
             }
             .navigationTitle("Live Session")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -129,6 +108,12 @@ struct LiveSessionView: View {
             }
             .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(s.startTime) }
             .onAppear { elapsed = Date().timeIntervalSince(s.startTime) }
+            .sheet(isPresented: $showBuyInSheet) {
+                BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
+                    store.addBuyIn(amount)
+                }
+                .environmentObject(settingsStore)
+            }
             .sheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }
         }

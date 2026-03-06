@@ -11,6 +11,7 @@ struct CompleteSessionView: View {
     @State private var avgBetRated = ""
     @State private var endingTier = ""
     @State private var showLowAlert = false
+    @State private var showCelebration = false
 
     init(session: Session) {
         self.session = session
@@ -37,7 +38,10 @@ struct CompleteSessionView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                settingsStore.primaryGradient.ignoresSafeArea()
+                if showCelebration {
+                    ConfettiCelebrationView()
+                }
                 ScrollView {
                     VStack(spacing: 20) {
                         VStack(spacing: 6) {
@@ -129,10 +133,31 @@ struct CompleteSessionView: View {
             }
             .navigationTitle("Complete Session")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
                 cashOut = session.cashOut.map { "\($0)" } ?? ""
+                // Default ending tier to this session's starting/ending tier if available,
+                // falling back to recent history for this casino.
+                if endingTier.isEmpty {
+                    if let et = session.endingTierPoints {
+                        endingTier = "\(et)"
+                    } else if session.startingTierPoints > 0 {
+                        endingTier = "\(session.startingTierPoints)"
+                    } else if let hist = store.defaultEndingTierPoints(for: session.casino) {
+                        endingTier = "\(hist)"
+                    }
+                }
+                // Pre-populate avg bets based on recent history for this game if missing.
+                if avgBetActual.isEmpty || avgBetRated.isEmpty {
+                    let defaults = store.defaultAvgBets(for: session.game)
+                    if avgBetActual.isEmpty, let a = defaults.actual {
+                        avgBetActual = "\(a)"
+                    }
+                    if avgBetRated.isEmpty, let r = defaults.rated {
+                        avgBetRated = "\(r)"
+                    }
+                }
             }
             .alert("Tier Points Decreased", isPresented: $showLowAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -146,13 +171,29 @@ struct CompleteSessionView: View {
     func save() {
         guard let co = Int(cashOut), let aba = Int(avgBetActual),
               let abr = Int(avgBetRated), let et = Int(endingTier) else { return }
-        var updated = session
-        updated.cashOut = co
-        updated.avgBetActual = aba
-        updated.avgBetRated = abr
-        updated.endingTierPoints = et
-        updated.status = .complete
-        store.updateSession(updated)
-        dismiss()
+        let netPositive = (co - session.totalBuyIn) > 0
+        if netPositive {
+            CelebrationPlayer.shared.celebrateWin()
+            showCelebration = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                var updated = session
+                updated.cashOut = co
+                updated.avgBetActual = aba
+                updated.avgBetRated = abr
+                updated.endingTierPoints = et
+                updated.status = .complete
+                store.updateSession(updated)
+                dismiss()
+            }
+        } else {
+            var updated = session
+            updated.cashOut = co
+            updated.avgBetActual = aba
+            updated.avgBetRated = abr
+            updated.endingTierPoints = et
+            updated.status = .complete
+            store.updateSession(updated)
+            dismiss()
+        }
     }
 }
