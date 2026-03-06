@@ -117,20 +117,37 @@ struct HomeView: View {
 
 struct LiveNowCard: View {
     let session: Session
+    @EnvironmentObject var settingsStore: SettingsStore
     @State private var elapsed: TimeInterval = 0
+    @State private var showStrategyOdds = false
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Circle().fill(Color.red).frame(width: 8, height: 8)
-                Text("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
-                Spacer()
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Circle().fill(Color.red).frame(width: 8, height: 8)
+                    Text("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
+                }
+                Text(session.casino).font(.headline).foregroundColor(.white)
+                Text(session.game).font(.subheadline).foregroundColor(.gray)
+                Text("Buy-in: $\(session.totalBuyIn)").font(.caption).foregroundColor(.white.opacity(0.7))
+            }
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 6) {
                 Text(Session.durationString(elapsed))
                     .font(.system(.caption, design: .monospaced)).foregroundColor(.green)
+                Spacer(minLength: 0)
+                Button { showStrategyOdds = true } label: {
+                    Text("Strategy/Odds")
+                        .font(.caption.weight(.medium))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .cornerRadius(8)
+                }
             }
-            Text(session.casino).font(.headline).foregroundColor(.white)
-            Text(session.game).font(.subheadline).foregroundColor(.gray)
-            Text("Buy-in: $\(session.totalBuyIn)").font(.caption).foregroundColor(.white.opacity(0.7))
+            .frame(maxHeight: .infinity)
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.2))
@@ -138,5 +155,9 @@ struct LiveNowCard: View {
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.red.opacity(0.4), lineWidth: 1))
         .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(session.startTime) }
         .onAppear { elapsed = Date().timeIntervalSince(session.startTime) }
+        .sheet(isPresented: $showStrategyOdds) {
+            StrategyOddsSheet(gameName: session.game)
+                .environmentObject(settingsStore)
+        }
     }
 }

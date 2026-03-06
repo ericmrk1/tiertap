@@ -212,6 +212,25 @@ struct CloseoutView: View {
                             .padding(12)
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(12)
+
+                            if let wl = previewWL,
+                               let abet = Int(avgBetActual), abet > 0,
+                               let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: s.game, winLoss: wl, avgBet: abet, hours: previewHours) {
+                                let above = result.aboveEdge >= 0
+                                let amount = Int(round(abs(result.aboveEdge)))
+                                HStack(spacing: 6) {
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .font(.caption)
+                                        .foregroundColor(above ? .green : .orange)
+                                    Text(above ? "$\(amount) above statistical house edge" : "$\(amount) below statistical house edge")
+                                        .font(.caption)
+                                        .foregroundColor(above ? .green : .orange)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(10)
+                                .background(Color(.systemGray6).opacity(0.12))
+                                .cornerRadius(10)
+                            }
                         }
 
                         // Actions

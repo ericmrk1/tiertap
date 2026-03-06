@@ -112,6 +112,16 @@ struct SessionDetailView: View {
                                 DetailRow(label: "Tiers per $100 Rated Bet-Hour",
                                           value: String(format: "%.3f", t100))
                             }
+                            if let wl = session.winLoss,
+                               let abet = session.avgBetActual ?? session.avgBetRated, abet > 0,
+                               session.hoursPlayed > 0,
+                               let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: session.game, winLoss: wl, avgBet: abet, hours: session.hoursPlayed) {
+                                let above = result.aboveEdge >= 0
+                                let amount = Int(round(abs(result.aboveEdge)))
+                                DetailRow(label: "Vs house edge",
+                                          value: above ? "$\(amount) above" : "$\(amount) below",
+                                          valueColor: above ? .green : .orange)
+                            }
                         }
                     }
                     .padding()

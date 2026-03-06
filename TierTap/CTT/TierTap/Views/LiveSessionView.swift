@@ -7,6 +7,7 @@ struct LiveSessionView: View {
     @State private var elapsed: TimeInterval = 0
     @State private var showBuyInSheet = false
     @State private var showCloseout = false
+    @State private var showStrategyOdds = false
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -39,6 +40,17 @@ struct LiveSessionView: View {
                             .font(.system(size: 60, weight: .bold, design: .monospaced))
                             .foregroundColor(.green)
                             .padding(.vertical, 4)
+
+                        Button { showStrategyOdds = true } label: {
+                            Text("Strategy/Odds")
+                                .font(.subheadline.weight(.medium))
+                                .foregroundColor(.green)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .cornerRadius(10)
+                        }
+                        .padding(.top, 4)
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -115,6 +127,10 @@ struct LiveSessionView: View {
                 .environmentObject(settingsStore)
             }
             .sheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
+            .sheet(isPresented: $showStrategyOdds) {
+                StrategyOddsSheet(gameName: s.game)
+                    .environmentObject(settingsStore)
+            }
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }
         }
     }

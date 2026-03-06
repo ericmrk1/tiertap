@@ -208,6 +208,7 @@ struct CheckInView: View {
                                 .cornerRadius(14).font(.headline)
                         }
                         .disabled(!isValid)
+                        .padding(.bottom, 24)
                     }
                     .padding()
                 }

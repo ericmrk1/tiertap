@@ -32,6 +32,8 @@
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
 		BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */; };
 		BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */; };
+		STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */; };
+		STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */; };
 		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
@@ -122,6 +124,8 @@
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPastSessionView.swift; sourceTree = "<group>"; };
 		BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankrollDatabase.swift; sourceTree = "<group>"; };
+		STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyDatabase.swift; sourceTree = "<group>"; };
+		STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyOddsSheet.swift; sourceTree = "<group>"; };
 		BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankrollView.swift; sourceTree = "<group>"; };
 		BE9B9607B2D22C77E1D06D68 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
@@ -194,6 +198,7 @@
 				9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */,
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
+				STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */,
 				BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */,
 				BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
@@ -263,6 +268,7 @@
 			isa = PBXGroup;
 			children = (
 				BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */,
+				STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -488,6 +494,8 @@
 				8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */,
 				8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */,
 				BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */,
+				STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */,
+				STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */,
 				BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
