@@ -269,4 +269,12 @@ class SessionStore: ObservableObject {
         }
         return matching.first?.startingTierPoints
     }
+
+    /// Returns the casino (location) from the most recently played session.
+    /// Used to pre-populate the location field when starting a new session.
+    func mostRecentCasino() -> String? {
+        let sorted = sessions
+            .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+        return sorted.first.flatMap { $0.casino.isEmpty ? nil : $0.casino }
+    }
 }

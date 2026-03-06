@@ -243,6 +243,11 @@ struct CheckInView: View {
             } message: {
                 Text("You have a live session. Resume it or end it to start a new one?")
             }
+            .onAppear {
+                if casino.isEmpty, let recent = store.mostRecentCasino() {
+                    casino = recent
+                }
+            }
         }
     }
 

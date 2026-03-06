@@ -196,6 +196,41 @@ struct StrategyDatabase {
             summary: """
             • British-style blackjack (twist, stick, buy, etc.). Dealer cards often both down; no hole card. Strategy differs from US blackjack; use a Pontoon-specific strategy. House edge varies with rules.
             """
+        ),
+        "Red Dog": Entry(
+            summary: """
+            • Also called Yablon or In-Between. Two cards dealt; you bet on whether a third card will fall in rank between them. Payout depends on the “spread” (number of ranks that can win). Raise on spread 7 or better; otherwise fold. House edge about 2.8%–3.2% with optimal play.
+            """
+        ),
+        "Andar Bahar": Entry(
+            summary: """
+            • Indian card game. One card is revealed; cards are then dealt alternately to two piles (Andar and Bahar) until a matching card appears. You bet on which pile will receive the match. No strategy; pure chance. House edge typically around 2.5%–3%.
+            """
+        ),
+        "Teen Patti": Entry(
+            summary: """
+            • Indian three-card game similar to poker (often “flush” beats “pair”). You ante, then play blind or seen; betting rounds and showdown. Strategy involves when to play blind vs seen and bet sizing. House edge and rules vary by casino; often played as a banker game.
+            """
+        ),
+        "Double Exposure Blackjack": Entry(
+            summary: """
+            • Blackjack with both dealer cards exposed. In return, dealer usually wins ties (except blackjack) and blackjack often pays even money. Strategy differs from standard blackjack; use a Double Exposure–specific basic strategy chart. House edge typically around 0.7%–1% with optimal play.
+            """
+        ),
+        "Fan Tan": Entry(
+            summary: """
+            • Traditional Asian game. A pile of beads or coins is reduced by 1–4 per round; you bet on the remainder (1, 2, 3, or 4). No strategy; house edge depends on the layout and paytable offered.
+            """
+        ),
+        "Criss Cross Poker": Entry(
+            summary: """
+            • You receive five cards and use them to make two hands (one line, one cross) on a 3×3 grid with community cards. Pays on hand rankings. Strategy is complex; house edge and paytables vary by casino. Consult strategy guides for the specific layout.
+            """
+        ),
+        "Oasis Poker": Entry(
+            summary: """
+            • Five-card poker vs dealer. You get five cards; after viewing, you may discard and draw (once), then dealer draws. Dealer qualifies (e.g. minimum hand). Strategy involves draw decisions and when to raise; use an Oasis Poker–specific strategy chart. House edge typically around 2%–3%.
+            """
         )
     ]
 
@@ -222,7 +257,9 @@ struct StrategyDatabase {
         "Spanish 21": 0.8, "Double Attack Blackjack": 0.6, "Super Fun 21": 0.8, "EZ Baccarat": 1.06,
         "Dragon Bonus Baccarat": 1.06, "Fortune Pai Gow": 2.7, "Crazy 4 Poker": 3.5, "High Card Flush": 3.5,
         "Casino Hold'em": 2.3, "Heads Up Hold'em": 2.5, "Texas Hold'em Bonus": 2.5, "3-5-7 Poker": 4.0,
-        "Blackjack Switch": 0.6, "Free Bet Blackjack": 0.7, "Lucky Ladies Blackjack": 0.5, "Pontoon": 0.4
+        "Blackjack Switch": 0.6, "Free Bet Blackjack": 0.7, "Lucky Ladies Blackjack": 0.5, "Pontoon": 0.4,
+        "Red Dog": 3.0, "Andar Bahar": 2.8, "Teen Patti": 3.5, "Double Exposure Blackjack": 0.7,
+        "Fan Tan": 3.0, "Criss Cross Poker": 3.5, "Oasis Poker": 2.5
     ]
     private static let roundsPerHour: [String: Double] = [
         "Blackjack": 70, "Craps": 30, "Baccarat": 70, "Roulette": 30,
@@ -232,7 +269,9 @@ struct StrategyDatabase {
         "Spanish 21": 70, "Double Attack Blackjack": 70, "Super Fun 21": 70, "EZ Baccarat": 70,
         "Dragon Bonus Baccarat": 70, "Fortune Pai Gow": 25, "Crazy 4 Poker": 45, "High Card Flush": 40,
         "Casino Hold'em": 45, "Heads Up Hold'em": 50, "Texas Hold'em Bonus": 45, "3-5-7 Poker": 35,
-        "Blackjack Switch": 65, "Free Bet Blackjack": 70, "Lucky Ladies Blackjack": 70, "Pontoon": 70
+        "Blackjack Switch": 65, "Free Bet Blackjack": 70, "Lucky Ladies Blackjack": 70, "Pontoon": 70,
+        "Red Dog": 50, "Andar Bahar": 60, "Teen Patti": 40, "Double Exposure Blackjack": 65,
+        "Fan Tan": 45, "Criss Cross Poker": 35, "Oasis Poker": 45
     ]
     private static let defaultRoundsPerHour: Double = 50
 
@@ -292,7 +331,14 @@ struct StrategyDatabase {
         "Blackjack Switch": "Blackjack_Switch",
         "Free Bet Blackjack": "Blackjack",
         "Lucky Ladies Blackjack": "Blackjack",
-        "Pontoon": "Pontoon_(card_game)"
+        "Pontoon": "Pontoon_(card_game)",
+        "Red Dog": "Red_dog_(card_game)",
+        "Andar Bahar": "Andar_Bahar",
+        "Teen Patti": "Teen_patti",
+        "Double Exposure Blackjack": "Blackjack",
+        "Fan Tan": "Fan_tan",
+        "Criss Cross Poker": "Criss_Cross_Poker",
+        "Oasis Poker": "Oasis_poker"
     ]
 
     /// Returns a Wikipedia URL for the game when no strategy exists. Uses known slugs where available; otherwise builds from the game name.

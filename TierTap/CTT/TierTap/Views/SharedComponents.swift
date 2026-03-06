@@ -466,54 +466,80 @@ final class CelebrationPlayer {
     }
 }
 
+private enum ConfettiPieceKind {
+    case color(Color)
+    case emoji(String)
+}
+
+private let confettiColors: [Color] = [.green, .yellow, .orange, .pink, .purple]
+private let confettiEmojis = ["🎲", "♠️", "♥️", "♦️", "♣️", "🪙", "💰", "💵", "💴", "💶", "💷", "💸"]
+private let confettiPieceKinds: [ConfettiPieceKind] = {
+    confettiColors.map { ConfettiPieceKind.color($0) } +
+    confettiEmojis.map { ConfettiPieceKind.emoji($0) }
+}()
+
 struct ConfettiCelebrationView: View {
-    let colors: [Color] = [.green, .yellow, .orange, .pink, .purple]
+    private let pieceCount = 80
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                ForEach(0..<60, id: \.self) { index in
+                ForEach(0..<pieceCount, id: \.self) { index in
                     ConfettiPiece(
                         index: index,
                         containerSize: geo.size,
-                        color: colors.randomElement() ?? .green
+                        kind: confettiPieceKinds[abs(index.hashValue) % confettiPieceKinds.count]
                     )
                 }
             }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
         .allowsHitTesting(false)
+        .onAppear {
+            CelebrationPlayer.shared.celebrateWin()
+        }
     }
 }
 
 private struct ConfettiPiece: View {
     let index: Int
     let containerSize: CGSize
-    let color: Color
+    let kind: ConfettiPieceKind
     @State private var yOffset: CGFloat = -200
     @State private var xOffset: CGFloat = 0
     @State private var rotation: Double = 0
 
     var body: some View {
-        let size = CGFloat(Int.random(in: 6...14))
-        RoundedRectangle(cornerRadius: size / 3)
-            .fill(color)
-            .frame(width: size, height: size * 1.6)
-            .rotationEffect(.degrees(rotation))
-            .offset(x: xOffset, y: yOffset)
-            .onAppear {
-                let startX = CGFloat.random(in: -containerSize.width/2...containerSize.width/2)
-                xOffset = startX
-                yOffset = -containerSize.height / 2 - CGFloat.random(in: 0...150)
-                let fallDistance = containerSize.height + 400
-                let delay = Double(index) * 0.01
-                withAnimation(.easeOut(duration: 1.8).delay(delay)) {
-                    yOffset = fallDistance / 2
-                }
-                withAnimation(.linear(duration: 1.8).delay(delay)) {
-                    rotation = Double.random(in: 180...720)
-                }
+        let size = CGFloat(8 + (index % 11))
+        Group {
+            switch kind {
+            case .color(let color):
+                RoundedRectangle(cornerRadius: size / 3)
+                    .fill(color)
+                    .frame(width: size, height: size * 1.6)
+            case .emoji(let emoji):
+                Text(emoji)
+                    .font(.system(size: size * 2.2))
             }
+        }
+        .rotationEffect(.degrees(rotation))
+        .offset(x: xOffset, y: yOffset)
+        .onAppear {
+            let halfW = containerSize.width / 2
+            let halfH = containerSize.height / 2
+            xOffset = CGFloat.random(in: -halfW...halfW)
+            yOffset = -halfH - CGFloat.random(in: 80...280)
+            let endY = halfH + CGFloat.random(in: 80...200)
+            let delay = Double(index) * 0.012
+            withAnimation(.easeOut(duration: 2.2).delay(delay)) {
+                yOffset = endY
+            }
+            withAnimation(.linear(duration: 2.2).delay(delay)) {
+                rotation = Double.random(in: 180...720)
+            }
+        }
     }
 }
 

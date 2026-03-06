@@ -8,8 +8,20 @@ struct LiveSessionView: View {
     @State private var showBuyInSheet = false
     @State private var showCloseout = false
     @State private var showStrategyOdds = false
+    @State private var showMissingInfoAlert = false
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    /// Required fields that must be set before closing out. Returns list of missing item names.
+    private var missingInfoFields: [String] {
+        var missing: [String] = []
+        if s.game.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Game") }
+        if s.casino.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Casino / Location") }
+        if s.buyInEvents.isEmpty { missing.append("At least one buy-in") }
+        return missing
+    }
+
+    private var hasMissingInfo: Bool { !missingInfoFields.isEmpty }
 
     /// Quick-add buy-in denominations for the live buy-in sheet.
     private var quickBuyIns: [Int] {
@@ -98,7 +110,13 @@ struct LiveSessionView: View {
                                 StatMini(title: "Start Pts", value: "\(s.startingTierPoints)")
                             }
 
-                            Button { showCloseout = true } label: {
+                            Button {
+                                if hasMissingInfo {
+                                    showMissingInfoAlert = true
+                                } else {
+                                    showCloseout = true
+                                }
+                            } label: {
                                 Label("Stop & Close Out", systemImage: "stop.circle.fill")
                                     .frame(maxWidth: .infinity).padding()
                                     .background(Color.red.opacity(0.85))
@@ -132,6 +150,11 @@ struct LiveSessionView: View {
                     .environmentObject(settingsStore)
             }
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }
+            .alert("Missing Information", isPresented: $showMissingInfoAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Please complete the following before closing out: \(missingInfoFields.joined(separator: ", ")). You can add buy-ins here, but game and location must be set when you check in.")
+            }
         }
     }
 }
