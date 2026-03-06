@@ -8,6 +8,7 @@ struct HomeView: View {
     @State private var showBuyInSheet = false
     @State private var showAddPast = false
     @State private var showHistory = false
+    @State private var showBankroll = false
 
     /// Quick-add buy-in denominations for the live buy-in sheet.
     private var quickBuyIns: [Int] {
@@ -80,6 +81,15 @@ struct HomeView: View {
                                     .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                             }
                         }
+                        Button { showBankroll = true } label: {
+                            Label("Bankroll", systemImage: "dollarsign.circle.fill")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                                .font(.title3.bold())
+                        }
                     }
                     .padding(.horizontal).padding(.bottom, 44)
                 }
@@ -95,6 +105,7 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
         .sheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
+        .sheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
     }
 }
 

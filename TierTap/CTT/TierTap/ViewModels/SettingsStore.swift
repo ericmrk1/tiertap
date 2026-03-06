@@ -27,10 +27,19 @@ struct ThemePreset: Identifiable, Codable, Equatable {
     var secondaryHex: String
 }
 
+/// Recorded bankroll reset (date and new value). Used for bankroll-over-time graph and history.
+struct BankrollResetEvent: Codable, Equatable {
+    let date: Date
+    let value: Int
+}
+
 final class SettingsStore: ObservableObject {
     @Published var bankroll: Int {
         didSet { UserDefaults.standard.set(bankroll, forKey: keyBankroll) }
     }
+
+    /// Resets of the bankroll (date and new value). Stored in dedicated SQLite DB for analytics.
+    @Published var bankrollResets: [BankrollResetEvent] = []
     @Published var unitSize: Int {
         didSet { UserDefaults.standard.set(unitSize, forKey: keyUnitSize) }
     }
@@ -122,6 +131,7 @@ final class SettingsStore: ObservableObject {
     init() {
         let b = UserDefaults.standard.integer(forKey: keyBankroll)
         self.bankroll = b > 0 ? b : 2000
+        self.bankrollResets = BankrollDatabase.shared.fetchResets()
         let u = UserDefaults.standard.integer(forKey: keyUnitSize)
         self.unitSize = u > 0 ? u : 50
         if let v = UserDefaults.standard.object(forKey: keyTargetAverage) as? Double {
@@ -167,6 +177,14 @@ final class SettingsStore: ObservableObject {
             ]
             self.themePresets = defaults
         }
+    }
+
+    /// Record a bankroll reset to a new value (e.g. from Bankroll screen). Updates `bankroll` and persists to SQLite.
+    func resetBankroll(to newValue: Int) {
+        bankroll = newValue
+        let event = BankrollResetEvent(date: Date(), value: newValue)
+        BankrollDatabase.shared.insertReset(date: event.date, value: event.value)
+        bankrollResets = BankrollDatabase.shared.fetchResets()
     }
 
     // MARK: - Derived helpers

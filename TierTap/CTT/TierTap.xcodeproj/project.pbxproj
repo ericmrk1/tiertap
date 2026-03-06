@@ -30,6 +30,9 @@
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
+		BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */; };
+		BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */; };
+		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
@@ -118,7 +121,10 @@
 		B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPastSessionView.swift; sourceTree = "<group>"; };
+		BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankrollDatabase.swift; sourceTree = "<group>"; };
+		BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankrollView.swift; sourceTree = "<group>"; };
 		BE9B9607B2D22C77E1D06D68 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoLocationPickerView.swift; sourceTree = "<group>"; };
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -147,6 +153,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,6 +195,7 @@
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
 				BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */,
+				BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
 				2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */,
 				EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */,
@@ -251,11 +259,20 @@
 			path = LiveActivity;
 			sourceTree = "<group>";
 		};
+		BRDBGRP1E2F3A4B5C6D7E8F9A0B1 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		F83566B140DB1139A064E7D0 /* TierTap */ = {
 			isa = PBXGroup;
 			children = (
 				2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */,
 				692681C1D425214EB9F4B3A2 /* TierTapApp.swift */,
+				BRDBGRP1E2F3A4B5C6D7E8F9A0B1 /* Data */,
 				23A3142A7EAE1591E127EBC1 /* Models */,
 				E12E0905B1BCD8F80BC7098A /* ViewModels */,
 				05C9D0E9516BCA8D35F41BC8 /* Views */,
@@ -470,6 +487,8 @@
 				4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */,
 				8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */,
 				8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */,
+				BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */,
+				BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
 				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,
