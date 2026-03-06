@@ -43,6 +43,7 @@
 		WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
+		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +125,7 @@
 		WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchCashOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCashOutView.swift; sourceTree = "<group>"; };
 		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
+		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -256,6 +258,7 @@
 			isa = PBXGroup;
 			children = (
 				2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */,
+				WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */,
 				WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */,
 				WCHG1B2C3D4E5F6A7B8C9D0 /* Views */,
 			);
@@ -391,6 +394,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
