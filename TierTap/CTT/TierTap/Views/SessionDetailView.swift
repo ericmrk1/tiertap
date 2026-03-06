@@ -1,0 +1,124 @@
+import SwiftUI
+
+struct SessionDetailView: View {
+    let session: Session
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Header
+                        VStack(spacing: 6) {
+                            Text(session.casino).font(.title.bold()).foregroundColor(.white)
+                            Text(session.game).font(.subheadline).foregroundColor(.gray)
+                            Text(session.startTime, style: .date).font(.caption).foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: .infinity).padding()
+                        .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
+
+                        // Metrics highlights
+                        HStack(spacing: 12) {
+                            if let e = session.tierPointsEarned {
+                                MetricCard(title: "Pts Earned",
+                                           value: "\(e >= 0 ? "+" : "")\(e)",
+                                           color: e >= 0 ? .green : .orange)
+                            }
+                            if let wl = session.winLoss {
+                                MetricCard(title: "Win/Loss",
+                                           value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
+                                           color: wl >= 0 ? .green : .red)
+                            }
+                            if let t = session.tiersPerHour {
+                                MetricCard(title: "Pts/Hour", value: String(format: "%.1f", t), color: .white)
+                            }
+                        }
+
+                        DetailSection(title: "Session Time", icon: "clock") {
+                            DetailRow(label: "Started", value: session.startTime.formatted(date: .omitted, time: .shortened))
+                            if let end = session.endTime {
+                                DetailRow(label: "Ended", value: end.formatted(date: .omitted, time: .shortened))
+                            }
+                            DetailRow(label: "Duration", value: Session.durationString(session.duration))
+                            DetailRow(label: "Hours", value: String(format: "%.2f hrs", session.hoursPlayed))
+                        }
+
+                        DetailSection(title: "Buy-Ins", icon: "dollarsign.circle") {
+                            ForEach(session.buyInEvents) { ev in
+                                DetailRow(label: ev.timestamp.formatted(date: .omitted, time: .shortened),
+                                          value: "$\(ev.amount)")
+                            }
+                            DetailRow(label: "Total Buy-In", value: "$\(session.totalBuyIn)", bold: true)
+                            if let co = session.cashOut {
+                                DetailRow(label: "Cash Out", value: "$\(co)", bold: true)
+                            }
+                            if let wl = session.winLoss {
+                                DetailRow(label: "Win/Loss",
+                                          value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
+                                          valueColor: wl >= 0 ? .green : .red, bold: true)
+                            }
+                        }
+
+                        if let aba = session.avgBetActual, let abr = session.avgBetRated {
+                            DetailSection(title: "Betting", icon: "chart.bar") {
+                                DetailRow(label: "Avg Bet Actual", value: "$\(aba)")
+                                DetailRow(label: "Avg Bet Rated", value: "$\(abr)")
+                                if abr < 100 {
+                                    Text("Tiers per $100 metric requires rated avg bet ≥ $100")
+                                        .font(.caption).foregroundColor(.gray).padding(.top, 4)
+                                }
+                            }
+                        }
+
+                        DetailSection(title: "Tier Points", icon: "star.circle") {
+                            DetailRow(label: "Starting", value: "\(session.startingTierPoints)")
+                            if let et = session.endingTierPoints {
+                                DetailRow(label: "Ending", value: "\(et)")
+                            }
+                            if let e = session.tierPointsEarned {
+                                DetailRow(label: "Earned",
+                                          value: "\(e >= 0 ? "+" : "")\(e)",
+                                          valueColor: e >= 0 ? .green : .orange, bold: true)
+                            }
+                        }
+
+                        DetailSection(title: "Metrics", icon: "chart.line.uptrend.xyaxis") {
+                            if let t = session.tiersPerHour {
+                                DetailRow(label: "Tiers / Hour", value: String(format: "%.2f", t))
+                            }
+                            if let t100 = session.tiersPerHundredRatedBetHour {
+                                DetailRow(label: "Tiers per $100 Rated Bet-Hour",
+                                          value: String(format: "%.3f", t100))
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Session Detail")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.black, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }.foregroundColor(.green)
+                }
+            }
+        }
+    }
+}
+
+struct MetricCard: View {
+    let title: String; let value: String; let color: Color
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(title).font(.caption2).foregroundColor(.gray)
+            Text(value).font(.headline.bold()).foregroundColor(color)
+                .minimumScaleFactor(0.7).lineLimit(1)
+        }
+        .frame(maxWidth: .infinity).padding(12)
+        .background(Color(.systemGray6).opacity(0.2)).cornerRadius(12)
+    }
+}
