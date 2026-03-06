@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var isThemeExpanded: Bool = false
     @State private var isSocialLoginsExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
+    @State private var isAboutExpanded: Bool = false
     @State private var isPresentingShareSheet: Bool = false
     @State private var exportFileURL: URL?
     @State private var isExporting: Bool = false
@@ -38,6 +39,7 @@ struct SettingsView: View {
                         themeSection
                         socialLoginsSection
                         dataExportSection
+                        aboutSection
                     }
                     .padding()
                 }
@@ -377,6 +379,50 @@ struct SettingsView: View {
                 Text("Exports your recorded sessions to a .csv file so you can back up your data or analyze it elsewhere. Uses the iOS Share sheet to send to Files, email, or other apps.")
                     .font(.caption)
                     .foregroundColor(.gray)
+            }
+        }
+    }
+
+    private var aboutSection: some View {
+        SettingsSection(
+            title: "About",
+            systemImage: "info.circle.fill",
+            isExpanded: $isAboutExpanded
+        ) {
+            VStack(spacing: 10) {
+                Link(destination: URL(string: "https://travelzork.com/privacy-policy/")!) {
+                    HStack {
+                        Image(systemName: "hand.raised.fill")
+                        Text("Privacy")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.caption)
+                    }
+                    .foregroundColor(.white)
+                }
+                Link(destination: URL(string: "https://travelzork.com/")!) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                        Text("Sponsor")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.caption)
+                    }
+                    .foregroundColor(.white)
+                }
+                Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
+                    HStack {
+                        Image(systemName: "doc.text.fill")
+                        Text("EULA")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.caption)
+                    }
+                    .foregroundColor(.white)
+                }
             }
         }
     }

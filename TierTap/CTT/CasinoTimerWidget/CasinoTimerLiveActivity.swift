@@ -30,7 +30,7 @@ struct CasinoTimerLiveActivity: Widget {
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 6) {
-                        Image(systemName: "suit.club.fill")
+                        Image(systemName: "arrow.up.circle.fill")
                             .foregroundColor(.green).font(.title3)
                         Text(context.state.startTime, style: .timer)
                             .font(.system(.title2, design: .monospaced).bold())
@@ -62,13 +62,13 @@ struct CasinoTimerLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     HStack {
-                        Image(systemName: "suit.club.fill").foregroundColor(.green)
+                        Image(systemName: "arrow.up.circle.fill").foregroundColor(.green)
                         Text("TierTap · Table Session Active")
                             .font(.caption2).foregroundColor(.gray)
                     }
                 }
             } compactLeading: {
-                Image(systemName: "suit.club.fill")
+                Image(systemName: "arrow.up.circle.fill")
                     .foregroundColor(.green).font(.caption)
             } compactTrailing: {
                 Text(context.state.startTime, style: .timer)
@@ -77,7 +77,7 @@ struct CasinoTimerLiveActivity: Widget {
                     .monospacedDigit()
                     .frame(width: 44)
             } minimal: {
-                Image(systemName: "suit.club.fill")
+                Image(systemName: "arrow.up.circle.fill")
                     .foregroundColor(.green).font(.caption)
             }
         }
