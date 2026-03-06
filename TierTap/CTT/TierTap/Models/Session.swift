@@ -1,5 +1,10 @@
 import Foundation
 
+enum SessionStatus: String, Codable, CaseIterable {
+    case complete
+    case requiringMoreInfo
+}
+
 struct BuyInEvent: Identifiable, Codable, Hashable {
     var id = UUID()
     var amount: Int
@@ -19,6 +24,68 @@ struct Session: Identifiable, Codable, Equatable {
     var avgBetActual: Int?
     var avgBetRated: Int?
     var isLive: Bool = false
+    var status: SessionStatus = .complete
+
+    var isComplete: Bool { status == .complete }
+    var requiresMoreInfo: Bool { status == .requiringMoreInfo }
+
+    enum CodingKeys: String, CodingKey {
+        case id, game, casino, startTime, endTime, startingTierPoints, endingTierPoints
+        case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        game = try c.decode(String.self, forKey: .game)
+        casino = try c.decode(String.self, forKey: .casino)
+        startTime = try c.decode(Date.self, forKey: .startTime)
+        endTime = try c.decodeIfPresent(Date.self, forKey: .endTime)
+        startingTierPoints = try c.decode(Int.self, forKey: .startingTierPoints)
+        endingTierPoints = try c.decodeIfPresent(Int.self, forKey: .endingTierPoints)
+        buyInEvents = try c.decodeIfPresent([BuyInEvent].self, forKey: .buyInEvents) ?? []
+        cashOut = try c.decodeIfPresent(Int.self, forKey: .cashOut)
+        avgBetActual = try c.decodeIfPresent(Int.self, forKey: .avgBetActual)
+        avgBetRated = try c.decodeIfPresent(Int.self, forKey: .avgBetRated)
+        isLive = try c.decodeIfPresent(Bool.self, forKey: .isLive) ?? false
+        status = try c.decodeIfPresent(SessionStatus.self, forKey: .status) ?? .complete
+    }
+
+    init(id: UUID = UUID(), game: String, casino: String, startTime: Date, endTime: Date? = nil,
+         startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
+         cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
+         status: SessionStatus = .complete) {
+        self.id = id
+        self.game = game
+        self.casino = casino
+        self.startTime = startTime
+        self.endTime = endTime
+        self.startingTierPoints = startingTierPoints
+        self.endingTierPoints = endingTierPoints
+        self.buyInEvents = buyInEvents
+        self.cashOut = cashOut
+        self.avgBetActual = avgBetActual
+        self.avgBetRated = avgBetRated
+        self.isLive = isLive
+        self.status = status
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(game, forKey: .game)
+        try c.encode(casino, forKey: .casino)
+        try c.encode(startTime, forKey: .startTime)
+        try c.encodeIfPresent(endTime, forKey: .endTime)
+        try c.encode(startingTierPoints, forKey: .startingTierPoints)
+        try c.encodeIfPresent(endingTierPoints, forKey: .endingTierPoints)
+        try c.encode(buyInEvents, forKey: .buyInEvents)
+        try c.encodeIfPresent(cashOut, forKey: .cashOut)
+        try c.encodeIfPresent(avgBetActual, forKey: .avgBetActual)
+        try c.encodeIfPresent(avgBetRated, forKey: .avgBetRated)
+        try c.encode(isLive, forKey: .isLive)
+        try c.encode(status, forKey: .status)
+    }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
 

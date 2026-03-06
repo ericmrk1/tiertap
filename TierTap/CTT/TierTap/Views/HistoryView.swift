@@ -51,6 +51,15 @@ struct SessionRow: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(session.casino).font(.headline).foregroundColor(.white)
+                if session.requiresMoreInfo {
+                    Text("Incomplete")
+                        .font(.caption2.bold())
+                        .foregroundColor(.orange)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.orange.opacity(0.25))
+                        .cornerRadius(4)
+                }
                 Spacer()
                 if let e = session.tierPointsEarned {
                     Text("\(e >= 0 ? "+" : "")\(e) pts")

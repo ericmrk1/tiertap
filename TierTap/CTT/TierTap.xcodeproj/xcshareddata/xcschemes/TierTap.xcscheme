@@ -34,6 +34,20 @@
                ReferencedContainer = "container:TierTap.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "WCHJ1B2C3D4E5F6A7B8C9D0"
+               BuildableName = "TierTap Watch App.app"
+               BlueprintName = "TierTap Watch App"
+               ReferencedContainer = "container:TierTap.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

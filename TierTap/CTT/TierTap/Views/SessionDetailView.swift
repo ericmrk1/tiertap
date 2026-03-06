@@ -2,7 +2,10 @@ import SwiftUI
 
 struct SessionDetailView: View {
     let session: Session
+    @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
+    @State private var showCompleteSession = false
 
     var body: some View {
         NavigationStack {
@@ -10,6 +13,23 @@ struct SessionDetailView: View {
                 Color.black.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
+                        if session.requiresMoreInfo {
+                            Button {
+                                showCompleteSession = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "pencil.circle.fill")
+                                    Text("Complete session — add avg bet & ending tier")
+                                        .font(.subheadline.bold())
+                                }
+                                .frame(maxWidth: .infinity).padding()
+                                .background(Color.orange.opacity(0.3))
+                                .foregroundColor(.orange)
+                                .cornerRadius(14)
+                            }
+                            .padding(.horizontal)
+                        }
+
                         // Header
                         VStack(spacing: 6) {
                             Text(session.casino).font(.title.bold()).foregroundColor(.white)
@@ -105,6 +125,11 @@ struct SessionDetailView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }.foregroundColor(.green)
                 }
+            }
+            .sheet(isPresented: $showCompleteSession) {
+                CompleteSessionView(session: session)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
             }
         }
     }
