@@ -14,9 +14,6 @@ struct HistoryView: View {
     @State private var isShareSheetPresented: Bool = false
     @State private var shareText: String = ""
     @State private var shareSummaryToPresent: String?
-    #if os(iOS)
-    @State private var shareFileURL: URL?
-    #endif
 
     private var showDeleteAlert: Binding<Bool> {
         Binding(
@@ -210,19 +207,6 @@ struct HistoryView: View {
         }
     }
 
-    #if os(iOS)
-    private func writeShareTextToFile(_ text: String) -> URL? {
-        let df = DateFormatter()
-        df.dateFormat = "yyyyMMddHHmmss"
-        let timestamp = df.string(from: Date())
-        let name = "TierTap\(timestamp).txt"
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
-        guard let data = text.data(using: .utf8) else { return nil }
-        try? data.write(to: url)
-        return url
-    }
-    #endif
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -284,19 +268,16 @@ struct HistoryView: View {
                 if !newValue, let summary = shareSummaryToPresent {
                     shareText = summary
                     #if os(iOS)
-                    shareFileURL = writeShareTextToFile(summary)
-                    if shareFileURL != nil {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            isShareSheetPresented = true
-                        }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isShareSheetPresented = true
                     }
                     #endif
                 }
             }
             .sheet(isPresented: $isShareSheetPresented) {
                 #if os(iOS)
-                if let url = shareFileURL {
-                    ShareSheet(items: [url])
+                if !shareText.isEmpty {
+                    ShareSheet(items: [shareText])
                 } else {
                     EmptyView()
                 }
@@ -304,12 +285,6 @@ struct HistoryView: View {
             }
             .onChange(of: isShareSheetPresented) { newValue in
                 if !newValue {
-                    #if os(iOS)
-                    if let url = shareFileURL {
-                        try? FileManager.default.removeItem(at: url)
-                    }
-                    shareFileURL = nil
-                    #endif
                     shareText = ""
                     shareSummaryToPresent = nil
                 }
