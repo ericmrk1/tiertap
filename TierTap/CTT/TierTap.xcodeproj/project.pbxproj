@@ -27,6 +27,7 @@
 		CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */; };
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
+		GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */; };
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
@@ -137,6 +138,7 @@
 		LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuin.swift; sourceTree = "<group>"; };
 		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
+		GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSharePhrasesGenerated.swift; sourceTree = "<group>"; };
 		ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
 				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
+				GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -508,6 +511,7 @@
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
 				SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */,
+				GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

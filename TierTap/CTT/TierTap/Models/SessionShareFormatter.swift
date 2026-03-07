@@ -521,26 +521,44 @@ struct SessionSharePhrases {
         "You’re still in the game – and that matters more than this one result."
     ]
 
+    // MARK: - Combined arrays (built-in + generated for 10,000+ combinations each)
+
+    private static var allPositiveOpeners: [String] {
+        positiveOpeners + SessionSharePhrasesGenerated.positiveOpeners
+    }
+
+    private static var allPositiveClosers: [String] {
+        positiveClosers + SessionSharePhrasesGenerated.positiveClosers
+    }
+
+    private static var allNegativeOpeners: [String] {
+        negativeOpeners + SessionSharePhrasesGenerated.negativeOpeners
+    }
+
+    private static var allNegativeClosers: [String] {
+        negativeClosers + SessionSharePhrasesGenerated.negativeClosers
+    }
+
     // MARK: - Public API
 
     static func randomPositivePhrase() -> String {
-        let opener = positiveOpeners.randomElement() ?? ""
-        let closer = positiveClosers.randomElement() ?? ""
+        let opener = allPositiveOpeners.randomElement() ?? ""
+        let closer = allPositiveClosers.randomElement() ?? ""
         return "\(opener) \(closer)"
     }
 
     static func randomNegativePhrase() -> String {
-        let opener = negativeOpeners.randomElement() ?? ""
-        let closer = negativeClosers.randomElement() ?? ""
+        let opener = allNegativeOpeners.randomElement() ?? ""
+        let closer = allNegativeClosers.randomElement() ?? ""
         return "\(opener) \(closer)"
     }
 
     static var positivePhraseCount: Int {
-        positiveOpeners.count * positiveClosers.count
+        allPositiveOpeners.count * allPositiveClosers.count
     }
 
     static var negativePhraseCount: Int {
-        negativeOpeners.count * negativeClosers.count
+        allNegativeOpeners.count * allNegativeClosers.count
     }
 }
 
