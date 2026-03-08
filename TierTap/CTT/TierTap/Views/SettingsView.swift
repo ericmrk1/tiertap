@@ -1,9 +1,9 @@
 import SwiftUI
-import AuthenticationServices
 
 struct SettingsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
     @State private var bankrollText: String = ""
     @State private var unitSizeText: String = ""
     @State private var targetAverageText: String = ""
@@ -306,45 +306,45 @@ struct SettingsView: View {
             systemImage: "person.crop.circle.fill",
             isExpanded: $isSocialLoginsExpanded
         ) {
-            VStack(spacing: 10) {
-                SignInWithAppleButton(.signIn) { request in
-                    request.requestedScopes = [.fullName, .email]
-                } onCompletion: { result in
-                    switch result {
-                    case .success:
-                        settingsStore.isAppleSignedIn = true
-                    case .failure:
-                        settingsStore.isAppleSignedIn = false
+            VStack(alignment: .leading, spacing: 12) {
+                if !SupabaseConfig.isConfigured {
+                    Text("Add Supabase keys to enable sign-in and sync.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                } else if authStore.isSignedIn {
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(settingsStore.primaryGradient)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Signed in")
+                                .font(.subheadline.bold())
+                                .foregroundColor(.white)
+                            if let name = authStore.userFullName, !name.isEmpty {
+                                Text(name)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.95))
+                            }
+                            if let email = authStore.userEmail {
+                                Text(email)
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.9))
+                            }
+                        }
+                        Spacer()
                     }
-                }
-                .signInWithAppleButtonStyle(.white)
-                .frame(height: 50)
+                    .padding(.vertical, 4)
 
-                Button {
-                    settingsStore.isGoogleSignedIn.toggle()
-                } label: {
-                    HStack {
-                        Image(systemName: "globe")
-                        Text(settingsStore.isGoogleSignedIn ? "Signed in with Google" : "Continue with Google")
+                    Button("Sign out", role: .destructive) {
+                        authStore.signOut()
                     }
-                    .frame(maxWidth: .infinity).frame(height: 50)
-                    .background(Color(.systemGray6).opacity(0.4))
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                .disabled(true)
-                .opacity(0.8)
-
-                if settingsStore.isAppleSignedIn || settingsStore.isGoogleSignedIn {
-                    Button("Sign out") {
-                        settingsStore.isAppleSignedIn = false
-                        settingsStore.isGoogleSignedIn = false
-                    }
-                    .font(.subheadline).foregroundColor(.red)
+                    .font(.subheadline)
+                } else {
+                    Text("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
                 }
             }
-            Text("Sign in to sync sessions across devices (Google sign-in coming soon).")
-                .font(.caption).foregroundColor(.gray)
         }
     }
 

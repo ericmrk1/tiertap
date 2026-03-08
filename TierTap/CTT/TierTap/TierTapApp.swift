@@ -5,6 +5,7 @@ import UIKit
 struct TierTapApp: App {
     @StateObject private var store = SessionStore()
     @StateObject private var settingsStore = SettingsStore()
+    @StateObject private var authStore = AuthStore()
     @State private var showSplash = true
 
     init() {
@@ -17,6 +18,7 @@ struct TierTapApp: App {
                 RootTabView()
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
                     .preferredColorScheme(ColorScheme.dark)
 
                 if showSplash {
@@ -30,6 +32,9 @@ struct TierTapApp: App {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     showSplash = false
                 }
+            }
+            .onOpenURL { url in
+                authStore.handleOpenURL(url)
             }
         }
     }
