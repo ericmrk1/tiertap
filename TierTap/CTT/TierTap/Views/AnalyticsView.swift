@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 
 struct AnalyticsShareSelection {
+    let includeBetCaptureDiff: Bool
     let includeVenn: Bool
     let includeWinLoss: Bool
     let includeTierProgress: Bool
@@ -933,6 +934,24 @@ private func buildAnalyticsShareImages(
     let totalProfit = closedSessions.compactMap { $0.winLoss }.filter { $0 > 0 }.reduce(0, +)
     let totalLoss = abs(closedSessions.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
 
+    let betCaptureDiffByDate: [(date: Date, diff: Int)] = {
+        let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
+            guard let actual = session.avgBetActual,
+                  let rated = session.avgBetRated else { return nil }
+            return (date: session.startTime, diff: rated - actual)
+        }
+        return withBothBets.sorted(by: { lhs, rhs in
+            lhs.date < rhs.date
+        })
+    }()
+
+    let betCaptureGoodBadCounts: (good: Int, bad: Int) = {
+        let diffs = betCaptureDiffByDate.map { $0.diff }
+        let good = diffs.filter { $0 >= 0 }.count
+        let bad = diffs.filter { $0 < 0 }.count
+        return (good, bad)
+    }()
+
     let cumulativePointsByDate: [(date: Date, total: Int)] = {
         let sorted = closedSessions.sorted { $0.startTime < $1.startTime }
         var running = 0
@@ -950,6 +969,19 @@ private func buildAnalyticsShareImages(
         df.dateStyle = .medium
         return "\(df.string(from: first)) – \(df.string(from: last))"
     }()
+
+    if selection.includeBetCaptureDiff && !betCaptureDiffByDate.isEmpty {
+        let card = BetCaptureDiffLineChartCard(
+            series: betCaptureDiffByDate,
+            goodBadCounts: betCaptureGoodBadCounts,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
 
     if selection.includeVenn {
         let card = VennDiagramCard(
@@ -1071,6 +1103,7 @@ struct AnalyticsShareSelectionSheet: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
 
+    @State private var includeBetCaptureDiff = true
     @State private var includeVenn = true
     @State private var includeWinLoss = true
     @State private var includeTierProgress = true
@@ -1083,7 +1116,7 @@ struct AnalyticsShareSelectionSheet: View {
     }
 
     private var canShare: Bool {
-        includeVenn || includeWinLoss || (includeTierProgress && hasTierData) || includeGameBreakdown
+        includeBetCaptureDiff || includeVenn || includeWinLoss || (includeTierProgress && hasTierData) || includeGameBreakdown
     }
 
     var body: some View {
@@ -1094,6 +1127,7 @@ struct AnalyticsShareSelectionSheet: View {
                     Section(header: Text("Include in share").foregroundColor(.white)) {
                         HStack {
                             Button {
+                                includeBetCaptureDiff = true
                                 includeVenn = true
                                 includeWinLoss = true
                                 includeTierProgress = true
@@ -1111,6 +1145,7 @@ struct AnalyticsShareSelectionSheet: View {
                             Spacer()
 
                             Button {
+                                includeBetCaptureDiff = false
                                 includeVenn = false
                                 includeWinLoss = false
                                 includeTierProgress = false
@@ -1127,6 +1162,7 @@ struct AnalyticsShareSelectionSheet: View {
                         }
                         .listRowBackground(Color(.systemGray6).opacity(0.2))
 
+                        Toggle("Bet Rating vs Actual", isOn: $includeBetCaptureDiff)
                         Toggle("Win vs. Tier Gain (Venn)", isOn: $includeVenn)
                         Toggle("Win/Loss Distribution", isOn: $includeWinLoss)
                         Toggle("Tier Progress Over Time", isOn: $includeTierProgress)
@@ -1159,6 +1195,7 @@ struct AnalyticsShareSelectionSheet: View {
                     Button("Share") {
                         #if os(iOS)
                         let selection = AnalyticsShareSelection(
+                            includeBetCaptureDiff: includeBetCaptureDiff,
                             includeVenn: includeVenn,
                             includeWinLoss: includeWinLoss,
                             includeTierProgress: includeTierProgress,
