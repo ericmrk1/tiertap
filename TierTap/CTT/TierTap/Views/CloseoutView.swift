@@ -340,6 +340,8 @@ struct CloseoutView: View {
                     endingTier = "\(s.startingTierPoints)"
                 } else if let hist = store.defaultEndingTierPoints(for: s.casino) {
                     endingTier = "\(hist)"
+                } else {
+                    endingTier = "0"
                 }
             }
             // Pre-populate avg bets based on recent history for this game.

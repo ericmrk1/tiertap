@@ -7,7 +7,7 @@ struct CheckInView: View {
     @State private var selectedGame = ""
     @State private var casino = ""
     @State private var isCasinoPublic = true
-    @State private var startingTier = ""
+    @State private var startingTier = "0"
     @State private var initialBuyIn = ""
     @State private var selectedRewardsProgram = ""
     @State private var showGamePicker = false

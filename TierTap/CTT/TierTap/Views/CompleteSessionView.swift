@@ -173,6 +173,8 @@ struct CompleteSessionView: View {
                         endingTier = "\(session.startingTierPoints)"
                     } else if let hist = store.defaultEndingTierPoints(for: session.casino) {
                         endingTier = "\(hist)"
+                    } else {
+                        endingTier = "0"
                     }
                 }
                 // Pre-populate avg bets based on recent history for this game if missing.
