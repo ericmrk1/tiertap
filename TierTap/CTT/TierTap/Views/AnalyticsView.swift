@@ -8,6 +8,7 @@ struct AnalyticsShareSelection {
     let includeTierProgress: Bool
     let includeGameBreakdown: Bool
     let includeTierByLoyaltyProgram: Bool
+    let includeSessionMoods: Bool
 }
 
 struct AnalyticsView: View {
@@ -79,7 +80,22 @@ struct AnalyticsView: View {
     private var totalLoss: Int {
         abs(closedSessions.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
     }
-    
+
+    /// Sessions that have a mood set (for mood bar chart).
+    private var sessionsWithMood: [Session] {
+        closedSessions.filter { $0.sessionMood != nil }
+    }
+
+    /// Count per mood, ordered for display (positive first, then neutral, then negative).
+    private var moodCounts: [(mood: SessionMood, count: Int)] {
+        let grouped = Dictionary(grouping: sessionsWithMood, by: { $0.sessionMood! })
+            .mapValues { $0.count }
+        return SessionMood.allCases
+            .compactMap { mood in (grouped[mood]).map { (mood: mood, count: $0) } }
+            .filter { $0.count > 0 }
+            .sorted { $0.count > $1.count }
+    }
+
     private var betCaptureDiffByDate: [(date: Date, diff: Int)] {
         let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
             guard let actual = session.avgBetActual,
@@ -454,6 +470,14 @@ struct AnalyticsView: View {
 
     private var secondaryGraphs: some View {
         VStack(spacing: 16) {
+            if !moodCounts.isEmpty {
+                SessionMoodBarChartCard(
+                    moodCounts: moodCounts,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+            }
             GameBreakdownBars(
                 sessions: closedSessions,
                 gradient: settingsStore.primaryGradient,
@@ -836,6 +860,14 @@ struct LineChart: View {
         self.showValueLabels = showValueLabels
     }
 
+    /// Indices of points that should show a value label so labels don't overlap (evenly spaced, max 8).
+    private var valueLabelIndices: Set<Int> {
+        let n = points.count
+        let maxLabels = 8
+        if n <= maxLabels { return Set(0..<n) }
+        return Set((0..<maxLabels).map { i in (i * (n - 1)) / max(1, maxLabels - 1) })
+    }
+
     var body: some View {
         GeometryReader { geo in
             let maxVal = max(points.max() ?? 1, 1)
@@ -843,6 +875,7 @@ struct LineChart: View {
             let span = max(maxVal - minVal, 1)
 
             let stepX = points.count > 1 ? geo.size.width / CGFloat(points.count - 1) : 0
+            let showLabelForIndex = valueLabelIndices
 
             let path = Path { p in
                 for (idx, value) in points.enumerated() {
@@ -864,12 +897,13 @@ struct LineChart: View {
                     let x = CGFloat(idx) * stepX
                     let normalized = (value - minVal) / span
                     let y = geo.size.height * (1 - CGFloat(normalized))
+                    let showLabel = showValueLabels && showLabelForIndex.contains(idx)
 
                     VStack(spacing: 2) {
                         Circle()
                             .fill(Color.white.opacity(0.9))
                             .frame(width: 4, height: 4)
-                        if showValueLabels {
+                        if showLabel {
                             let intValue = Int(value.rounded())
                             let signPrefix = intValue > 0 ? "+" : ""
                             Text("\(signPrefix)\(intValue)")
@@ -881,6 +915,67 @@ struct LineChart: View {
                 }
             }
         }
+    }
+}
+
+struct SessionMoodBarChartCard: View {
+    let moodCounts: [(mood: SessionMood, count: Int)]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Session moods", systemImage: "face.smiling.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if moodCounts.isEmpty {
+                Text("No session moods recorded yet. Enable \"Prompt for session mood\" in Settings → Sessions and end a session to record how each session felt.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let maxCount = max(moodCounts.map { Double($0.count) }.max() ?? 1, 1)
+                ForEach(moodCounts, id: \.mood) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(row.mood.label)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("\(row.count)")
+                                .font(.caption2.bold())
+                                .foregroundColor(.gray)
+                        }
+                        GeometryReader { geo in
+                            let width = max(2, geo.size.width * CGFloat(Double(row.count) / maxCount))
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(.systemGray6).opacity(0.4))
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(gradient)
+                                    .frame(width: width)
+                            }
+                        }
+                        .frame(height: 10)
+                    }
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
     }
 }
 
@@ -1191,6 +1286,26 @@ private func buildAnalyticsShareImages(
         }
     }
 
+    let moodCountsForShare: [(mood: SessionMood, count: Int)] = {
+        let withMood = closedSessions.filter { $0.sessionMood != nil }
+        let grouped = Dictionary(grouping: withMood, by: { $0.sessionMood! }).mapValues { $0.count }
+        return SessionMood.allCases
+            .compactMap { mood in (grouped[mood]).map { (mood: mood, count: $0) } }
+            .filter { $0.count > 0 }
+            .sorted { $0.count > $1.count }
+    }()
+    if selection.includeSessionMoods && !moodCountsForShare.isEmpty {
+        let card = SessionMoodBarChartCard(
+            moodCounts: moodCountsForShare,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
     return images
 }
 
@@ -1261,11 +1376,16 @@ struct AnalyticsShareSelectionSheet: View {
     @State private var includeTierProgress = true
     @State private var includeGameBreakdown = true
     @State private var includeTierByLoyaltyProgram = true
+    @State private var includeSessionMoods = true
 
     private var hasTierData: Bool {
         !closedSessions
             .filter { ($0.tierPointsEarned ?? 0) != 0 }
             .isEmpty
+    }
+
+    private var hasMoodData: Bool {
+        !closedSessions.filter { $0.sessionMood != nil }.isEmpty
     }
 
     private var canShare: Bool {
@@ -1275,6 +1395,7 @@ struct AnalyticsShareSelectionSheet: View {
         || (includeTierProgress && hasTierData)
         || includeGameBreakdown
         || (includeTierByLoyaltyProgram && hasTierData)
+        || (includeSessionMoods && hasMoodData)
     }
 
     var body: some View {
@@ -1291,6 +1412,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 includeTierProgress = true
                                 includeGameBreakdown = true
                                 includeTierByLoyaltyProgram = true
+                                includeSessionMoods = true
                             } label: {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
@@ -1310,6 +1432,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 includeTierProgress = false
                                 includeGameBreakdown = false
                                 includeTierByLoyaltyProgram = false
+                                includeSessionMoods = false
                             } label: {
                                 HStack {
                                     Image(systemName: "xmark.circle")
@@ -1330,6 +1453,8 @@ struct AnalyticsShareSelectionSheet: View {
                         Toggle("Sessions by Game", isOn: $includeGameBreakdown)
                         Toggle("Tier Points by Loyalty Program", isOn: $includeTierByLoyaltyProgram)
                             .disabled(!hasTierData)
+                        Toggle("Session moods", isOn: $includeSessionMoods)
+                            .disabled(!hasMoodData)
                     }
 
                     Section(
@@ -1362,7 +1487,8 @@ struct AnalyticsShareSelectionSheet: View {
                             includeWinLoss: includeWinLoss,
                             includeTierProgress: includeTierProgress,
                             includeGameBreakdown: includeGameBreakdown,
-                            includeTierByLoyaltyProgram: includeTierByLoyaltyProgram
+                            includeTierByLoyaltyProgram: includeTierByLoyaltyProgram,
+                            includeSessionMoods: includeSessionMoods
                         )
                         onShare(selection)
                         #endif

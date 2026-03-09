@@ -8,6 +8,7 @@ struct LiveSessionView: View {
     @State private var showBuyInSheet = false
     @State private var showCloseout = false
     @State private var showStrategyOdds = false
+    @State private var showPrivateNotes = false
     @State private var showMissingInfoAlert = false
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -53,14 +54,25 @@ struct LiveSessionView: View {
                             .foregroundColor(.green)
                             .padding(.vertical, 4)
 
-                        Button { showStrategyOdds = true } label: {
-                            Text("Strategy/Odds")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundColor(.green)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .cornerRadius(10)
+                        HStack(spacing: 10) {
+                            Button { showPrivateNotes = true } label: {
+                                Image(systemName: "note.text")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.green)
+                                    .frame(width: 44, height: 36)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .cornerRadius(10)
+                            }
+                            .accessibilityLabel("Private notes")
+                            Button { showStrategyOdds = true } label: {
+                                Text("Strategy/Odds")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.green)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .cornerRadius(10)
+                            }
                         }
                         .padding(.top, 4)
                     }
@@ -122,6 +134,22 @@ struct LiveSessionView: View {
                                     .background(Color.red.opacity(0.85))
                                     .foregroundColor(.white).cornerRadius(14).font(.headline)
                             }
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Private notes (not shared)")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                TextEditor(text: Binding(
+                                    get: { store.liveSession?.privateNotes ?? "" },
+                                    set: { store.updateLiveSessionNotes($0) }
+                                ))
+                                .frame(minHeight: 72)
+                                .padding(8)
+                                .background(Color(.systemGray6).opacity(0.2))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .scrollContentBackground(.hidden)
+                            }
                         }
                         .padding()
                     }
@@ -149,11 +177,64 @@ struct LiveSessionView: View {
                 StrategyOddsSheet(gameName: s.game)
                     .environmentObject(settingsStore)
             }
+            .sheet(isPresented: $showPrivateNotes) {
+                PrivateNotesSheet(
+                    notes: Binding(
+                        get: { store.liveSession?.privateNotes ?? "" },
+                        set: { store.updateLiveSessionNotes($0) }
+                    ),
+                    onDismiss: { showPrivateNotes = false }
+                )
+                .environmentObject(settingsStore)
+            }
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }
             .alert("Missing Information", isPresented: $showMissingInfoAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text("Please complete the following before closing out: \(missingInfoFields.joined(separator: ", ")). You can add buy-ins here, but game and location must be set when you check in.")
+            }
+        }
+    }
+}
+
+/// Sheet for editing private session notes (local only, not shared).
+struct PrivateNotesSheet: View {
+    @Binding var notes: String
+    let onDismiss: () -> Void
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Private notes (stored locally only, not shared)")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    TextEditor(text: $notes)
+                        .frame(minHeight: 120)
+                        .padding(8)
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .scrollContentBackground(.hidden)
+                    Spacer(minLength: 0)
+                }
+                .padding()
+            }
+            .navigationTitle("Private Notes")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        onDismiss()
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
             }
         }
     }

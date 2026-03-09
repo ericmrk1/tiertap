@@ -5,6 +5,41 @@ enum SessionStatus: String, Codable, CaseIterable {
     case requiringMoreInfo
 }
 
+/// Emotional state after a session (stored in session metadata).
+enum SessionMood: String, Codable, CaseIterable {
+    case epic      // amazing
+    case great
+    case good
+    case okay
+    case meh
+    case disappointed
+    case frustrated
+    case tilt
+    case rough
+
+    var label: String {
+        switch self {
+        case .epic: return "Epic"
+        case .great: return "Great"
+        case .good: return "Good"
+        case .okay: return "Okay"
+        case .meh: return "Meh"
+        case .disappointed: return "Disappointed"
+        case .frustrated: return "Frustrated"
+        case .tilt: return "Tilt"
+        case .rough: return "Rough"
+        }
+    }
+
+    /// Used for downswing detection: disappointed, frustrated, tilt, rough.
+    var isDownswingMood: Bool {
+        switch self {
+        case .disappointed, .frustrated, .tilt, .rough: return true
+        default: return false
+        }
+    }
+}
+
 struct BuyInEvent: Identifiable, Codable, Hashable {
     var id = UUID()
     var amount: Int
@@ -25,13 +60,16 @@ struct Session: Identifiable, Codable, Equatable {
     var avgBetRated: Int?
     var isLive: Bool = false
     var status: SessionStatus = .complete
+    var sessionMood: SessionMood?
+    /// Private notes; stored locally only, never shared to community/database.
+    var privateNotes: String?
 
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
 
     enum CodingKeys: String, CodingKey {
         case id, game, casino, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status
+        case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes
     }
 
     init(from decoder: Decoder) throws {
@@ -49,12 +87,14 @@ struct Session: Identifiable, Codable, Equatable {
         avgBetRated = try c.decodeIfPresent(Int.self, forKey: .avgBetRated)
         isLive = try c.decodeIfPresent(Bool.self, forKey: .isLive) ?? false
         status = try c.decodeIfPresent(SessionStatus.self, forKey: .status) ?? .complete
+        sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
+        privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
     }
 
     init(id: UUID = UUID(), game: String, casino: String, startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
-         status: SessionStatus = .complete) {
+         status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -68,6 +108,8 @@ struct Session: Identifiable, Codable, Equatable {
         self.avgBetRated = avgBetRated
         self.isLive = isLive
         self.status = status
+        self.sessionMood = sessionMood
+        self.privateNotes = privateNotes
     }
 
     func encode(to encoder: Encoder) throws {
@@ -85,6 +127,8 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(avgBetRated, forKey: .avgBetRated)
         try c.encode(isLive, forKey: .isLive)
         try c.encode(status, forKey: .status)
+        try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
+        try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
     }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }

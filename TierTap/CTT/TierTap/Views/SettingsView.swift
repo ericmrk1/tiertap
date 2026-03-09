@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var secondaryColorSelection: Color = .blue
     @State private var isBankrollExpanded: Bool = false
     @State private var isRiskOfRuinExpanded: Bool = false
+    @State private var isSessionsExpanded: Bool = false
     @State private var isQuickButtonsExpanded: Bool = false
     @State private var isFavoritesExpanded: Bool = false
     @State private var isThemeExpanded: Bool = false
@@ -36,6 +37,7 @@ struct SettingsView: View {
                     VStack(spacing: 24) {
                         bankrollSection
                         riskOfRuinSection
+                        sessionsSection
                         quickButtonsSection
                         favoritesSection
                         themeSection
@@ -158,6 +160,22 @@ struct SettingsView: View {
                 }
             Text("Compare your actual average win/loss per session to this target in the Risk of Ruin screen.")
                 .font(.caption).foregroundColor(.gray)
+        }
+    }
+
+    private var sessionsSection: some View {
+        SettingsSection(
+            title: "Sessions",
+            systemImage: "calendar.badge.clock",
+            isExpanded: $isSessionsExpanded
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle("Prompt for session mood after ending", isOn: $settingsStore.promptSessionMood)
+                    .tint(.green)
+                Text("When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
         }
     }
 
@@ -511,6 +529,19 @@ struct SettingsView: View {
             isExpanded: $isAboutExpanded
         ) {
             VStack(spacing: 10) {
+                if let gaURL = URL(string: "https://www.gamblersanonymous.org/") {
+                    Link(destination: gaURL) {
+                        HStack {
+                            Image(systemName: "heart.circle.fill")
+                            Text("If you need help — Gamblers Anonymous")
+                                .font(.subheadline.bold())
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                                .font(.caption)
+                        }
+                        .foregroundColor(.white)
+                    }
+                }
                 Link(destination: URL(string: "https://travelzork.com/privacy-policy/")!) {
                     HStack {
                         Image(systemName: "hand.raised.fill")

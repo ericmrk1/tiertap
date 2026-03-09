@@ -12,6 +12,10 @@ struct CompleteSessionView: View {
     @State private var endingTier = ""
     @State private var showLowAlert = false
     @State private var showCelebration = false
+    @State private var showEmotionPicker = false
+    @State private var completedSessionId: UUID?
+    @State private var showGASheet = false
+    @State private var privateNotes = ""
 
     init(session: Session) {
         self.session = session
@@ -115,6 +119,19 @@ struct CompleteSessionView: View {
                             .cornerRadius(16)
                         }
 
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Private notes (not shared)")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+                            TextEditor(text: $privateNotes)
+                                .frame(minHeight: 72)
+                                .padding(8)
+                                .background(Color(.systemGray6).opacity(0.2))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .scrollContentBackground(.hidden)
+                        }
+
                         VStack(spacing: 10) {
                             Button {
                                 if let et = Int(endingTier), et < session.startingTierPoints {
@@ -145,6 +162,7 @@ struct CompleteSessionView: View {
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
+                privateNotes = session.privateNotes ?? ""
                 cashOut = session.cashOut.map { "\($0)" } ?? ""
                 // Default ending tier to this session's starting/ending tier if available,
                 // falling back to recent history for this casino.
@@ -174,6 +192,55 @@ struct CompleteSessionView: View {
             } message: {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(session.startingTierPoints)). Save anyway?")
             }
+            .sheet(isPresented: $showEmotionPicker, onDismiss: {
+                if completedSessionId == session.id, let co = Int(cashOut), let aba = Int(avgBetActual),
+                   let abr = Int(avgBetRated), let et = Int(endingTier) {
+                    var updated = session
+                    updated.cashOut = co
+                    updated.avgBetActual = aba
+                    updated.avgBetRated = abr
+                    updated.endingTierPoints = et
+                    updated.status = .complete
+                    updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    store.updateSession(updated)
+                    completedSessionId = nil
+                    dismiss()
+                }
+            }) {
+                SessionMoodPickerView { mood in
+                    guard completedSessionId == session.id,
+                          let co = Int(cashOut), let aba = Int(avgBetActual),
+                          let abr = Int(avgBetRated), let et = Int(endingTier) else {
+                        completedSessionId = nil
+                        dismiss()
+                        return
+                    }
+                    var updated = session
+                    updated.cashOut = co
+                    updated.avgBetActual = aba
+                    updated.avgBetRated = abr
+                    updated.endingTierPoints = et
+                    updated.status = .complete
+                    updated.sessionMood = mood
+                    updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    store.updateSession(updated)
+                    completedSessionId = nil
+                    if store.recentMoodDownswingDetected() {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showGASheet = true
+                        }
+                    }
+                    dismiss()
+                }
+                .environmentObject(settingsStore)
+            }
+            .sheet(isPresented: $showGASheet) {
+                GASupportSheet(onDismiss: {
+                    showGASheet = false
+                    dismiss()
+                })
+                .environmentObject(settingsStore)
+            }
         }
     }
 
@@ -181,28 +248,35 @@ struct CompleteSessionView: View {
         guard let co = Int(cashOut), let aba = Int(avgBetActual),
               let abr = Int(avgBetRated), let et = Int(endingTier) else { return }
         let netPositive = (co - session.totalBuyIn) > 0
-        if netPositive {
-            CelebrationPlayer.shared.celebrateWin()
-            showCelebration = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                var updated = session
-                updated.cashOut = co
-                updated.avgBetActual = aba
-                updated.avgBetRated = abr
-                updated.endingTierPoints = et
-                updated.status = .complete
-                store.updateSession(updated)
-                dismiss()
-            }
-        } else {
+
+        if !settingsStore.promptSessionMood {
             var updated = session
             updated.cashOut = co
             updated.avgBetActual = aba
             updated.avgBetRated = abr
             updated.endingTierPoints = et
             updated.status = .complete
+            updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
             store.updateSession(updated)
-            dismiss()
+            if netPositive {
+                CelebrationPlayer.shared.celebrateWin()
+                showCelebration = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { dismiss() }
+            } else {
+                dismiss()
+            }
+            return
+        }
+
+        completedSessionId = session.id
+        if netPositive {
+            CelebrationPlayer.shared.celebrateWin()
+            showCelebration = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                showEmotionPicker = true
+            }
+        } else {
+            showEmotionPicker = true
         }
     }
 }

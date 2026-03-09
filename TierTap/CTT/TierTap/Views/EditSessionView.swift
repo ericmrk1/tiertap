@@ -18,6 +18,7 @@ struct EditSessionView: View {
     @State private var endingTier: String = ""
     @State private var avgBetActual: String = ""
     @State private var avgBetRated: String = ""
+    @State private var privateNotes: String = ""
     @State private var showGamePicker = false
 
     var isValid: Bool {
@@ -78,6 +79,22 @@ struct EditSessionView: View {
                         .background(Color(.systemGray6).opacity(0.15))
                         .cornerRadius(16)
 
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Private notes (not shared)")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+                            TextEditor(text: $privateNotes)
+                                .frame(minHeight: 72)
+                                .padding(8)
+                                .background(Color(.systemGray6).opacity(0.2))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .scrollContentBackground(.hidden)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.15))
+                        .cornerRadius(16)
+
                         Button { save() } label: {
                             Text("Save Changes")
                                 .frame(maxWidth: .infinity).padding()
@@ -118,6 +135,7 @@ struct EditSessionView: View {
         endingTier = session.endingTierPoints.map { "\($0)" } ?? ""
         avgBetActual = session.avgBetActual.map { "\($0)" } ?? ""
         avgBetRated = session.avgBetRated.map { "\($0)" } ?? ""
+        privateNotes = session.privateNotes ?? ""
     }
 
     private func save() {
@@ -138,6 +156,8 @@ struct EditSessionView: View {
             endingTierPoints: et, buyInEvents: [ev], cashOut: co,
             avgBetActual: aba, avgBetRated: abr, isLive: false)
         updated.status = session.status
+        updated.sessionMood = session.sessionMood
+        updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
         store.updateSession(updated)
         dismiss()
     }

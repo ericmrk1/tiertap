@@ -10,6 +10,10 @@ struct CloseoutView: View {
     @State private var endingTier = ""
     @State private var showLowAlert = false
     @State private var showCelebration = false
+    @State private var showEmotionPicker = false
+    @State private var closedSessionId: UUID?
+    @State private var showGASheet = false
+    @State private var privateNotes = ""
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
@@ -233,6 +237,20 @@ struct CloseoutView: View {
                             }
                         }
 
+                        // Private notes (local only, not shared)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Private notes (not shared)")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+                            TextEditor(text: $privateNotes)
+                                .frame(minHeight: 72)
+                                .padding(8)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .scrollContentBackground(.hidden)
+                        }
+
                         // Actions
                         VStack(spacing: 8) {
                             Button {
@@ -269,8 +287,49 @@ struct CloseoutView: View {
             } message: {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(s.startingTierPoints)). Save anyway?")
             }
+            .sheet(isPresented: $showEmotionPicker, onDismiss: {
+                if closedSessionId != nil, let co = Int(cashOut), let aba = Int(avgBetActual),
+                   let abr = Int(avgBetRated), let et = Int(endingTier) {
+                    let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    closedSessionId = nil
+                    dismiss()
+                }
+            }) {
+                SessionMoodPickerView { mood in
+                    guard let co = Int(cashOut), let aba = Int(avgBetActual),
+                          let abr = Int(avgBetRated), let et = Int(endingTier),
+                          let id = closedSessionId else {
+                        closedSessionId = nil
+                        dismiss()
+                        return
+                    }
+                    let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    if var session = store.sessions.first(where: { $0.id == id }) {
+                        session.sessionMood = mood
+                        store.updateSession(session)
+                    }
+                    closedSessionId = nil
+                    if store.recentMoodDownswingDetected() {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showGASheet = true
+                        }
+                    }
+                    dismiss()
+                }
+                .environmentObject(settingsStore)
+            }
+            .sheet(isPresented: $showGASheet) {
+                GASupportSheet(onDismiss: {
+                    showGASheet = false
+                    dismiss()
+                })
+                .environmentObject(settingsStore)
+            }
         }
         .onAppear {
+            privateNotes = s.privateNotes ?? ""
             if cashOut.isEmpty {
                 cashOut = "\(s.totalBuyIn)"
             }
@@ -299,17 +358,35 @@ struct CloseoutView: View {
     func save() {
         guard let co = Int(cashOut), let aba = Int(avgBetActual),
               let abr = Int(avgBetRated), let et = Int(endingTier) else { return }
+        let sessionId = s.id
         let netPositive = (co - s.totalBuyIn) > 0
+
+        let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+        if !settingsStore.promptSessionMood {
+            if netPositive {
+                CelebrationPlayer.shared.celebrateWin()
+                showCelebration = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    dismiss()
+                }
+            } else {
+                store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                dismiss()
+            }
+            return
+        }
+
         if netPositive {
             CelebrationPlayer.shared.celebrateWin()
             showCelebration = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et)
-                dismiss()
+                closedSessionId = sessionId
+                showEmotionPicker = true
             }
         } else {
-            store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et)
-            dismiss()
+            closedSessionId = sessionId
+            showEmotionPicker = true
         }
     }
 }

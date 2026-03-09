@@ -25,11 +25,13 @@ struct CommunityPublisher {
     /// Publish the given sessions to the `TableGamePosts` table.
     /// Returns the number of rows successfully sent.
     /// `currencyCode` and `currencySymbol` are saved into the metrics JSON so the feed can render amounts correctly.
+    /// Optional `comment` is stored in each post's session_details JSON and shown in the feed (one line).
     static func publishSessions(
         _ sessions: [Session],
         authStore: AuthStore,
         currencyCode: String,
-        currencySymbol: String
+        currencySymbol: String,
+        comment: String? = nil
     ) async throws -> Int {
         guard SupabaseConfig.isConfigured else {
             throw CommunityPublisherError.supabaseNotConfigured
@@ -59,7 +61,8 @@ struct CommunityPublisher {
                 casino: s.casino,
                 game: s.game,
                 start_time: start,
-                end_time: end
+                end_time: end,
+                comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t }
             )
 
             let metrics = TableGamePostMetrics(
@@ -109,6 +112,8 @@ struct TableGamePostSessionDetails: Codable {
     let game: String
     let start_time: String
     let end_time: String?
+    /// Optional short comment from the poster; shown as one line in the feed.
+    let comment: String?
 }
 
 /// JSON body stored in the `metrics` column.

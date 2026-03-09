@@ -32,7 +32,10 @@
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
+		SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */; };
+		GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
+		PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
@@ -40,6 +43,7 @@
 		GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */; };
 		LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */; };
 		ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */; };
+		TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */; };
 		ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */; };
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
@@ -50,6 +54,7 @@
 		STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */; };
 		STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */; };
 		SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */; };
+		PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */; };
 		SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
@@ -135,7 +140,11 @@
 		BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankrollView.swift; sourceTree = "<group>"; };
 		CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoLocationPickerView.swift; sourceTree = "<group>"; };
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
+		SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMoodPickerView.swift; sourceTree = "<group>"; };
+		GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASupportSheet.swift; sourceTree = "<group>"; };
 		COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityPublisher.swift; sourceTree = "<group>"; };
+		PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfanityChecker.swift; sourceTree = "<group>"; };
+		PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ProfanityWords.txt; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
 		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
@@ -143,6 +152,7 @@
 		GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSharePhrasesGenerated.swift; sourceTree = "<group>"; };
 		LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuin.swift; sourceTree = "<group>"; };
+		TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapLevel.swift; sourceTree = "<group>"; };
 		ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
@@ -221,6 +231,8 @@
 				CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */,
 				282155DBCB51F96C8840E98B /* SessionDetailView.swift */,
 				CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */,
+				SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */,
+				GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */,
 				ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */,
 				ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */,
 			);
@@ -233,6 +245,7 @@
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
+				TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */,
 				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
 				GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */,
 			);
@@ -304,6 +317,7 @@
 				692681C1D425214EB9F4B3A2 /* TierTapApp.swift */,
 				SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */,
 				COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */,
+				PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */,
 				BRDBGRP1E2F3A4B5C6D7E8F9A0B1 /* Data */,
 				23A3142A7EAE1591E127EBC1 /* Models */,
 				E12E0905B1BCD8F80BC7098A /* ViewModels */,
@@ -312,6 +326,7 @@
 				SYNC4E2F3A4B5C6D7E8F9A0B1 /* WatchConnectivity */,
 				2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */,
 				BE9B9607B2D22C77E1D06D68 /* Info.plist */,
+				PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */,
 				SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */,
 			);
 			path = TierTap;
@@ -455,6 +470,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */,
+				PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */,
 				SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -537,9 +553,12 @@
 				EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */,
 				5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */,
 				CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */,
+				SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */,
+				GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */,
 				674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */,
 				CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */,
 				ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */,
+				TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */,
 				ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */,
 				ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
@@ -548,6 +567,7 @@
 				GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */,
 				SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */,
 				COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */,
+				PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */,
 				AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

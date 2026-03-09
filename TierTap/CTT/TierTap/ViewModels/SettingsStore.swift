@@ -20,6 +20,7 @@ private let keyPrimaryColorHex = "ctt_primary_color_hex"
 private let keySecondaryColorHex = "ctt_secondary_color_hex"
 private let keySelectedLocationFilter = "ctt_selected_location_filter"
 private let keyThemePresets = "ctt_theme_presets"
+private let keyPromptSessionMood = "ctt_prompt_session_mood"
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -250,6 +251,11 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// When true (default), show the session mood picker after ending a session. When false, skip the emotion grid.
+    @Published var promptSessionMood: Bool {
+        didSet { UserDefaults.standard.set(promptSessionMood, forKey: keyPromptSessionMood) }
+    }
+
     init() {
         let b = UserDefaults.standard.integer(forKey: keyBankroll)
         self.bankroll = b > 0 ? b : 2000
@@ -285,6 +291,14 @@ final class SettingsStore: ObservableObject {
            !decoded.isEmpty {
             self.themePresets = decoded
         } else {
+            self.themePresets = []
+        }
+        if UserDefaults.standard.object(forKey: keyPromptSessionMood) != nil {
+            self.promptSessionMood = UserDefaults.standard.bool(forKey: keyPromptSessionMood)
+        } else {
+            self.promptSessionMood = true
+        }
+        if self.themePresets.isEmpty {
             let defaults: [ThemePreset] = [
                 ThemePreset(id: UUID(), name: "Casino Dark", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .blue)),
                 ThemePreset(id: UUID(), name: "Apple Standard", primaryHex: Self.hexString(from: .blue), secondaryHex: Self.hexString(from: .teal)),

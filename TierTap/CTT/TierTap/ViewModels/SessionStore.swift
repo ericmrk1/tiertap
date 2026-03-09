@@ -112,10 +112,11 @@ class SessionStore: ObservableObject {
         #endif
     }
 
-    func closeSession(cashOut: Int, avgBetActual: Int, avgBetRated: Int, endingTier: Int) {
+    func closeSession(cashOut: Int, avgBetActual: Int, avgBetRated: Int, endingTier: Int, privateNotes: String? = nil) {
         guard var s = liveSession else { return }
         s.cashOut = cashOut; s.avgBetActual = avgBetActual
         s.avgBetRated = avgBetRated; s.endingTierPoints = endingTier
+        if privateNotes != nil { s.privateNotes = privateNotes }
         s.endTime = s.endTime ?? Date(); s.isLive = false; s.status = .complete
         sessions.insert(s, at: 0)
         liveSession = nil
@@ -171,6 +172,17 @@ class SessionStore: ObservableObject {
     func resumeLiveSessionTimer() {
         guard var s = liveSession, s.endTime != nil else { return }
         s.endTime = nil
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
+    /// Update private notes on the current live session (saved locally only).
+    func updateLiveSessionNotes(_ text: String?) {
+        guard var s = liveSession else { return }
+        s.privateNotes = text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true ? nil : text
         liveSession = s
         saveLive()
         #if os(iOS)
@@ -268,6 +280,18 @@ class SessionStore: ObservableObject {
             return withEnding.endingTierPoints
         }
         return matching.first?.startingTierPoints
+    }
+
+    /// Returns true if recent sessions with mood show a downswing (3+ of last 5 with “bad” mood).
+    /// Call after updating a session’s mood to decide whether to show Gamblers Anonymous support.
+    func recentMoodDownswingDetected() -> Bool {
+        let withMood = sessions
+            .filter { $0.sessionMood != nil }
+            .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+        let recent = Array(withMood.prefix(5))
+        guard recent.count >= 3 else { return false }
+        let badCount = recent.filter { $0.sessionMood!.isDownswingMood }.count
+        return badCount >= 3
     }
 
     /// Returns the casino (location) from the most recently played session.

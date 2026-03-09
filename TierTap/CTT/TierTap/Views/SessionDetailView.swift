@@ -6,6 +6,7 @@ struct SessionDetailView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var showCompleteSession = false
+    @State private var privateNotes: String = ""
 
     var body: some View {
         NavigationStack {
@@ -35,6 +36,12 @@ struct SessionDetailView: View {
                             Text(session.casino).font(.title.bold()).foregroundColor(.white)
                             Text(session.game).font(.subheadline).foregroundColor(.gray)
                             Text(session.startTime, style: .date).font(.caption).foregroundColor(.gray)
+                            if let mood = session.sessionMood {
+                                Text(mood.label)
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .padding(.top, 4)
+                            }
                         }
                         .frame(maxWidth: .infinity).padding()
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
@@ -123,8 +130,29 @@ struct SessionDetailView: View {
                                           valueColor: above ? .green : .orange)
                             }
                         }
+
+                        DetailSection(title: "Private notes (not shared)", icon: "note.text") {
+                            TextEditor(text: $privateNotes)
+                                .frame(minHeight: 88)
+                                .padding(8)
+                                .background(Color(.systemGray6).opacity(0.2))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .scrollContentBackground(.hidden)
+                        }
                     }
                     .padding()
+                }
+            }
+            .onAppear { privateNotes = session.privateNotes ?? "" }
+            .onDisappear {
+                let trimmed = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard let idx = store.sessions.firstIndex(where: { $0.id == session.id }) else { return }
+                var s = store.sessions[idx]
+                let newNotes = trimmed.isEmpty ? nil : trimmed
+                if s.privateNotes != newNotes {
+                    s.privateNotes = newNotes
+                    store.updateSession(s)
                 }
             }
             .navigationTitle("Session Detail")

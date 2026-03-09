@@ -1,2 +1,5 @@
 # Supabase keys - copy from SupabaseKeys.example.plist and fill in
 CTT/TierTap/SupabaseKeys.plist
+
+# Profanity word list - populated by Scripts/download_profanity_list.sh
+CTT/TierTap/ProfanityWords.txt

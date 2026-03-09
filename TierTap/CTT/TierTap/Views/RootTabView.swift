@@ -991,6 +991,14 @@ struct CommunityFeedRow: View {
                     .lineLimit(1)
             }
 
+            if let comment = item.session_details?.comment, !comment.isEmpty {
+                Text(comment)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.85))
+                    .italic()
+                    .lineLimit(1)
+            }
+
             // Bottom area: pts metrics + Rating Diff on same line, date slightly below
             VStack(alignment: .leading, spacing: 6) {
                 // First line: pts/hr (left) and Rating Diff (right)
@@ -1462,6 +1470,7 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var selectedSessionIDs: Set<UUID> = []
     @State private var isPublishing = false
     @State private var errorMessage: String?
+    @State private var postComment: String = ""
 
     private var allSelected: Bool {
         !sessions.isEmpty && selectedSessionIDs.count == sessions.count
@@ -1514,6 +1523,23 @@ struct CommunitySessionPublishSelectionView: View {
                             }
                             .buttonStyle(.plain)
                             .listRowBackground(Color(.systemGray6).opacity(0.2))
+                        }
+
+                        Section(
+                            header: Text("Add a short comment (optional)").foregroundColor(.gray),
+                            footer: Text("One line in the feed. \(postComment.count)/\(ProfanityChecker.maxCommentLength) characters")
+                                .foregroundColor(.gray.opacity(0.8))
+                        ) {
+                            TextField("e.g. Great run today", text: $postComment)
+                                .foregroundColor(.white)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.sentences)
+                                .onChange(of: postComment) { newValue in
+                                    if newValue.count > ProfanityChecker.maxCommentLength {
+                                        postComment = String(newValue.prefix(ProfanityChecker.maxCommentLength))
+                                    }
+                                }
+                                .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
 
                         Section(header: Text("Choose sessions to publish").foregroundColor(.gray)) {
@@ -1598,6 +1624,10 @@ struct CommunitySessionPublishSelectionView: View {
         let chosen = sortedSessions.filter { selectedSessionIDs.contains($0.id) }
         guard !chosen.isEmpty else { return }
 
+        let trimmedComment = postComment.trimmingCharacters(in: .whitespacesAndNewlines)
+        let sanitized = ProfanityChecker.replaceProfanity(trimmedComment)
+        let commentToPublish = sanitized.isEmpty ? nil : String(sanitized.prefix(ProfanityChecker.maxCommentLength))
+
         await MainActor.run {
             isPublishing = true
             errorMessage = nil
@@ -1608,7 +1638,8 @@ struct CommunitySessionPublishSelectionView: View {
                 chosen,
                 authStore: authStore,
                 currencyCode: settingsStore.currencyCode,
-                currencySymbol: settingsStore.currencySymbol
+                currencySymbol: settingsStore.currencySymbol,
+                comment: commentToPublish
             )
             await MainActor.run {
                 isPublishing = false
