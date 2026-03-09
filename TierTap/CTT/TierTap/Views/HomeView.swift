@@ -130,7 +130,7 @@ struct LiveNowCard: View {
                 }
                 Text(session.casino).font(.headline).foregroundColor(.white)
                 Text(session.game).font(.subheadline).foregroundColor(.gray)
-                Text("Buy-in: $\(session.totalBuyIn)").font(.caption).foregroundColor(.white.opacity(0.7))
+                Text("Buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)").font(.caption).foregroundColor(.white.opacity(0.7))
             }
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 6) {

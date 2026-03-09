@@ -116,11 +116,12 @@ struct DetailRow: View {
 struct CommonAmountButtons: View {
     let amounts: [Int]
     @Binding var selected: String
+    @EnvironmentObject var settingsStore: SettingsStore
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(amounts, id: \.self) { amt in
-                    Button("$\(amt)") { selected = "\(amt)" }
+                    Button("\(settingsStore.currencySymbol)\(amt)") { selected = "\(amt)" }
                         .font(.caption)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -138,9 +139,21 @@ struct GamePickerView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var search = ""
+    @State private var dynamicGames: [String] = []
+    @State private var isLoading = false
+
     private var favorites: [String] { settingsStore.favoriteGames }
+
+    private var allGamesUnion: [String] {
+        let hardCoded = GamesList.all
+        let combined = Set(hardCoded + dynamicGames)
+        return Array(combined).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
     private var filteredAll: [String] {
-        search.isEmpty ? GamesList.all : GamesList.all.filter { $0.lowercased().contains(search.lowercased()) }
+        let base = allGamesUnion
+        guard !search.isEmpty else { return base }
+        return base.filter { $0.lowercased().contains(search.lowercased()) }
     }
     private var filteredFavorites: [String] {
         search.isEmpty ? favorites : favorites.filter { $0.lowercased().contains(search.lowercased()) }
@@ -154,6 +167,10 @@ struct GamePickerView: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 List {
+                    if isLoading {
+                        ProgressView("Loading games…")
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+                    }
                     if !filteredFavorites.isEmpty {
                         Section("Favorites") {
                             ForEach(filteredFavorites, id: \.self) { game in
@@ -178,6 +195,9 @@ struct GamePickerView: View {
                     Button("Cancel") { dismiss() }.foregroundColor(.green)
                 }
             }
+            .task {
+                await loadDynamicGames()
+            }
         }
     }
     private func gameRow(_ game: String) -> some View {
@@ -192,6 +212,16 @@ struct GamePickerView: View {
             }
         }
         .listRowBackground(Color(.systemGray6).opacity(0.15))
+    }
+
+    private func loadDynamicGames() async {
+        guard !isLoading else { return }
+        isLoading = true
+        let names = await TableGamesAPI.loadDistinctNames()
+        await MainActor.run {
+            dynamicGames = names
+            isLoading = false
+        }
     }
 }
 
@@ -260,7 +290,7 @@ struct BuyInGridSheet: View {
                                         selectedAmounts.insert(amt)
                                     }
                                 } label: {
-                                    Text("$\(amt)")
+                                    Text("\(settingsStore.currencySymbol)\(amt)")
                                         .font(.headline)
                                         .frame(maxWidth: .infinity)
                                         .frame(minHeight: 56)
@@ -280,7 +310,7 @@ struct BuyInGridSheet: View {
                     VStack(spacing: 8) {
                         Text(
                             totalSelected > 0
-                            ? "Total buy-in: $\(totalSelected)"
+                            ? "Total buy-in: \(settingsStore.currencySymbol)\(totalSelected)"
                             : "Select one or more amounts."
                         )
                         .font(.subheadline)
@@ -293,7 +323,7 @@ struct BuyInGridSheet: View {
                         } label: {
                             Text(
                                 totalSelected > 0
-                                ? "Good Luck - Buying in for $\(totalSelected)"
+                                ? "Good Luck - Buying in for \(settingsStore.currencySymbol)\(totalSelected)"
                                 : "Good Luck"
                             )
                             .font(.headline)
@@ -364,7 +394,7 @@ struct BuyInQuickAddSheet: View {
                             Button {
                                 pendingTotal += amt
                             } label: {
-                                Text("$\(amt)")
+                                Text("\(settingsStore.currencySymbol)\(amt)")
                                     .font(.title3.bold())
                                     .frame(maxWidth: .infinity, minHeight: 70)
                                     .background(Color.green)
@@ -394,7 +424,7 @@ struct BuyInQuickAddSheet: View {
                         .disabled(!isCustomValid)
 
                         VStack(spacing: 6) {
-                            Text(pendingTotal > 0 ? "Current buy-in total: $\(pendingTotal)" : "Tap amounts to build a buy-in, then confirm.")
+                            Text(pendingTotal > 0 ? "Current buy-in total: \(settingsStore.currencySymbol)\(pendingTotal)" : "Tap amounts to build a buy-in, then confirm.")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                                 .multilineTextAlignment(.center)
@@ -404,7 +434,7 @@ struct BuyInQuickAddSheet: View {
                                 onAdd(pendingTotal)
                                 dismiss()
                             } label: {
-                                Text(pendingTotal > 0 ? "Add $\(pendingTotal)" : "Add Buy-In")
+                                Text(pendingTotal > 0 ? "Add \(settingsStore.currencySymbol)\(pendingTotal)" : "Add Buy-In")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                                     .padding()

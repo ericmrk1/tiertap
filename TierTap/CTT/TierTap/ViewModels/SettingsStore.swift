@@ -7,6 +7,7 @@ import UIKit
 private let keyBankroll = "ctt_bankroll"
 private let keyUnitSize = "ctt_unit_size"
 private let keyTargetAverage = "ctt_target_average"
+private let keyCurrencyCode = "ctt_currency_code"
 private let keyAppleSignedIn = "ctt_apple_signed_in"
 private let keyGoogleSignedIn = "ctt_google_signed_in"
 private let keyCommonDenominations = "ctt_common_denominations"
@@ -27,6 +28,122 @@ struct ThemePreset: Identifiable, Codable, Equatable {
     var secondaryHex: String
 }
 
+/// Supported currency for bankroll, units, and money displays.
+/// Backed by a 3-letter ISO code, a primary symbol, and an optional country/region name.
+struct Currency: Identifiable, Codable, Equatable {
+    let id: String
+    let code: String
+    let symbol: String
+    let name: String
+    let country: String?
+
+    init(code: String, symbol: String, name: String, country: String? = nil) {
+        self.id = code
+        self.code = code
+        self.symbol = symbol
+        self.name = name
+        self.country = country
+    }
+}
+
+extension Currency {
+    static let usd = Currency(code: "USD", symbol: "$", name: "US Dollar", country: "United States")
+
+    /// Master list of currencies shown in the picker.
+    /// Includes major and many minor/region-specific currencies.
+    static let all: [Currency] = [
+        // North America
+        .init(code: "USD", symbol: "$", name: "US Dollar", country: "United States"),
+        .init(code: "CAD", symbol: "$", name: "Canadian Dollar", country: "Canada"),
+        .init(code: "MXN", symbol: "$", name: "Mexican Peso", country: "Mexico"),
+        .init(code: "GTQ", symbol: "Q", name: "Quetzal", country: "Guatemala"),
+        .init(code: "CRC", symbol: "₡", name: "Costa Rican Colón", country: "Costa Rica"),
+        .init(code: "HNL", symbol: "L", name: "Lempira", country: "Honduras"),
+        .init(code: "NIO", symbol: "C", name: "Córdoba", country: "Nicaragua"),
+        .init(code: "PAB", symbol: "B", name: "Balboa", country: "Panama"),
+        .init(code: "DOP", symbol: "$", name: "Dominican Peso", country: "Dominican Republic"),
+        .init(code: "JMD", symbol: "$", name: "Jamaican Dollar", country: "Jamaica"),
+        .init(code: "BBD", symbol: "$", name: "Barbadian Dollar", country: "Barbados"),
+        .init(code: "TTD", symbol: "$", name: "Trinidad & Tobago Dollar", country: "Trinidad and Tobago"),
+
+        // South America
+        .init(code: "BRL", symbol: "R", name: "Brazilian Real", country: "Brazil"),
+        .init(code: "ARS", symbol: "$", name: "Argentine Peso", country: "Argentina"),
+        .init(code: "CLP", symbol: "$", name: "Chilean Peso", country: "Chile"),
+        .init(code: "COP", symbol: "$", name: "Colombian Peso", country: "Colombia"),
+        .init(code: "PEN", symbol: "S", name: "Sol", country: "Peru"),
+        .init(code: "UYU", symbol: "$", name: "Uruguayan Peso", country: "Uruguay"),
+        .init(code: "PYG", symbol: "₲", name: "Guaraní", country: "Paraguay"),
+        .init(code: "BOB", symbol: "B", name: "Boliviano", country: "Bolivia"),
+
+        // Europe
+        .init(code: "EUR", symbol: "€", name: "Euro", country: "Eurozone"),
+        .init(code: "GBP", symbol: "£", name: "Pound Sterling", country: "United Kingdom"),
+        .init(code: "CHF", symbol: "₣", name: "Swiss Franc", country: "Switzerland"),
+        .init(code: "NOK", symbol: "k", name: "Norwegian Krone", country: "Norway"),
+        .init(code: "SEK", symbol: "k", name: "Swedish Krona", country: "Sweden"),
+        .init(code: "DKK", symbol: "k", name: "Danish Krone", country: "Denmark"),
+        .init(code: "PLN", symbol: "z", name: "Złoty", country: "Poland"),
+        .init(code: "CZK", symbol: "K", name: "Czech Koruna", country: "Czech Republic"),
+        .init(code: "HUF", symbol: "F", name: "Forint", country: "Hungary"),
+        .init(code: "RON", symbol: "L", name: "Romanian Leu", country: "Romania"),
+        .init(code: "RSD", symbol: "дин", name: "Serbian Dinar", country: "Serbia"),
+        .init(code: "HRK", symbol: "k", name: "Kuna", country: "Croatia"),
+        .init(code: "ISK", symbol: "k", name: "Icelandic Króna", country: "Iceland"),
+        .init(code: "UAH", symbol: "₴", name: "Hryvnia", country: "Ukraine"),
+        .init(code: "RUB", symbol: "₽", name: "Russian Ruble", country: "Russia"),
+        .init(code: "TRY", symbol: "₺", name: "Turkish Lira", country: "Türkiye"),
+
+        // Middle East & Africa
+        .init(code: "AED", symbol: "د", name: "UAE Dirham", country: "United Arab Emirates"),
+        .init(code: "SAR", symbol: "ر", name: "Saudi Riyal", country: "Saudi Arabia"),
+        .init(code: "QAR", symbol: "ر", name: "Qatari Riyal", country: "Qatar"),
+        .init(code: "KWD", symbol: "د", name: "Kuwaiti Dinar", country: "Kuwait"),
+        .init(code: "OMR", symbol: "ر", name: "Omani Rial", country: "Oman"),
+        .init(code: "BHD", symbol: "د", name: "Bahraini Dinar", country: "Bahrain"),
+        .init(code: "EGP", symbol: "£", name: "Egyptian Pound", country: "Egypt"),
+        .init(code: "NGN", symbol: "₦", name: "Naira", country: "Nigeria"),
+        .init(code: "GHS", symbol: "₵", name: "Cedi", country: "Ghana"),
+        .init(code: "KES", symbol: "S", name: "Kenyan Shilling", country: "Kenya"),
+        .init(code: "TZS", symbol: "S", name: "Tanzanian Shilling", country: "Tanzania"),
+        .init(code: "UGX", symbol: "S", name: "Ugandan Shilling", country: "Uganda"),
+        .init(code: "ZAR", symbol: "R", name: "Rand", country: "South Africa"),
+        .init(code: "MAD", symbol: "د", name: "Moroccan Dirham", country: "Morocco"),
+
+        // Asia-Pacific
+        .init(code: "JPY", symbol: "¥", name: "Yen", country: "Japan"),
+        .init(code: "CNY", symbol: "¥", name: "Yuan", country: "China"),
+        .init(code: "HKD", symbol: "$", name: "Hong Kong Dollar", country: "Hong Kong"),
+        .init(code: "TWD", symbol: "$", name: "New Taiwan Dollar", country: "Taiwan"),
+        .init(code: "KRW", symbol: "₩", name: "Won", country: "South Korea"),
+        .init(code: "SGD", symbol: "$", name: "Singapore Dollar", country: "Singapore"),
+        .init(code: "THB", symbol: "฿", name: "Baht", country: "Thailand"),
+        .init(code: "MYR", symbol: "R", name: "Ringgit", country: "Malaysia"),
+        .init(code: "IDR", symbol: "R", name: "Rupiah", country: "Indonesia"),
+        .init(code: "PHP", symbol: "₱", name: "Philippine Peso", country: "Philippines"),
+        .init(code: "VND", symbol: "₫", name: "Dong", country: "Vietnam"),
+        .init(code: "INR", symbol: "₹", name: "Indian Rupee", country: "India"),
+        .init(code: "PKR", symbol: "₨", name: "Pakistani Rupee", country: "Pakistan"),
+        .init(code: "BDT", symbol: "৳", name: "Taka", country: "Bangladesh"),
+        .init(code: "LKR", symbol: "₨", name: "Sri Lankan Rupee", country: "Sri Lanka"),
+        .init(code: "NPR", symbol: "₨", name: "Nepalese Rupee", country: "Nepal"),
+        .init(code: "AUD", symbol: "$", name: "Australian Dollar", country: "Australia"),
+        .init(code: "NZD", symbol: "$", name: "New Zealand Dollar", country: "New Zealand"),
+        .init(code: "FJD", symbol: "$", name: "Fijian Dollar", country: "Fiji"),
+        .init(code: "PGK", symbol: "K", name: "Kina", country: "Papua New Guinea"),
+
+        // Crypto-style/common virtual currencies (for convenience; non-fiat)
+        .init(code: "BTC", symbol: "₿", name: "Bitcoin", country: nil),
+        .init(code: "ETH", symbol: "Ξ", name: "Ethereum", country: nil),
+        .init(code: "USDT", symbol: "₮", name: "Tether", country: nil)
+    ]
+
+    /// Find a currency by ISO code, defaulting to USD if not present.
+    static func byCode(_ code: String) -> Currency {
+        all.first { $0.code == code } ?? .usd
+    }
+}
+
 /// Recorded bankroll reset (date and new value). Used for bankroll-over-time graph and history.
 struct BankrollResetEvent: Codable, Equatable {
     let date: Date
@@ -42,6 +159,11 @@ final class SettingsStore: ObservableObject {
     @Published var bankrollResets: [BankrollResetEvent] = []
     @Published var unitSize: Int {
         didSet { UserDefaults.standard.set(unitSize, forKey: keyUnitSize) }
+    }
+
+    /// Selected currency for bankroll, unit size, and monetary amounts (ISO code; default USD).
+    @Published var currencyCode: String {
+        didSet { UserDefaults.standard.set(currencyCode, forKey: keyCurrencyCode) }
     }
     /// Target average win per session ($). Nil = not set.
     @Published var targetAveragePerSession: Double? {
@@ -134,6 +256,8 @@ final class SettingsStore: ObservableObject {
         self.bankrollResets = BankrollDatabase.shared.fetchResets()
         let u = UserDefaults.standard.integer(forKey: keyUnitSize)
         self.unitSize = u > 0 ? u : 50
+        let storedCurrency = UserDefaults.standard.string(forKey: keyCurrencyCode) ?? Currency.usd.code
+        self.currencyCode = Currency.byCode(storedCurrency).code
         if let v = UserDefaults.standard.object(forKey: keyTargetAverage) as? Double {
             self.targetAveragePerSession = v
         } else {
@@ -188,6 +312,25 @@ final class SettingsStore: ObservableObject {
     }
 
     // MARK: - Derived helpers
+
+    /// Currently selected currency details.
+    var currency: Currency {
+        Currency.byCode(currencyCode)
+    }
+
+    /// Convenience access to the selected currency's symbol.
+    var currencySymbol: String {
+        currency.symbol
+    }
+
+    /// Human-readable label for use in pickers and summaries.
+    var currencyDisplayLabel: String {
+        if let country = currency.country {
+            return "\(currency.code) \(currency.symbol) — \(country)"
+        } else {
+            return "\(currency.code) \(currency.symbol) — \(currency.name)"
+        }
+    }
 
     /// Effective quick-selection denominations after applying optional 18x multiplier.
     var effectiveDenominations: [Int] {

@@ -3,11 +3,11 @@ import Foundation
 struct SessionShareFormatter {
     // MARK: - Public API
 
-    static func combinedMessage(for sessions: [Session]) -> String {
+    static func combinedMessage(for sessions: [Session], currencySymbol: String) -> String {
         sessions
             .sorted { $0.startTime < $1.startTime }
             .map { session in
-                let stats = summary(for: session)
+                let stats = summary(for: session, currencySymbol: currencySymbol)
                 let sentiment = sentiment(for: session)
                 return "\(stats)\n\(sentiment)"
             }
@@ -20,24 +20,24 @@ struct SessionShareFormatter {
 
     // MARK: - Private helpers
 
-    private static func summary(for session: Session) -> String {
+    private static func summary(for session: Session, currencySymbol: String) -> String {
         let dateString = dateFormatter.string(from: session.startTime)
         let durationString = humanReadableDuration(session.duration)
 
         var parts: [String] = []
         parts.append("On \(dateString) at \(session.casino), you played \(session.game) for \(durationString).")
-        parts.append("You bought in for $\(session.totalBuyIn).")
+        parts.append("You bought in for \(currencySymbol)\(session.totalBuyIn).")
 
         if let cashOut = session.cashOut, let winLoss = session.winLoss {
             if winLoss > 0 {
-                parts.append("You cashed out with $\(cashOut), finishing with a profit of $\(winLoss).")
+                parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing with a profit of \(currencySymbol)\(winLoss).")
             } else if winLoss < 0 {
-                parts.append("You cashed out with $\(cashOut), finishing with a loss of $\(abs(winLoss)).")
+                parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing with a loss of \(currencySymbol)\(abs(winLoss)).")
             } else {
-                parts.append("You cashed out with $\(cashOut), finishing even on the session.")
+                parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing even on the session.")
             }
         } else if let cashOut = session.cashOut {
-            parts.append("You cashed out with $\(cashOut).")
+            parts.append("You cashed out with \(currencySymbol)\(cashOut).")
         }
 
         if let points = session.tierPointsEarned {

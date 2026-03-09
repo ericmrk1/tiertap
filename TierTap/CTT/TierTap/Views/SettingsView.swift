@@ -87,11 +87,31 @@ struct SettingsView: View {
             isExpanded: $isBankrollExpanded
         ) {
             VStack(spacing: 10) {
-                InputRow(label: "Bankroll ($)", placeholder: "Total bankroll", value: $bankrollText)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Currency")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Picker("", selection: $settingsStore.currencyCode) {
+                        ForEach(Currency.all) { currency in
+                            let countryPart = currency.country ?? currency.name
+                            Text("\(currency.code) \(currency.symbol) — \(countryPart)")
+                                .tag(currency.code)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.wheel)
+                    .frame(height: 120)
+                    .clipped()
+                }
+                .padding()
+                .background(Color(.systemGray6).opacity(0.15))
+                .cornerRadius(12)
+
+                InputRow(label: "Bankroll (\(settingsStore.currencySymbol))", placeholder: "Total bankroll", value: $bankrollText)
                     .onChange(of: bankrollText) { new in
                         if let v = Int(new.filter { $0.isNumber }) { settingsStore.bankroll = v }
                     }
-                InputRow(label: "Unit size ($)", placeholder: "Max bet per unit (recommended 1–2% of bankroll)", value: $unitSizeText)
+                InputRow(label: "Unit size (\(settingsStore.currencySymbol))", placeholder: "Max bet per unit (recommended 1–2% of bankroll)", value: $unitSizeText)
                     .onChange(of: unitSizeText) { new in
                         if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
                     }
@@ -107,7 +127,7 @@ struct SettingsView: View {
             systemImage: "target",
             isExpanded: $isRiskOfRuinExpanded
         ) {
-            InputRow(label: "Target win per session ($)", placeholder: "Optional — e.g. 100", value: $targetAverageText)
+            InputRow(label: "Target win per session (\(settingsStore.currencySymbol))", placeholder: "Optional — e.g. 100", value: $targetAverageText)
                 .onChange(of: targetAverageText) { new in
                     let n = new.replacingOccurrences(of: ",", with: ".")
                     if n.isEmpty {
@@ -140,9 +160,9 @@ struct SettingsView: View {
                             settingsStore.commonDenominations = nums
                         }
                     }
-                Toggle("Use $18 increment mode", isOn: $settingsStore.useEighteenXMultipliers)
+                Toggle("Use \(settingsStore.currencySymbol)18 increment mode", isOn: $settingsStore.useEighteenXMultipliers)
                     .tint(.green)
-                Text("When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for $18-style bets.")
+                Text("When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for \(settingsStore.currencySymbol)18-style bets.")
                     .font(.caption).foregroundColor(.gray)
             }
         }
@@ -332,13 +352,12 @@ struct SettingsView: View {
                             }
                         }
                         Spacer()
+                        Button("Sign out", role: .destructive) {
+                            authStore.signOut()
+                        }
+                        .font(.subheadline)
                     }
                     .padding(.vertical, 4)
-
-                    Button("Sign out", role: .destructive) {
-                        authStore.signOut()
-                    }
-                    .font(.subheadline)
                 } else {
                     Text("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
                         .font(.subheadline)

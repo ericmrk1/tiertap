@@ -83,12 +83,12 @@ struct BankrollView: View {
             case .reset(let e):
                 running = e.value
                 points.append((e.date, running))
-                entries.append((e.date, true, "Bankroll reset to $\(e.value)", nil))
+                entries.append((e.date, true, "Bankroll reset to \(settingsStore.currencySymbol)\(e.value)", nil))
             case .session(let s):
                 running += s.winLoss ?? 0
                 points.append((s.startTime, running))
                 let wl = s.winLoss ?? 0
-                let wlStr = wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))"
+                let wlStr = wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))"
                 entries.append((s.startTime, false, "\(s.casino) · \(wlStr)", running))
             }
         }
@@ -160,7 +160,8 @@ struct BankrollView: View {
         let card = BankrollGraphShareCard(
             points: bankrollTimeline,
             gradient: settingsStore.primaryGradient,
-            currentTotal: currentTotal
+            currentTotal: currentTotal,
+            currencySymbol: settingsStore.currencySymbol
         )
         guard let image = renderBankrollCardToImage(card) else { return }
         let df = DateFormatter()
@@ -205,7 +206,7 @@ struct BankrollView: View {
             Text("Current Bankroll")
                 .font(.subheadline.bold())
                 .foregroundColor(.white.opacity(0.9))
-            Text("$\(currentTotal)")
+            Text("\(settingsStore.currencySymbol)\(currentTotal)")
                 .font(.system(size: 36, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
         }
@@ -281,7 +282,7 @@ struct BankrollView: View {
                                         .font(.caption2)
                                         .foregroundColor(.gray)
                                 } else if let after = entry.bankrollAfter {
-                                    Text("Bankroll after: $\(after)")
+                                    Text("Bankroll after: \(settingsStore.currencySymbol)\(after)")
                                         .font(.caption2)
                                         .foregroundColor(.gray)
                                 }
@@ -313,7 +314,7 @@ struct BankrollView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
 
-                    TextField("Bankroll ($)", text: $resetEntryText)
+                    TextField("Bankroll (\(settingsStore.currencySymbol))", text: $resetEntryText)
                         .textFieldStyle(DarkTextFieldStyle())
                         .keyboardType(.numberPad)
                         .padding(.horizontal)
@@ -353,6 +354,7 @@ struct BankrollGraphShareCard: View {
     let points: [(date: Date, value: Int)]
     let gradient: LinearGradient
     let currentTotal: Int
+    let currencySymbol: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -361,7 +363,7 @@ struct BankrollGraphShareCard: View {
                     Text("Bankroll Over Time")
                         .font(.headline)
                         .foregroundColor(.white)
-                    Text("Current: $\(currentTotal)")
+                    Text("Current: \(currencySymbol)\(currentTotal)")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.8))
                 }

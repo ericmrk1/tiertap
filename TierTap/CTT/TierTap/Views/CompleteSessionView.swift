@@ -49,7 +49,7 @@ struct CompleteSessionView: View {
                             Text(session.game).foregroundColor(.gray)
                             HStack(spacing: 16) {
                                 Label(Session.durationString(session.duration), systemImage: "clock")
-                                Label("Buy-in: $\(session.totalBuyIn)", systemImage: "dollarsign.circle")
+                                Label("Buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)", systemImage: "dollarsign.circle")
                             }
                             .font(.caption).foregroundColor(.green)
                         }
@@ -58,16 +58,16 @@ struct CompleteSessionView: View {
                         .cornerRadius(16)
 
                         VStack(spacing: 14) {
-                            InputRow(label: "Cash Out ($)", placeholder: "Amount left with", value: $cashOut)
-                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", value: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", value: $avgBetRated)
+                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount left with", value: $cashOut)
+                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
+                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
                             InputRow(label: "Ending Tier Points", placeholder: "From loyalty app", value: $endingTier)
                             if settingsStore.unitSize > 0,
                                (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || session.totalBuyIn > settingsStore.unitSize {
                                 HStack(spacing: 8) {
                                     Image(systemName: "exclamationmark.triangle.fill")
                                         .foregroundColor(.orange)
-                                    Text("Bet or buy-in exceeds unit size ($\(settingsStore.unitSize)).")
+                                    Text("Bet or buy-in exceeds unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)).")
                                         .font(.caption).foregroundColor(.orange)
                                 }
                                 .padding(8)
@@ -83,10 +83,10 @@ struct CompleteSessionView: View {
                                 Divider().background(Color.gray.opacity(0.3))
                                 if let wl = previewWL {
                                     SummaryRow(label: "Win/Loss",
-                                               value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
+                                               value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                                color: wl >= 0 ? .green : .red)
                                 }
-                                SummaryRow(label: "Total Buy-In", value: "$\(session.totalBuyIn)", color: .white)
+                                SummaryRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(session.totalBuyIn)", color: .white)
                                 SummaryRow(label: "Hours Played", value: String(format: "%.2f", previewHours), color: .white)
                                 if let e = previewTierEarned {
                                     SummaryRow(label: "Tier Points Earned",
@@ -97,7 +97,7 @@ struct CompleteSessionView: View {
                                     SummaryRow(label: "Tiers / Hour", value: String(format: "%.1f", t), color: .white)
                                 }
                                 if let t100 = previewT100 {
-                                    SummaryRow(label: "Tiers per $100 Rated Bet-Hour",
+                                    SummaryRow(label: "Tiers per 100 \(settingsStore.currencySymbol) Rated Bet-Hour",
                                                value: String(format: "%.2f", t100), color: .white)
                                 }
                                 if let wl = previewWL,
@@ -106,7 +106,7 @@ struct CompleteSessionView: View {
                                     let above = result.aboveEdge >= 0
                                     let amount = Int(round(abs(result.aboveEdge)))
                                     SummaryRow(label: "Vs house edge",
-                                               value: above ? "$\(amount) above" : "$\(amount) below",
+                                               value: above ? "\(settingsStore.currencySymbol)\(amount) above" : "\(settingsStore.currencySymbol)\(amount) below",
                                                color: above ? .green : .orange)
                                 }
                             }

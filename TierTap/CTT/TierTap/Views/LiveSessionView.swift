@@ -75,14 +75,14 @@ struct LiveSessionView: View {
                                 HStack {
                                     Text("Buy-Ins").font(.headline).foregroundColor(.white)
                                     Spacer()
-                                    Text("Total: $\(s.totalBuyIn)")
+                                    Text("Total: \(settingsStore.currencySymbol)\(s.totalBuyIn)")
                                         .font(.title3.bold()).foregroundColor(.white)
                                 }
                                 ForEach(s.buyInEvents) { ev in
                                     HStack {
                                         Image(systemName: "arrow.right.circle.fill")
                                             .foregroundColor(.green).font(.caption)
-                                        Text("$\(ev.amount)").foregroundColor(.white)
+                                        Text("\(settingsStore.currencySymbol)\(ev.amount)").foregroundColor(.white)
                                         Spacer()
                                         Text(ev.timestamp, style: .time)
                                             .font(.caption).foregroundColor(.gray)

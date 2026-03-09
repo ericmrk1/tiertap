@@ -67,12 +67,12 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         VStack(spacing: 12) {
-                            InputRow(label: "Total Buy-In ($)", placeholder: "Total bought in", value: $totalBuyIn)
-                            InputRow(label: "Cash Out ($)", placeholder: "Amount cashed out", value: $cashOut)
+                            InputRow(label: "Total Buy-In (\(settingsStore.currencySymbol))", placeholder: "Total bought in", value: $totalBuyIn)
+                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", value: $cashOut)
                             InputRow(label: "Starting Tier Points", placeholder: "At session start", value: $startingTier)
                             InputRow(label: "Ending Tier Points", placeholder: "At session end", value: $endingTier)
-                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", value: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", value: $avgBetRated)
+                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
+                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
                         }
                         .padding()
                         .background(Color(.systemGray6).opacity(0.15))

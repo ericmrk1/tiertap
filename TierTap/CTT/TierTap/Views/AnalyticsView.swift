@@ -11,8 +11,8 @@ struct AnalyticsShareSelection {
 struct AnalyticsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
-
-    @State private var selectedGraphKind: GraphKind = .venn
+    
+    @State private var selectedGraphKind: GraphKind = .betCaptureDiff
     @State private var isShareSelectionPresented: Bool = false
     @State private var isShareSheetPresented: Bool = false
     @State private var analyticsFromDate: Date? = nil
@@ -75,6 +75,25 @@ struct AnalyticsView: View {
 
     private var totalLoss: Int {
         abs(closedSessions.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
+    }
+    
+    private var betCaptureDiffByDate: [(date: Date, diff: Int)] {
+        let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
+            guard let actual = session.avgBetActual,
+                  let rated = session.avgBetRated else { return nil }
+            // Positive diff means rated (captured) > actual, which is good
+            return (date: session.startTime, diff: rated - actual)
+        }
+        return withBothBets.sorted(by: { lhs, rhs in
+            lhs.date < rhs.date
+        })
+    }
+    
+    private var betCaptureGoodBadCounts: (good: Int, bad: Int) {
+        let diffs = betCaptureDiffByDate.map { $0.diff }
+        let good = diffs.filter { $0 >= 0 }.count
+        let bad = diffs.filter { $0 < 0 }.count
+        return (good, bad)
     }
 
     private var cumulativePointsByDate: [(date: Date, total: Int)] {
@@ -155,6 +174,7 @@ struct AnalyticsView: View {
                     selection: selection,
                     closedSessions: closedSessions,
                     gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
                     locationFilterText: analyticsLocationFilterText
                 )
                 pendingShareSelection = nil
@@ -325,8 +345,8 @@ struct AnalyticsView: View {
 
             HStack(spacing: 12) {
                 MetricPill(title: "Win rate", value: String(format: "%.0f%%", winRate * 100), color: .green)
-                MetricPill(title: "Profit", value: "$\(totalProfit)", color: .green)
-                MetricPill(title: "Loss", value: "-$\(totalLoss)", color: .red)
+                MetricPill(title: "Profit", value: "\(settingsStore.currencySymbol)\(totalProfit)", color: .green)
+                MetricPill(title: "Loss", value: "-\(settingsStore.currencySymbol)\(totalLoss)", color: .red)
             }
 
             HStack(spacing: 12) {
@@ -360,6 +380,14 @@ struct AnalyticsView: View {
     private var selectedGraph: some View {
         Group {
             switch selectedGraphKind {
+            case .betCaptureDiff:
+                BetCaptureDiffLineChartCard(
+                    series: betCaptureDiffByDate,
+                    goodBadCounts: betCaptureGoodBadCounts,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
             case .venn:
                 VennDiagramCard(
                     leftLabel: "Winning sessions",
@@ -378,6 +406,7 @@ struct AnalyticsView: View {
                     totalLoss: totalLoss,
                     totalSessions: closedSessions.count,
                     gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
                     dateRangeText: analyticsDateRangeText,
                     locationFilterText: analyticsLocationFilterText
                 )
@@ -407,6 +436,7 @@ struct AnalyticsView: View {
 // MARK: - Graph kinds
 
 enum GraphKind: String, CaseIterable, Identifiable {
+    case betCaptureDiff
     case venn
     case winLossBars
     case tierProgress
@@ -415,6 +445,7 @@ enum GraphKind: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
+        case .betCaptureDiff: return "Bet Rating"
         case .venn: return "Venn"
         case .winLossBars: return "Win/Loss"
         case .tierProgress: return "Tier curve"
@@ -442,6 +473,71 @@ struct MetricPill: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(12)
+    }
+}
+
+struct BetCaptureDiffLineChartCard: View {
+    let series: [(date: Date, diff: Int)]
+    let goodBadCounts: (good: Int, bad: Int)
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+    
+    private var hasData: Bool { !series.isEmpty }
+    
+    private var goodPercentageText: String {
+        let total = series.count
+        guard total > 0 else { return "—" }
+        let pct = Double(goodBadCounts.good) / Double(total) * 100.0
+        return String(format: "%.0f%% of sessions", pct)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Bet Rating vs Actual", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            if hasData {
+                LineChart(points: series.map { Double($0.diff) }, gradient: gradient, showValueLabels: true)
+                    .frame(height: 180)
+                
+                HStack(spacing: 8) {
+                    Label("\(goodBadCounts.good) good", systemImage: "hand.thumbsup.fill")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                    Label("\(goodBadCounts.bad) bad", systemImage: "hand.thumbsdown.fill")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    Spacer()
+                    Text(goodPercentageText)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            } else {
+                Text("No sessions with both actual and rated average bet yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            Text("Above 0 means your rated (captured) average bet is higher than your actual average bet, which is good. Below 0 means you’re effectively overbetting relative to what the casino tracks.")
+                .font(.caption)
+                .foregroundColor(.gray)
+            
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
     }
 }
 
@@ -579,6 +675,7 @@ struct WinLossBarChartCard: View {
     let totalLoss: Int
     let totalSessions: Int
     let gradient: LinearGradient
+    let currencySymbol: String
     var dateRangeText: String? = nil
     var locationFilterText: String? = nil
 
@@ -591,8 +688,8 @@ struct WinLossBarChartCard: View {
                 .foregroundColor(.white)
 
             VStack(spacing: 10) {
-                BarRow(label: "Total profit", value: Double(totalProfit), maxValue: maxValue, gradient: gradient)
-                BarRow(label: "Total loss", value: Double(totalLoss), maxValue: maxValue, gradient: LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing))
+                BarRow(label: "Total profit", value: Double(totalProfit), maxValue: maxValue, gradient: gradient, currencySymbol: currencySymbol)
+                BarRow(label: "Total loss", value: Double(totalLoss), maxValue: maxValue, gradient: LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing), currencySymbol: currencySymbol)
             }
 
             Text("How much you’ve won vs. lost across all completed sessions.")
@@ -621,6 +718,7 @@ struct BarRow: View {
     let value: Double
     let maxValue: Double
     let gradient: LinearGradient
+    let currencySymbol: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -629,7 +727,7 @@ struct BarRow: View {
                     .font(.caption)
                     .foregroundColor(.gray)
                 Spacer()
-                Text("$\(Int(value))")
+                Text("\(currencySymbol)\(Int(value))")
                     .font(.caption2.bold())
                     .foregroundColor(.white)
             }
@@ -693,6 +791,13 @@ struct TierProgressLineChartCard: View {
 struct LineChart: View {
     let points: [Double]
     let gradient: LinearGradient
+    let showValueLabels: Bool
+
+    init(points: [Double], gradient: LinearGradient, showValueLabels: Bool = false) {
+        self.points = points
+        self.gradient = gradient
+        self.showValueLabels = showValueLabels
+    }
 
     var body: some View {
         GeometryReader { geo in
@@ -722,10 +827,20 @@ struct LineChart: View {
                     let x = CGFloat(idx) * stepX
                     let normalized = (value - minVal) / span
                     let y = geo.size.height * (1 - CGFloat(normalized))
-                    Circle()
-                        .fill(Color.white.opacity(0.9))
-                        .frame(width: 4, height: 4)
-                        .position(x: x, y: y)
+
+                    VStack(spacing: 2) {
+                        Circle()
+                            .fill(Color.white.opacity(0.9))
+                            .frame(width: 4, height: 4)
+                        if showValueLabels {
+                            let intValue = Int(value.rounded())
+                            let signPrefix = intValue > 0 ? "+" : ""
+                            Text("\(signPrefix)\(intValue)")
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .position(x: x, y: y)
                 }
             }
         }
@@ -807,6 +922,7 @@ private func buildAnalyticsShareImages(
     selection: AnalyticsShareSelection,
     closedSessions: [Session],
     gradient: LinearGradient,
+    currencySymbol: String,
     locationFilterText: String? = nil
 ) -> [UIImage] {
     var images: [UIImage] = []
@@ -858,6 +974,7 @@ private func buildAnalyticsShareImages(
             totalLoss: totalLoss,
             totalSessions: closedSessions.count,
             gradient: gradient,
+            currencySymbol: currencySymbol,
             dateRangeText: dateRangeText,
             locationFilterText: locationFilterText
         )

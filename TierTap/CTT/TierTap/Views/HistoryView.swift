@@ -260,7 +260,7 @@ struct HistoryView: View {
             .sheet(isPresented: $isShareSelectorPresented) {
                 SessionShareSelectionView(sessions: filteredSessions) { selected in
                     guard !selected.isEmpty else { return }
-                    shareSummaryToPresent = SessionShareFormatter.combinedMessage(for: selected)
+                    shareSummaryToPresent = SessionShareFormatter.combinedMessage(for: selected, currencySymbol: settingsStore.currencySymbol)
                 }
                 .environmentObject(settingsStore)
             }
@@ -295,6 +295,7 @@ struct HistoryView: View {
 
 struct SessionRow: View {
     let session: Session
+    @EnvironmentObject var settingsStore: SettingsStore
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
@@ -329,7 +330,7 @@ struct SessionRow: View {
                         .font(.caption).foregroundColor(.gray)
                 }
                 if let wl = session.winLoss {
-                    Text(wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))")
+                    Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
                         .font(.caption.bold())
                         .foregroundColor(wl >= 0 ? .green : .red)
                 }
@@ -455,6 +456,8 @@ private struct SessionSelectableRow: View {
     let isSelected: Bool
     let onToggle: () -> Void
 
+    @EnvironmentObject var settingsStore: SettingsStore
+
     var body: some View {
         Button(action: onToggle) {
             HStack(spacing: 12) {
@@ -467,7 +470,7 @@ private struct SessionSelectableRow: View {
                             .foregroundColor(.white)
                         Spacer()
                         if let wl = session.winLoss {
-                            Text(wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))")
+                            Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
                                 .font(.caption.bold())
                                 .foregroundColor(wl >= 0 ? .green : .red)
                         }

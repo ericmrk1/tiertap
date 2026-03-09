@@ -80,7 +80,7 @@ struct CloseoutView: View {
                                 Text("·").foregroundColor(.gray)
                                 Text(Session.durationString(s.duration)).font(.caption.monospacedDigit()).foregroundColor(.green)
                                 Text("·").foregroundColor(.gray)
-                                Text("$\(s.totalBuyIn)").font(.caption).foregroundColor(.gray)
+                                Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.caption).foregroundColor(.gray)
                             }
                             .padding(.horizontal, 12).padding(.vertical, 8)
                             .background(Color(.systemGray6).opacity(0.15))
@@ -89,7 +89,7 @@ struct CloseoutView: View {
 
                         // Inputs (compact)
                         VStack(spacing: 8) {
-                            InputRow(label: "Cash Out ($)", placeholder: "Amount leaving with", value: $cashOut)
+                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount leaving with", value: $cashOut)
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Adjust cash out")
                                     .font(.caption.bold())
@@ -97,7 +97,7 @@ struct CloseoutView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
-                                            Button("+$\(amt)") {
+                                            Button("+\(settingsStore.currencySymbol)\(amt)") {
                                                 let current = Int(cashOut) ?? s.totalBuyIn
                                                 cashOut = String(current + amt)
                                             }
@@ -113,7 +113,7 @@ struct CloseoutView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
-                                            Button("−$\(amt)") {
+                                            Button("−\(settingsStore.currencySymbol)\(amt)") {
                                                 let current = Int(cashOut) ?? s.totalBuyIn
                                                 cashOut = String(max(0, current - amt))
                                             }
@@ -158,16 +158,16 @@ struct CloseoutView: View {
                                     .cornerRadius(8)
                                 }
                             }
-                            InputRow(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", value: $avgBetActual)
+                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
                             CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", value: $avgBetRated)
+                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
                             CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetRated)
                             InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier)
                             if settingsStore.unitSize > 0,
                                (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || s.totalBuyIn > settingsStore.unitSize {
                                 HStack(spacing: 6) {
                                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange).font(.caption2)
-                                    Text("Exceeds unit $\(settingsStore.unitSize).").font(.caption2).foregroundColor(.orange)
+                                    Text("Exceeds unit \(settingsStore.currencySymbol)\(settingsStore.unitSize).").font(.caption2).foregroundColor(.orange)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(6)
@@ -182,14 +182,14 @@ struct CloseoutView: View {
                                 VStack(alignment: .leading, spacing: 4) {
                                     if let wl = previewWL {
                                         Text("W/L").font(.caption2).foregroundColor(.gray)
-                                        Text(wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))")
+                                        Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
                                             .font(.subheadline.bold())
                                             .foregroundColor(wl >= 0 ? .green : .red)
                                     }
                                 }
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Buy-in").font(.caption2).foregroundColor(.gray)
-                                    Text("$\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
+                                    Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
                                 }
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("Hrs").font(.caption2).foregroundColor(.gray)
@@ -213,16 +213,16 @@ struct CloseoutView: View {
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(12)
 
-                            if let wl = previewWL,
-                               let abet = Int(avgBetActual), abet > 0,
-                               let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: s.game, winLoss: wl, avgBet: abet, hours: previewHours) {
+                                if let wl = previewWL,
+                                   let abet = Int(avgBetActual), abet > 0,
+                                   let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: s.game, winLoss: wl, avgBet: abet, hours: previewHours) {
                                 let above = result.aboveEdge >= 0
                                 let amount = Int(round(abs(result.aboveEdge)))
                                 HStack(spacing: 6) {
                                     Image(systemName: "chart.line.uptrend.xyaxis")
                                         .font(.caption)
                                         .foregroundColor(above ? .green : .orange)
-                                    Text(above ? "$\(amount) above statistical house edge" : "$\(amount) below statistical house edge")
+                                    Text(above ? "\(settingsStore.currencySymbol)\(amount) above statistical house edge" : "\(settingsStore.currencySymbol)\(amount) below statistical house edge")
                                         .font(.caption)
                                         .foregroundColor(above ? .green : .orange)
                                 }

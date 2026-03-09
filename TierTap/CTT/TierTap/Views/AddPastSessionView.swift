@@ -173,12 +173,12 @@ struct AddPastSessionView: View {
                 .foregroundColor(.white)
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
                 GridRow {
-                    compactNumberField(label: "Total Buy-In ($)", placeholder: "Total bought in", text: $totalBuyIn)
-                    compactNumberField(label: "Cash Out ($)", placeholder: "Amount cashed out", text: $cashOut)
+                    compactNumberField(label: "Total Buy-In (\(settingsStore.currencySymbol))", placeholder: "Total bought in", text: $totalBuyIn)
+                    compactNumberField(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", text: $cashOut)
                 }
                 GridRow {
-                    compactNumberField(label: "Avg Bet Actual ($)", placeholder: "Actual avg bet", text: $avgBetActual)
-                    compactNumberField(label: "Avg Bet Rated ($)", placeholder: "Rated avg bet", text: $avgBetRated)
+                    compactNumberField(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", text: $avgBetActual)
+                    compactNumberField(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", text: $avgBetRated)
                 }
             }
             VStack(alignment: .leading, spacing: 6) {
@@ -202,7 +202,7 @@ struct AddPastSessionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(quickDenominations, id: \.self) { amt in
-                        Button("+$\(amt)") {
+                        Button("+\(settingsStore.currencySymbol)\(amt)") {
                             let current = Int(totalBuyIn) ?? 0
                             totalBuyIn = String(current + amt)
                         }
@@ -218,7 +218,7 @@ struct AddPastSessionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(quickDenominations, id: \.self) { amt in
-                        Button("+$\(amt) cash out") {
+                        Button("+\(settingsStore.currencySymbol)\(amt) cash out") {
                             let current = Int(cashOut) ?? 0
                             cashOut = String(current + amt)
                         }
@@ -242,7 +242,7 @@ struct AddPastSessionView: View {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundColor(.orange)
-                Text("Buy-in or bet exceeds unit size ($\(settingsStore.unitSize)). Set unit in Settings to match your bankroll plan.")
+                Text("Buy-in or bet exceeds unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)). Set unit in Settings to match your bankroll plan.")
                     .font(.caption)
                     .foregroundColor(.orange)
             }

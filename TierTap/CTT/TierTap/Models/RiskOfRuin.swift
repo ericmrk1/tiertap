@@ -100,7 +100,7 @@ enum RiskOfRuinMath {
         let finalRoR: Double
         if total >= 3 {
             finalRoR = sessionBasedRoR
-        } else if total > 0, let avg = actualAvg, unitSize > 0 {
+        } else if total > 0, let _ = actualAvg, unitSize > 0 {
             finalRoR = edgeBasedRoR
         } else {
             finalRoR = 1.0

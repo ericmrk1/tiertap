@@ -48,7 +48,7 @@ struct SessionDetailView: View {
                             }
                             if let wl = session.winLoss {
                                 MetricCard(title: "Win/Loss",
-                                           value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
+                                           value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                            color: wl >= 0 ? .green : .red)
                             }
                             if let t = session.tiersPerHour {
@@ -68,25 +68,25 @@ struct SessionDetailView: View {
                         DetailSection(title: "Buy-Ins", icon: "dollarsign.circle") {
                             ForEach(session.buyInEvents) { ev in
                                 DetailRow(label: ev.timestamp.formatted(date: .omitted, time: .shortened),
-                                          value: "$\(ev.amount)")
+                                          value: "\(settingsStore.currencySymbol)\(ev.amount)")
                             }
-                            DetailRow(label: "Total Buy-In", value: "$\(session.totalBuyIn)", bold: true)
+                            DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(session.totalBuyIn)", bold: true)
                             if let co = session.cashOut {
-                                DetailRow(label: "Cash Out", value: "$\(co)", bold: true)
+                                DetailRow(label: "Cash Out", value: "\(settingsStore.currencySymbol)\(co)", bold: true)
                             }
                             if let wl = session.winLoss {
                                 DetailRow(label: "Win/Loss",
-                                          value: wl >= 0 ? "+$\(wl)" : "-$\(abs(wl))",
+                                          value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                           valueColor: wl >= 0 ? .green : .red, bold: true)
                             }
                         }
 
                         if let aba = session.avgBetActual, let abr = session.avgBetRated {
                             DetailSection(title: "Betting", icon: "chart.bar") {
-                                DetailRow(label: "Avg Bet Actual", value: "$\(aba)")
-                                DetailRow(label: "Avg Bet Rated", value: "$\(abr)")
+                                DetailRow(label: "Avg Bet Actual", value: "\(settingsStore.currencySymbol)\(aba)")
+                                DetailRow(label: "Avg Bet Rated", value: "\(settingsStore.currencySymbol)\(abr)")
                                 if abr < 100 {
-                                    Text("Tiers per $100 metric requires rated avg bet ≥ $100")
+                                    Text("Tiers per 100 \(settingsStore.currencySymbol) metric requires rated avg bet ≥ 100")
                                         .font(.caption).foregroundColor(.gray).padding(.top, 4)
                                 }
                             }
@@ -109,7 +109,7 @@ struct SessionDetailView: View {
                                 DetailRow(label: "Tiers / Hour", value: String(format: "%.2f", t))
                             }
                             if let t100 = session.tiersPerHundredRatedBetHour {
-                                DetailRow(label: "Tiers per $100 Rated Bet-Hour",
+                                DetailRow(label: "Tiers per 100 \(settingsStore.currencySymbol) Rated Bet-Hour",
                                           value: String(format: "%.3f", t100))
                             }
                             if let wl = session.winLoss,
@@ -119,7 +119,7 @@ struct SessionDetailView: View {
                                 let above = result.aboveEdge >= 0
                                 let amount = Int(round(abs(result.aboveEdge)))
                                 DetailRow(label: "Vs house edge",
-                                          value: above ? "$\(amount) above" : "$\(amount) below",
+                                          value: above ? "\(settingsStore.currencySymbol)\(amount) above" : "\(settingsStore.currencySymbol)\(amount) below",
                                           valueColor: above ? .green : .orange)
                             }
                         }

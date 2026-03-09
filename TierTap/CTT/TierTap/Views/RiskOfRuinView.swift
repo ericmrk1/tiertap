@@ -144,7 +144,7 @@ struct RiskOfRuinView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Bet exceeds target unit")
                     .font(.headline).foregroundColor(.orange)
-                Text("Your current buy-in or average bet is above your set unit size ($\(result.recommendedUnitSize)). Consider lowering bet size to stay within bankroll management target.")
+                Text("Your current buy-in or average bet is above your set unit size (\(settingsStore.currencySymbol)\(result.recommendedUnitSize)). Consider lowering bet size to stay within bankroll management target.")
                     .font(.caption).foregroundColor(.gray)
             }
             Spacer()
@@ -157,8 +157,8 @@ struct RiskOfRuinView: View {
 
     private var unitAndSessionsCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            DetailRow(label: "Bankroll", value: "$\(settingsStore.bankroll)")
-            DetailRow(label: "Unit size", value: "$\(settingsStore.unitSize)")
+            DetailRow(label: "Bankroll", value: "\(settingsStore.currencySymbol)\(settingsStore.bankroll)")
+            DetailRow(label: "Unit size", value: "\(settingsStore.currencySymbol)\(settingsStore.unitSize)")
             DetailRow(label: "Sessions used", value: "\(result.sessionCount)")
         }
         .padding()
@@ -181,6 +181,6 @@ struct RiskOfRuinView: View {
     private func formatDollars(_ value: Double?) -> String {
         guard let v = value else { return "—" }
         let sign = v >= 0 ? "+" : ""
-        return sign + "$\(Int(round(v)))"
+        return sign + settingsStore.currencySymbol + "\(Int(round(v)))"
     }
 }
