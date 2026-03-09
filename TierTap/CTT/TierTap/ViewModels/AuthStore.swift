@@ -42,6 +42,15 @@ final class AuthStore: ObservableObject {
     /// Profile emojis set by the user (stored in metadata).
     var userProfileEmojis: String? { stringFromUserMetadata("profile_emojis") }
 
+    /// Profile photo stored as base64-encoded JPEG in user metadata.
+    var userProfilePhotoBase64: String? { stringFromUserMetadata("profile_photo_base64") }
+
+    /// Decoded profile photo data (if available).
+    var userProfilePhotoData: Data? {
+        guard let base64 = userProfilePhotoBase64 else { return nil }
+        return Data(base64Encoded: base64)
+    }
+
     /// Short label for UI: display name or "email@example.com" when no name is available.
     var signedInSummary: String? {
         if let name = userDisplayName, !name.isEmpty { return name }
@@ -49,12 +58,13 @@ final class AuthStore: ObservableObject {
         return email
     }
 
-    /// Update profile display name and/or emojis in Supabase user metadata.
-    func updateProfile(displayName: String?, emojis: String?) async {
+    /// Update profile display name, emojis, and/or photo in Supabase user metadata.
+    func updateProfile(displayName: String?, emojis: String?, photoBase64: String?) async {
         guard let client = supabase else { return }
         var data: [String: AnyJSON] = [:]
         if let name = displayName { data["display_name"] = .string(name) }
         if let e = emojis { data["profile_emojis"] = .string(e) }
+        if let photo = photoBase64 { data["profile_photo_base64"] = .string(photo) }
         guard !data.isEmpty else { return }
         do {
             _ = try await client.auth.update(user: .init(data: data))

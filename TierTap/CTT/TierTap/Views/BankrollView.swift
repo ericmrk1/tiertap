@@ -396,38 +396,6 @@ struct BankrollLineChart: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-            let maxVal = max(values.max() ?? 1, 1)
-            let minVal = min(values.min() ?? 0, 0)
-            let span = max(maxVal - minVal, 1)
-            let stepX = values.count > 1 ? geo.size.width / CGFloat(values.count - 1) : 0
-
-            let path = Path { p in
-                for (idx, value) in values.enumerated() {
-                    let x = CGFloat(idx) * stepX
-                    let normalized = (value - minVal) / span
-                    let y = geo.size.height * (1 - CGFloat(normalized))
-                    if idx == 0 {
-                        p.move(to: CGPoint(x: x, y: y))
-                    } else {
-                        p.addLine(to: CGPoint(x: x, y: y))
-                    }
-                }
-            }
-
-            ZStack(alignment: .bottomLeading) {
-                path
-                    .stroke(gradient, style: StrokeStyle(lineWidth: 3, lineJoin: .round))
-                ForEach(Array(values.enumerated()), id: \.offset) { idx, value in
-                    let x = CGFloat(idx) * stepX
-                    let normalized = (value - minVal) / span
-                    let y = geo.size.height * (1 - CGFloat(normalized))
-                    Circle()
-                        .fill(Color.white.opacity(0.9))
-                        .frame(width: 5, height: 5)
-                        .position(x: x, y: y)
-                }
-            }
-        }
+        LineChart(points: values, gradient: gradient, showValueLabels: true)
     }
 }

@@ -44,6 +44,7 @@
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
+		PPCV1E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */; };
 		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
 		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
 		STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */; };
@@ -146,6 +147,7 @@
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
 		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoCaptureView.swift; sourceTree = "<group>"; };
 		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyDatabase.swift; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 			children = (
 				B89A89EFB8A3238E20A9044B /* SharedComponents.swift */,
 				RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */,
+				PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */,
 				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
 				7E68A7C0EAF309AC9F041237 /* HomeView.swift */,
 				9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */,
@@ -512,6 +515,7 @@
 			files = (
 				8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */,
 				RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */,
+				PPCV1E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift in Sources */,
 				ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */,
 				CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */,
 				LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */,

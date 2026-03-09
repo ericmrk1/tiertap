@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import UIKit
 
 enum MainTab: Hashable {
     case sessions
@@ -72,6 +73,7 @@ struct CommunitySessionsView: View {
     @State private var filterStartDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date().addingTimeInterval(-24 * 60 * 60)
     @State private var filterEndDate: Date = Date()
     @State private var showMapSheet = false
+    @State private var mapSessions: [TableGamePostRow] = []
     @State private var hasMoreFeedPages = false
 
     private var visibleFeedSessions: [TableGamePostRow] {
@@ -192,7 +194,10 @@ struct CommunitySessionsView: View {
                         } else {
                             LazyVStack(spacing: 12) {
                                 ForEach(visibleFeedSessions) { item in
-                                    CommunityFeedRow(item: item)
+                                    CommunityFeedRow(item: item, onShowLocation: { row in
+                                        mapSessions = [row]
+                                        showMapSheet = true
+                                    })
                                         .padding(.horizontal)
                                 }
 
@@ -241,6 +246,7 @@ struct CommunitySessionsView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     if SupabaseConfig.isConfigured, authStore.isSignedIn, !visibleFeedSessions.isEmpty {
                         Button {
+                            mapSessions = visibleFeedSessions
                             showMapSheet = true
                         } label: {
                             Text("🌐")
@@ -355,7 +361,7 @@ struct CommunitySessionsView: View {
             }
             .sheet(isPresented: $showMapSheet) {
                 CommunityFeedMapSheet(
-                    sessions: visibleFeedSessions
+                    sessions: mapSessions
                 )
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
@@ -373,8 +379,10 @@ struct CommunityAuthSheet: View {
 
     @State private var profileDisplayName: String = ""
     @State private var profileEmojis: String = ""
+    @State private var profilePhoto: UIImage?
     @State private var isSavingProfile = false
     @State private var profileSaved = false
+    @State private var isShowingImagePicker = false
 
     var body: some View {
         NavigationStack {
@@ -401,10 +409,21 @@ struct CommunityAuthSheet: View {
         .onAppear {
             profileDisplayName = authStore.userDisplayName ?? ""
             profileEmojis = authStore.userProfileEmojis ?? ""
+            if let data = authStore.userProfilePhotoData {
+                profilePhoto = UIImage(data: data)
+            }
         }
         .onChange(of: authStore.session?.user.id) { _ in
             profileDisplayName = authStore.userDisplayName ?? ""
             profileEmojis = authStore.userProfileEmojis ?? ""
+            if let data = authStore.userProfilePhotoData {
+                profilePhoto = UIImage(data: data)
+            } else {
+                profilePhoto = nil
+            }
+        }
+        .sheet(isPresented: $isShowingImagePicker) {
+            ProfilePhotoCaptureView(image: $profilePhoto)
         }
     }
 
@@ -415,6 +434,44 @@ struct CommunityAuthSheet: View {
                 .foregroundColor(.white)
 
             VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 16) {
+                    ZStack {
+                        if let image = profilePhoto {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                        } else if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
+                            Text(emojis)
+                                .font(.system(size: 40))
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.system(size: 40))
+                        }
+                    }
+                    .frame(width: 72, height: 72)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                    )
+
+                    Button {
+                        isShowingImagePicker = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "camera.fill")
+                            Text("Take or choose photo")
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.white.opacity(0.18))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                }
+
                 Text("Display name")
                     .font(.subheadline.bold())
                     .foregroundColor(.white.opacity(0.9))
@@ -425,11 +482,6 @@ struct CommunityAuthSheet: View {
                     .background(Color.white.opacity(0.15))
                     .cornerRadius(12)
                     .foregroundColor(.white)
-
-                Text("Emojis")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.white.opacity(0.9))
-                EmojiPickerView(selection: $profileEmojis)
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -445,27 +497,6 @@ struct CommunityAuthSheet: View {
                         .foregroundColor(.green)
                 }
             }
-
-            Button {
-                saveProfile()
-            } label: {
-                HStack {
-                    if isSavingProfile {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Save profile")
-                    }
-                }
-                .font(.headline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(settingsStore.primaryGradient)
-                .cornerRadius(12)
-            }
-            .buttonStyle(.plain)
-            .disabled(isSavingProfile)
         }
     }
 
@@ -473,9 +504,15 @@ struct CommunityAuthSheet: View {
         profileSaved = false
         isSavingProfile = true
         Task {
+            var photoBase64: String?
+            if let image = profilePhoto,
+               let data = image.jpegData(compressionQuality: 0.8) {
+                photoBase64 = data.base64EncodedString()
+            }
             await authStore.updateProfile(
                 displayName: profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines),
-                emojis: profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines)
+                emojis: profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines),
+                photoBase64: photoBase64
             )
             await MainActor.run {
                 isSavingProfile = false
@@ -855,6 +892,7 @@ extension CommunitySessionsView {
 
 struct CommunityFeedRow: View {
     let item: TableGamePostRow
+    let onShowLocation: ((TableGamePostRow) -> Void)?
 
     private var metrics: TableGamePostMetrics? {
         item.metrics
@@ -927,12 +965,25 @@ struct CommunityFeedRow: View {
         let metrics = self.metrics
 
         VStack(alignment: .leading, spacing: 10) {
-            // Top row: casino (upper left), game (upper right)
+            // Top row: casino (upper left) with location link, game (upper right)
             HStack {
-                Text(casinoName)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(casinoName)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    if let onShowLocation = onShowLocation {
+                        Button {
+                            onShowLocation(item)
+                        } label: {
+                            Image(systemName: "mappin.and.ellipse")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.green)
+                        .accessibilityLabel("Show \(casinoName) on map")
+                    }
+                }
                 Spacer()
                 Text(gameName)
                     .font(.subheadline.weight(.semibold))

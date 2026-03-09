@@ -7,6 +7,7 @@ struct AnalyticsShareSelection {
     let includeWinLoss: Bool
     let includeTierProgress: Bool
     let includeGameBreakdown: Bool
+    let includeTierByLoyaltyProgram: Bool
 }
 
 struct AnalyticsView: View {
@@ -18,6 +19,7 @@ struct AnalyticsView: View {
     @State private var isShareSheetPresented: Bool = false
     @State private var analyticsFromDate: Date? = nil
     @State private var analyticsToDate: Date? = nil
+    @State private var isFiltersExpanded: Bool = false
 
 #if os(iOS)
     @State private var shareImages: [UIImage] = []
@@ -130,8 +132,7 @@ struct AnalyticsView: View {
                     ScrollView {
                         VStack(spacing: 24) {
                             headerSummary
-                            locationFilterBar
-                            dateFilterBar
+                            filtersSection
                             graphTypePicker
                             selectedGraph
                             secondaryGraphs
@@ -199,6 +200,35 @@ struct AnalyticsView: View {
             }
         }
 #endif
+    }
+
+    private var filtersSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isFiltersExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Text("Filters")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Spacer()
+                    Image(systemName: isFiltersExpanded ? "chevron.up" : "chevron.down")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isFiltersExpanded {
+                VStack(spacing: 16) {
+                    locationFilterBar
+                    dateFilterBar
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
     }
 
     private var locationFilterBar: some View {
@@ -425,6 +455,12 @@ struct AnalyticsView: View {
     private var secondaryGraphs: some View {
         VStack(spacing: 16) {
             GameBreakdownBars(
+                sessions: closedSessions,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            TierPointsByLoyaltyProgramBars(
                 sessions: closedSessions,
                 gradient: settingsStore.primaryGradient,
                 dateRangeText: analyticsDateRangeText,
@@ -917,6 +953,110 @@ struct GameBreakdownBars: View {
     }
 }
 
+struct TierPointsByLoyaltyProgramBars: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    // Simple mapping from casino name keywords to loyalty programs.
+    private let loyaltyProgramRules: [(keyword: String, program: String)] = [
+        ("MGM", "MGM Rewards"),
+        ("Bellagio", "MGM Rewards"),
+        ("Aria", "MGM Rewards"),
+        ("Cosmopolitan", "Identity Rewards"),
+        ("Caesars", "Caesars Rewards"),
+        ("Harrah", "Caesars Rewards"),
+        ("Paris", "Caesars Rewards"),
+        ("Wynn", "Wynn Rewards"),
+        ("Encore", "Wynn Rewards"),
+        ("Venetian", "Grazie Rewards"),
+        ("Palazzo", "Grazie Rewards"),
+        ("Palms", "Club Serrano"),
+        ("Boyd", "B Connected")
+    ]
+
+    private func loyaltyProgram(for casino: String) -> String {
+        for rule in loyaltyProgramRules {
+            if casino.localizedCaseInsensitiveContains(rule.keyword) {
+                return rule.program
+            }
+        }
+        return "Other loyalty programs"
+    }
+
+    private var totalsByProgram: [(program: String, points: Int)] {
+        let rows: [(String, Int)] = sessions.compactMap { session in
+            guard let points = session.tierPointsEarned, points > 0 else { return nil }
+            let program = loyaltyProgram(for: session.casino)
+            return (program, points)
+        }
+
+        let grouped = Dictionary(grouping: rows, by: { $0.0 })
+        return grouped
+            .map { key, values in
+                let total = values.reduce(0) { $0 + $1.1 }
+                return (program: key, points: total)
+            }
+            .sorted { $0.points > $1.points }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Tier Points by Loyalty Program", systemImage: "star.circle.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if totalsByProgram.isEmpty {
+                Text("No tier point data yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let maxPoints = max(totalsByProgram.map { Double($0.points) }.max() ?? 1, 1)
+                ForEach(totalsByProgram.prefix(5), id: \.program) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(row.program)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                            Spacer()
+                            Text("\(row.points) pts")
+                                .font(.caption2.bold())
+                                .foregroundColor(.gray)
+                        }
+                        GeometryReader { geo in
+                            let width = max(2, geo.size.width * CGFloat(Double(row.points) / maxPoints))
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(.systemGray6).opacity(0.4))
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(gradient)
+                                    .frame(width: width)
+                            }
+                        }
+                        .frame(height: 10)
+                    }
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
 #if os(iOS)
 @MainActor
 private func buildAnalyticsShareImages(
@@ -1039,6 +1179,18 @@ private func buildAnalyticsShareImages(
         }
     }
 
+    if selection.includeTierByLoyaltyProgram {
+        let card = TierPointsByLoyaltyProgramBars(
+            sessions: closedSessions,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
     return images
 }
 
@@ -1108,6 +1260,7 @@ struct AnalyticsShareSelectionSheet: View {
     @State private var includeWinLoss = true
     @State private var includeTierProgress = true
     @State private var includeGameBreakdown = true
+    @State private var includeTierByLoyaltyProgram = true
 
     private var hasTierData: Bool {
         !closedSessions
@@ -1116,7 +1269,12 @@ struct AnalyticsShareSelectionSheet: View {
     }
 
     private var canShare: Bool {
-        includeBetCaptureDiff || includeVenn || includeWinLoss || (includeTierProgress && hasTierData) || includeGameBreakdown
+        includeBetCaptureDiff
+        || includeVenn
+        || includeWinLoss
+        || (includeTierProgress && hasTierData)
+        || includeGameBreakdown
+        || (includeTierByLoyaltyProgram && hasTierData)
     }
 
     var body: some View {
@@ -1132,6 +1290,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 includeWinLoss = true
                                 includeTierProgress = true
                                 includeGameBreakdown = true
+                                includeTierByLoyaltyProgram = true
                             } label: {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
@@ -1150,6 +1309,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 includeWinLoss = false
                                 includeTierProgress = false
                                 includeGameBreakdown = false
+                                includeTierByLoyaltyProgram = false
                             } label: {
                                 HStack {
                                     Image(systemName: "xmark.circle")
@@ -1168,6 +1328,8 @@ struct AnalyticsShareSelectionSheet: View {
                         Toggle("Tier Progress Over Time", isOn: $includeTierProgress)
                             .disabled(!hasTierData)
                         Toggle("Sessions by Game", isOn: $includeGameBreakdown)
+                        Toggle("Tier Points by Loyalty Program", isOn: $includeTierByLoyaltyProgram)
+                            .disabled(!hasTierData)
                     }
 
                     Section(
@@ -1199,7 +1361,8 @@ struct AnalyticsShareSelectionSheet: View {
                             includeVenn: includeVenn,
                             includeWinLoss: includeWinLoss,
                             includeTierProgress: includeTierProgress,
-                            includeGameBreakdown: includeGameBreakdown
+                            includeGameBreakdown: includeGameBreakdown,
+                            includeTierByLoyaltyProgram: includeTierByLoyaltyProgram
                         )
                         onShare(selection)
                         #endif
