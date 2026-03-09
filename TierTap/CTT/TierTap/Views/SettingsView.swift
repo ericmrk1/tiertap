@@ -8,8 +8,6 @@ struct SettingsView: View {
     @State private var unitSizeText: String = ""
     @State private var targetAverageText: String = ""
     @State private var denominationsText: String = ""
-    @State private var favoriteGamesText: String = ""
-    @State private var favoriteCasinosText: String = ""
     @State private var primaryColorSelection: Color = .green
     @State private var secondaryColorSelection: Color = .blue
     @State private var isBankrollExpanded: Bool = false
@@ -21,10 +19,14 @@ struct SettingsView: View {
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
     @State private var isPresentingShareSheet: Bool = false
+    @State private var isShowingGamePicker: Bool = false
+    @State private var isShowingCasinoPicker: Bool = false
     @State private var exportFileURL: URL?
     @State private var isExporting: Bool = false
     @State private var exportErrorMessage: String?
     @State private var isShowingExportError: Bool = false
+    @State private var gamePickerSelection: String = ""
+    @State private var casinoPickerSelection: String = ""
 
     var body: some View {
         NavigationStack {
@@ -57,10 +59,22 @@ struct SettingsView: View {
                     targetAverageText = ""
                 }
                 denominationsText = settingsStore.commonDenominations.map { "\($0)" }.joined(separator: ", ")
-                favoriteGamesText = settingsStore.favoriteGames.joined(separator: ", ")
-                favoriteCasinosText = settingsStore.favoriteCasinos.joined(separator: ", ")
                 primaryColorSelection = settingsStore.primaryColor
                 secondaryColorSelection = settingsStore.secondaryColor
+            }
+            .onChange(of: gamePickerSelection) { new in
+                let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { return }
+                if !settingsStore.favoriteGames.contains(trimmed) {
+                    settingsStore.favoriteGames.append(trimmed)
+                }
+            }
+            .onChange(of: casinoPickerSelection) { new in
+                let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { return }
+                if !settingsStore.favoriteCasinos.contains(trimmed) {
+                    settingsStore.favoriteCasinos.append(trimmed)
+                }
             }
             .sheet(isPresented: $isPresentingShareSheet, onDismiss: {
                 exportFileURL = nil
@@ -76,6 +90,12 @@ struct SettingsView: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(exportErrorMessage ?? "An unknown error occurred while exporting your data.")
+            }
+            .sheet(isPresented: $isShowingGamePicker) {
+                GamePickerView(selectedGame: $gamePickerSelection)
+            }
+            .sheet(isPresented: $isShowingCasinoPicker) {
+                CasinoLocationPickerView(selectedCasino: $casinoPickerSelection)
             }
         }
     }
@@ -174,28 +194,110 @@ struct SettingsView: View {
             systemImage: "star.fill",
             isExpanded: $isFavoritesExpanded
         ) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Favorite casino games")
-                    .font(.subheadline.bold()).foregroundColor(.white)
-                TextField("e.g. Blackjack, Craps, Baccarat", text: $favoriteGamesText)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .onChange(of: favoriteGamesText) { new in
-                        let parts = new.split(separator: ",")
-                        settingsStore.favoriteGames = parts
-                            .map { $0.trimmingCharacters(in: .whitespaces) }
-                            .filter { !$0.isEmpty }
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Favorite casino games")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    
+                    if settingsStore.favoriteGames.isEmpty {
+                        Text("No favorite games yet. Tap **Add game from picker** to select from the game list.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(settingsStore.favoriteGames, id: \.self) { game in
+                                    HStack(spacing: 6) {
+                                        Text(game)
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                        Button {
+                                            settingsStore.favoriteGames.removeAll { $0 == game }
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.caption2)
+                                                .foregroundColor(.white.opacity(0.9))
+                                        }
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6).opacity(0.3))
+                                    .cornerRadius(10)
+                                }
+                            }
+                        }
                     }
-
-                Text("Common casino locations")
-                    .font(.subheadline.bold()).foregroundColor(.white)
-                TextField("e.g. Aria, Bellagio, Wynn", text: $favoriteCasinosText)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .onChange(of: favoriteCasinosText) { new in
-                        let parts = new.split(separator: ",")
-                        settingsStore.favoriteCasinos = parts
-                            .map { $0.trimmingCharacters(in: .whitespaces) }
-                            .filter { !$0.isEmpty }
+                    
+                    Button {
+                        gamePickerSelection = ""
+                        isShowingGamePicker = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("Add game from picker")
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                     }
+                }
+                
+                Divider().background(Color.gray.opacity(0.3))
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Common casino locations")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    
+                    if settingsStore.favoriteCasinos.isEmpty {
+                        Text("No favorite locations yet. Tap **Add casino from picker** to select from the casino map/search.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(settingsStore.favoriteCasinos, id: \.self) { casino in
+                                    HStack(spacing: 6) {
+                                        Text(casino)
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                        Button {
+                                            settingsStore.favoriteCasinos.removeAll { $0 == casino }
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.caption2)
+                                                .foregroundColor(.white.opacity(0.9))
+                                        }
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6).opacity(0.3))
+                                    .cornerRadius(10)
+                                }
+                            }
+                        }
+                    }
+                    
+                    Button {
+                        casinoPickerSelection = ""
+                        isShowingCasinoPicker = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("Add casino from picker")
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
             }
         }
     }

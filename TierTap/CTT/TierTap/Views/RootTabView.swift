@@ -72,6 +72,7 @@ struct CommunitySessionsView: View {
     @State private var filterStartDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date().addingTimeInterval(-24 * 60 * 60)
     @State private var filterEndDate: Date = Date()
     @State private var showMapSheet = false
+    @State private var hasMoreFeedPages = false
 
     private var visibleFeedSessions: [TableGamePostRow] {
         feedSessions.filter { item in
@@ -194,6 +195,34 @@ struct CommunitySessionsView: View {
                                     CommunityFeedRow(item: item)
                                         .padding(.horizontal)
                                 }
+
+                                if hasMoreFeedPages {
+                                    Button {
+                                        Task { await loadMoreCommunityFeed() }
+                                    } label: {
+                                        HStack(spacing: 8) {
+                                            if isLoadingFeed {
+                                                ProgressView()
+                                                    .tint(.white)
+                                            } else {
+                                                Image(systemName: "arrow.down.circle.fill")
+                                                Text("Load more")
+                                                    .fontWeight(.semibold)
+                                            }
+                                        }
+                                        .font(.subheadline)
+                                        .foregroundColor(.white)
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.white.opacity(0.12))
+                                        .cornerRadius(14)
+                                        .padding(.top, 8)
+                                        .padding(.horizontal)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .disabled(isLoadingFeed)
+                                }
                             }
                             .padding(.top, 8)
                         }
@@ -278,7 +307,7 @@ struct CommunitySessionsView: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "paperplane.circle.fill")
-                                Text("Publish to Community")
+                                Text("Publish Sessions")
                                     .fontWeight(.semibold)
                             }
                             .font(.headline)
@@ -630,6 +659,8 @@ struct EmojiPickerView: View {
 // MARK: - Community feed helpers
 
 extension CommunitySessionsView {
+    private var communityPageSize: Int { 100 }
+
     private func loadCommunityFeedIfNeeded() async {
         guard SupabaseConfig.isConfigured, authStore.isSignedIn else { return }
         if !feedSessions.isEmpty || isLoadingFeed { return }
@@ -656,6 +687,7 @@ extension CommunitySessionsView {
         await MainActor.run {
             isLoadingFeed = true
             feedErrorMessage = nil
+            hasMoreFeedPages = false
         }
 
         do {
@@ -675,7 +707,7 @@ extension CommunitySessionsView {
             let ordered = query.order("created_at", ascending: false)
 
             let items: [TableGamePostRow] = try await ordered
-                .limit(50)
+                .range(from: 0, to: communityPageSize - 1)
                 .execute()
                 .value
 
@@ -697,6 +729,7 @@ extension CommunitySessionsView {
 
             await MainActor.run {
                 feedSessions = items
+                hasMoreFeedPages = items.count == communityPageSize
                 availableGames = Array(gamesSet)
                     .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
                 availableLocations = Array(locationsSet)
@@ -721,6 +754,98 @@ extension CommunitySessionsView {
             }
             await MainActor.run {
                 feedErrorMessage = "Could not load community feed. Please try again."
+                isLoadingFeed = false
+            }
+        }
+    }
+
+    private func loadMoreCommunityFeed() async {
+        guard SupabaseConfig.isConfigured, authStore.isSignedIn else { return }
+        guard let client = supabase else { return }
+        guard !isLoadingFeed, hasMoreFeedPages else { return }
+
+        // Ensure date range is still valid
+        if filterStartDate > filterEndDate {
+            await MainActor.run {
+                feedErrorMessage = "Start date must be before end date."
+            }
+            return
+        }
+
+        await MainActor.run {
+            isLoadingFeed = true
+        }
+
+        do {
+            let existingItems: [TableGamePostRow] = await MainActor.run {
+                feedSessions
+            }
+
+            var query = client.database
+                .from(SupabaseTables.tableGamePosts)
+                .select()
+
+            let isoFormatter = ISO8601DateFormatter()
+            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let startISO = isoFormatter.string(from: filterStartDate)
+            let endISO = isoFormatter.string(from: filterEndDate)
+
+            query = query
+                .gte("created_at", value: startISO)
+                .lte("created_at", value: endISO)
+
+            let ordered = query.order("created_at", ascending: false)
+
+            let offset = existingItems.count
+            let moreItems: [TableGamePostRow] = try await ordered
+                .range(from: offset, to: offset + communityPageSize - 1)
+                .execute()
+                .value
+
+            let allItems = existingItems + moreItems
+
+            let gamesSet = Set(
+                allItems.compactMap { row in
+                    (row.game ?? row.session_details?.game)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                .filter { !$0.isEmpty }
+            )
+
+            let locationsSet = Set(
+                allItems.compactMap { row in
+                    (row.location ?? row.session_details?.casino)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                .filter { !$0.isEmpty }
+            )
+
+            await MainActor.run {
+                feedSessions = allItems
+                hasMoreFeedPages = moreItems.count == communityPageSize
+                availableGames = Array(gamesSet)
+                    .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+                availableLocations = Array(locationsSet)
+                    .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+                selectedGames = selectedGames.intersection(gamesSet)
+                selectedLocations = selectedLocations.intersection(locationsSet)
+                isLoadingFeed = false
+            }
+        } catch {
+            if (error as? CancellationError) != nil {
+                await MainActor.run {
+                    isLoadingFeed = false
+                }
+                return
+            }
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                await MainActor.run {
+                    isLoadingFeed = false
+                }
+                return
+            }
+            await MainActor.run {
+                feedErrorMessage = "Could not load more community sessions. Please try again."
                 isLoadingFeed = false
             }
         }
@@ -940,7 +1065,7 @@ struct CommunityFeedFiltersView: View {
                 .buttonStyle(.plain)
 
                 if isDateExpanded {
-                    HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("From")
                                 .font(.caption)
@@ -1481,6 +1606,9 @@ private struct CommunitySessionSelectableRow: View {
                             .font(.caption)
                             .foregroundColor(.gray)
                         Text(session.startTime, style: .date)
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        Text(session.startTime, style: .time)
                             .font(.caption2)
                             .foregroundColor(.gray)
                     }
