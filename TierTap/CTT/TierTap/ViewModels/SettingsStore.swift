@@ -21,6 +21,9 @@ private let keySecondaryColorHex = "ctt_secondary_color_hex"
 private let keySelectedLocationFilter = "ctt_selected_location_filter"
 private let keyThemePresets = "ctt_theme_presets"
 private let keyPromptSessionMood = "ctt_prompt_session_mood"
+private let keyAITone = "ctt_ai_tone"
+private let keyAICallsDate = "ctt_ai_calls_date"
+private let keyAICallsCount = "ctt_ai_calls_count"
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -256,6 +259,52 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(promptSessionMood, forKey: keyPromptSessionMood) }
     }
 
+    enum AITone: String, CaseIterable, Identifiable, Codable {
+        case sarcastic
+        case scientific
+        case funny
+        case serious
+        case business
+
+        var id: String { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .sarcastic: return "Sarcastic"
+            case .scientific: return "Scientific"
+            case .funny: return "Funny"
+            case .serious: return "Serious"
+            case .business: return "Business"
+            }
+        }
+
+        var promptLabel: String {
+            switch self {
+            case .sarcastic: return "a lightly sarcastic, playful tone"
+            case .scientific: return "a precise, scientific tone with clear references to probabilities and expectations"
+            case .funny: return "a humorous, light, casino-savvy tone"
+            case .serious: return "a calm, serious coaching tone"
+            case .business: return "a concise, business-style tone focused on numbers"
+            }
+        }
+    }
+
+    @Published var aiTone: AITone {
+        didSet { UserDefaults.standard.set(aiTone.rawValue, forKey: keyAITone) }
+    }
+
+    /// Daily AI usage tracking for the free tier.
+    @Published private(set) var aiCallsToday: Int
+    @Published private(set) var aiCallsDate: Date
+
+    /// Maximum number of AI calls allowed per day on the free tier.
+    let maxAICallsPerDay: Int = 5
+
+    /// Remaining AI calls the user can make today on the free tier.
+    var remainingAICallsToday: Int {
+        max(0, maxAICallsPerDay - aiCallsToday)
+    }
+
     init() {
         let b = UserDefaults.standard.integer(forKey: keyBankroll)
         self.bankroll = b > 0 ? b : 2000
@@ -298,6 +347,28 @@ final class SettingsStore: ObservableObject {
         } else {
             self.promptSessionMood = true
         }
+        if let storedTone = UserDefaults.standard.string(forKey: keyAITone),
+           let tone = AITone(rawValue: storedTone) {
+            self.aiTone = tone
+        } else {
+            self.aiTone = .sarcastic
+        }
+
+        // AI usage tracking (default to "today" with zero calls if nothing stored).
+        let calendar = Calendar.current
+        let storedDate = UserDefaults.standard.object(forKey: keyAICallsDate) as? Date
+        let today = calendar.startOfDay(for: Date())
+        if let storedDate = storedDate,
+           calendar.isDate(storedDate, inSameDayAs: today) {
+            self.aiCallsDate = storedDate
+            let storedCount = UserDefaults.standard.integer(forKey: keyAICallsCount)
+            self.aiCallsToday = max(0, storedCount)
+        } else {
+            self.aiCallsDate = today
+            self.aiCallsToday = 0
+            UserDefaults.standard.set(today, forKey: keyAICallsDate)
+            UserDefaults.standard.set(0, forKey: keyAICallsCount)
+        }
         if self.themePresets.isEmpty {
             let defaults: [ThemePreset] = [
                 ThemePreset(id: UUID(), name: "Casino Dark", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .blue)),
@@ -315,6 +386,45 @@ final class SettingsStore: ObservableObject {
             ]
             self.themePresets = defaults
         }
+    }
+
+    // MARK: - AI usage helpers
+
+    /// Reset the AI call counter if the stored date is not today.
+    private func resetAICallCounterIfNeeded(referenceDate: Date = Date()) {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: referenceDate)
+        if !calendar.isDate(aiCallsDate, inSameDayAs: today) {
+            aiCallsDate = today
+            aiCallsToday = 0
+            UserDefaults.standard.set(today, forKey: keyAICallsDate)
+            UserDefaults.standard.set(0, forKey: keyAICallsCount)
+        }
+    }
+
+    /// Whether the user can make another AI call today on the free tier.
+    func canUseAI() -> Bool {
+        #if targetEnvironment(simulator)
+        // Do not enforce AI limits in the simulator so development is not blocked.
+        return true
+        #else
+        resetAICallCounterIfNeeded()
+        return aiCallsToday < maxAICallsPerDay
+        #endif
+    }
+
+    /// Record a successful AI call usage.
+    func registerAICall() {
+        #if targetEnvironment(simulator)
+        // Skip counting AI calls in the simulator.
+        return
+        #else
+        resetAICallCounterIfNeeded()
+        guard aiCallsToday < maxAICallsPerDay else { return }
+        aiCallsToday += 1
+        UserDefaults.standard.set(aiCallsDate, forKey: keyAICallsDate)
+        UserDefaults.standard.set(aiCallsToday, forKey: keyAICallsCount)
+        #endif
     }
 
     /// Record a bankroll reset to a new value (e.g. from Bankroll screen). Updates `bankroll` and persists to SQLite.

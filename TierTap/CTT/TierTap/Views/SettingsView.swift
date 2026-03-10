@@ -13,12 +13,12 @@ struct SettingsView: View {
     @State private var isBankrollExpanded: Bool = false
     @State private var isRiskOfRuinExpanded: Bool = false
     @State private var isSessionsExpanded: Bool = false
-    @State private var isQuickButtonsExpanded: Bool = false
     @State private var isFavoritesExpanded: Bool = false
     @State private var isThemeExpanded: Bool = false
     @State private var isSocialLoginsExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
+    @State private var isAIToneExpanded: Bool = false
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
     @State private var isShowingCasinoPicker: Bool = false
@@ -37,10 +37,10 @@ struct SettingsView: View {
                     VStack(spacing: 24) {
                         bankrollSection
                         riskOfRuinSection
-                        sessionsSection
-                        quickButtonsSection
                         favoritesSection
+                        sessionsSection
                         themeSection
+                        aiSection
                         socialLoginsSection
                         dataExportSection
                         aboutSection
@@ -179,29 +179,26 @@ struct SettingsView: View {
         }
     }
 
-    private var quickButtonsSection: some View {
+    private var aiSection: some View {
         SettingsSection(
-            title: "Quick amounts",
-            systemImage: "square.grid.2x2",
-            isExpanded: $isQuickButtonsExpanded
+            title: "AI assistant",
+            systemImage: "wand.and.stars",
+            isExpanded: $isAIToneExpanded
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Common denominations")
-                    .font(.subheadline.bold()).foregroundColor(.white)
-                TextField("e.g. 20, 100, 500, 1000, 10000", text: $denominationsText)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .keyboardType(.numbersAndPunctuation)
-                    .onChange(of: denominationsText) { new in
-                        let parts = new.split(separator: ",")
-                        let nums = parts.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
-                        if !nums.isEmpty {
-                            settingsStore.commonDenominations = nums
-                        }
+                Text("Tone of voice")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                Picker("Tone of voice", selection: $settingsStore.aiTone) {
+                    ForEach(SettingsStore.AITone.allCases) { tone in
+                        Text(tone.displayName).tag(tone)
                     }
-                Toggle("Use \(settingsStore.currencySymbol)18 increment mode", isOn: $settingsStore.useEighteenXMultipliers)
-                    .tint(.green)
-                Text("When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for \(settingsStore.currencySymbol)18-style bets.")
-                    .font(.caption).foregroundColor(.gray)
+                }
+                .pickerStyle(.segmented)
+
+                Text("Controls how the TierTap AI summarizes your sessions. Default is **Sarcastic**.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
         }
     }
@@ -212,7 +209,7 @@ struct SettingsView: View {
             systemImage: "star.fill",
             isExpanded: $isFavoritesExpanded
         ) {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Favorite casino games")
                         .font(.subheadline.bold())
@@ -315,6 +312,32 @@ struct SettingsView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                     }
+                }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Quick amounts")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Text("Common denominations")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    TextField("e.g. 20, 100, 500, 1000, 10000", text: $denominationsText)
+                        .textFieldStyle(DarkTextFieldStyle())
+                        .keyboardType(.numbersAndPunctuation)
+                        .onChange(of: denominationsText) { new in
+                            let parts = new.split(separator: ",")
+                            let nums = parts.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+                            if !nums.isEmpty {
+                                settingsStore.commonDenominations = nums
+                            }
+                        }
+                    Toggle("Use \(settingsStore.currencySymbol)18 increment mode", isOn: $settingsStore.useEighteenXMultipliers)
+                        .tint(.green)
+                    Text("When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for \(settingsStore.currencySymbol)18-style bets.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
             }
         }

@@ -512,70 +512,193 @@ struct AnalyticsView: View {
 }
 
 struct AIAnalyticsSheet: View {
+    @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
     
+    enum TierTapAIQuestion: String, CaseIterable, Identifiable {
+        case whereEarnTiersFastest
+        case rankProgramsByTierEfficiency
+        case rankPropertiesByTierEfficiency
+        case bestGamePropertyCombos
+        case optimizeForFastestTierGain
+        
+        case showRatedVsActualGaps
+        case whereUnderRated
+        case trendGapByProperty
+        case trendGapByGame
+        case ratingInsightsConfidence
+        
+        case moodVsPlay
+        case whenTiltedOrOff
+        case gentleBreakMoments
+        
+        case highVolatilitySessions
+        case riskVolatilityProfile
+        case stopLossAndBreakNudges
+        
+        case tapPointsEarningLately
+        case nextBadgeOrLevel
+        case consistencyTapPointsIdeas
+        case bestFittingRewards
+        
+        var id: String { rawValue }
+        
+        var title: String {
+            switch self {
+            case .whereEarnTiersFastest: return "Where do I earn tiers fastest?"
+            case .rankProgramsByTierEfficiency: return "Rank my casino programs by tier efficiency"
+            case .rankPropertiesByTierEfficiency: return "Rank my properties by tier efficiency"
+            case .bestGamePropertyCombos: return "Best game and property combos for tiers"
+            case .optimizeForFastestTierGain: return "Optimize my play for fastest tier gain"
+            case .showRatedVsActualGaps: return "Show my rated vs actual gaps"
+            case .whereUnderRated: return "Where am I consistently under-rated?"
+            case .trendGapByProperty: return "Trend my rating gaps by property"
+            case .trendGapByGame: return "Trend my rating gaps by game"
+            case .ratingInsightsConfidence: return "How confident are my rating insights?"
+            case .moodVsPlay: return "How does my mood relate to my play?"
+            case .whenTiltedOrOff: return "When do I tend to feel tilted or off?"
+            case .gentleBreakMoments: return "When might a gentle break reminder help?"
+            case .highVolatilitySessions: return "Show my high-volatility sessions"
+            case .riskVolatilityProfile: return "Explain my typical risk/volatility profile"
+            case .stopLossAndBreakNudges: return "When should I see stop-loss or break nudges?"
+            case .tapPointsEarningLately: return "How am I earning TapPoints lately?"
+            case .nextBadgeOrLevel: return "What do I need for my next badge or level?"
+            case .consistencyTapPointsIdeas: return "Easy ways to earn more TapPoints through consistency"
+            case .bestFittingRewards: return "Which rewards best fit my habits?"
+            }
+        }
+        
+        func instruction(toneLabel: String) -> String {
+            switch self {
+            case .whereEarnTiersFastest:
+                return "Using the player's historical sessions, focus on where they earn tiers fastest by program, property, and game, emphasizing tiers per hour and tiers per $100 rated bet. Write the response in \(toneLabel), be clear and data-driven, and avoid generic gambling advice."
+            case .rankProgramsByTierEfficiency:
+                return "Compare and rank the player's casino loyalty programs by tier-earning efficiency using their past sessions. Explain which programs look strongest for earning tiers, in \(toneLabel), staying neutral and analytical."
+            case .rankPropertiesByTierEfficiency:
+                return "Compare and rank the properties where the player has recorded sessions by tier-earning efficiency. Highlight the top few standouts and briefly explain why, in \(toneLabel), without being promotional."
+            case .bestGamePropertyCombos:
+                return "Identify combinations of property and game where the player seems to earn tiers efficiently. Summarize the best combos and what patterns you see, in \(toneLabel), using simple, practical language."
+            case .optimizeForFastestTierGain:
+                return "Given how and where the player actually plays, suggest practical ways to focus on faster tier gain (programs, properties, and games they already use). Use \(toneLabel) and keep recommendations realistic, not prescriptive."
+            case .showRatedVsActualGaps:
+                return "Analyze the gap between rated (casino-captured) average bet and the player's estimated actual average bet across sessions. Summarize where gaps appear and how large they seem, in \(toneLabel), staying factual and non-judgmental."
+            case .whereUnderRated:
+                return "Look for patterns where rated average bet appears consistently lower than actual average bet. Gently describe any properties or games that look under-rated, using a neutral, non-accusatory tone even if patterns are clear, and write the answer in \(toneLabel)."
+            case .trendGapByProperty:
+                return "Describe how the rating gap between actual and rated bet has behaved by property over time. Focus on trends (getting better, worse, or staying similar) in \(toneLabel), avoiding blame or accusations."
+            case .trendGapByGame:
+                return "Describe how the rating gap between actual and rated bet has behaved by game over time. Focus on patterns and trends in \(toneLabel), without speculating about casino intent."
+            case .ratingInsightsConfidence:
+                return "Assess how strong or weak the rating insights are, based on how many sessions have both rated and actual bets and how consistent the gaps look. Explain confidence levels in \(toneLabel), being transparent and cautious about over-claiming."
+            case .moodVsPlay:
+                return "Correlate the player's recorded moods and comfort levels with how their sessions actually went (length, net result, volatility, tiers). Use a supportive, non-preachy tone within \(toneLabel), focusing on self-awareness rather than judgment."
+            case .whenTiltedOrOff:
+                return "Look for situations where the player reports feeling 'off' or 'tilted' and describe any patterns in games, properties, or session characteristics. Explain gently, using \(toneLabel), and avoid sounding like a lecture."
+            case .gentleBreakMoments:
+                return "Suggest circumstances in the player's history where a soft 'take a break' nudge could have been helpful (e.g., long sessions, repeated negative moods). Keep the language very gentle, non-judgmental, and aligned with \(toneLabel)."
+            case .highVolatilitySessions:
+                return "Identify sessions that look high-volatility based on buy-ins, adds, duration, and swings in win/loss. Explain them with careful, educational framing around variance and risk, in \(toneLabel), without glamorizing wins or shaming losses."
+            case .riskVolatilityProfile:
+                return "Using the player's most common games and session patterns, describe their typical risk and volatility profile in simple terms. Keep the tone educational and calm within \(toneLabel), and avoid prescriptive betting advice."
+            case .stopLossAndBreakNudges:
+                return "Based on the player's patterns, suggest a few gentle, time- or loss-based moments where a stop-loss reminder or 'take a break' nudge could make sense. Use very soft, non-preachy language consistent with \(toneLabel)."
+            case .tapPointsEarningLately:
+                return "Using the player's recent engagement patterns (sessions logged, streaks, consistency, sharing or referrals if visible), describe how they appear to be earning engagement-style rewards such as TapPoints. Stay focused on engagement, not gambling outcomes, and write in \(toneLabel)."
+            case .nextBadgeOrLevel:
+                return "Given how often and how consistently the player engages with the app, suggest realistic next-badge or level-style milestones. Emphasize healthy, track-focused behavior rather than more gambling, in \(toneLabel)."
+            case .consistencyTapPointsIdeas:
+                return "Recommend simple, low-friction ways for the player to earn more engagement rewards through consistency (like logging sessions promptly and maintaining streaks), using \(toneLabel), and avoid implying they should gamble more."
+            case .bestFittingRewards:
+                return "Based on the player's travel and play patterns, suggest reward or perk styles that would likely fit them best (e.g., travel perks, status-oriented rewards). Keep the focus on engagement and experience, not on promising winnings, and stay within \(toneLabel)."
+            }
+        }
+    }
+    
     @State private var isLoading = false
-    @State private var answer: String?
+    @State private var fullAnswer: String?
+    @State private var displayedAnswer: String = ""
     @State private var errorMessage: String?
     
-    private let questionText = "Is the sky blue?"
+    @State private var selectedQuestion: TierTapAIQuestion = .whereEarnTiersFastest
     
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("AI Analysis")
-                            .font(.title2.bold())
-                            .foregroundColor(.white)
-                        Text("Ask the TierTap assistant a quick question.")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Question")
-                            .font(.caption.bold())
-                            .foregroundColor(.white.opacity(0.8))
-                        Text(questionText)
-                            .font(.body)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.black.opacity(0.25))
-                            .cornerRadius(12)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    if isLoading {
-                        ProgressView("Asking Gemini…")
-                            .tint(.white)
-                    }
-                    
-                    if let answer = answer {
+                    VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Answer")
-                                .font(.caption.bold())
-                                .foregroundColor(.white.opacity(0.8))
-                            Text(answer)
-                                .font(.body)
+                            Text("AI Analysis")
+                                .font(.title2.bold())
                                 .foregroundColor(.white)
-                                .padding()
-                                .background(Color.black.opacity(0.35))
-                                .cornerRadius(12)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    } else if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Question")
+                                .font(.caption.bold())
+                                .foregroundColor(.white.opacity(0.8))
+                            Menu {
+                                ForEach(TierTapAIQuestion.allCases) { question in
+                                    Button(question.title) {
+                                        selectedQuestion = question
+                                    }
+                                }
+                            } label: {
+                                HStack {
+                                    Text(selectedQuestion.title)
+                                        .font(.body)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                .padding()
+                                .background(Color.black.opacity(0.25))
+                                .cornerRadius(12)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        if isLoading {
+                            ProgressView("Asking TierTap AI…")
+                                .tint(.white)
+                        }
+                        
+                        if fullAnswer != nil {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Answer")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.white.opacity(0.8))
+                                ScrollView {
+                                    Text(displayedAnswer)
+                                        .font(.body)
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding()
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(Color.black.opacity(0.35))
+                                .cornerRadius(12)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        } else if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        } else {
+                            Text("On the free version of TierTap, AI analysis is limited to 5 calls per day. Upgrade to the PRO version to unlock unlimited AI insights.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
                     }
-                    
-                    Spacer()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     
                     Button {
                         Task { await callAI() }
@@ -586,7 +709,7 @@ struct AIAnalyticsSheet: View {
                                     .tint(.white)
                             } else {
                                 Image(systemName: "sparkles")
-                                Text("Ask Gemini")
+                                Text("Ask TierTap")
                                     .fontWeight(.semibold)
                             }
                         }
@@ -625,10 +748,124 @@ struct AIAnalyticsSheet: View {
             return
         }
         
+        // Enforce daily AI usage limit for the free version.
+        if !settingsStore.canUseAI() {
+            await MainActor.run {
+                errorMessage = "You have reached the daily limit of 5 AI calls on the free version of TierTap. Upgrade to the PRO version to unlock unlimited AI analysis."
+            }
+            return
+        }
+        
+        let allSessions = sessionStore.sessions
+        let closedSessions = allSessions.filter { $0.winLoss != nil }
+        let sortedRecent = closedSessions.sorted { $0.startTime > $1.startTime }
+        let recentSessions = Array(sortedRecent.prefix(20))
+        
+        let total = closedSessions.count
+        let wins = closedSessions.filter { ($0.winLoss ?? 0) > 0 }.count
+        let losses = closedSessions.filter { ($0.winLoss ?? 0) < 0 }.count
+        let breakeven = closedSessions.filter { ($0.winLoss ?? 0) == 0 }.count
+        let net = closedSessions.compactMap { $0.winLoss }.reduce(0, +)
+        let avgPerSession: Double? = total > 0 ? Double(net) / Double(total) : nil
+        let winRate: Double? = total > 0 ? Double(wins) / Double(total) : nil
+        
+        let rorResult = RiskOfRuinMath.compute(
+            sessions: allSessions,
+            bankroll: settingsStore.bankroll,
+            unitSize: settingsStore.unitSize,
+            targetAveragePerSession: settingsStore.targetAveragePerSession,
+            currentBetAmount: nil
+        )
+        
+        let currency = settingsStore.currencySymbol
+        let netString: String = {
+            if net == 0 { return "break-even" }
+            let sign = net > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(net))"
+        }()
+        let avgString: String = {
+            guard let avg = avgPerSession else { return "n/a" }
+            let rounded = Int(round(abs(avg)))
+            let sign = avg > 0 ? "+" : (avg < 0 ? "-" : "")
+            return "\(sign)\(currency)\(rounded) per session"
+        }()
+        let winRateString: String = {
+            guard let wr = winRate else { return "n/a" }
+            return String(format: "%.0f%%", wr * 100)
+        }()
+        let rorPercentString: String = {
+            let pct = rorResult.riskOfRuin * 100
+            if rorResult.sessionCount == 0 { return "n/a" }
+            if pct >= 99.5 { return "~100%" }
+            if pct <= 0.5 { return "<1%" }
+            return String(format: "%.1f%%", pct)
+        }()
+        
+        let df = DateFormatter()
+        df.dateStyle = .short
+        
+        let recentLines: String = recentSessions.map { session in
+            let wl = session.winLoss ?? 0
+            let wlSign = wl > 0 ? "+" : (wl < 0 ? "-" : "")
+            let wlText = wl == 0 ? "even" : "\(wlSign)\(currency)\(abs(wl))"
+            let points = session.tierPointsEarned ?? 0
+            let mood = session.sessionMood?.label ?? "none"
+            let hours = String(format: "%.1f hrs", session.hoursPlayed)
+            let ratedBet = session.avgBetRated.map { "\(currency)\($0)" } ?? "n/a"
+            let actualBet = session.avgBetActual.map { "\(currency)\($0)" } ?? "n/a"
+            let ratingGapText: String = {
+                if let rated = session.avgBetRated, let actual = session.avgBetActual {
+                    let diff = rated - actual
+                    let sign = diff > 0 ? "+" : (diff < 0 ? "-" : "")
+                    return "\(sign)\(currency)\(abs(diff))"
+                } else {
+                    return "n/a"
+                }
+            }()
+            let dateText = df.string(from: session.startTime)
+            return "\(dateText): \(session.casino) — \(session.game), \(wlText), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
+        }.joined(separator: "\n")
+        
+        let statsBlock = """
+        Player settings:
+        - Bankroll: \(currency)\(settingsStore.bankroll)
+        - Unit size: \(currency)\(settingsStore.unitSize)
+        
+        History summary:
+        - Closed sessions: \(total)
+        - Wins: \(wins), Losses: \(losses), Breakeven: \(breakeven)
+        - Net result: \(netString)
+        - Average per session: \(avgString)
+        - Session win rate: \(winRateString)
+        - Estimated risk of ruin: \(rorPercentString)
+        """
+        
+        let toneInstruction = settingsStore.aiTone.promptLabel
+        let questionPrompt = selectedQuestion.instruction(toneLabel: toneInstruction)
+        let prompt = """
+        You are a gambling session analytics assistant for the TierTap app.
+        
+        The player has asked the following question:
+        \"\(selectedQuestion.title)\"
+        
+        Your task:
+        \(questionPrompt)
+        
+        Use the data below to ground your answer. If the data is thin for a specific angle, say so briefly instead of guessing.
+        Prefer short paragraphs over bullet points and keep the answer focused on what this specific player is showing in their history.
+        
+        Data:
+        \(statsBlock)
+        
+        Recent sessions (most recent first):
+        \(recentLines)
+        """
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
-            answer = nil
+            fullAnswer = nil
+            displayedAnswer = ""
         }
         
         struct GeminiRequest: Encodable {
@@ -653,9 +890,13 @@ struct AIAnalyticsSheet: View {
         }
         
         do {
+            // Record usage before calling the Gemini router so we never exceed the limit.
+            await MainActor.run {
+                settingsStore.registerAICall()
+            }
             let body = GeminiRequest(
                 contents: [
-                    .init(role: "user", parts: [.init(text: "Is the sky blue?")])
+                    .init(role: "user", parts: [.init(text: prompt)])
                 ]
             )
             let response: GeminiRouterResponse = try await client.functions.invoke(
@@ -670,13 +911,26 @@ struct AIAnalyticsSheet: View {
                 .joined(separator: "\n")
                 ?? "No text response from Gemini."
             await MainActor.run {
-                answer = text
+                fullAnswer = text
                 isLoading = false
             }
+            await typeOut(text)
         } catch {
             await MainActor.run {
                 errorMessage = error.localizedDescription
                 isLoading = false
+            }
+        }
+    }
+    
+    private func typeOut(_ text: String) async {
+        await MainActor.run {
+            displayedAnswer = ""
+        }
+        for character in text {
+            try? await Task.sleep(nanoseconds: 25_000_000)
+            await MainActor.run {
+                displayedAnswer.append(character)
             }
         }
     }
