@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import Supabase
 
 struct AnalyticsShareSelection {
     let includeBetCaptureDiff: Bool
@@ -14,6 +15,8 @@ struct AnalyticsShareSelection {
 struct AnalyticsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    
+    @State private var isAISheetPresented: Bool = false
     
     @State private var selectedGraphKind: GraphKind = .betCaptureDiff
     @State private var isShareSelectionPresented: Bool = false
@@ -162,6 +165,16 @@ struct AnalyticsView: View {
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isAISheetPresented = true
+                    } label: {
+                        Image(systemName: "wand.and.stars")
+                            .imageScale(.medium)
+                    }
+                    .foregroundColor(.white)
+                    .accessibilityLabel("AI analysis")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !closedSessions.isEmpty {
                         Button {
@@ -174,6 +187,10 @@ struct AnalyticsView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $isAISheetPresented) {
+            AIAnalyticsSheet()
+                .environmentObject(settingsStore)
         }
         .sheet(isPresented: $isShareSelectionPresented) {
             AnalyticsShareSelectionSheet(
@@ -490,6 +507,177 @@ struct AnalyticsView: View {
                 dateRangeText: analyticsDateRangeText,
                 locationFilterText: analyticsLocationFilterText
             )
+        }
+    }
+}
+
+struct AIAnalyticsSheet: View {
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var isLoading = false
+    @State private var answer: String?
+    @State private var errorMessage: String?
+    
+    private let questionText = "Is the sky blue?"
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("AI Analysis")
+                            .font(.title2.bold())
+                            .foregroundColor(.white)
+                        Text("Ask the TierTap assistant a quick question.")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Question")
+                            .font(.caption.bold())
+                            .foregroundColor(.white.opacity(0.8))
+                        Text(questionText)
+                            .font(.body)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.25))
+                            .cornerRadius(12)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    if isLoading {
+                        ProgressView("Asking Gemini…")
+                            .tint(.white)
+                    }
+                    
+                    if let answer = answer {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Answer")
+                                .font(.caption.bold())
+                                .foregroundColor(.white.opacity(0.8))
+                            Text(answer)
+                                .font(.body)
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.black.opacity(0.35))
+                                .cornerRadius(12)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    } else if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    
+                    Spacer()
+                    
+                    Button {
+                        Task { await callAI() }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Image(systemName: "sparkles")
+                                Text("Ask Gemini")
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 3)
+                    }
+                    .disabled(isLoading)
+                }
+                .padding()
+            }
+            .navigationTitle("AI Analysis")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+            }
+        }
+    }
+    
+    private func callAI() async {
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run {
+                errorMessage = "Supabase is not configured. Add your project keys to SupabaseKeys.plist."
+            }
+            return
+        }
+        
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            answer = nil
+        }
+        
+        struct GeminiRequest: Encodable {
+            struct Part: Encodable { let text: String }
+            struct Content: Encodable {
+                let role: String
+                let parts: [Part]
+            }
+            let contents: [Content]
+        }
+        struct GeminiPart: Decodable {
+            let text: String?
+        }
+        struct GeminiContent: Decodable {
+            let parts: [GeminiPart]?
+        }
+        struct GeminiCandidate: Decodable {
+            let content: GeminiContent?
+        }
+        struct GeminiRouterResponse: Decodable {
+            let candidates: [GeminiCandidate]?
+        }
+        
+        do {
+            let body = GeminiRequest(
+                contents: [
+                    .init(role: "user", parts: [.init(text: "Is the sky blue?")])
+                ]
+            )
+            let response: GeminiRouterResponse = try await client.functions.invoke(
+                "gemini-router",
+                options: FunctionInvokeOptions(body: body)
+            )
+            let text = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n")
+                ?? "No text response from Gemini."
+            await MainActor.run {
+                answer = text
+                isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                isLoading = false
+            }
         }
     }
 }
