@@ -641,7 +641,7 @@ struct ChipEstimatorSheetView: View {
                                 Text("Estimating chip value…")
                                     .font(.headline)
                                     .foregroundColor(.white)
-                                Text("Analyzing your photo with Gemini.")
+                                Text("Analyzing your photo with TierTap AI.")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
@@ -768,8 +768,11 @@ struct ChipEstimatorSheetView: View {
         You are estimating the total cash value of casino chips shown in this photo.
         The game is \(gameText) and the location is \(casinoText).
 
-        Respond with only a single integer number of dollars (no currency symbol, commas, or extra text).
-        If you are unsure, make your best estimate and still return a single integer.
+        Only estimate a value if the primary subject of the photo is CLEARLY casino chips, cash, or other casino items that have an obvious, standard cash-equivalent value (for example, chips, plaques, or bills).
+        If the photo does not clearly show casino chips, cash, or obvious casino items of monetary value, or if you are not confident it is a casino chip/cash photo, you MUST respond with the single word UNKNOWN.
+
+        If it IS a valid casino chip/cash photo, respond with only a single integer number of dollars (no currency symbol, commas, or extra text).
+        Do not explain your reasoning; just return either UNKNOWN or a single integer.
         """
 
         let body = GeminiImageRequest(
@@ -805,6 +808,16 @@ struct ChipEstimatorSheetView: View {
                 .parts?
                 .compactMap { $0.text }
                 .joined(separator: "\n") ?? ""
+            let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+            // If the model indicates it cannot confidently estimate a chip/cash value.
+            if trimmedText == "UNKNOWN" {
+                await MainActor.run {
+                    isEstimating = false
+                    errorMessage = "AI could not identify a clear chip or cash value from this photo. Make sure the image shows casino chips or cash clearly."
+                }
+                return
+            }
 
             let digits = text.compactMap { $0.isNumber ? $0 : nil }
             let amount = Int(String(digits))
