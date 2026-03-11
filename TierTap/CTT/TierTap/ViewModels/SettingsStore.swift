@@ -325,8 +325,10 @@ final class SettingsStore: ObservableObject {
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
 
-    /// Maximum number of AI calls allowed per day on the free tier.
-    let maxAICallsPerDay: Int = 5
+    /// Maximum number of AI calls allowed per day on the free tier. Higher on TestFlight for testers.
+    var maxAICallsPerDay: Int {
+        SupabaseConfig.isTestFlight ? 20 : 5
+    }
 
     /// Remaining AI calls the user can make today on the free tier.
     var remainingAICallsToday: Int {

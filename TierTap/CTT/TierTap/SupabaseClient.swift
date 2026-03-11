@@ -21,6 +21,15 @@ enum SupabaseConfig {
         url != nil && anonKey != nil
     }
 
+    /// True when the app is running as a TestFlight build (on device). Used to relax limits for testers.
+    static var isTestFlight: Bool {
+        #if targetEnvironment(simulator)
+        return false
+        #else
+        return currentDistributionChannel() == .testFlight
+        #endif
+    }
+
     private static func string(forKey key: String) -> String? {
         guard let url = Bundle.main.url(forResource: keysPlistName, withExtension: "plist"),
               let dict = NSDictionary(contentsOf: url) as? [String: Any],
