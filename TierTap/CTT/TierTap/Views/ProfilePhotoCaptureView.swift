@@ -5,6 +5,7 @@ import UIKit
 struct ProfilePhotoCaptureView: UIViewControllerRepresentable {
     @Environment(\.presentationMode) private var presentationMode
     @Binding var image: UIImage?
+    var preferredSourceType: UIImagePickerController.SourceType = .camera
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -12,8 +13,8 @@ struct ProfilePhotoCaptureView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            picker.sourceType = .camera
+        if UIImagePickerController.isSourceTypeAvailable(preferredSourceType) {
+            picker.sourceType = preferredSourceType
         } else {
             picker.sourceType = .photoLibrary
         }

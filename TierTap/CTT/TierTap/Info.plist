@@ -17,6 +17,10 @@
 	<dict/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TierTap uses your location to suggest nearby casinos so you can quickly tag where you played.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>TierTap uses the camera so you can take a profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TierTap needs access to your photo library so you can choose a profile photo.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

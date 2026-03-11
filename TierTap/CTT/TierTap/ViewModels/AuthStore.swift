@@ -10,6 +10,8 @@ final class AuthStore: ObservableObject {
     @Published private(set) var session: Auth.Session?
     @Published private(set) var isLoading = false
     @Published var errorMessage: String?
+    /// Generic informational message for non-error auth states (e.g. "Check your email").
+    @Published var infoMessage: String?
     @Published var otpSent = false
 
     private var authStateTask: Task<Void, Never>?
@@ -119,12 +121,83 @@ final class AuthStore: ObservableObject {
         }
         isLoading = true
         errorMessage = nil
+        infoMessage = nil
         otpSent = false
         defer { isLoading = false }
         do {
             let redirectTo = URL(string: "com.app.tiertap://login-callback")!
             try await client.auth.signInWithOTP(email: trimmed, redirectTo: redirectTo)
             otpSent = true
+            infoMessage = "Check your inbox for the sign-in link."
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// Create a new account using email + password.
+    func signUpWithEmailPassword(email: String, password: String) async {
+        guard let client = supabase else {
+            errorMessage = "Supabase is not configured. Add SUPABASE_URL and SUPABASE_ANON_KEY to Info.plist."
+            return
+        }
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedEmail.isEmpty else {
+            errorMessage = "Please enter your email."
+            return
+        }
+        guard !password.isEmpty else {
+            errorMessage = "Please enter a password."
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        infoMessage = nil
+        otpSent = false
+        defer { isLoading = false }
+
+        do {
+            _ = try await client.auth.signUp(
+                email: trimmedEmail,
+                password: password
+            )
+            // Depending on your Supabase email confirmation settings, this may immediately create a session
+            // or require the user to confirm via email first. Either way, the auth state observer will keep
+            // `session` in sync; we just show a helpful message here.
+            infoMessage = "If required, check your email to confirm your TierTap account."
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// Sign in using email + password for users who already created an account.
+    func signInWithEmailPassword(email: String, password: String) async {
+        guard let client = supabase else {
+            errorMessage = "Supabase is not configured. Add SUPABASE_URL and SUPABASE_ANON_KEY to Info.plist."
+            return
+        }
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedEmail.isEmpty else {
+            errorMessage = "Please enter your email."
+            return
+        }
+        guard !password.isEmpty else {
+            errorMessage = "Please enter your password."
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        infoMessage = nil
+        otpSent = false
+        defer { isLoading = false }
+
+        do {
+            let authSession = try await client.auth.signIn(
+                email: trimmedEmail,
+                password: password
+            )
+            session = authSession
         } catch {
             errorMessage = error.localizedDescription
         }

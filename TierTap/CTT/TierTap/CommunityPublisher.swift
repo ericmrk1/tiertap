@@ -65,10 +65,8 @@ struct CommunityPublisher {
                 comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t }
             )
 
-            let metrics = TableGamePostMetrics(
+            let metrics = TableGamePostMetricsPayload(
                 duration_seconds: Int(s.duration),
-                total_buy_in: s.totalBuyIn,
-                cash_out: s.cashOut,
                 starting_tier_points: s.startingTierPoints,
                 ending_tier_points: s.endingTierPoints,
                 tiers_per_hour: s.tiersPerHour,
@@ -101,7 +99,7 @@ struct TableGamePostPayload: Encodable {
     let session_details: TableGamePostSessionDetails
     let location: String
     let game: String
-    let metrics: TableGamePostMetrics
+    let metrics: TableGamePostMetricsPayload
     let user_id: UUID
 }
 
@@ -116,11 +114,23 @@ struct TableGamePostSessionDetails: Codable {
     let comment: String?
 }
 
-/// JSON body stored in the `metrics` column.
+/// JSON body stored in the `metrics` column when reading from the feed.
 struct TableGamePostMetrics: Codable {
     let duration_seconds: Int?
-    let total_buy_in: Int
-    let cash_out: Int?
+    let starting_tier_points: Int
+    let ending_tier_points: Int?
+    let tiers_per_hour: Double?
+    let avg_bet_actual: Int?
+    let avg_bet_rated: Int?
+    let currency_code: String?
+    let currency_symbol: String?
+}
+
+/// JSON body stored in the `metrics` column when publishing sessions.
+/// This intentionally omits `total_buy_in` and `cash_out` so that win/loss amounts
+/// are not saved in the metrics JSON for shared sessions.
+struct TableGamePostMetricsPayload: Encodable {
+    let duration_seconds: Int?
     let starting_tier_points: Int
     let ending_tier_points: Int?
     let tiers_per_hour: Double?

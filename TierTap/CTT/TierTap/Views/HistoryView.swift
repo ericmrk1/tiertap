@@ -3,6 +3,7 @@ import SwiftUI
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSession: Session?
     @State private var sessionToEdit: Session?
@@ -229,14 +230,57 @@ struct HistoryView: View {
                     .foregroundColor(.green)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    if !filteredSessions.isEmpty {
-                        Button {
-                            isShareSelectorPresented = true
-                        } label: {
-                            Image(systemName: "square.and.arrow.up")
-                                .foregroundColor(.green)
+                    HStack(spacing: 8) {
+                        if !filteredSessions.isEmpty {
+                            Button {
+                                isShareSelectorPresented = true
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .foregroundColor(.green)
+                            }
+                            .accessibilityLabel("Share sessions")
                         }
-                        .accessibilityLabel("Share sessions")
+
+                        Button {
+                            NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                        } label: {
+                            HStack(spacing: 6) {
+                                if authStore.isSignedIn,
+                                   let data = authStore.userProfilePhotoData,
+                                   let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 24, height: 24)
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                        )
+                                } else {
+                                    Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                                }
+                                if authStore.isSignedIn {
+                                    if authStore.userProfilePhotoData == nil,
+                                       let emojis = authStore.userProfileEmojis,
+                                       !emojis.isEmpty {
+                                        Text(emojis)
+                                            .font(.caption)
+                                    }
+                                    Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
+                                        .lineLimit(1)
+                                        .font(.caption)
+                                } else {
+                                    Text("Account")
+                                        .font(.caption)
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.18))
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                        }
                     }
                 }
             }

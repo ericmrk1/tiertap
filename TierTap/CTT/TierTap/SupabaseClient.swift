@@ -29,11 +29,12 @@ enum SupabaseConfig {
     }
 }
 
-/// Global Supabase client. Only valid when SupabaseConfig.isConfigured is true.
-var supabase: SupabaseClient? {
+/// Global Supabase client instance, created once so that auth state,
+/// sessions, and storage are shared consistently across the app.
+let supabase: SupabaseClient? = {
     guard let url = SupabaseConfig.url, let key = SupabaseConfig.anonKey else { return nil }
     return SupabaseClient(supabaseURL: url, supabaseKey: key)
-}
+}()
 
 // MARK: - App distribution detection
 

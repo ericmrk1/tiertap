@@ -261,21 +261,41 @@ struct CommunitySessionsView: View {
                         showAuthSheet = true
                     } label: {
                         HStack(spacing: 6) {
-                            Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                            if authStore.isSignedIn,
+                               let data = authStore.userProfilePhotoData,
+                               let uiImage = UIImage(data: data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 24, height: 24)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                    )
+                            } else {
+                                Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                            }
                             if authStore.isSignedIn {
-                                if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
+                                if authStore.userProfilePhotoData == nil,
+                                   let emojis = authStore.userProfileEmojis,
+                                   !emojis.isEmpty {
                                     Text(emojis)
-                                        .font(.body)
+                                        .font(.caption)
                                 }
                                 Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
                                     .lineLimit(1)
                                     .font(.caption)
                             } else {
                                 Text("Account")
-                                    .font(.subheadline)
+                                    .font(.caption)
                             }
                         }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.18))
                         .foregroundColor(.white)
+                        .clipShape(Capsule())
                     }
                 }
             }
@@ -377,12 +397,44 @@ struct CommunityAuthSheet: View {
     @Binding var emailInput: String
     var onDismiss: () -> Void
 
+    private enum EmailAuthMode: String, CaseIterable, Identifiable {
+        case signIn
+        case signUp
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .signIn: return "Sign in"
+            case .signUp: return "Sign up"
+            }
+        }
+
+        var buttonTitle: String {
+            switch self {
+            case .signIn: return "Sign in with email"
+            case .signUp: return "Create email account"
+            }
+        }
+    }
+
     @State private var profileDisplayName: String = ""
     @State private var profileEmojis: String = ""
     @State private var profilePhoto: UIImage?
     @State private var isSavingProfile = false
     @State private var profileSaved = false
-    @State private var isShowingImagePicker = false
+    @State private var isShowingCameraPicker = false
+    @State private var isShowingLibraryPicker = false
+    @State private var emailAuthMode: EmailAuthMode = .signUp
+    @State private var emailPassword: String = ""
+    @State private var emailPasswordConfirm: String = ""
+
+    private var logoImage: Image {
+        if let processed = TransparentLogoCache.image {
+            return Image(uiImage: processed)
+        }
+        return Image("LogoSplash")
+    }
 
     var body: some View {
         NavigationStack {
@@ -422,8 +474,16 @@ struct CommunityAuthSheet: View {
                 profilePhoto = nil
             }
         }
-        .sheet(isPresented: $isShowingImagePicker) {
-            ProfilePhotoCaptureView(image: $profilePhoto)
+        .onChange(of: profilePhoto) { _ in
+            if authStore.isSignedIn {
+                saveProfile()
+            }
+        }
+        .sheet(isPresented: $isShowingCameraPicker) {
+            ProfilePhotoCaptureView(image: $profilePhoto, preferredSourceType: .camera)
+        }
+        .sheet(isPresented: $isShowingLibraryPicker) {
+            ProfilePhotoCaptureView(image: $profilePhoto, preferredSourceType: .photoLibrary)
         }
     }
 
@@ -455,21 +515,39 @@ struct CommunityAuthSheet: View {
                             .stroke(Color.white.opacity(0.6), lineWidth: 2)
                     )
 
-                    Button {
-                        isShowingImagePicker = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "camera.fill")
-                            Text("Take or choose photo")
-                                .font(.subheadline.bold())
+                    VStack(alignment: .leading, spacing: 8) {
+                        Button {
+                            isShowingCameraPicker = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "camera.fill")
+                                Text("Take photo")
+                                    .font(.subheadline.bold())
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.white.opacity(0.18))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.white.opacity(0.18))
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                        .buttonStyle(.plain)
+
+                        Button {
+                            isShowingLibraryPicker = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "photo.on.rectangle")
+                                Text("Choose from library")
+                                    .font(.subheadline.bold())
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.white.opacity(0.18))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
 
                 Text("Display name")
@@ -524,43 +602,69 @@ struct CommunityAuthSheet: View {
     @ViewBuilder
     private var authContent: some View {
         VStack(spacing: 20) {
+            VStack(spacing: 16) {
+                logoImage
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 120)
+                    .shadow(radius: 10)
+
+                Text("Your TierTap Account")
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+
+                Text("Sign in to unlock advanced AI features, sync your data, and join Community sessions.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.bottom, 4)
+
             if !SupabaseConfig.isConfigured {
-                Text("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in.")
+                Text("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                     .padding()
             } else if authStore.isSignedIn {
-                // Current login info
-                VStack(spacing: 8) {
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(settingsStore.primaryGradient)
-                    Text("Signed in")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    if let name = authStore.userDisplayName, !name.isEmpty {
-                        Text(name)
-                            .font(.subheadline.bold())
-                            .foregroundColor(.white)
-                    }
-                    if let email = authStore.userEmail {
-                        Text(email)
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.9))
-                            .multilineTextAlignment(.center)
-                    }
-                    if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
-                        Text(emojis)
-                            .font(.title2)
-                            .padding(.top, 4)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-
                 // Profile: display name & emojis (large section)
                 profileSection
+
+                // Current login info moved below profile in its own bubble
+                VStack {
+                    HStack(alignment: .center, spacing: 12) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(settingsStore.primaryGradient)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Signed in")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            if let name = authStore.userDisplayName, !name.isEmpty {
+                                Text(name)
+                                    .font(.subheadline.bold())
+                                    .foregroundColor(.white)
+                            }
+                            if let email = authStore.userEmail {
+                                Text(email)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
+                                Text(emojis)
+                                    .font(.title3)
+                            }
+                        }
+                        Spacer()
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray6).opacity(0.18))
+                .cornerRadius(16)
 
                 Button("Log out", role: .destructive) {
                     authStore.signOut()
@@ -569,10 +673,24 @@ struct CommunityAuthSheet: View {
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
             } else {
-                Text("Sign in to sync with the community")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Why create an account?")
+                        .font(.headline)
+                        .foregroundColor(.white)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Advanced AI summaries and guidance for your sessions.", systemImage: "wand.and.stars")
+                        Label("Sync your sessions and bankroll safely across devices.", systemImage: "icloud")
+                        Label("See and publish Community sessions with other players.", systemImage: "person.3.sequence.fill")
+                        Label("Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
+                    }
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(Color.black.opacity(0.35))
+                .cornerRadius(18)
 
                 Button {
                     authStore.signInWithApple()
@@ -608,44 +726,106 @@ struct CommunityAuthSheet: View {
                 .buttonStyle(.plain)
                 .disabled(authStore.isLoading)
 
-                Text("or use email")
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Email account")
+                        .font(.headline)
+                        .foregroundColor(.white)
 
-                TextField("Email", text: $emailInput)
-                    .textContentType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .keyboardType(.emailAddress)
-                    .padding(12)
-                    .background(Color.white.opacity(0.15))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
+                    Picker("Email auth mode", selection: $emailAuthMode) {
+                        ForEach(EmailAuthMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
 
-                if authStore.otpSent {
-                    Text("Check your inbox for the sign-in link.")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                }
-                if let msg = authStore.errorMessage {
-                    Text(msg)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
+                    TextField("Email", text: $emailInput)
+                        .textContentType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .keyboardType(.emailAddress)
+                        .padding(12)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(10)
+                        .foregroundColor(.white)
+
+                    SecureField("Password", text: $emailPassword)
+                        .textContentType(.password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .padding(12)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(10)
+                        .foregroundColor(.white)
+
+                    if emailAuthMode == .signUp {
+                        SecureField("Confirm password", text: $emailPasswordConfirm)
+                            .textContentType(.password)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .padding(12)
+                            .background(Color.white.opacity(0.15))
+                            .cornerRadius(10)
+                            .foregroundColor(.white)
+                    }
+
+                    if let info = authStore.infoMessage {
+                        Text(info)
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .multilineTextAlignment(.leading)
+                    }
+
+                    if let msg = authStore.errorMessage {
+                        Text(msg)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.leading)
+                    }
+
+                    Button {
+                        let trimmedEmail = emailInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                        switch emailAuthMode {
+                        case .signIn:
+                            Task { await authStore.signInWithEmailPassword(email: trimmedEmail, password: emailPassword) }
+                        case .signUp:
+                            Task { await authStore.signUpWithEmailPassword(email: trimmedEmail, password: emailPassword) }
+                        }
+                    } label: {
+                        if authStore.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(maxWidth: .infinity)
+                        } else {
+                            Text(emailAuthMode.buttonTitle)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(
+                        authStore.isLoading ||
+                        emailInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        emailPassword.isEmpty ||
+                        (emailAuthMode == .signUp && emailPasswordConfirm.isEmpty) ||
+                        (emailAuthMode == .signUp && emailPasswordConfirm != emailPassword)
+                    )
                 }
 
                 Button {
-                    Task { await authStore.signInWithOTP(email: emailInput) }
+                    onDismiss()
                 } label: {
-                    if authStore.isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Send magic link")
-                    }
+                    Text("Continue without an account")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .background(Color.white.opacity(0.1))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(authStore.isLoading || emailInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Text("You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.85))
+                    .multilineTextAlignment(.center)
             }
         }
         .frame(maxWidth: .infinity)
