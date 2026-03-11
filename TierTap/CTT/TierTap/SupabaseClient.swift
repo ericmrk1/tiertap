@@ -33,7 +33,13 @@ enum SupabaseConfig {
 /// sessions, and storage are shared consistently across the app.
 let supabase: SupabaseClient? = {
     guard let url = SupabaseConfig.url, let key = SupabaseConfig.anonKey else { return nil }
-    return SupabaseClient(supabaseURL: url, supabaseKey: key)
+    return SupabaseClient(
+        supabaseURL: url,
+        supabaseKey: key,
+        options: SupabaseClientOptions(
+            auth: .init(emitLocalSessionAsInitialSession: true)
+        )
+    )
 }()
 
 // MARK: - App distribution detection

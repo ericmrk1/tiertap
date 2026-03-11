@@ -17,6 +17,8 @@
 		2E255D4C2F61FAF900CAF0D7 /* victory_confetti.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */; };
 		2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */; };
 		2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */; };
+		2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */; };
+		2E9D7B8C2F621216004015F4 /* PhotoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
@@ -131,6 +133,8 @@
 		2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = cat_star_collect.wav; sourceTree = "<group>"; };
 		2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = coins_clinking.wav; sourceTree = "<group>"; };
 		2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory_confetti.wav; sourceTree = "<group>"; };
+		2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipEstimatorPhotoStorage.swift; sourceTree = "<group>"; };
+		2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHelpers.swift; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -225,6 +229,8 @@
 				7BB2D6A268E0AEBFFAF0C87B /* Products */,
 				2E255C1A2F5E726A00CAF0D7 /* Recovered References */,
 				2E255D282F61F5D300CAF0D7 /* Sounds */,
+				2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */,
+				2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -587,11 +593,13 @@
 				STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */,
 				BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
+				2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
 				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,
 				EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */,
 				5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */,
+				2E9D7B8C2F621216004015F4 /* PhotoHelpers.swift in Sources */,
 				CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */,
 				SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */,
 				GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */,

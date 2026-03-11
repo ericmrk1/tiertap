@@ -1,8 +1,11 @@
 import SwiftUI
+import UIKit
+import Supabase
 
 struct CloseoutView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
     @State private var cashOut = ""
     @State private var avgBetActual = ""
@@ -14,6 +17,10 @@ struct CloseoutView: View {
     @State private var closedSessionId: UUID?
     @State private var showGASheet = false
     @State private var privateNotes = ""
+
+    // Chip estimator entry point
+    @State private var showChipEstimatorSheet = false
+    @State private var chipEstimatorError: String?
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
@@ -276,11 +283,54 @@ struct CloseoutView: View {
                     }
                     .padding()
                 }
+                // Floating Chip Estimator button for signed-in users only
+                if authStore.isSignedIn {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Button {
+                                startChipEstimatorFlow()
+                            } label: {
+                                Label("Chip Estimator", systemImage: "camera.viewfinder")
+                                    .font(.subheadline.bold())
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(Color.blue.opacity(0.9))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                                    .shadow(radius: 5)
+                            }
+                            .padding(.trailing, 16)
+                            .padding(.bottom, 16)
+                        }
+                    }
+                    .allowsHitTesting(true)
+                }
             }
             .navigationTitle("End Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .alert("Chip estimator error", isPresented: Binding<Bool>(
+                get: { chipEstimatorError != nil },
+                set: { if !$0 { chipEstimatorError = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(chipEstimatorError ?? "Something went wrong while estimating the chip value.")
+            }
+            .sheet(isPresented: $showChipEstimatorSheet) {
+                ChipEstimatorSheetView(
+                    sessionID: s.id,
+                    game: s.game,
+                    casino: s.casino,
+                    cashOut: $cashOut
+                )
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+            }
             .alert("Tier Points Decreased", isPresented: $showLowAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Save Anyway") { save() }
@@ -395,4 +445,388 @@ struct CloseoutView: View {
             showEmotionPicker = true
         }
     }
+
+    private func startChipEstimatorFlow() {
+        guard SupabaseConfig.isConfigured else {
+            chipEstimatorError = "AI is not configured for this build."
+            return
+        }
+        guard authStore.isSignedIn else {
+            chipEstimatorError = "Chip Estimator is only available to signed-in users."
+            return
+        }
+        guard settingsStore.canUseAI() else {
+            chipEstimatorError = "You've reached today's free AI limit. Try again tomorrow."
+            return
+        }
+        showChipEstimatorSheet = true
+    }
 }
+
+struct ChipEstimatorSheetView: View {
+    let sessionID: UUID
+    let game: String
+    let casino: String
+    @Binding var cashOut: String
+
+    @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var selectedImage: UIImage?
+    @State private var isEstimating = false
+    @State private var estimatedAmount: Int?
+    @State private var errorMessage: String?
+
+    private enum ChipPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
+
+    @State private var chipPhotoSource: ChipPhotoSource?
+
+    private var canEstimate: Bool {
+        selectedImage != nil &&
+        !isEstimating &&
+        SupabaseConfig.isConfigured &&
+        authStore.isSignedIn &&
+        settingsStore.canUseAI()
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 20) {
+                        VStack(spacing: 6) {
+                            Text(casino.isEmpty ? "Unknown casino" : casino)
+                                .font(.title2.bold())
+                                .foregroundColor(.white)
+                            Text(game.isEmpty ? "Unknown table game" : game)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text("Chip Estimator")
+                                .font(.caption.bold())
+                                .foregroundColor(.green)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.18))
+                        .cornerRadius(16)
+
+                        VStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                    .background(Color(.systemGray6).opacity(0.15))
+                                    .cornerRadius(16)
+
+                                if let image = selectedImage {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(14)
+                                        .padding(4)
+                                } else {
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "camera.viewfinder")
+                                            .font(.system(size: 32))
+                                            .foregroundColor(.gray)
+                                        Text("Add a photo of your chips")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(24)
+                                }
+                            }
+                            .frame(maxHeight: 280)
+
+                            HStack(spacing: 12) {
+                                Button {
+                                    chipPhotoSource = .camera
+                                } label: {
+                                    Label("Camera", systemImage: "camera")
+                                        .font(.subheadline.bold())
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color.blue.opacity(0.95))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(18)
+                                }
+
+                                Button {
+                                    chipPhotoSource = .photoLibrary
+                                } label: {
+                                    Label("Photo Library", systemImage: "photo")
+                                        .font(.subheadline.bold())
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(18)
+                                }
+                            }
+
+                            Button {
+                                Task { await estimateAmount() }
+                            } label: {
+                                HStack {
+                                    if isEstimating {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                                    } else {
+                                        Image(systemName: "sparkles")
+                                    }
+                                    Text(isEstimating ? "Estimating…" : "Estimate with AI")
+                                }
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(canEstimate ? Color.green : Color.gray)
+                                .foregroundColor(canEstimate ? .black : .white)
+                                .cornerRadius(16)
+                            }
+                            .disabled(!canEstimate)
+
+                            if let estimatedAmount {
+                                VStack(spacing: 8) {
+                                    Text("Estimated value")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                    Text("\(settingsStore.currencySymbol)\(estimatedAmount)")
+                                        .font(.title.bold())
+                                        .foregroundColor(.green)
+
+                                    Button {
+                                        cashOut = String(estimatedAmount)
+                                        dismiss()
+                                    } label: {
+                                        Text("Use as cash-out amount")
+                                            .font(.subheadline.bold())
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 10)
+                                            .background(Color.blue.opacity(0.95))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(18)
+                                    }
+                                }
+                                .padding(.top, 8)
+                            }
+
+                            if let errorMessage {
+                                Text(errorMessage)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top, 4)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+
+                if isEstimating {
+                    Color.black.opacity(0.45)
+                        .ignoresSafeArea()
+                        .overlay {
+                            VStack(spacing: 14) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .green))
+                                    .scaleEffect(1.3)
+                                Text("Estimating chip value…")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Text("Analyzing your photo with Gemini.")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(20)
+                            .background(Color(.systemGray6).opacity(0.95))
+                            .cornerRadius(18)
+                        }
+                }
+            }
+            .navigationTitle("Chip Estimator")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                        .foregroundColor(.green)
+                }
+            }
+            .sheet(item: $chipPhotoSource) { source in
+                switch source {
+                case .camera:
+                    #if os(iOS)
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        selectedImage = image
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                case .photoLibrary:
+                    #if os(iOS)
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        selectedImage = image
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                }
+            }
+        }
+    }
+
+    // MARK: - Estimation
+
+    private func estimateAmount() async {
+        guard let image = selectedImage else {
+            await MainActor.run { errorMessage = "Please add a photo first." }
+            return
+        }
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run { errorMessage = "AI is not configured for this build." }
+            return
+        }
+        guard authStore.isSignedIn else {
+            await MainActor.run { errorMessage = "Chip Estimator is only available to signed-in users." }
+            return
+        }
+        guard settingsStore.canUseAI() else {
+            await MainActor.run { errorMessage = "You've reached today's free AI limit. Try again tomorrow." }
+            return
+        }
+
+        await MainActor.run {
+            isEstimating = true
+            errorMessage = nil
+            estimatedAmount = nil
+        }
+
+        struct GeminiInlineData: Encodable {
+            let mime_type: String
+            let data: String
+
+            enum CodingKeys: String, CodingKey {
+                case mime_type = "mime_type"
+                case data
+            }
+        }
+
+        struct GeminiPartImage: Encodable {
+            let text: String?
+            let inline_data: GeminiInlineData?
+
+            enum CodingKeys: String, CodingKey {
+                case text
+                case inline_data = "inline_data"
+            }
+        }
+
+        struct GeminiContentImage: Encodable {
+            let role: String
+            let parts: [GeminiPartImage]
+        }
+
+        struct GeminiImageRequest: Encodable {
+            let contents: [GeminiContentImage]
+        }
+
+        struct GeminiPart: Decodable {
+            let text: String?
+        }
+
+        struct GeminiContent: Decodable {
+            let parts: [GeminiPart]?
+        }
+
+        struct GeminiCandidate: Decodable {
+            let content: GeminiContent?
+        }
+
+        struct GeminiRouterResponse: Decodable {
+            let candidates: [GeminiCandidate]?
+        }
+
+        guard let imageData = image.jpegData(compressionQuality: 0.9)?.base64EncodedString() else {
+            await MainActor.run {
+                isEstimating = false
+                errorMessage = "Unable to process image."
+            }
+            return
+        }
+
+        let gameText = game.isEmpty ? "an unknown table game" : game
+        let casinoText = casino.isEmpty ? "an unknown casino" : casino
+
+        let prompt = """
+        You are estimating the total cash value of casino chips shown in this photo.
+        The game is \(gameText) and the location is \(casinoText).
+
+        Respond with only a single integer number of dollars (no currency symbol, commas, or extra text).
+        If you are unsure, make your best estimate and still return a single integer.
+        """
+
+        let body = GeminiImageRequest(
+            contents: [
+                .init(
+                    role: "user",
+                    parts: [
+                        .init(text: prompt, inline_data: nil),
+                        .init(
+                            text: nil,
+                            inline_data: GeminiInlineData(
+                                mime_type: "image/jpeg",
+                                data: imageData
+                            )
+                        )
+                    ]
+                )
+            ]
+        )
+
+        do {
+            await MainActor.run {
+                settingsStore.registerAICall()
+            }
+
+            let response: GeminiRouterResponse = try await client.functions.invoke(
+                "gemini-router",
+                options: FunctionInvokeOptions(body: body)
+            )
+            let text = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n") ?? ""
+
+            let digits = text.compactMap { $0.isNumber ? $0 : nil }
+            let amount = Int(String(digits))
+
+            await MainActor.run {
+                isEstimating = false
+                if let amount {
+                    estimatedAmount = amount
+
+                    if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: sessionID) {
+                        store.setChipEstimatorImageFilename(fileName)
+                    }
+                } else {
+                    errorMessage = "AI did not return a clear numeric estimate."
+                }
+            }
+        } catch {
+            await MainActor.run {
+                isEstimating = false
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+}
+

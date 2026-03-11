@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SessionDetailView: View {
     let session: Session
@@ -45,6 +46,21 @@ struct SessionDetailView: View {
                         }
                         .frame(maxWidth: .infinity).padding()
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
+
+                        if let fileName = session.chipEstimatorImageFilename,
+                           let url = ChipEstimatorPhotoStorage.url(for: fileName),
+                           let uiImage = UIImage(contentsOfFile: url.path) {
+                            DetailSection(title: "Chip photo estimate", icon: "camera.viewfinder") {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    )
+                            }
+                        }
 
                         // Metrics highlights
                         HStack(spacing: 12) {

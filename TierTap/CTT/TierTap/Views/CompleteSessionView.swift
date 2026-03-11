@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Fill in missing closeout details for a session that was cashed out from Watch (requiring more info).
 struct CompleteSessionView: View {
@@ -16,6 +17,18 @@ struct CompleteSessionView: View {
     @State private var completedSessionId: UUID?
     @State private var showGASheet = false
     @State private var privateNotes = ""
+    @State private var chipEstimatorImageFilename: String?
+    @State private var chipPreviewImage: UIImage?
+    @State private var showChipSourceDialog = false
+
+    private enum ChipPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
+
+    @State private var chipPhotoSource: ChipPhotoSource?
 
     init(session: Session) {
         self.session = session
@@ -132,6 +145,59 @@ struct CompleteSessionView: View {
                                 .scrollContentBackground(.hidden)
                         }
 
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "camera.viewfinder")
+                                    .foregroundColor(.green)
+                                Text("Chip photo (optional)")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                            }
+                            if let image = chipPreviewImage {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    )
+                            }
+                            HStack {
+                                Button {
+                                    showChipSourceDialog = true
+                                } label: {
+                                    Label(
+                                        chipPreviewImage == nil ? "Add chip photo" : "Replace chip photo",
+                                        systemImage: "camera"
+                                    )
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blue.opacity(0.9))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(16)
+                                }
+                                if chipPreviewImage != nil {
+                                    Button(role: .destructive) {
+                                        chipPreviewImage = nil
+                                        chipEstimatorImageFilename = nil
+                                        // Persist removal immediately.
+                                        var updated = session
+                                        updated.chipEstimatorImageFilename = nil
+                                        store.updateSession(updated)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .font(.caption)
+                                            .padding(8)
+                                            .background(Color.red.opacity(0.9))
+                                            .foregroundColor(.white)
+                                            .clipShape(Circle())
+                                    }
+                                }
+                            }
+                        }
+
                         VStack(spacing: 10) {
                             Button {
                                 if let et = Int(endingTier), et < session.startingTierPoints {
@@ -164,6 +230,14 @@ struct CompleteSessionView: View {
             .onAppear {
                 privateNotes = session.privateNotes ?? ""
                 cashOut = session.cashOut.map { "\($0)" } ?? ""
+                chipEstimatorImageFilename = session.chipEstimatorImageFilename
+                if let fileName = session.chipEstimatorImageFilename,
+                   let url = ChipEstimatorPhotoStorage.url(for: fileName),
+                   let uiImage = UIImage(contentsOfFile: url.path) {
+                    chipPreviewImage = uiImage
+                } else {
+                    chipPreviewImage = nil
+                }
                 // Default ending tier to this session's starting/ending tier if available,
                 // falling back to recent history for this casino.
                 if endingTier.isEmpty {
@@ -243,6 +317,39 @@ struct CompleteSessionView: View {
                 })
                 .environmentObject(settingsStore)
             }
+            .confirmationDialog(
+                "Choose a photo source",
+                isPresented: $showChipSourceDialog,
+                titleVisibility: .visible
+            ) {
+                Button("Camera") {
+                    chipPhotoSource = .camera
+                }
+                Button("Photo Library") {
+                    chipPhotoSource = .photoLibrary
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .sheet(item: $chipPhotoSource) { source in
+                switch source {
+                case .camera:
+                    #if os(iOS)
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        handleChipPhotoChange(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                case .photoLibrary:
+                    #if os(iOS)
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        handleChipPhotoChange(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                }
+            }
         }
     }
 
@@ -259,6 +366,7 @@ struct CompleteSessionView: View {
             updated.endingTierPoints = et
             updated.status = .complete
             updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+            updated.chipEstimatorImageFilename = chipEstimatorImageFilename
             store.updateSession(updated)
             if netPositive {
                 if settingsStore.enableCasinoFeedback {
@@ -283,6 +391,16 @@ struct CompleteSessionView: View {
             }
         } else {
             showEmotionPicker = true
+        }
+    }
+
+    private func handleChipPhotoChange(_ image: UIImage) {
+        if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: session.id) {
+            chipEstimatorImageFilename = fileName
+            chipPreviewImage = image
+            var updated = session
+            updated.chipEstimatorImageFilename = fileName
+            store.updateSession(updated)
         }
     }
 }

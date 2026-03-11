@@ -149,6 +149,17 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    /// Attach or replace the chip estimator image filename on the current live session.
+    func setChipEstimatorImageFilename(_ fileName: String?) {
+        guard var s = liveSession else { return }
+        s.chipEstimatorImageFilename = fileName
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
     func discardLiveSession() {
         liveSession = nil; clearLive()
         #if os(iOS)

@@ -63,6 +63,8 @@ struct Session: Identifiable, Codable, Equatable {
     var sessionMood: SessionMood?
     /// Private notes; stored locally only, never shared to community/database.
     var privateNotes: String?
+    /// Optional filename for a locally stored chip estimator photo associated with this session.
+    var chipEstimatorImageFilename: String?
 
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
@@ -70,6 +72,7 @@ struct Session: Identifiable, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case id, game, casino, startTime, endTime, startingTierPoints, endingTierPoints
         case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes
+        case chipEstimatorImageFilename
     }
 
     init(from decoder: Decoder) throws {
@@ -89,12 +92,14 @@ struct Session: Identifiable, Codable, Equatable {
         status = try c.decodeIfPresent(SessionStatus.self, forKey: .status) ?? .complete
         sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
         privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
+        chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
     }
 
     init(id: UUID = UUID(), game: String, casino: String, startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
-         status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil) {
+         status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
+         chipEstimatorImageFilename: String? = nil) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -110,6 +115,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.status = status
         self.sessionMood = sessionMood
         self.privateNotes = privateNotes
+        self.chipEstimatorImageFilename = chipEstimatorImageFilename
     }
 
     func encode(to encoder: Encoder) throws {
@@ -129,6 +135,7 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encode(status, forKey: .status)
         try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
         try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
+        try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
     }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
