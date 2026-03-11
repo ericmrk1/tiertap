@@ -12,6 +12,11 @@
 		2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */; };
 		2E255C192F5E726A00CAF0D7 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = SUPAPROD1E2F3A4B5C6D7E8F9A0B1 /* Supabase */; };
 		2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255D0E2F5FC0FB00CAF0D7 /* Sensitive.swift */; };
+		2E255D4A2F61FAF900CAF0D7 /* cash_register_sfx.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D462F61FAF900CAF0D7 /* cash_register_sfx.wav */; };
+		2E255D4B2F61FAF900CAF0D7 /* coins_clinking.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */; };
+		2E255D4C2F61FAF900CAF0D7 /* victory_confetti.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */; };
+		2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */; };
+		2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
@@ -121,6 +126,11 @@
 		2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch App.entitlements"; sourceTree = "<group>"; };
 		2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCalendarView.swift; sourceTree = "<group>"; };
 		2E255D0E2F5FC0FB00CAF0D7 /* Sensitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensitive.swift; sourceTree = "<group>"; };
+		2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = boodoodaloop.wav; sourceTree = "<group>"; };
+		2E255D462F61FAF900CAF0D7 /* cash_register_sfx.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = cash_register_sfx.wav; sourceTree = "<group>"; };
+		2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = cat_star_collect.wav; sourceTree = "<group>"; };
+		2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = coins_clinking.wav; sourceTree = "<group>"; };
+		2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory_confetti.wav; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -214,6 +224,7 @@
 				WCHF1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */,
 				7BB2D6A268E0AEBFFAF0C87B /* Products */,
 				2E255C1A2F5E726A00CAF0D7 /* Recovered References */,
+				2E255D282F61F5D300CAF0D7 /* Sounds */,
 			);
 			sourceTree = "<group>";
 		};
@@ -264,6 +275,18 @@
 				SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */,
 			);
 			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		2E255D282F61F5D300CAF0D7 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */,
+				2E255D462F61FAF900CAF0D7 /* cash_register_sfx.wav */,
+				2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */,
+				2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */,
+				2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		7BB2D6A268E0AEBFFAF0C87B /* Products */ = {
@@ -483,6 +506,11 @@
 				0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */,
 				PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */,
 				SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */,
+				2E255D4A2F61FAF900CAF0D7 /* cash_register_sfx.wav in Resources */,
+				2E255D4B2F61FAF900CAF0D7 /* coins_clinking.wav in Resources */,
+				2E255D4C2F61FAF900CAF0D7 /* victory_confetti.wav in Resources */,
+				2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */,
+				2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

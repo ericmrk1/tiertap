@@ -180,6 +180,9 @@ struct AnalyticsView: View {
                     HStack(spacing: 8) {
                         if !closedSessions.isEmpty {
                             Button {
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
                                 isShareSelectionPresented = true
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
@@ -1967,6 +1970,9 @@ struct AnalyticsShareSelectionSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Share") {
                         #if os(iOS)
+                        if settingsStore.enableCasinoFeedback {
+                            CelebrationPlayer.shared.playQuickChime()
+                        }
                         let selection = AnalyticsShareSelection(
                             includeBetCaptureDiff: includeBetCaptureDiff,
                             includeVenn: includeVenn,

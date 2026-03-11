@@ -432,6 +432,9 @@ struct BuyInQuickAddSheet: View {
                             Button {
                                 guard pendingTotal > 0 else { return }
                                 onAdd(pendingTotal)
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
                                 dismiss()
                             } label: {
                                 Text(pendingTotal > 0 ? "Add \(settingsStore.currencySymbol)\(pendingTotal)" : "Add Buy-In")
@@ -477,7 +480,13 @@ final class CelebrationPlayer {
 
     func celebrateWin() {
         triggerHaptics()
-        playSound()
+        playSound(for: .bigWin)
+    }
+
+    /// Generic casino-style chime + success haptics for key button events.
+    func playQuickChime() {
+        triggerHaptics()
+        playSound(for: .quickChime)
     }
 
     private func triggerHaptics() {
@@ -485,14 +494,41 @@ final class CelebrationPlayer {
         generator.notificationOccurred(.success)
     }
 
-    private func playSound() {
-        if let url = Bundle.main.url(forResource: "win-celebration", withExtension: "wav") {
-            player = try? AVAudioPlayer(contentsOf: url)
-            player?.prepareToPlay()
-            player?.play()
-        } else {
-            AudioServicesPlaySystemSound(1117)
+    /// High-level sound events we care about. Each profile can map these to different files.
+    private enum Event {
+        case quickChime
+        case bigWin
+    }
+
+    private func currentProfile() -> SettingsStore.SoundProfile {
+        let stored = UserDefaults.standard.string(forKey: "ctt_sound_profile")
+        return SettingsStore.SoundProfile(rawValue: stored ?? "") ?? .classicCasino
+    }
+
+    private func playSound(for event: Event) {
+        let profile = currentProfile()
+        let fileName: String
+
+        switch (profile, event) {
+        case (.classicCasino, .quickChime):
+            fileName = "coins_clinking"
+        case (.softChimes, .quickChime):
+            fileName = "cat_star_collect"
+        case (.arcadeLights, .quickChime):
+            fileName = "boodoodaloop"
+
+        case (_, .bigWin):
+            fileName = "victory_confetti"
         }
+
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "wav") else {
+            print("⚠️ [CelebrationPlayer] Missing sound in bundle:", fileName, "for profile:", profile.rawValue, "event:", event)
+            return
+        }
+        print("✅ [CelebrationPlayer] Playing sound:", fileName, "for profile:", profile.rawValue, "event:", event, "url:", url)
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.prepareToPlay()
+        player?.play()
     }
 }
 
@@ -509,6 +545,7 @@ private let confettiPieceKinds: [ConfettiPieceKind] = {
 }()
 
 struct ConfettiCelebrationView: View {
+    @EnvironmentObject var settingsStore: SettingsStore
     private let pieceCount = 80
 
     var body: some View {
@@ -528,7 +565,9 @@ struct ConfettiCelebrationView: View {
         .ignoresSafeArea()
         .allowsHitTesting(false)
         .onAppear {
-            CelebrationPlayer.shared.celebrateWin()
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.celebrateWin()
+            }
         }
     }
 }

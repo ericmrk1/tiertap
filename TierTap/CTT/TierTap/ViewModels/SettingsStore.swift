@@ -24,6 +24,8 @@ private let keyPromptSessionMood = "ctt_prompt_session_mood"
 private let keyAITone = "ctt_ai_tone"
 private let keyAICallsDate = "ctt_ai_calls_date"
 private let keyAICallsCount = "ctt_ai_calls_count"
+private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
+private let keySoundProfile = "ctt_sound_profile"
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -259,6 +261,32 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(promptSessionMood, forKey: keyPromptSessionMood) }
     }
 
+    /// When true (default), play casino-style chimes and haptics for key actions like check-in, buy-ins, closing out, and sharing.
+    @Published var enableCasinoFeedback: Bool {
+        didSet { UserDefaults.standard.set(enableCasinoFeedback, forKey: keyEnableCasinoFeedback) }
+    }
+
+    enum SoundProfile: String, CaseIterable, Identifiable, Codable {
+        case classicCasino
+        case softChimes
+        case arcadeLights
+
+        var id: String { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .classicCasino: return "Classic Casino"
+            case .softChimes: return "Soft Chimes"
+            case .arcadeLights: return "Arcade Lights"
+            }
+        }
+    }
+
+    /// Selected sound profile, which controls which group of external sound files are used for casino feedback.
+    @Published var soundProfile: SoundProfile {
+        didSet { UserDefaults.standard.set(soundProfile.rawValue, forKey: keySoundProfile) }
+    }
+
     enum AITone: String, CaseIterable, Identifiable, Codable {
         case sarcastic
         case scientific
@@ -346,6 +374,17 @@ final class SettingsStore: ObservableObject {
             self.promptSessionMood = UserDefaults.standard.bool(forKey: keyPromptSessionMood)
         } else {
             self.promptSessionMood = true
+        }
+        if UserDefaults.standard.object(forKey: keyEnableCasinoFeedback) != nil {
+            self.enableCasinoFeedback = UserDefaults.standard.bool(forKey: keyEnableCasinoFeedback)
+        } else {
+            self.enableCasinoFeedback = true
+        }
+        if let storedProfile = UserDefaults.standard.string(forKey: keySoundProfile),
+           let profile = SoundProfile(rawValue: storedProfile) {
+            self.soundProfile = profile
+        } else {
+            self.soundProfile = .classicCasino
         }
         if let storedTone = UserDefaults.standard.string(forKey: keyAITone),
            let tone = AITone(rawValue: storedTone) {

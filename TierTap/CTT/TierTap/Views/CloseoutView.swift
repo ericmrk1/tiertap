@@ -366,7 +366,9 @@ struct CloseoutView: View {
         let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
         if !settingsStore.promptSessionMood {
             if netPositive {
-                CelebrationPlayer.shared.celebrateWin()
+                if settingsStore.enableCasinoFeedback {
+                    CelebrationPlayer.shared.celebrateWin()
+                }
                 showCelebration = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
                     store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
@@ -380,7 +382,9 @@ struct CloseoutView: View {
         }
 
         if netPositive {
-            CelebrationPlayer.shared.celebrateWin()
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.celebrateWin()
+            }
             showCelebration = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
                 closedSessionId = sessionId

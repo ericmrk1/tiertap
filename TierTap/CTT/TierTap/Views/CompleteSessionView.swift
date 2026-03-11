@@ -261,7 +261,9 @@ struct CompleteSessionView: View {
             updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
             store.updateSession(updated)
             if netPositive {
-                CelebrationPlayer.shared.celebrateWin()
+                if settingsStore.enableCasinoFeedback {
+                    CelebrationPlayer.shared.celebrateWin()
+                }
                 showCelebration = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { dismiss() }
             } else {
@@ -272,7 +274,9 @@ struct CompleteSessionView: View {
 
         completedSessionId = session.id
         if netPositive {
-            CelebrationPlayer.shared.celebrateWin()
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.celebrateWin()
+            }
             showCelebration = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
                 showEmotionPicker = true

@@ -339,6 +339,25 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Toggle("Casino chimes & haptics", isOn: $settingsStore.enableCasinoFeedback)
+                        .tint(.green)
+                    Text("When on, major actions like check-in, buy-ins, closing out sessions, and sharing will play quick casino-style chimes and success haptics.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    Picker("Sound profile", selection: $settingsStore.soundProfile) {
+                        ForEach(SettingsStore.SoundProfile.allCases) { profile in
+                            Text(profile.displayName).tag(profile)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    Text("Each profile uses its own set of external casino sound effects (e.g. classic chips, softer chimes, or arcade-style pings).")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
             }
         }
     }

@@ -328,6 +328,9 @@ struct CheckInView: View {
         // Best-effort insert of the casino location; when typed we won't have coordinates.
         CasinoLocationsAPI.insertTyped(name: casino, isPublic: isCasinoPublic, userId: nil)
         store.startSession(game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy)
+        if settingsStore.enableCasinoFeedback {
+            CelebrationPlayer.shared.playQuickChime()
+        }
         dismiss()
     }
 }

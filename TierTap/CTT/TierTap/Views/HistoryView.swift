@@ -233,6 +233,9 @@ struct HistoryView: View {
                     HStack(spacing: 8) {
                         if !filteredSessions.isEmpty {
                             Button {
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
                                 isShareSelectorPresented = true
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
@@ -476,6 +479,9 @@ struct SessionShareSelectionView: View {
                     Button("Share") {
                         let chosen = sortedSessions.filter { selectedSessionIDs.contains($0.id) }
                         guard !chosen.isEmpty else { return }
+                        if settingsStore.enableCasinoFeedback {
+                            CelebrationPlayer.shared.playQuickChime()
+                        }
                         onShare(chosen)
                         dismiss()
                     }

@@ -126,6 +126,9 @@ struct LiveSessionView: View {
                                 if hasMissingInfo {
                                     showMissingInfoAlert = true
                                 } else {
+                                    if settingsStore.enableCasinoFeedback {
+                                        CelebrationPlayer.shared.playQuickChime()
+                                    }
                                     showCloseout = true
                                 }
                             } label: {
