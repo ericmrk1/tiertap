@@ -969,6 +969,13 @@ extension CommunitySessionsView {
                 }
                 return
             }
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                await MainActor.run {
+                    feedErrorMessage = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
+                    isLoadingFeed = false
+                }
+                return
+            }
             await MainActor.run {
                 feedErrorMessage = "Could not load community feed. Please try again."
                 isLoadingFeed = false
@@ -1057,6 +1064,13 @@ extension CommunitySessionsView {
             }
             if let urlError = error as? URLError, urlError.code == .cancelled {
                 await MainActor.run {
+                    isLoadingFeed = false
+                }
+                return
+            }
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                await MainActor.run {
+                    feedErrorMessage = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
                     isLoadingFeed = false
                 }
                 return
@@ -1827,9 +1841,15 @@ struct CommunitySessionPublishSelectionView: View {
                 dismiss()
             }
         } catch {
+            let message: String
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                message = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
+            } else {
+                message = error.localizedDescription
+            }
             await MainActor.run {
                 isPublishing = false
-                errorMessage = error.localizedDescription
+                errorMessage = message
                 onFinished(.failure(error))
             }
         }

@@ -18,11 +18,22 @@ struct CloseoutView: View {
     @State private var showGASheet = false
     @State private var privateNotes = ""
 
+    // Session photo attachment
+    @State private var sessionPhoto: UIImage?
+    @State private var sessionPhotoSource: SessionPhotoSource?
+
     // Chip estimator entry point
     @State private var showChipEstimatorSheet = false
     @State private var chipEstimatorError: String?
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
+
+    private enum SessionPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
 
     /// Quick denominations for adjusting cash-out, falling back to sensible defaults.
     private var cashOutQuickAmounts: [Int] {
@@ -258,6 +269,80 @@ struct CloseoutView: View {
                                 .scrollContentBackground(.hidden)
                         }
 
+                        // Session photo attachment
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Session photo")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                    .background(Color(.systemGray6).opacity(0.2))
+                                    .cornerRadius(12)
+
+                                if let image = sessionPhoto {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(10)
+                                        .padding(4)
+                                } else {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "camera.viewfinder")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.gray)
+                                        Text("Add a photo from your session")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(16)
+                                }
+                            }
+                            .frame(maxHeight: 220)
+
+                            HStack(spacing: 12) {
+                                Button {
+                                    sessionPhotoSource = .camera
+                                } label: {
+                                    Label("Camera", systemImage: "camera")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue.opacity(0.9))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+
+                                Button {
+                                    sessionPhotoSource = .photoLibrary
+                                } label: {
+                                    Label("Photo Library", systemImage: "photo")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+
+                                if sessionPhoto != nil {
+                                    Spacer()
+                                    Button(role: .destructive) {
+                                        sessionPhoto = nil
+                                        // Do not clear filename on live session here to avoid
+                                        // edge-cases with already-closed sessions; leaving the
+                                        // last saved photo is safer than dangling references.
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                            .padding(8)
+                                    }
+                                }
+                            }
+                        }
+
                         // Actions
                         VStack(spacing: 8) {
                             Button {
@@ -377,6 +462,26 @@ struct CloseoutView: View {
                 })
                 .environmentObject(settingsStore)
             }
+            .sheet(item: $sessionPhotoSource) { source in
+                switch source {
+                case .camera:
+                    #if os(iOS)
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        handlePickedSessionPhoto(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                case .photoLibrary:
+                    #if os(iOS)
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        handlePickedSessionPhoto(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                }
+            }
         }
         .onAppear {
             privateNotes = s.privateNotes ?? ""
@@ -403,6 +508,13 @@ struct CloseoutView: View {
                 if avgBetRated.isEmpty, let r = defaults.rated {
                     avgBetRated = "\(r)"
                 }
+            }
+
+            // Load any existing session photo attached while live.
+            if let fileName = s.chipEstimatorImageFilename,
+               let url = ChipEstimatorPhotoStorage.url(for: fileName),
+               let uiImage = UIImage(contentsOfFile: url.path) {
+                sessionPhoto = uiImage
             }
         }
     }
@@ -460,6 +572,13 @@ struct CloseoutView: View {
             return
         }
         showChipEstimatorSheet = true
+    }
+
+    private func handlePickedSessionPhoto(_ image: UIImage) {
+        sessionPhoto = image
+        if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: s.id) {
+            store.setChipEstimatorImageFilename(fileName)
+        }
     }
 }
 

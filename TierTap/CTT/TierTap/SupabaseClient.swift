@@ -38,16 +38,36 @@ enum SupabaseConfig {
     }
 }
 
+/// URLSession used for Supabase in the simulator. The simulator can report URL errors (e.g. -1000)
+/// when auth redirect URLs (custom schemes) appear in query params; using a custom session with
+/// TLS 1.2 max can improve stability (see supabase/supabase-swift#708).
+private let simulatorURLSession: URLSession = {
+    let config = URLSessionConfiguration.default
+    #if targetEnvironment(simulator)
+    if #available(iOS 15.0, *) {
+        config.tlsMaximumSupportedProtocolVersion = .TLSv12
+    }
+    #endif
+    return URLSession(configuration: config)
+}()
+
 /// Global Supabase client instance, created once so that auth state,
 /// sessions, and storage are shared consistently across the app.
 let supabase: SupabaseClient? = {
     guard let url = SupabaseConfig.url, let key = SupabaseConfig.anonKey else { return nil }
+    let options: SupabaseClientOptions
+    #if targetEnvironment(simulator)
+    options = SupabaseClientOptions(
+        auth: .init(emitLocalSessionAsInitialSession: true),
+        global: .init(headers: [:], session: simulatorURLSession)
+    )
+    #else
+    options = SupabaseClientOptions(auth: .init(emitLocalSessionAsInitialSession: true))
+    #endif
     return SupabaseClient(
         supabaseURL: url,
         supabaseKey: key,
-        options: SupabaseClientOptions(
-            auth: .init(emitLocalSessionAsInitialSession: true)
-        )
+        options: options
     )
 }()
 

@@ -130,7 +130,11 @@ final class AuthStore: ObservableObject {
             otpSent = true
             infoMessage = "Check your inbox for the sign-in link."
         } catch {
-            errorMessage = error.localizedDescription
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                errorMessage = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
+            } else {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 
@@ -166,7 +170,11 @@ final class AuthStore: ObservableObject {
             // `session` in sync; we just show a helpful message here.
             infoMessage = "If required, check your email to confirm your TierTap account."
         } catch {
-            errorMessage = error.localizedDescription
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                errorMessage = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
+            } else {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 
@@ -199,7 +207,11 @@ final class AuthStore: ObservableObject {
             )
             session = authSession
         } catch {
-            errorMessage = error.localizedDescription
+            if let urlError = error as? URLError, urlError.code == .badURL {
+                errorMessage = "Invalid URL (common in Simulator). Check SupabaseKeys.plist has a valid https URL."
+            } else {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 

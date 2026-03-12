@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
@@ -13,8 +14,8 @@ struct HistoryView: View {
     @State private var isCalendarExpanded: Bool = false
     @State private var isShareSelectorPresented: Bool = false
     @State private var isShareSheetPresented: Bool = false
-    @State private var shareText: String = ""
-    @State private var shareSummaryToPresent: String?
+    @State private var shareItems: [Any] = []
+    @State private var pendingShareItems: [Any]?
 
     private var showDeleteAlert: Binding<Bool> {
         Binding(
@@ -305,15 +306,19 @@ struct HistoryView: View {
                 Text("This session will be permanently removed. This cannot be undone.")
             }
             .sheet(isPresented: $isShareSelectorPresented) {
-                SessionShareSelectionView(sessions: filteredSessions) { selected in
+                SessionShareSelectionView(sessions: filteredSessions) { selected, shareAsPhoto, includeWinLosses in
                     guard !selected.isEmpty else { return }
-                    shareSummaryToPresent = SessionShareFormatter.combinedMessage(for: selected, currencySymbol: settingsStore.currencySymbol)
+                    pendingShareItems = createShareItems(
+                        for: selected,
+                        shareAsPhoto: shareAsPhoto,
+                        includeWinLosses: includeWinLosses
+                    )
                 }
                 .environmentObject(settingsStore)
             }
             .onChange(of: isShareSelectorPresented) { newValue in
-                if !newValue, let summary = shareSummaryToPresent {
-                    shareText = summary
+                if !newValue, let items = pendingShareItems, !items.isEmpty {
+                    shareItems = items
                     #if os(iOS)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         isShareSheetPresented = true
@@ -323,8 +328,8 @@ struct HistoryView: View {
             }
             .sheet(isPresented: $isShareSheetPresented) {
                 #if os(iOS)
-                if !shareText.isEmpty {
-                    ShareSheet(items: [shareText])
+                if !shareItems.isEmpty {
+                    ShareSheet(items: shareItems)
                 } else {
                     EmptyView()
                 }
@@ -332,12 +337,157 @@ struct HistoryView: View {
             }
             .onChange(of: isShareSheetPresented) { newValue in
                 if !newValue {
-                    shareText = ""
-                    shareSummaryToPresent = nil
+                    shareItems = []
+                    pendingShareItems = nil
                 }
             }
         }
     }
+}
+
+extension HistoryView {
+    private func createShareItems(for sessions: [Session], shareAsPhoto: Bool, includeWinLosses: Bool) -> [Any] {
+        #if os(iOS)
+        if shareAsPhoto, let image = sharePhoto(for: sessions, includeWinLosses: includeWinLosses) {
+            return [image]
+        }
+        #endif
+
+        let message = SessionShareFormatter.combinedMessage(
+            for: sessions,
+            currencySymbol: settingsStore.currencySymbol,
+            includeWinLoss: includeWinLosses
+        )
+        return [message]
+    }
+
+    #if os(iOS)
+    private func sharePhoto(for sessions: [Session], includeWinLosses: Bool) -> UIImage? {
+        guard let session = sessions.first(where: { $0.chipEstimatorImageFilename != nil }),
+              let fileName = session.chipEstimatorImageFilename,
+              let url = ChipEstimatorPhotoStorage.url(for: fileName),
+              let baseImage = UIImage(contentsOfFile: url.path) else {
+            return nil
+        }
+
+        let scale = baseImage.scale
+        let size = baseImage.size
+        let rendererFormat = UIGraphicsImageRendererFormat()
+        rendererFormat.scale = scale
+        rendererFormat.opaque = false
+
+        let renderer = UIGraphicsImageRenderer(size: size, format: rendererFormat)
+
+        let image = renderer.image { ctx in
+            // Draw base image
+            baseImage.draw(in: CGRect(origin: .zero, size: size))
+
+            // Overlay gradient at bottom
+            let overlayHeight = size.height * 0.32
+            let overlayRect = CGRect(
+                x: 0,
+                y: size.height - overlayHeight,
+                width: size.width,
+                height: overlayHeight
+            )
+
+            ctx.cgContext.setFillColor(UIColor.black.withAlphaComponent(0.6).cgColor)
+            ctx.cgContext.fill(overlayRect)
+
+            // Prepare text
+            let inset: CGFloat = size.width * 0.06
+            let textRect = overlayRect.insetBy(dx: inset, dy: inset * 0.7)
+
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.alignment = .left
+
+            let titleFont = UIFont.boldSystemFont(ofSize: min(size.width, size.height) * 0.065)
+            let subtitleFont = UIFont.systemFont(ofSize: min(size.width, size.height) * 0.045, weight: .medium)
+            let bodyFont = UIFont.systemFont(ofSize: min(size.width, size.height) * 0.04)
+
+            var lines: [NSAttributedString] = []
+
+            // Line 1: casino / game
+            let title = "\(session.casino) · \(session.game)"
+            lines.append(NSAttributedString(
+                string: title,
+                attributes: [
+                    .font: titleFont,
+                    .foregroundColor: UIColor.white,
+                    .paragraphStyle: paragraph
+                ]
+            ))
+
+            // Line 2: date & duration
+            let dateString = SessionShareFormatter.dateFormatter.string(from: session.startTime)
+            let durationString = Session.durationString(session.duration)
+            let subtitle = "\(dateString) • \(durationString)"
+            lines.append(NSAttributedString(
+                string: subtitle,
+                attributes: [
+                    .font: subtitleFont,
+                    .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
+                    .paragraphStyle: paragraph
+                ]
+            ))
+
+            // Line 3: stats
+            var statsParts: [String] = []
+
+            if includeWinLosses {
+                let buyInText = "\(settingsStore.currencySymbol)\(session.totalBuyIn)"
+                statsParts.append("Buy-In \(buyInText)")
+                if let cashOut = session.cashOut {
+                    let cashOutText = "\(settingsStore.currencySymbol)\(cashOut)"
+                    statsParts.append("Cash-Out \(cashOutText)")
+                }
+                if let wl = session.winLoss {
+                    let sign = wl >= 0 ? "+" : "-"
+                    let wlText = "\(settingsStore.currencySymbol)\(abs(wl))"
+                    statsParts.append("Result \(sign)\(wlText)")
+                }
+            }
+
+            if let points = session.tierPointsEarned {
+                let ptsText = "\(points >= 0 ? "+" : "")\(points) pts"
+                statsParts.append(ptsText)
+            }
+
+            if let tph = session.tiersPerHour {
+                let tphText = String(format: "%.1f pts/hr", tph)
+                statsParts.append(tphText)
+            }
+
+            if !statsParts.isEmpty {
+                let statsLine = statsParts.joined(separator: "   •   ")
+                lines.append(NSAttributedString(
+                    string: statsLine,
+                    attributes: [
+                        .font: bodyFont,
+                        .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
+                        .paragraphStyle: paragraph
+                    ]
+                ))
+            }
+
+            // Draw lines vertically
+            var currentY = textRect.minY
+            for (index, line) in lines.enumerated() {
+                let lineHeight = (index == 0 ? titleFont.lineHeight : bodyFont.lineHeight) * 1.1
+                let lineRect = CGRect(
+                    x: textRect.minX,
+                    y: currentY,
+                    width: textRect.width,
+                    height: lineHeight
+                )
+                line.draw(in: lineRect)
+                currentY += lineHeight
+            }
+        }
+
+        return image
+    }
+    #endif
 }
 
 struct SessionRow: View {
@@ -389,11 +539,13 @@ struct SessionRow: View {
 
 struct SessionShareSelectionView: View {
     let sessions: [Session]
-    let onShare: ([Session]) -> Void
+    let onShare: (_ sessions: [Session], _ shareAsPhoto: Bool, _ includeWinLosses: Bool) -> Void
 
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSessionIDs: Set<UUID> = []
+    @State private var shareAsPhoto: Bool = false
+    @State private var includeWinLosses: Bool = true
 
     private var allSelected: Bool {
         !sessions.isEmpty && selectedSessionIDs.count == sessions.count
@@ -449,6 +601,20 @@ struct SessionShareSelectionView: View {
                         }
 
                         Section(header: Text("Choose sessions to share").foregroundColor(.gray)) {
+                            Toggle(isOn: $shareAsPhoto) {
+                                Text("Photo")
+                                    .foregroundColor(.white)
+                            }
+                            .toggleStyle(SwitchToggleStyle(tint: .green))
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+
+                            Toggle(isOn: $includeWinLosses) {
+                                Text("Include win/losses")
+                                    .foregroundColor(.white)
+                            }
+                            .toggleStyle(SwitchToggleStyle(tint: .green))
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+
                             ForEach(sortedSessions) { session in
                                 SessionSelectableRow(
                                     session: session,
@@ -482,7 +648,7 @@ struct SessionShareSelectionView: View {
                         if settingsStore.enableCasinoFeedback {
                             CelebrationPlayer.shared.playQuickChime()
                         }
-                        onShare(chosen)
+                        onShare(chosen, shareAsPhoto, includeWinLosses)
                         dismiss()
                     }
                     .foregroundColor(selectedSessionIDs.isEmpty ? .gray : .green)

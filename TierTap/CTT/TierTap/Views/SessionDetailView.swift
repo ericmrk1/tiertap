@@ -50,7 +50,7 @@ struct SessionDetailView: View {
                         if let fileName = session.chipEstimatorImageFilename,
                            let url = ChipEstimatorPhotoStorage.url(for: fileName),
                            let uiImage = UIImage(contentsOfFile: url.path) {
-                            DetailSection(title: "Chip photo estimate", icon: "camera.viewfinder") {
+                            DetailSection(title: "Session photo", icon: "camera.viewfinder") {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .scaledToFit()

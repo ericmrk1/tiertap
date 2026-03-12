@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Edit an existing session from history. Updates via SessionStore.updateSession.
 struct EditSessionView: View {
@@ -20,6 +21,18 @@ struct EditSessionView: View {
     @State private var avgBetRated: String = ""
     @State private var privateNotes: String = ""
     @State private var showGamePicker = false
+
+    // Session photo attachment
+    @State private var sessionPhoto: UIImage?
+    @State private var chipPhotoFilename: String?
+    @State private var sessionPhotoSource: SessionPhotoSource?
+
+    private enum SessionPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
 
     var isValid: Bool {
         !selectedGame.isEmpty && !casino.isEmpty &&
@@ -95,6 +108,79 @@ struct EditSessionView: View {
                         .background(Color(.systemGray6).opacity(0.15))
                         .cornerRadius(16)
 
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Session photo")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                    .background(Color(.systemGray6).opacity(0.2))
+                                    .cornerRadius(12)
+
+                                if let image = sessionPhoto {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(10)
+                                        .padding(4)
+                                } else {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "camera.viewfinder")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.gray)
+                                        Text("Add a photo from this session")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(16)
+                                }
+                            }
+                            .frame(maxHeight: 220)
+
+                            HStack(spacing: 12) {
+                                Button {
+                                    sessionPhotoSource = .camera
+                                } label: {
+                                    Label("Camera", systemImage: "camera")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue.opacity(0.9))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+
+                                Button {
+                                    sessionPhotoSource = .photoLibrary
+                                } label: {
+                                    Label("Photo Library", systemImage: "photo")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+
+                                if sessionPhoto != nil {
+                                    Spacer()
+                                    Button(role: .destructive) {
+                                        sessionPhoto = nil
+                                        chipPhotoFilename = nil
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .font(.caption)
+                                            .foregroundColor(.red)
+                                            .padding(8)
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.15))
+                        .cornerRadius(16)
+
                         Button { save() } label: {
                             Text("Save Changes")
                                 .frame(maxWidth: .infinity).padding()
@@ -120,6 +206,26 @@ struct EditSessionView: View {
             .sheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame).presentationDetents([.medium, .large])
             }
+            .sheet(item: $sessionPhotoSource) { source in
+                switch source {
+                case .camera:
+                    #if os(iOS)
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        handlePickedSessionPhoto(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                case .photoLibrary:
+                    #if os(iOS)
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        handlePickedSessionPhoto(image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                }
+            }
         }
     }
 
@@ -136,6 +242,13 @@ struct EditSessionView: View {
         avgBetActual = session.avgBetActual.map { "\($0)" } ?? ""
         avgBetRated = session.avgBetRated.map { "\($0)" } ?? ""
         privateNotes = session.privateNotes ?? ""
+
+        chipPhotoFilename = session.chipEstimatorImageFilename
+        if let fileName = chipPhotoFilename,
+           let url = ChipEstimatorPhotoStorage.url(for: fileName),
+           let uiImage = UIImage(contentsOfFile: url.path) {
+            sessionPhoto = uiImage
+        }
     }
 
     private func save() {
@@ -158,7 +271,15 @@ struct EditSessionView: View {
         updated.status = session.status
         updated.sessionMood = session.sessionMood
         updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+        updated.chipEstimatorImageFilename = chipPhotoFilename
         store.updateSession(updated)
         dismiss()
+    }
+
+    private func handlePickedSessionPhoto(_ image: UIImage) {
+        sessionPhoto = image
+        if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: session.id) {
+            chipPhotoFilename = fileName
+        }
     }
 }
