@@ -41,6 +41,11 @@ final class SubscriptionStore: ObservableObject {
         isLoading = true
         errorMessage = nil
         let ids = TierTapProductId.allCases.map(\.rawValue)
+        let bundleId = Bundle.main.bundleIdentifier ?? "nil"
+        let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "nil"
+        let build = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "nil"
+        let isSimulator = ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+        print("[SubscriptionStore] loadProducts starting. bundleId=\(bundleId) version=\(version) (\(build)) ids=\(ids) isSimulator=\(isSimulator)")
         do {
             products = try await Product.products(for: ids)
             // Sort by price, but keep stable ordering otherwise.
@@ -48,10 +53,10 @@ final class SubscriptionStore: ObservableObject {
                 (p1.price as Decimal) < (p2.price as Decimal)
             }
             let loadedIds = products.map(\.id)
-            print("[SubscriptionStore] Loaded products for ids =", ids, "->", loadedIds)
+            print("[SubscriptionStore] loadProducts succeeded. requestedIds=\(ids) loadedIds=\(loadedIds) count=\(products.count)")
         } catch {
             errorMessage = error.localizedDescription
-            print("[SubscriptionStore] Failed to load products for ids =", ids, "error:", error.localizedDescription)
+            print("[SubscriptionStore] loadProducts failed. requestedIds=\(ids) error=\(error.localizedDescription)")
             products = []
         }
         isLoading = false

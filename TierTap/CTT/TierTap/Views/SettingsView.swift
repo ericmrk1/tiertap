@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var isShowingExportError: Bool = false
     @State private var gamePickerSelection: String = ""
     @State private var casinoPickerSelection: String = ""
+    @State private var subscriptionOverrideText: String = ""
 
     var body: some View {
         NavigationStack {
@@ -67,6 +68,7 @@ struct SettingsView: View {
                 denominationsText = settingsStore.commonDenominations.map { "\($0)" }.joined(separator: ", ")
                 primaryColorSelection = settingsStore.primaryColor
                 secondaryColorSelection = settingsStore.secondaryColor
+                subscriptionOverrideText = settingsStore.subscriptionOverrideCode
             }
             .onChange(of: gamePickerSelection) { new in
                 let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -224,10 +226,10 @@ struct SettingsView: View {
             } label: {
                 HStack {
                     Image(systemName: "crown.fill")
-                    Text(subscriptionStore.isPro ? "Manage TierTap Pro" : "Upgrade to TierTap Pro")
+                    Text(hasProAccess ? "Manage TierTap Pro" : "Upgrade to TierTap Pro")
                         .font(.subheadline.bold())
                     Spacer()
-                    if subscriptionStore.isPro {
+                    if hasProAccess {
                         Text("Active")
                             .font(.caption2)
                             .fontWeight(.semibold)
@@ -252,6 +254,27 @@ struct SettingsView: View {
             Text("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
                 .font(.caption)
                 .foregroundColor(.gray)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Developer subscription override")
+                    .font(.caption.bold())
+                    .foregroundColor(.gray)
+                TextField("Enter override code", text: $subscriptionOverrideText)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.numberPad)
+                    .onChange(of: subscriptionOverrideText) { new in
+                        let digitsOnly = new.filter { $0.isNumber }
+                        if digitsOnly != new {
+                            subscriptionOverrideText = digitsOnly
+                        }
+                        settingsStore.subscriptionOverrideCode = digitsOnly
+                    }
+                if settingsStore.isSubscriptionOverrideActive {
+                    Text("Override is active for this build; subscription checks are bypassed.")
+                        .font(.caption2)
+                        .foregroundColor(.green)
+                }
+            }
         }
     }
 
@@ -532,6 +555,10 @@ struct SettingsView: View {
         settingsStore.applyThemePreset(preset)
         primaryColorSelection = settingsStore.primaryColor
         secondaryColorSelection = settingsStore.secondaryColor
+    }
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
     private var socialLoginsSection: some View {

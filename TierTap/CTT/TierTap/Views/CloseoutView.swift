@@ -30,6 +30,10 @@ struct CloseoutView: View {
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
     private enum SessionPhotoSource: Identifiable {
         case camera
         case photoLibrary
@@ -376,7 +380,7 @@ struct CloseoutView: View {
                     HStack {
                         Spacer()
                         Button {
-                            if subscriptionStore.isPro && authStore.isSignedIn {
+                            if hasProAccess && authStore.isSignedIn {
                                 startChipEstimatorFlow()
                             } else {
                                 showSubscriptionPaywall = true
@@ -616,7 +620,7 @@ struct ChipEstimatorSheetView: View {
         !isEstimating &&
         SupabaseConfig.isConfigured &&
         authStore.isSignedIn &&
-        (subscriptionStore.isPro || settingsStore.canUseAI())
+        (subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive || settingsStore.canUseAI())
     }
 
     var body: some View {
@@ -820,7 +824,7 @@ struct ChipEstimatorSheetView: View {
             await MainActor.run { errorMessage = "Chip Estimator is only available to signed-in users." }
             return
         }
-        if !subscriptionStore.isPro && !settingsStore.canUseAI() {
+        if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive && !settingsStore.canUseAI() {
             await MainActor.run { errorMessage = "You've reached today's free AI limit. Try again tomorrow." }
             return
         }
@@ -917,7 +921,7 @@ struct ChipEstimatorSheetView: View {
         )
 
         do {
-            if !subscriptionStore.isPro {
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
                 await MainActor.run {
                     settingsStore.registerAICall()
                 }

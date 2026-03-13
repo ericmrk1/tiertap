@@ -78,6 +78,10 @@ struct CommunitySessionsView: View {
     @State private var mapSessions: [TableGamePostRow] = []
     @State private var hasMoreFeedPages = false
 
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
     private var visibleFeedSessions: [TableGamePostRow] {
         feedSessions.filter { item in
             let gameName = (item.game ?? item.session_details?.game ?? "")
@@ -109,7 +113,7 @@ struct CommunitySessionsView: View {
 
     var body: some View {
         NavigationStack {
-            if !subscriptionStore.isPro || !authStore.isSignedIn {
+            if !hasProAccess || !authStore.isSignedIn {
                 TierTapPaywallView()
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)

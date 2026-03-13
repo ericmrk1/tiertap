@@ -2,6 +2,10 @@ import Foundation
 import Supabase
 import CoreLocation
 
+/// When true, a specific developer override code in Settings can unlock
+/// all subscription-gated functionality without requiring a live StoreKit subscription.
+let SUBSCRIPTION_OVERRIDE_FLAG: Bool = true
+
 /// Shared Supabase client. Keys are read from SupabaseKeys.plist (gitignored).
 /// Copy SupabaseKeys.example.plist to SupabaseKeys.plist and add your project URL and anon key.
 enum SupabaseConfig {

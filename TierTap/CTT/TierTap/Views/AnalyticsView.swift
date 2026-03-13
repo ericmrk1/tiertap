@@ -144,6 +144,10 @@ struct AnalyticsView: View {
         return "Location: \(filter)"
     }
 
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -170,7 +174,7 @@ struct AnalyticsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        if subscriptionStore.isPro && authStore.isSignedIn {
+                        if hasProAccess && authStore.isSignedIn {
                             isAISheetPresented = true
                         } else {
                             isPaywallPresented = true
@@ -683,6 +687,10 @@ struct AIAnalyticsSheet: View {
     @State private var errorMessage: String?
     
     @State private var selectedQuestion: TierTapAIQuestion = .whereEarnTiersFastest
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
     
     var body: some View {
         NavigationStack {
@@ -752,7 +760,7 @@ struct AIAnalyticsSheet: View {
                                 .foregroundColor(.red)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
-                        } else if !subscriptionStore.isPro {
+                        } else if !hasProAccess {
                             Text("AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
@@ -817,7 +825,7 @@ struct AIAnalyticsSheet: View {
         }
         
         // Enforce daily AI usage limit only for non‑Pro users.
-        if !subscriptionStore.isPro && !settingsStore.canUseAI() {
+        if !hasProAccess && !settingsStore.canUseAI() {
             await MainActor.run {
                 errorMessage = "You have reached the daily limit of 5 AI calls on the free version of TierTap. Upgrade to the PRO version to unlock unlimited AI analysis."
             }
@@ -959,7 +967,7 @@ struct AIAnalyticsSheet: View {
         
         do {
             // Record usage before calling the Gemini router so we never exceed the limit for free users.
-            if !subscriptionStore.isPro {
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
                 await MainActor.run {
                     settingsStore.registerAICall()
                 }

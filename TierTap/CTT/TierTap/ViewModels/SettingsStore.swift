@@ -26,6 +26,7 @@ private let keyAICallsDate = "ctt_ai_calls_date"
 private let keyAICallsCount = "ctt_ai_calls_count"
 private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
 private let keySoundProfile = "ctt_sound_profile"
+private let keySubscriptionOverrideCode = "ctt_subscription_override_code"
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -287,6 +288,11 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(soundProfile.rawValue, forKey: keySoundProfile) }
     }
 
+    /// Developer override code for bypassing subscription checks (when enabled in code).
+    @Published var subscriptionOverrideCode: String {
+        didSet { UserDefaults.standard.set(subscriptionOverrideCode, forKey: keySubscriptionOverrideCode) }
+    }
+
     enum AITone: String, CaseIterable, Identifiable, Codable {
         case sarcastic
         case scientific
@@ -333,6 +339,12 @@ final class SettingsStore: ObservableObject {
     /// Remaining AI calls the user can make today on the free tier.
     var remainingAICallsToday: Int {
         max(0, maxAICallsPerDay - aiCallsToday)
+    }
+
+    /// True when the hard-coded override flag is on *and* the user-entered code matches the expected value.
+    var isSubscriptionOverrideActive: Bool {
+        guard SUBSCRIPTION_OVERRIDE_FLAG else { return false }
+        return Int(subscriptionOverrideCode) == 1234567
     }
 
     init() {
@@ -394,6 +406,8 @@ final class SettingsStore: ObservableObject {
         } else {
             self.aiTone = .sarcastic
         }
+
+        self.subscriptionOverrideCode = UserDefaults.standard.string(forKey: keySubscriptionOverrideCode) ?? ""
 
         // AI usage tracking (default to "today" with zero calls if nothing stored).
         let calendar = Calendar.current

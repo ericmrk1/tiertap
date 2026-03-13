@@ -15,6 +15,10 @@ struct TierTapPaywallView: View {
     @State private var isPurchasing = false
     @State private var showConfetti = false
 
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -82,8 +86,8 @@ struct TierTapPaywallView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
-                    Image(systemName: subscriptionStore.isPro ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(subscriptionStore.isPro ? .green : .white.opacity(0.8))
+                    Image(systemName: hasProAccess ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(hasProAccess ? .green : .white.opacity(0.8))
                     Text("Active TierTap Pro subscription.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
@@ -224,7 +228,7 @@ struct TierTapPaywallView: View {
         if subscriptionStore.purchasedProductIds.contains(selected.id) {
             return "Current plan"
         }
-        return subscriptionStore.isPro ? "Change plan" : "Subscribe"
+        return hasProAccess ? "Change plan" : "Subscribe"
     }
 
     private var isPurchaseDisabled: Bool {
