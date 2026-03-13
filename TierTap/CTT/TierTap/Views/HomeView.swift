@@ -457,7 +457,7 @@ struct TapLevelLevelsExplainerSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 List {
                     Section {
-                        Text("Your level (1–100) is based on sessions logged, tier point gains, and sessions where you enter both rated and actual avg bet. Session milestones are on a scale of 10,000.")
+                        Text("Your level (1–1,000) is based on sessions logged, tier point gains, and sessions where you enter both rated and actual avg bet. Each level needs 50 more raw score. Session milestones are on a scale of 10,000.")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.9))
                             .listRowBackground(Color.white.opacity(0.08))
@@ -503,7 +503,7 @@ struct TapLevelLevelsExplainerSheet: View {
                             .padding(.vertical, 6)
                         }
                     }
-                    Section(header: Text("Level bands (1–100)").foregroundColor(.gray)) {
+                    Section(header: Text("Level bands (1–1,000)").foregroundColor(.gray)) {
                         ForEach(Array(TapLevel.levelBandsForExplainer.enumerated()), id: \.offset) { _, band in
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack(alignment: .firstTextBaseline) {

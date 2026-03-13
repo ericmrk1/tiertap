@@ -16,8 +16,10 @@ struct AnalyticsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     
     @State private var isAISheetPresented: Bool = false
+    @State private var isPaywallPresented: Bool = false
     
     @State private var selectedGraphKind: GraphKind = .betCaptureDiff
     @State private var isShareSelectionPresented: Bool = false
@@ -168,7 +170,11 @@ struct AnalyticsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        isAISheetPresented = true
+                        if subscriptionStore.isPro && authStore.isSignedIn {
+                            isAISheetPresented = true
+                        } else {
+                            isPaywallPresented = true
+                        }
                     } label: {
                         Image(systemName: "wand.and.stars")
                             .imageScale(.medium)
@@ -238,6 +244,14 @@ struct AnalyticsView: View {
         .sheet(isPresented: $isAISheetPresented) {
             AIAnalyticsSheet()
                 .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+        }
+        .sheet(isPresented: $isPaywallPresented) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
         }
         .sheet(isPresented: $isShareSelectionPresented) {
             AnalyticsShareSelectionSheet(
@@ -561,6 +575,7 @@ struct AnalyticsView: View {
 struct AIAnalyticsSheet: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
     
     enum TierTapAIQuestion: String, CaseIterable, Identifiable {
@@ -737,8 +752,14 @@ struct AIAnalyticsSheet: View {
                                 .foregroundColor(.red)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
+                        } else if !subscriptionStore.isPro {
+                            Text("AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
                         } else {
-                            Text("On the free version of TierTap, AI analysis is limited to 5 calls per day. Upgrade to the PRO version to unlock unlimited AI insights.")
+                            Text("Ask TierTap as often as you like with your TierTap Pro subscription.")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -795,8 +816,8 @@ struct AIAnalyticsSheet: View {
             return
         }
         
-        // Enforce daily AI usage limit for the free version.
-        if !settingsStore.canUseAI() {
+        // Enforce daily AI usage limit only for non‑Pro users.
+        if !subscriptionStore.isPro && !settingsStore.canUseAI() {
             await MainActor.run {
                 errorMessage = "You have reached the daily limit of 5 AI calls on the free version of TierTap. Upgrade to the PRO version to unlock unlimited AI analysis."
             }
@@ -937,9 +958,11 @@ struct AIAnalyticsSheet: View {
         }
         
         do {
-            // Record usage before calling the Gemini router so we never exceed the limit.
-            await MainActor.run {
-                settingsStore.registerAICall()
+            // Record usage before calling the Gemini router so we never exceed the limit for free users.
+            if !subscriptionStore.isPro {
+                await MainActor.run {
+                    settingsStore.registerAICall()
+                }
             }
             let body = GeminiRequest(
                 contents: [

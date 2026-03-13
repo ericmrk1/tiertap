@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @State private var bankrollText: String = ""
     @State private var unitSizeText: String = ""
     @State private var targetAverageText: String = ""
@@ -19,9 +20,11 @@ struct SettingsView: View {
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
     @State private var isAIToneExpanded: Bool = false
+    @State private var isSubscriptionExpanded: Bool = true
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
     @State private var isShowingCasinoPicker: Bool = false
+    @State private var isShowingSubscriptionPaywall: Bool = false
     @State private var exportFileURL: URL?
     @State private var isExporting: Bool = false
     @State private var exportErrorMessage: String?
@@ -35,6 +38,7 @@ struct SettingsView: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        subscriptionSection
                         bankrollSection
                         riskOfRuinSection
                         favoritesSection
@@ -98,6 +102,12 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $isShowingCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casinoPickerSelection)
+            }
+            .sheet(isPresented: $isShowingSubscriptionPaywall) {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
             }
         }
     }
@@ -200,6 +210,48 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundColor(.gray)
             }
+        }
+    }
+
+    private var subscriptionSection: some View {
+        SettingsSection(
+            title: "Subscriptions",
+            systemImage: "crown.fill",
+            isExpanded: $isSubscriptionExpanded
+        ) {
+            Button {
+                isShowingSubscriptionPaywall = true
+            } label: {
+                HStack {
+                    Image(systemName: "crown.fill")
+                    Text(subscriptionStore.isPro ? "Manage TierTap Pro" : "Upgrade to TierTap Pro")
+                        .font(.subheadline.bold())
+                    Spacer()
+                    if subscriptionStore.isPro {
+                        Text("Active")
+                            .font(.caption2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.white.opacity(0.15))
+                            .cornerRadius(6)
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(Color(.systemGray6).opacity(0.25))
+                .foregroundColor(.white)
+                .cornerRadius(12)
+            }
+            .buttonStyle(.plain)
+
+            Text("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
+                .font(.caption)
+                .foregroundColor(.gray)
         }
     }
 

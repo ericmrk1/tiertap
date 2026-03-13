@@ -1,11 +1,13 @@
 import SwiftUI
 import UIKit
+import StoreKit
 
 @main
 struct TierTapApp: App {
     @StateObject private var store = SessionStore()
     @StateObject private var settingsStore = SettingsStore()
     @StateObject private var authStore = AuthStore()
+    @StateObject private var subscriptionStore = SubscriptionStore()
     @State private var showSplash = true
     @State private var showWelcome = false
     @State private var welcomeEmailInput = ""
@@ -29,6 +31,7 @@ struct TierTapApp: App {
             .environmentObject(store)
             .environmentObject(settingsStore)
             .environmentObject(authStore)
+            .environmentObject(subscriptionStore)
             .animation(.easeOut(duration: 0.4), value: showSplash)
             .animation(.easeOut(duration: 0.35), value: showWelcome)
             .onAppear {

@@ -6,6 +6,7 @@ struct CloseoutView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
     @State private var cashOut = ""
     @State private var avgBetActual = ""
@@ -25,6 +26,7 @@ struct CloseoutView: View {
     // Chip estimator entry point
     @State private var showChipEstimatorSheet = false
     @State private var chipEstimatorError: String?
+    @State private var showSubscriptionPaywall = false
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
@@ -368,30 +370,32 @@ struct CloseoutView: View {
                     }
                     .padding()
                 }
-                // Floating Chip Estimator button for signed-in users only
-                if authStore.isSignedIn {
-                    VStack {
+                // Floating Chip Estimator button – gated behind subscription and login
+                VStack {
+                    Spacer()
+                    HStack {
                         Spacer()
-                        HStack {
-                            Spacer()
-                            Button {
+                        Button {
+                            if subscriptionStore.isPro && authStore.isSignedIn {
                                 startChipEstimatorFlow()
-                            } label: {
-                                Label("Chip Estimator", systemImage: "camera.viewfinder")
-                                    .font(.subheadline.bold())
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(Color.blue.opacity(0.9))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(20)
-                                    .shadow(radius: 5)
+                            } else {
+                                showSubscriptionPaywall = true
                             }
-                            .padding(.trailing, 16)
-                            .padding(.bottom, 16)
+                        } label: {
+                            Label("Chip Estimator", systemImage: "camera.viewfinder")
+                                .font(.subheadline.bold())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color.blue.opacity(0.9))
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                                .shadow(radius: 5)
                         }
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 16)
                     }
-                    .allowsHitTesting(true)
                 }
+                .allowsHitTesting(true)
             }
             .navigationTitle("End Session")
             .navigationBarTitleDisplayMode(.inline)
@@ -415,6 +419,7 @@ struct CloseoutView: View {
                 .environmentObject(store)
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
             }
             .alert("Tier Points Decreased", isPresented: $showLowAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -481,6 +486,12 @@ struct CloseoutView: View {
                     EmptyView()
                     #endif
                 }
+            }
+            .sheet(isPresented: $showSubscriptionPaywall) {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
             }
         }
         .onAppear {
@@ -563,14 +574,6 @@ struct CloseoutView: View {
             chipEstimatorError = "AI is not configured for this build."
             return
         }
-        guard authStore.isSignedIn else {
-            chipEstimatorError = "Chip Estimator is only available to signed-in users."
-            return
-        }
-        guard settingsStore.canUseAI() else {
-            chipEstimatorError = "You've reached today's free AI limit. Try again tomorrow."
-            return
-        }
         showChipEstimatorSheet = true
     }
 
@@ -591,6 +594,7 @@ struct ChipEstimatorSheetView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedImage: UIImage?
@@ -612,7 +616,7 @@ struct ChipEstimatorSheetView: View {
         !isEstimating &&
         SupabaseConfig.isConfigured &&
         authStore.isSignedIn &&
-        settingsStore.canUseAI()
+        (subscriptionStore.isPro || settingsStore.canUseAI())
     }
 
     var body: some View {
@@ -816,7 +820,7 @@ struct ChipEstimatorSheetView: View {
             await MainActor.run { errorMessage = "Chip Estimator is only available to signed-in users." }
             return
         }
-        guard settingsStore.canUseAI() else {
+        if !subscriptionStore.isPro && !settingsStore.canUseAI() {
             await MainActor.run { errorMessage = "You've reached today's free AI limit. Try again tomorrow." }
             return
         }
@@ -913,8 +917,10 @@ struct ChipEstimatorSheetView: View {
         )
 
         do {
-            await MainActor.run {
-                settingsStore.registerAICall()
+            if !subscriptionStore.isPro {
+                await MainActor.run {
+                    settingsStore.registerAICall()
+                }
             }
 
             let response: GeminiRouterResponse = try await client.functions.invoke(

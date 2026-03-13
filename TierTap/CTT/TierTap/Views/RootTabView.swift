@@ -15,6 +15,7 @@ struct RootTabView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @State private var selectedTab: MainTab = .sessions
 
     var body: some View {
@@ -58,6 +59,7 @@ struct CommunitySessionsView: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @State private var showAuthSheet = false
     @State private var emailInput = ""
     @State private var isPublishSelectorPresented = false
@@ -107,9 +109,15 @@ struct CommunitySessionsView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                ScrollView {
+            if !subscriptionStore.isPro || !authStore.isSignedIn {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+            } else {
+                ZStack {
+                    settingsStore.primaryGradient.ignoresSafeArea()
+                    ScrollView {
                     VStack(spacing: 16) {
 
                         if let error = feedErrorMessage {
@@ -233,11 +241,11 @@ struct CommunitySessionsView: View {
                         }
                     }
                     .padding(.bottom, 24)
+                    }
+                    .refreshable {
+                        await reloadCommunityFeed()
+                    }
                 }
-                .refreshable {
-                    await reloadCommunityFeed()
-                }
-            }
             .navigationTitle("Community")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
@@ -385,6 +393,7 @@ struct CommunitySessionsView: View {
                 )
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+            }
             }
         }
     }

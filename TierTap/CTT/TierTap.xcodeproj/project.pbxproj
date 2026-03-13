@@ -19,6 +19,9 @@
 		2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */; };
 		2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */; };
 		2E9D7B8C2F621216004015F4 /* PhotoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */; };
+		2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */; };
+		2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */; };
+		2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
@@ -135,6 +138,9 @@
 		2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory_confetti.wav; sourceTree = "<group>"; };
 		2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipEstimatorPhotoStorage.swift; sourceTree = "<group>"; };
 		2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHelpers.swift; sourceTree = "<group>"; };
+		2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TierTapPaywallView 2.swift"; sourceTree = "<group>"; };
+		2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionStore 2.swift"; sourceTree = "<group>"; };
+		2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TierTapStoreKitConfig.storekit; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -223,6 +229,7 @@
 		012CA1DD049612F01FD14100 = {
 			isa = PBXGroup;
 			children = (
+				2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */,
 				F83566B140DB1139A064E7D0 /* TierTap */,
 				884F94035CBDFFAC738CD223 /* CasinoTimerWidget */,
 				WCHF1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */,
@@ -237,6 +244,7 @@
 		05C9D0E9516BCA8D35F41BC8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */,
 				B89A89EFB8A3238E20A9044B /* SharedComponents.swift */,
 				RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */,
 				PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */,
@@ -333,6 +341,7 @@
 				ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */,
 				LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */,
 				AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */,
+				2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -513,6 +522,7 @@
 				PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */,
 				SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */,
 				2E255D4A2F61FAF900CAF0D7 /* cash_register_sfx.wav in Resources */,
+				2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */,
 				2E255D4B2F61FAF900CAF0D7 /* coins_clinking.wav in Resources */,
 				2E255D4C2F61FAF900CAF0D7 /* victory_confetti.wav in Resources */,
 				2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */,
@@ -583,6 +593,7 @@
 				C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */,
 				CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */,
 				4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */,
+				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,
 				4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */,
@@ -616,6 +627,7 @@
 				SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */,
 				COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */,
 				PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */,
+				2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */,
 				AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

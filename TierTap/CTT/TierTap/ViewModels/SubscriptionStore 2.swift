@@ -1,0 +1,130 @@
+import Foundation
+import StoreKit
+
+/// Product identifiers for TierTap subscriptions (must match App Store Connect).
+enum TierTapProductId: String, CaseIterable {
+    case monthly = "com.app.subs.tiertap.monthly"
+    case quarterly = "com.app.subs.tiertap.quarterly"
+    case yearly = "com.app.subs.tiertap.yearly"
+
+    /// Subscription group identifier.
+    var subscriptionGroupId: String { "com.app.subs.tiertap" }
+}
+
+@MainActor
+final class SubscriptionStore: ObservableObject {
+    @Published private(set) var products: [Product] = []
+    @Published private(set) var purchasedProductIds: Set<String> = []
+    @Published private(set) var isLoading = false
+    @Published private(set) var errorMessage: String?
+
+    private var updateListenerTask: Task<Void, Error>?
+
+    /// Whether the user currently has any active TierTap subscription.
+    var isPro: Bool {
+        !purchasedProductIds.isEmpty
+    }
+
+    init() {
+        updateListenerTask = listenForTransactions()
+        Task {
+            await loadProducts()
+            await updatePurchasedState()
+        }
+    }
+
+    deinit {
+        updateListenerTask?.cancel()
+    }
+
+    func loadProducts() async {
+        isLoading = true
+        errorMessage = nil
+        let ids = TierTapProductId.allCases.map(\.rawValue)
+        do {
+            products = try await Product.products(for: ids)
+            // Sort by price, but keep stable ordering otherwise.
+            products.sort { p1, p2 in
+                (p1.price as Decimal) < (p2.price as Decimal)
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+            products = []
+        }
+        isLoading = false
+    }
+
+    func purchase(_ product: Product) async -> Bool {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification):
+                let transaction = try checkVerified(verification)
+                await transaction.finish()
+                await updatePurchasedState()
+                return true
+            case .userCancelled:
+                return false
+            case .pending:
+                errorMessage = "Purchase is pending approval."
+                return false
+            @unknown default:
+                return false
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    func restorePurchases() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await AppStore.sync()
+            await updatePurchasedState()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    private func updatePurchasedState() async {
+        var activeIds: Set<String> = []
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result else { continue }
+            if transaction.revocationDate == nil {
+                activeIds.insert(transaction.productID)
+            }
+        }
+        purchasedProductIds = activeIds
+    }
+
+    private func listenForTransactions() -> Task<Void, Error> {
+        Task.detached { [weak self] in
+            guard let self else { return }
+            for await result in Transaction.updates {
+                guard case .verified(let transaction) = result else { continue }
+                await transaction.finish()
+                await self.updatePurchasedState()
+            }
+        }
+    }
+
+    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+        switch result {
+        case .verified(let value):
+            return value
+        case .unverified:
+            throw StoreError.failedVerification
+        }
+    }
+}
+
+enum StoreError: Error {
+    case failedVerification
+}
+
