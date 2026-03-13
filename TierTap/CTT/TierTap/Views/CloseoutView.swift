@@ -413,7 +413,7 @@ struct CloseoutView: View {
             } message: {
                 Text(chipEstimatorError ?? "Something went wrong while estimating the chip value.")
             }
-            .sheet(isPresented: $showChipEstimatorSheet) {
+            .adaptiveSheet(isPresented: $showChipEstimatorSheet) {
                 ChipEstimatorSheetView(
                     sessionID: s.id,
                     game: s.game,
@@ -431,7 +431,7 @@ struct CloseoutView: View {
             } message: {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(s.startingTierPoints)). Save anyway?")
             }
-            .sheet(isPresented: $showEmotionPicker, onDismiss: {
+            .adaptiveSheet(isPresented: $showEmotionPicker, onDismiss: {
                 if closedSessionId != nil, let co = Int(cashOut), let aba = Int(avgBetActual),
                    let abr = Int(avgBetRated), let et = Int(endingTier) {
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
@@ -464,14 +464,14 @@ struct CloseoutView: View {
                 }
                 .environmentObject(settingsStore)
             }
-            .sheet(isPresented: $showGASheet) {
+            .adaptiveSheet(isPresented: $showGASheet) {
                 GASupportSheet(onDismiss: {
                     showGASheet = false
                     dismiss()
                 })
                 .environmentObject(settingsStore)
             }
-            .sheet(item: $sessionPhotoSource) { source in
+            .adaptiveSheet(item: $sessionPhotoSource) { source in
                 switch source {
                 case .camera:
                     #if os(iOS)
@@ -491,7 +491,7 @@ struct CloseoutView: View {
                     #endif
                 }
             }
-            .sheet(isPresented: $showSubscriptionPaywall) {
+            .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
                 TierTapPaywallView()
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)
@@ -786,7 +786,7 @@ struct ChipEstimatorSheetView: View {
                         .foregroundColor(.green)
                 }
             }
-            .sheet(item: $chipPhotoSource) { source in
+            .adaptiveSheet(item: $chipPhotoSource) { source in
                 switch source {
                 case .camera:
                     #if os(iOS)

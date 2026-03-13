@@ -245,19 +245,19 @@ struct AnalyticsView: View {
                 }
             }
         }
-        .sheet(isPresented: $isAISheetPresented) {
+        .adaptiveSheet(isPresented: $isAISheetPresented) {
             AIAnalyticsSheet()
                 .environmentObject(settingsStore)
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
         }
-        .sheet(isPresented: $isPaywallPresented) {
+        .adaptiveSheet(isPresented: $isPaywallPresented) {
             TierTapPaywallView()
                 .environmentObject(subscriptionStore)
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
         }
-        .sheet(isPresented: $isShareSelectionPresented) {
+        .adaptiveSheet(isPresented: $isShareSelectionPresented) {
             AnalyticsShareSelectionSheet(
                 closedSessions: closedSessions,
                 gradient: settingsStore.primaryGradient,
@@ -287,7 +287,7 @@ struct AnalyticsView: View {
                 }
             }
         }
-        .sheet(isPresented: $isShareSheetPresented) {
+        .adaptiveSheet(isPresented: $isShareSheetPresented) {
             ShareSheet(items: shareURLs)
         }
         .onChange(of: isShareSheetPresented) { newValue in

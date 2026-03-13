@@ -314,7 +314,7 @@ struct CommunitySessionsView: View {
             .task {
                 await loadCommunityFeedIfNeeded()
             }
-            .sheet(isPresented: $showAuthSheet) {
+            .adaptiveSheet(isPresented: $showAuthSheet) {
                 CommunityAuthSheet(
                     emailInput: $emailInput,
                     onDismiss: { showAuthSheet = false }
@@ -373,7 +373,7 @@ struct CommunitySessionsView: View {
                     )
                 }
             }
-            .sheet(isPresented: $isPublishSelectorPresented) {
+            .adaptiveSheet(isPresented: $isPublishSelectorPresented) {
                 CommunitySessionPublishSelectionView(
                     sessions: sessionStore.sessions.filter { $0.isComplete }
                 ) { result in
@@ -391,7 +391,7 @@ struct CommunitySessionsView: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
             }
-            .sheet(isPresented: $showMapSheet) {
+            .adaptiveSheet(isPresented: $showMapSheet) {
                 CommunityFeedMapSheet(
                     sessions: mapSessions
                 )
@@ -492,10 +492,10 @@ struct CommunityAuthSheet: View {
                 saveProfile()
             }
         }
-        .sheet(isPresented: $isShowingCameraPicker) {
+        .adaptiveSheet(isPresented: $isShowingCameraPicker) {
             ProfilePhotoCaptureView(image: $profilePhoto, preferredSourceType: .camera)
         }
-        .sheet(isPresented: $isShowingLibraryPicker) {
+        .adaptiveSheet(isPresented: $isShowingLibraryPicker) {
             ProfilePhotoCaptureView(image: $profilePhoto, preferredSourceType: .photoLibrary)
         }
     }

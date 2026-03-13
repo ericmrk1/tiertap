@@ -288,8 +288,8 @@ struct HistoryView: View {
                     }
                 }
             }
-            .sheet(item: $selectedSession) { SessionDetailView(session: $0) }
-            .sheet(item: $sessionToEdit) { s in
+            .adaptiveSheet(item: $selectedSession) { SessionDetailView(session: $0) }
+            .adaptiveSheet(item: $sessionToEdit) { s in
                 EditSessionView(session: s)
                     .environmentObject(store)
                     .environmentObject(settingsStore)
@@ -305,7 +305,7 @@ struct HistoryView: View {
             } message: {
                 Text("This session will be permanently removed. This cannot be undone.")
             }
-            .sheet(isPresented: $isShareSelectorPresented) {
+            .adaptiveSheet(isPresented: $isShareSelectorPresented) {
                 SessionShareSelectionView(sessions: filteredSessions) { selected, shareAsPhoto, includeWinLosses in
                     guard !selected.isEmpty else { return }
                     pendingShareItems = createShareItems(
@@ -326,7 +326,7 @@ struct HistoryView: View {
                     #endif
                 }
             }
-            .sheet(isPresented: $isShareSheetPresented) {
+            .adaptiveSheet(isPresented: $isShareSheetPresented) {
                 #if os(iOS)
                 if !shareItems.isEmpty {
                     ShareSheet(items: shareItems)

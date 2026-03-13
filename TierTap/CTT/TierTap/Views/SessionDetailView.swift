@@ -180,7 +180,7 @@ struct SessionDetailView: View {
                     Button("Done") { dismiss() }.foregroundColor(.green)
                 }
             }
-            .sheet(isPresented: $showCompleteSession) {
+            .adaptiveSheet(isPresented: $showCompleteSession) {
                 CompleteSessionView(session: session)
                     .environmentObject(store)
                     .environmentObject(settingsStore)

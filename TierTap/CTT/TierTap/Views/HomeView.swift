@@ -153,16 +153,16 @@ struct HomeView: View {
                 lastComputedLevel = tap.level
             }
         }
-        .sheet(isPresented: $showCheckIn) { CheckInView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showLive) { LiveSessionView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showBuyInSheet) {
+        .adaptiveSheet(isPresented: $showCheckIn) { CheckInView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showLive) { LiveSessionView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showBuyInSheet) {
             BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
                 store.addBuyIn(amount)
             }
         }
-        .sheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
-        .sheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
     }
 }
 
@@ -219,11 +219,11 @@ struct LiveNowCard: View {
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.red.opacity(0.4), lineWidth: 1))
         .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(session.startTime) }
         .onAppear { elapsed = Date().timeIntervalSince(session.startTime) }
-        .sheet(isPresented: $showStrategyOdds) {
+        .adaptiveSheet(isPresented: $showStrategyOdds) {
             StrategyOddsSheet(gameName: session.game)
                 .environmentObject(settingsStore)
         }
-        .sheet(isPresented: $showPrivateNotes) {
+        .adaptiveSheet(isPresented: $showPrivateNotes) {
             PrivateNotesSheet(
                 notes: Binding(
                     get: { store.liveSession?.privateNotes ?? "" },
@@ -303,12 +303,12 @@ struct TapLevelCard: View {
         .background(Color(.systemGray6).opacity(0.2))
         .cornerRadius(16)
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.15), lineWidth: 1))
-        .sheet(isPresented: $showLevelsExplainer) {
+        .adaptiveSheet(isPresented: $showLevelsExplainer) {
             TapLevelLevelsExplainerSheet(tapLevel: tapLevel)
                 .environmentObject(settingsStore)
         }
         #if os(iOS)
-        .sheet(isPresented: $showShareSheet) {
+        .adaptiveSheet(isPresented: $showShareSheet) {
             if let url = shareURL {
                 ShareSheet(items: [url])
             }

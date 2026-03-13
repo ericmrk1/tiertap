@@ -78,6 +78,7 @@
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,6 +188,7 @@
 		SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SupabaseKeys.plist; sourceTree = "<group>"; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
 		TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapLevel.swift; sourceTree = "<group>"; };
+		VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AdaptiveSheet.swift"; sourceTree = "<group>"; };
 		WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchApp.swift; sourceTree = "<group>"; };
 		WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 		05C9D0E9516BCA8D35F41BC8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */,
 				2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */,
 				B89A89EFB8A3238E20A9044B /* SharedComponents.swift */,
 				RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */,
@@ -622,6 +625,7 @@
 				ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
+				VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */,
 				SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */,
 				GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */,
 				SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */,
@@ -771,7 +775,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -892,7 +896,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};

@@ -132,7 +132,7 @@ struct BankrollView: View {
                 }
                 #endif
             }
-            .sheet(isPresented: $showResetSheet) {
+            .adaptiveSheet(isPresented: $showResetSheet) {
                 resetSheet
             }
             .onAppear {
@@ -140,7 +140,7 @@ struct BankrollView: View {
                 BankrollDatabase.shared.syncSessions(store.sessions)
             }
             #if os(iOS)
-            .sheet(isPresented: $isShareSheetPresented) {
+            .adaptiveSheet(isPresented: $isShareSheetPresented) {
                 if let url = shareURL {
                     ShareSheet(items: [url])
                 }

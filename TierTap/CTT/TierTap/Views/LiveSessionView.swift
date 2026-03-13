@@ -169,18 +169,18 @@ struct LiveSessionView: View {
             }
             .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(s.startTime) }
             .onAppear { elapsed = Date().timeIntervalSince(s.startTime) }
-            .sheet(isPresented: $showBuyInSheet) {
+            .adaptiveSheet(isPresented: $showBuyInSheet) {
                 BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
                     store.addBuyIn(amount)
                 }
                 .environmentObject(settingsStore)
             }
-            .sheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
-            .sheet(isPresented: $showStrategyOdds) {
+            .adaptiveSheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
+            .adaptiveSheet(isPresented: $showStrategyOdds) {
                 StrategyOddsSheet(gameName: s.game)
                     .environmentObject(settingsStore)
             }
-            .sheet(isPresented: $showPrivateNotes) {
+            .adaptiveSheet(isPresented: $showPrivateNotes) {
                 PrivateNotesSheet(
                     notes: Binding(
                         get: { store.liveSession?.privateNotes ?? "" },

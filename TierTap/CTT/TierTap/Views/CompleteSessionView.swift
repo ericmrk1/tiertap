@@ -268,7 +268,7 @@ struct CompleteSessionView: View {
             } message: {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(session.startingTierPoints)). Save anyway?")
             }
-            .sheet(isPresented: $showEmotionPicker, onDismiss: {
+            .adaptiveSheet(isPresented: $showEmotionPicker, onDismiss: {
                 if completedSessionId == session.id, let co = Int(cashOut), let aba = Int(avgBetActual),
                    let abr = Int(avgBetRated), let et = Int(endingTier) {
                     var updated = session
@@ -310,7 +310,7 @@ struct CompleteSessionView: View {
                 }
                 .environmentObject(settingsStore)
             }
-            .sheet(isPresented: $showGASheet) {
+            .adaptiveSheet(isPresented: $showGASheet) {
                 GASupportSheet(onDismiss: {
                     showGASheet = false
                     dismiss()
@@ -330,7 +330,7 @@ struct CompleteSessionView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
-            .sheet(item: $chipPhotoSource) { source in
+            .adaptiveSheet(item: $chipPhotoSource) { source in
                 switch source {
                 case .camera:
                     #if os(iOS)

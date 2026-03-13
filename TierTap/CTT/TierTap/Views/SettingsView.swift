@@ -84,7 +84,7 @@ struct SettingsView: View {
                     settingsStore.favoriteCasinos.append(trimmed)
                 }
             }
-            .sheet(isPresented: $isPresentingShareSheet, onDismiss: {
+            .adaptiveSheet(isPresented: $isPresentingShareSheet, onDismiss: {
                 exportFileURL = nil
             }) {
                 if let url = exportFileURL {
@@ -99,13 +99,13 @@ struct SettingsView: View {
             } message: {
                 Text(exportErrorMessage ?? "An unknown error occurred while exporting your data.")
             }
-            .sheet(isPresented: $isShowingGamePicker) {
+            .adaptiveSheet(isPresented: $isShowingGamePicker) {
                 GamePickerView(selectedGame: $gamePickerSelection)
             }
-            .sheet(isPresented: $isShowingCasinoPicker) {
+            .adaptiveSheet(isPresented: $isShowingCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casinoPickerSelection)
             }
-            .sheet(isPresented: $isShowingSubscriptionPaywall) {
+            .adaptiveSheet(isPresented: $isShowingSubscriptionPaywall) {
                 TierTapPaywallView()
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)

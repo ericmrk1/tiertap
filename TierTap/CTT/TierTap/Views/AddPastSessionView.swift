@@ -59,12 +59,12 @@ struct AddPastSessionView: View {
                         .foregroundColor(.green)
                 }
             }
-            .sheet(isPresented: $showGamePicker) {
+            .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame)
                     .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])
             }
-            .sheet(isPresented: $showCasinoPicker) {
+            .adaptiveSheet(isPresented: $showCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casino)
                     .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])

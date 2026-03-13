@@ -203,10 +203,10 @@ struct EditSessionView: View {
                 }
             }
             .onAppear { prefill() }
-            .sheet(isPresented: $showGamePicker) {
+            .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame).presentationDetents([.medium, .large])
             }
-            .sheet(item: $sessionPhotoSource) { source in
+            .adaptiveSheet(item: $sessionPhotoSource) { source in
                 switch source {
                 case .camera:
                     #if os(iOS)

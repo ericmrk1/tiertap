@@ -291,7 +291,7 @@ struct CheckInView: View {
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .sheet(isPresented: $showGamePicker) {
+            .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame)
                     .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])
@@ -302,7 +302,7 @@ struct CheckInView: View {
                         .environmentObject(settingsStore)
                 }
             }
-            .sheet(isPresented: $showBuyInPicker) {
+            .adaptiveSheet(isPresented: $showBuyInPicker) {
                 BuyInGridSheet(amounts: buyInGridAmounts, selected: $initialBuyIn)
                     .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])

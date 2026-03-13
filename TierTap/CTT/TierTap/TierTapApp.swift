@@ -52,7 +52,7 @@ struct TierTapApp: App {
             .onOpenURL { url in
                 authStore.handleOpenURL(url)
             }
-            .sheet(isPresented: $showWelcome) {
+            .adaptiveSheet(isPresented: $showWelcome) {
                 CommunityAuthSheet(
                     emailInput: $welcomeEmailInput,
                     onDismiss: { showWelcome = false }
