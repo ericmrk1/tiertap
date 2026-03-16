@@ -48,6 +48,7 @@
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
+		GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */; };
 		GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */; };
 		GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */; };
 		LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */; };
@@ -69,6 +70,7 @@
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */; };
+		VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */; };
 		WCH2E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */; };
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
@@ -78,7 +80,6 @@
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,6 +185,7 @@
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyDatabase.swift; sourceTree = "<group>"; };
 		STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyOddsSheet.swift; sourceTree = "<group>"; };
+		GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiRouterThrottle.swift; sourceTree = "<group>"; };
 		SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SupabaseKeys.plist; sourceTree = "<group>"; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				2E255D112F5FC59400CAF0D7 /* Supabase Functions */,
 				2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */,
 				692681C1D425214EB9F4B3A2 /* TierTapApp.swift */,
+				GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */,
 				SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */,
 				COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */,
 				PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */,
@@ -628,6 +631,7 @@
 				VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */,
 				SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */,
 				GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */,
+				GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */,
 				SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */,
 				COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */,
 				PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */,
@@ -765,7 +769,7 @@
 				INFOPLIST_KEY_UILaunchScreen_UIColorName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -886,7 +890,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LE_SWIFT_VERSION = 5.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;

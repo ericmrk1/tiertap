@@ -903,10 +903,12 @@ struct ChipEstimatorSheetView: View {
                 }
             }
 
-            let response: GeminiRouterResponse = try await client.functions.invoke(
-                "gemini-router",
-                options: FunctionInvokeOptions(body: body)
-            )
+            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.execute {
+                try await client.functions.invoke(
+                    "gemini-router",
+                    options: FunctionInvokeOptions(body: body)
+                )
+            }
             let text = response.candidates?
                 .first?
                 .content?
