@@ -13,6 +13,8 @@ if (!GEMINI_API_KEY) {
   console.error("GEMINI_API_KEY is not set in environment variables");
 }
 
+// gemini-2.5-flash is current model here.
+
 console.log("gemini-proxy function loaded");
 
 Deno.serve(async (req: Request) => {
@@ -60,6 +62,9 @@ Deno.serve(async (req: Request) => {
     console.error("Error reading incoming body for logging:", e);
     bodyForGemini = req.body;
   }
+
+  console.log( "Throttle.....")
+  await new Promise(r => setTimeout(r, 100))
 
   // Build headers for Gemini
   const headers = new Headers();
