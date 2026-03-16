@@ -67,7 +67,8 @@ enum RiskOfRuinMath {
         targetAveragePerSession: Double?,
         currentBetAmount: Int? = nil
     ) -> RiskOfRuinResult {
-        let closed = sessions.filter { $0.winLoss != nil }
+        // Exclude poker sessions (only use table games for RoR).
+        let closed = sessions.filter { $0.winLoss != nil && $0.gameCategory != .poker }
         let wins = closed.filter { ($0.winLoss ?? 0) > 0 }.count
         let losses = closed.filter { ($0.winLoss ?? 0) < 0 }.count
         let total = closed.count

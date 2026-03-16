@@ -46,6 +46,16 @@ struct BuyInEvent: Identifiable, Codable, Hashable {
     var timestamp: Date
 }
 
+enum SessionGameCategory: String, Codable {
+    case table
+    case poker
+}
+
+enum SessionPokerGameKind: String, Codable {
+    case cash
+    case tournament
+}
+
 struct Session: Identifiable, Codable, Equatable {
     var id = UUID()
     var game: String
@@ -66,6 +76,22 @@ struct Session: Identifiable, Codable, Equatable {
     /// Optional filename for a locally stored chip estimator photo associated with this session.
     var chipEstimatorImageFilename: String?
 
+    /// Optional structured metadata describing the type of game.
+    /// Older sessions may have these unset; fall back to `game` string if needed.
+    var gameCategory: SessionGameCategory?
+    var pokerGameKind: SessionPokerGameKind?
+    var pokerAllowsRebuy: Bool?
+    var pokerAllowsAddOn: Bool?
+    var pokerHasFreeOut: Bool?
+    var pokerVariant: String?
+    /// Optional structured metadata for poker game structure (cash and tournaments).
+    /// Blinds/ante are typically used for cash games; level clock and starting stack for tournaments.
+    var pokerSmallBlind: Int?
+    var pokerBigBlind: Int?
+    var pokerAnte: Int?
+    var pokerLevelMinutes: Int?
+    var pokerStartingStack: Int?
+
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
 
@@ -73,6 +99,8 @@ struct Session: Identifiable, Codable, Equatable {
         case id, game, casino, startTime, endTime, startingTierPoints, endingTierPoints
         case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes
         case chipEstimatorImageFilename
+        case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
+        case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
     }
 
     init(from decoder: Decoder) throws {
@@ -93,13 +121,35 @@ struct Session: Identifiable, Codable, Equatable {
         sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
         privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
+        gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
+        pokerGameKind = try c.decodeIfPresent(SessionPokerGameKind.self, forKey: .pokerGameKind)
+        pokerAllowsRebuy = try c.decodeIfPresent(Bool.self, forKey: .pokerAllowsRebuy)
+        pokerAllowsAddOn = try c.decodeIfPresent(Bool.self, forKey: .pokerAllowsAddOn)
+        pokerHasFreeOut = try c.decodeIfPresent(Bool.self, forKey: .pokerHasFreeOut)
+        pokerVariant = try c.decodeIfPresent(String.self, forKey: .pokerVariant)
+        pokerSmallBlind = try c.decodeIfPresent(Int.self, forKey: .pokerSmallBlind)
+        pokerBigBlind = try c.decodeIfPresent(Int.self, forKey: .pokerBigBlind)
+        pokerAnte = try c.decodeIfPresent(Int.self, forKey: .pokerAnte)
+        pokerLevelMinutes = try c.decodeIfPresent(Int.self, forKey: .pokerLevelMinutes)
+        pokerStartingStack = try c.decodeIfPresent(Int.self, forKey: .pokerStartingStack)
     }
 
     init(id: UUID = UUID(), game: String, casino: String, startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
          status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
-         chipEstimatorImageFilename: String? = nil) {
+         chipEstimatorImageFilename: String? = nil,
+         gameCategory: SessionGameCategory? = nil,
+         pokerGameKind: SessionPokerGameKind? = nil,
+         pokerAllowsRebuy: Bool? = nil,
+         pokerAllowsAddOn: Bool? = nil,
+         pokerHasFreeOut: Bool? = nil,
+         pokerVariant: String? = nil,
+         pokerSmallBlind: Int? = nil,
+         pokerBigBlind: Int? = nil,
+         pokerAnte: Int? = nil,
+         pokerLevelMinutes: Int? = nil,
+         pokerStartingStack: Int? = nil) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -116,6 +166,17 @@ struct Session: Identifiable, Codable, Equatable {
         self.sessionMood = sessionMood
         self.privateNotes = privateNotes
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
+        self.gameCategory = gameCategory
+        self.pokerGameKind = pokerGameKind
+        self.pokerAllowsRebuy = pokerAllowsRebuy
+        self.pokerAllowsAddOn = pokerAllowsAddOn
+        self.pokerHasFreeOut = pokerHasFreeOut
+        self.pokerVariant = pokerVariant
+        self.pokerSmallBlind = pokerSmallBlind
+        self.pokerBigBlind = pokerBigBlind
+        self.pokerAnte = pokerAnte
+        self.pokerLevelMinutes = pokerLevelMinutes
+        self.pokerStartingStack = pokerStartingStack
     }
 
     func encode(to encoder: Encoder) throws {
@@ -136,6 +197,17 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
         try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
+        try c.encodeIfPresent(gameCategory, forKey: .gameCategory)
+        try c.encodeIfPresent(pokerGameKind, forKey: .pokerGameKind)
+        try c.encodeIfPresent(pokerAllowsRebuy, forKey: .pokerAllowsRebuy)
+        try c.encodeIfPresent(pokerAllowsAddOn, forKey: .pokerAllowsAddOn)
+        try c.encodeIfPresent(pokerHasFreeOut, forKey: .pokerHasFreeOut)
+        try c.encodeIfPresent(pokerVariant, forKey: .pokerVariant)
+        try c.encodeIfPresent(pokerSmallBlind, forKey: .pokerSmallBlind)
+        try c.encodeIfPresent(pokerBigBlind, forKey: .pokerBigBlind)
+        try c.encodeIfPresent(pokerAnte, forKey: .pokerAnte)
+        try c.encodeIfPresent(pokerLevelMinutes, forKey: .pokerLevelMinutes)
+        try c.encodeIfPresent(pokerStartingStack, forKey: .pokerStartingStack)
     }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
@@ -148,6 +220,15 @@ struct Session: Identifiable, Codable, Equatable {
     var winLoss: Int? {
         guard let c = cashOut else { return nil }
         return c - totalBuyIn
+    }
+    /// Net result per hour (win rate) in currency units, if both win/loss and hours are available.
+    var winRatePerHour: Double? {
+        guard let wl = winLoss, hoursPlayed > 0 else { return nil }
+        return Double(wl) / hoursPlayed
+    }
+    /// Initial buy-in amount for the session (first buy-in event), if available.
+    var initialBuyIn: Int? {
+        buyInEvents.first?.amount
     }
     var tierPointsEarned: Int? {
         guard let e = endingTierPoints else { return nil }

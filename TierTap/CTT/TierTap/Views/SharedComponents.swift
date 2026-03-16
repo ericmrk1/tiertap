@@ -225,6 +225,159 @@ struct GamePickerView: View {
     }
 }
 
+// MARK: - Poker Analytics Shared Components
+
+/// Poker-focused summary metrics card (win rate, hourly, ROI).
+struct PokerPerformanceSummaryCard: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    let currencySymbol: String
+    let dateRangeText: String?
+    let locationFilterText: String?
+
+    private var closedWithWL: [Session] {
+        sessions.filter { $0.winLoss != nil && $0.gameCategory == .poker }
+    }
+
+    private var totalProfit: Int {
+        closedWithWL.compactMap { $0.winLoss }.filter { $0 > 0 }.reduce(0, +)
+    }
+
+    private var totalLoss: Int {
+        abs(closedWithWL.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
+    }
+
+    private var totalHours: Double {
+        closedWithWL.reduce(0.0) { $0 + $1.hoursPlayed }
+    }
+
+    private var hourlyRate: Double? {
+        let net = closedWithWL.compactMap { $0.winLoss }.reduce(0, +)
+        guard totalHours > 0 else { return nil }
+        return Double(net) / totalHours
+    }
+
+    private var roiPercent: Double? {
+        let totalInitial = closedWithWL.compactMap { $0.initialBuyIn }.reduce(0, +)
+        guard totalInitial > 0 else { return nil }
+        let net = closedWithWL.compactMap { $0.winLoss }.reduce(0, +)
+        return (Double(net) / Double(totalInitial)) * 100.0
+    }
+
+    private var winRate: Double? {
+        let wins = closedWithWL.filter { ($0.winLoss ?? 0) > 0 }.count
+        guard !closedWithWL.isEmpty else { return nil }
+        return Double(wins) / Double(closedWithWL.count)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Poker Performance")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+                if let range = dateRangeText {
+                    Text(range)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            }
+
+            HStack(spacing: 12) {
+                let net = totalProfit - totalLoss
+                MetricPill(
+                    title: "Net",
+                    value: "\(currencySymbol)\(net)",
+                    color: net >= 0 ? .green : .red
+                )
+                if let hr = hourlyRate {
+                    let amt = Int(round(hr))
+                    MetricPill(
+                        title: "Hourly",
+                        value: "\(amt >= 0 ? "+" : "-")\(currencySymbol)\(abs(amt))",
+                        color: amt >= 0 ? .green : .red
+                    )
+                }
+                if let roi = roiPercent {
+                    MetricPill(
+                        title: "ROI",
+                        value: String(format: "%.1f%%", roi),
+                        color: roi >= 0 ? .green : .red
+                    )
+                }
+            }
+
+            if let wr = winRate {
+                Text("Win rate: \(String(format: "%.0f%%", wr * 100)) over \(closedWithWL.count) sessions")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+/// Poker ROI trend "chart" – summarizes ROI distribution over time.
+struct PokerROITrendChartCard: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    let currencySymbol: String
+    let dateRangeText: String?
+    let locationFilterText: String?
+
+    private struct Point: Identifiable {
+        let id = UUID()
+        let date: Date
+        let roi: Double
+    }
+
+    private var points: [Point] {
+        let poker = sessions
+            .filter { $0.gameCategory == .poker && $0.winLoss != nil && ($0.initialBuyIn ?? 0) > 0 }
+            .sorted { $0.startTime < $1.startTime }
+        return poker.compactMap { s in
+            guard let wl = s.winLoss, let bi = s.initialBuyIn, bi > 0 else { return nil }
+            let roi = (Double(wl) / Double(bi)) * 100.0
+            return Point(date: s.startTime, roi: roi)
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Poker ROI Over Time")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            if points.isEmpty {
+                Text("Add a few poker sessions to see ROI trends over time.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let values = points.map { $0.roi }
+                let avg = values.reduce(0, +) / Double(values.count)
+                if let min = values.min(), let max = values.max() {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(format: "Avg ROI: %.1f%%", avg))
+                            .font(.subheadline)
+                            .foregroundColor(avg >= 0 ? .green : .red)
+                        Text(String(format: "Range: %.1f%% to %.1f%%", min, max))
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
 // MARK: - Tier points wheel (0 to 999,999, step 1000)
 struct TierPointsWheel: View {
     @Binding var selectedValue: String

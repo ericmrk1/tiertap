@@ -102,7 +102,7 @@ struct RiskOfRuinView: View {
                 .frame(width: 160, height: 160)
                 Spacer()
             }
-            Text("risk of ruin — probability of losing your entire bankroll based on your session history and current bankroll/unit settings.")
+            Text("risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()
@@ -215,7 +215,7 @@ struct RiskOfRuinView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("How it's calculated")
                 .font(.caption.bold()).foregroundColor(.gray)
-            Text("Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your history. With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.")
+            Text("Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()

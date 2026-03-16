@@ -17,11 +17,25 @@ struct AddPastSessionView: View {
     @State private var avgBetActual = ""
     @State private var avgBetRated = ""
 
+    // Casino game type metadata
+    @State private var gameCategory: SessionGameCategory = .table
+    @State private var pokerGameKind: SessionPokerGameKind = .cash
+    @State private var pokerAllowsRebuy: Bool = false
+    @State private var pokerAllowsAddOn: Bool = false
+    @State private var pokerHasFreeOut: Bool = false
+    @State private var pokerVariant: String = "No Limit Texas Hold’em"
+    @State private var pokerSmallBlindText: String = ""
+    @State private var pokerBigBlindText: String = ""
+    @State private var pokerAnteText: String = ""
+    @State private var pokerLevelMinutesText: String = ""
+    @State private var pokerStartingStackText: String = ""
+
     @State private var showGamePicker = false
     @State private var showCasinoPicker = false
 
     var isValid: Bool {
-        !selectedGame.isEmpty && !casino.isEmpty &&
+        let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
+        return hasGame && !casino.isEmpty &&
         endTime > startTime &&
         Int(totalBuyIn) != nil && Int(cashOut) != nil &&
         Int(startingTier) != nil && Int(endingTier) != nil &&
@@ -87,21 +101,152 @@ struct AddPastSessionView: View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Casino Game", systemImage: "suit.club.fill")
                 .font(.headline).foregroundColor(.white)
-            Button { showGamePicker = true } label: {
-                HStack {
-                    Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
-                    Spacer()
-                    Image(systemName: "chevron.right")
+
+            HStack(spacing: 8) {
+                GameTypePill(title: "Table", isSelected: gameCategory == .table) {
+                    gameCategory = .table
                 }
-                .padding(12)
-                .background(Color(.systemGray6).opacity(0.25))
-                .foregroundColor(selectedGame.isEmpty ? .gray : .white)
-                .cornerRadius(10)
+                GameTypePill(title: "Poker", isSelected: gameCategory == .poker) {
+                    gameCategory = .poker
+                    if pokerVariant.isEmpty {
+                        pokerVariant = "No Limit Texas Hold’em"
+                    }
+                }
+            }
+
+            if gameCategory == .table {
+                Button { showGamePicker = true } label: {
+                    HStack {
+                        Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                    }
+                    .padding(12)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(selectedGame.isEmpty ? .gray : .white)
+                    .cornerRadius(10)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        GameTypePill(title: "Cash", isSelected: pokerGameKind == .cash) {
+                            pokerGameKind = .cash
+                        }
+                        GameTypePill(title: "Tournament", isSelected: pokerGameKind == .tournament) {
+                            pokerGameKind = .tournament
+                        }
+                    }
+
+                    if pokerGameKind == .tournament {
+                        HStack(spacing: 8) {
+                            OptionChip(title: "Re-buy", isOn: pokerAllowsRebuy) {
+                                pokerAllowsRebuy.toggle()
+                            }
+                            OptionChip(title: "Add-On", isOn: pokerAllowsAddOn) {
+                                pokerAllowsAddOn.toggle()
+                            }
+                            OptionChip(title: "Free-Out", isOn: pokerHasFreeOut) {
+                                pokerHasFreeOut.toggle()
+                            }
+                        }
+                    }
+
+                    Picker("Poker Type", selection: $pokerVariant) {
+                        Text("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
+                        Text("Pot Limit Omaha").tag("Pot Limit Omaha")
+                        Text("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
+                        Text("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
+                        Text("Spread Limit Hold’em").tag("Spread Limit Hold’em")
+                        Text("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
+                        Text("Omaha Hi").tag("Omaha Hi")
+                        Text("Omaha Hi-Lo").tag("Omaha Hi-Lo")
+                        Text("5 Card Omaha").tag("5 Card Omaha")
+                        Text("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
+                        Text("7 Card Stud").tag("7 Card Stud")
+                        Text("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
+                        Text("Razz").tag("Razz")
+                        Text("5 Card Draw").tag("5 Card Draw")
+                        Text("2-7 Triple Draw").tag("2-7 Triple Draw")
+                        Text("2-7 Single Draw").tag("2-7 Single Draw")
+                        Text("Chinese Poker").tag("Chinese Poker")
+                        Text("Open Face Chinese").tag("Open Face Chinese")
+                        Text("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
+                        Text("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
+                        Text("Other Poker").tag("Other Poker")
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.white)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Blinds & Structure")
+                            .font(.caption.bold())
+                            .foregroundColor(.white)
+
+                        HStack(spacing: 8) {
+                            TextField("SB", text: $pokerSmallBlindText)
+                                .textFieldStyle(DarkTextFieldStyle())
+                                .keyboardType(.numberPad)
+                            TextField("BB", text: $pokerBigBlindText)
+                                .textFieldStyle(DarkTextFieldStyle())
+                                .keyboardType(.numberPad)
+                            TextField("Ante", text: $pokerAnteText)
+                                .textFieldStyle(DarkTextFieldStyle())
+                                .keyboardType(.numberPad)
+                        }
+
+                        if pokerGameKind == .tournament {
+                            HStack(spacing: 8) {
+                                TextField("Level mins", text: $pokerLevelMinutesText)
+                                    .textFieldStyle(DarkTextFieldStyle())
+                                    .keyboardType(.numberPad)
+                                TextField("Starting stack", text: $pokerStartingStackText)
+                                    .textFieldStyle(DarkTextFieldStyle())
+                                    .keyboardType(.numberPad)
+                            }
+                        }
+                    }
+                }
             }
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(16)
+    }
+
+    private struct GameTypePill: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isSelected ? .black : .white)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    private struct OptionChip: View {
+        let title: String
+        let isOn: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(isOn ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isOn ? .green : .white)
+                    .cornerRadius(8)
+            }
+        }
     }
 
     @ViewBuilder private var casinoAndTimeSection: some View {
@@ -295,6 +440,26 @@ struct AddPastSessionView: View {
     }
 
     func save() {
+        // For Poker, build a descriptive game name from the selected options.
+        if gameCategory == .poker {
+            var parts: [String] = []
+            let kindLabel = (pokerGameKind == .cash) ? "Cash" : "Tournament"
+            parts.append("Poker \(kindLabel)")
+            if !pokerVariant.isEmpty {
+                parts.append(pokerVariant)
+            }
+            if pokerGameKind == .tournament {
+                var opts: [String] = []
+                if pokerAllowsRebuy { opts.append("Re-buy") }
+                if pokerAllowsAddOn { opts.append("Add-On") }
+                if pokerHasFreeOut { opts.append("Free-Out") }
+                if !opts.isEmpty {
+                    parts.append(opts.joined(separator: ", "))
+                }
+            }
+            selectedGame = parts.joined(separator: " - ")
+        }
+
         guard let bi = Int(totalBuyIn), let co = Int(cashOut),
               let st = Int(startingTier), let et = Int(endingTier),
               let aba = Int(avgBetActual), let abr = Int(avgBetRated) else { return }
@@ -307,10 +472,39 @@ struct AddPastSessionView: View {
         let start = cal.date(from: s1) ?? date
         let end = cal.date(from: e1) ?? date.addingTimeInterval(3600)
         let ev = BuyInEvent(amount: bi, timestamp: start)
-        let session = Session(game: selectedGame, casino: casino,
-            startTime: start, endTime: end, startingTierPoints: st,
-            endingTierPoints: et, buyInEvents: [ev], cashOut: co,
-            avgBetActual: aba, avgBetRated: abr, isLive: false)
+        let sb: Int? = (gameCategory == .poker) ? Int(pokerSmallBlindText) : nil
+        let bb: Int? = (gameCategory == .poker) ? Int(pokerBigBlindText) : nil
+        let ante: Int? = (gameCategory == .poker) ? Int(pokerAnteText) : nil
+        let levelMinutes: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil
+        let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
+        let session = Session(
+            game: selectedGame,
+            casino: casino,
+            startTime: start,
+            endTime: end,
+            startingTierPoints: st,
+            endingTierPoints: et,
+            buyInEvents: [ev],
+            cashOut: co,
+            avgBetActual: aba,
+            avgBetRated: abr,
+            isLive: false,
+            status: .complete,
+            sessionMood: nil,
+            privateNotes: nil,
+            chipEstimatorImageFilename: nil,
+            gameCategory: gameCategory,
+            pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,
+            pokerAllowsRebuy: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsRebuy : nil,
+            pokerAllowsAddOn: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsAddOn : nil,
+            pokerHasFreeOut: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerHasFreeOut : nil,
+            pokerVariant: gameCategory == .poker ? pokerVariant : nil,
+            pokerSmallBlind: sb,
+            pokerBigBlind: bb,
+            pokerAnte: ante,
+            pokerLevelMinutes: levelMinutes,
+            pokerStartingStack: startingStack
+        )
         store.addPastSession(session)
         dismiss()
     }

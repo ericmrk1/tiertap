@@ -74,7 +74,14 @@ struct SessionDetailView: View {
                                            value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                            color: wl >= 0 ? .green : .red)
                             }
-                            if let t = session.tiersPerHour {
+                            if let rate = session.winRatePerHour {
+                                MetricCard(title: "Win Rate",
+                                           value: String(format: "%@%.0f/hr",
+                                                         rate >= 0 ? "+\(settingsStore.currencySymbol)" : "-\(settingsStore.currencySymbol)",
+                                                         fabs(rate)),
+                                           color: rate >= 0 ? .green : .red)
+                            }
+                            if session.gameCategory != .poker, let t = session.tiersPerHour {
                                 MetricCard(title: "Pts/Hour", value: String(format: "%.1f", t), color: .white)
                             }
                         }
@@ -144,6 +151,45 @@ struct SessionDetailView: View {
                                 DetailRow(label: "Vs house edge",
                                           value: above ? "\(settingsStore.currencySymbol)\(amount) above" : "\(settingsStore.currencySymbol)\(amount) below",
                                           valueColor: above ? .green : .orange)
+                            }
+                        }
+
+                        if session.gameCategory == .poker ||
+                            session.pokerSmallBlind != nil ||
+                            session.pokerBigBlind != nil ||
+                            session.pokerAnte != nil ||
+                            session.pokerLevelMinutes != nil ||
+                            session.pokerStartingStack != nil {
+                            DetailSection(title: "Poker Structure", icon: "suit.club.fill") {
+                                if let sb = session.pokerSmallBlind, let bb = session.pokerBigBlind {
+                                    DetailRow(
+                                        label: "Blinds",
+                                        value: "\(settingsStore.currencySymbol)\(sb)/\(settingsStore.currencySymbol)\(bb)\(session.pokerAnte.map { " (ante \(settingsStore.currencySymbol)\($0))" } ?? "")"
+                                    )
+                                } else if let sb = session.pokerSmallBlind {
+                                    DetailRow(
+                                        label: "Small blind",
+                                        value: "\(settingsStore.currencySymbol)\(sb)"
+                                    )
+                                } else if let bb = session.pokerBigBlind {
+                                    DetailRow(
+                                        label: "Big blind",
+                                        value: "\(settingsStore.currencySymbol)\(bb)"
+                                    )
+                                }
+
+                                if let minutes = session.pokerLevelMinutes {
+                                    DetailRow(
+                                        label: "Level clock",
+                                        value: "\(minutes) min"
+                                    )
+                                }
+                                if let stack = session.pokerStartingStack {
+                                    DetailRow(
+                                        label: "Starting stack",
+                                        value: "\(stack) chips"
+                                    )
+                                }
                             }
                         }
 

@@ -34,12 +34,37 @@ struct AnalyticsView: View {
     @State private var pendingShareSelection: AnalyticsShareSelection?
 #endif
 
+    @State private var selectedAnalyticsCategory: SessionGameCategory = .table
+
     private var allClosedSessions: [Session] {
         sessionStore.sessions.filter { $0.winLoss != nil }
     }
 
+    /// Whether there are any closed sessions at all, regardless of category.
+    private var hasAnyClosedSessions: Bool {
+        !allClosedSessions.isEmpty
+    }
+
+    /// Table-only closed sessions.
+    private var tableClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory != .poker }
+    }
+
+    /// Poker-only closed sessions.
+    private var pokerClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory == .poker }
+    }
+
+    /// Closed sessions for the currently selected analytics category.
     private var closedSessions: [Session] {
-        var base = allClosedSessions
+        let baseAll: [Session]
+        switch selectedAnalyticsCategory {
+        case .table:
+            baseAll = tableClosedSessions
+        case .poker:
+            baseAll = pokerClosedSessions
+        }
+        var base = baseAll
         if let filter = settingsStore.selectedLocationFilter, !filter.isEmpty {
             base = base.filter { $0.casino == filter }
         }
@@ -148,17 +173,36 @@ struct AnalyticsView: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
+    private struct GameTypePillAnalytics: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isSelected ? .black : .white)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
-                if closedSessions.isEmpty {
+                if !hasAnyClosedSessions {
                     emptyState
                 } else {
                     ScrollView {
                         VStack(spacing: 24) {
                             headerSummary
                             filtersSection
+                            gameCategoryToggle
                             graphTypePicker
                             selectedGraph
                             secondaryGraphs
@@ -452,7 +496,7 @@ struct AnalyticsView: View {
 
         return VStack(spacing: 12) {
             HStack {
-                Text("Session Overview")
+                Text(selectedAnalyticsCategory == .table ? "Table Session Overview" : "Poker Session Overview")
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
@@ -560,18 +604,57 @@ struct AnalyticsView: View {
                     locationFilterText: analyticsLocationFilterText
                 )
             }
-            GameBreakdownBars(
-                sessions: closedSessions,
-                gradient: settingsStore.primaryGradient,
-                dateRangeText: analyticsDateRangeText,
-                locationFilterText: analyticsLocationFilterText
-            )
-            TierPointsByLoyaltyProgramBars(
-                sessions: closedSessions,
-                gradient: settingsStore.primaryGradient,
-                dateRangeText: analyticsDateRangeText,
-                locationFilterText: analyticsLocationFilterText
-            )
+            if selectedAnalyticsCategory == .table {
+                GameBreakdownBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                TierPointsByLoyaltyProgramBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+            } else {
+                PokerPerformanceSummaryCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                PokerROITrendChartCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+            }
+        }
+    }
+
+    /// Toggle between Table and Poker analytics.
+    private var gameCategoryToggle: some View {
+        HStack(spacing: 8) {
+            Text("Game type")
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+            Spacer()
+            GameTypePillAnalytics(
+                title: "Table",
+                isSelected: selectedAnalyticsCategory == .table
+            ) {
+                selectedAnalyticsCategory = .table
+            }
+            GameTypePillAnalytics(
+                title: "Poker",
+                isSelected: selectedAnalyticsCategory == .poker
+            ) {
+                selectedAnalyticsCategory = .poker
+            }
         }
     }
 }
@@ -1725,6 +1808,12 @@ private func buildAnalyticsShareImages(
         return "\(df.string(from: first)) – \(df.string(from: last))"
     }()
 
+    // Treat this share as poker-focused when all sessions are explicitly marked as poker.
+    let isPokerAnalytics: Bool = {
+        guard !closedSessions.isEmpty else { return false }
+        return closedSessions.allSatisfy { $0.gameCategory == .poker }
+    }()
+
     if selection.includeBetCaptureDiff && !betCaptureDiffByDate.isEmpty {
         let card = BetCaptureDiffLineChartCard(
             series: betCaptureDiffByDate,
@@ -1783,26 +1872,52 @@ private func buildAnalyticsShareImages(
     }
 
     if selection.includeGameBreakdown {
-        let card = GameBreakdownBars(
-            sessions: closedSessions,
-            gradient: gradient,
-            dateRangeText: dateRangeText,
-            locationFilterText: locationFilterText
-        )
-        if let image = renderAnalyticsCard(card) {
-            images.append(image)
+        if isPokerAnalytics {
+            let card = PokerPerformanceSummaryCard(
+                sessions: closedSessions,
+                gradient: gradient,
+                currencySymbol: currencySymbol,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        } else {
+            let card = GameBreakdownBars(
+                sessions: closedSessions,
+                gradient: gradient,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
         }
     }
 
     if selection.includeTierByLoyaltyProgram {
-        let card = TierPointsByLoyaltyProgramBars(
-            sessions: closedSessions,
-            gradient: gradient,
-            dateRangeText: dateRangeText,
-            locationFilterText: locationFilterText
-        )
-        if let image = renderAnalyticsCard(card) {
-            images.append(image)
+        if isPokerAnalytics {
+            let card = PokerROITrendChartCard(
+                sessions: closedSessions,
+                gradient: gradient,
+                currencySymbol: currencySymbol,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        } else {
+            let card = TierPointsByLoyaltyProgramBars(
+                sessions: closedSessions,
+                gradient: gradient,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
         }
     }
 

@@ -14,6 +14,8 @@ struct TierTapPaywallView: View {
     @State private var selectedProduct: Product?
     @State private var isPurchasing = false
     @State private var showConfetti = false
+    @State private var showAccountSheet = false
+    @State private var emailInput: String = ""
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -64,6 +66,14 @@ struct TierTapPaywallView: View {
             }
         }
         .navigationViewStyle(.stack)
+        .adaptiveSheet(isPresented: $showAccountSheet) {
+            CommunityAuthSheet(
+                emailInput: $emailInput,
+                onDismiss: { showAccountSheet = false }
+            )
+            .environmentObject(authStore)
+            .environmentObject(settingsStore)
+        }
     }
 
     private var headerSection: some View {
@@ -98,6 +108,25 @@ struct TierTapPaywallView: View {
                     Text("Signed in with a valid TierTap account (email, Apple, or Google).")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
+                }
+
+                if !authStore.isSignedIn {
+                    Button {
+                        showAccountSheet = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "person.crop.circle")
+                            Text("Go to Account to sign in")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.18))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 4)
                 }
             }
         }

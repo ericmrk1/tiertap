@@ -9,8 +9,6 @@ struct CloseoutView: View {
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
     @State private var cashOut = ""
-    @State private var avgBetActual = ""
-    @State private var avgBetRated = ""
     @State private var endingTier = ""
     @State private var showLowAlert = false
     @State private var showCelebration = false
@@ -48,8 +46,7 @@ struct CloseoutView: View {
     }
 
     var isValid: Bool {
-        Int(cashOut) != nil && Int(avgBetActual) != nil &&
-        Int(avgBetRated) != nil && Int(endingTier) != nil
+        Int(cashOut) != nil && Int(endingTier) != nil
     }
 
     var previewTierEarned: Int? { Int(endingTier).map { $0 - s.startingTierPoints } }
@@ -59,10 +56,16 @@ struct CloseoutView: View {
         return Double(e) / previewHours
     }
     var previewWL: Int? { Int(cashOut).map { $0 - s.totalBuyIn } }
-    var previewT100: Double? {
-        guard let r = Int(avgBetRated), r >= 100,
-              let e = previewTierEarned, previewHours > 0 else { return nil }
-        return (Double(e) / (Double(r) * previewHours)) * 100
+    /// Hourly win/loss rate based on total W/L and hours played.
+    var previewHourlyWinLoss: Double? {
+        guard let wl = previewWL, previewHours > 0 else { return nil }
+        return Double(wl) / previewHours
+    }
+    /// ROI % based on initial buy-in only.
+    var previewROI: Double? {
+        guard let wl = previewWL,
+              let initial = s.initialBuyIn, initial > 0 else { return nil }
+        return (Double(wl) / Double(initial)) * 100.0
     }
 
     var timerStopped: Bool { s.endTime != nil }
@@ -186,13 +189,9 @@ struct CloseoutView: View {
                                     .cornerRadius(8)
                                 }
                             }
-                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
-                            CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
-                            CommonAmountButtons(amounts: settingsStore.effectiveDenominations.isEmpty ? [25, 50, 100, 200, 500, 1000] : settingsStore.effectiveDenominations, selected: $avgBetRated)
                             InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier)
                             if settingsStore.unitSize > 0,
-                               (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || s.totalBuyIn > settingsStore.unitSize {
+                               s.totalBuyIn > settingsStore.unitSize {
                                 HStack(spacing: 6) {
                                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange).font(.caption2)
                                     Text("Exceeds unit \(settingsStore.currencySymbol)\(settingsStore.unitSize).").font(.caption2).foregroundColor(.orange)
@@ -223,16 +222,21 @@ struct CloseoutView: View {
                                     Text("Hrs").font(.caption2).foregroundColor(.gray)
                                     Text(String(format: "%.2f", previewHours)).font(.subheadline).foregroundColor(.white)
                                 }
-                                if let e = previewTierEarned {
+                                if let hourly = previewHourlyWinLoss {
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("Pts").font(.caption2).foregroundColor(.gray)
-                                        Text("\(e >= 0 ? "+" : "")\(e)").font(.subheadline).foregroundColor(e >= 0 ? .green : .orange)
+                                        Text("Hourly W/L").font(.caption2).foregroundColor(.gray)
+                                        let amount = Int(round(hourly))
+                                        Text("\(amount >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(amount))")
+                                            .font(.subheadline)
+                                            .foregroundColor(amount >= 0 ? .green : .red)
                                     }
                                 }
-                                if let t = previewTPH {
+                                if let roi = previewROI {
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("Pts/hr").font(.caption2).foregroundColor(.gray)
-                                        Text(String(format: "%.1f", t)).font(.subheadline).foregroundColor(.white)
+                                        Text("ROI %").font(.caption2).foregroundColor(.gray)
+                                        Text(String(format: "%.1f%%", roi))
+                                            .font(.subheadline)
+                                            .foregroundColor(roi >= 0 ? .green : .red)
                                     }
                                 }
                                 Spacer(minLength: 0)
@@ -241,24 +245,7 @@ struct CloseoutView: View {
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(12)
 
-                                if let wl = previewWL,
-                                   let abet = Int(avgBetActual), abet > 0,
-                                   let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: s.game, winLoss: wl, avgBet: abet, hours: previewHours) {
-                                let above = result.aboveEdge >= 0
-                                let amount = Int(round(abs(result.aboveEdge)))
-                                HStack(spacing: 6) {
-                                    Image(systemName: "chart.line.uptrend.xyaxis")
-                                        .font(.caption)
-                                        .foregroundColor(above ? .green : .orange)
-                                    Text(above ? "\(settingsStore.currencySymbol)\(amount) above statistical house edge" : "\(settingsStore.currencySymbol)\(amount) below statistical house edge")
-                                        .font(.caption)
-                                        .foregroundColor(above ? .green : .orange)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(10)
-                                .background(Color(.systemGray6).opacity(0.12))
-                                .cornerRadius(10)
-                            }
+                            // Removed house edge comparison since avg bet inputs are no longer collected at closeout.
                         }
 
                         // Private notes (local only, not shared)
@@ -432,24 +419,24 @@ struct CloseoutView: View {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(s.startingTierPoints)). Save anyway?")
             }
             .adaptiveSheet(isPresented: $showEmotionPicker, onDismiss: {
-                if closedSessionId != nil, let co = Int(cashOut), let aba = Int(avgBetActual),
-                   let abr = Int(avgBetRated), let et = Int(endingTier) {
+                if closedSessionId != nil, let co = Int(cashOut),
+                   let et = Int(endingTier) {
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
-                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
                     closedSessionId = nil
                     dismiss()
                 }
             }) {
                 SessionMoodPickerView { mood in
-                    guard let co = Int(cashOut), let aba = Int(avgBetActual),
-                          let abr = Int(avgBetRated), let et = Int(endingTier),
+                    guard let co = Int(cashOut),
+                          let et = Int(endingTier),
                           let id = closedSessionId else {
                         closedSessionId = nil
                         dismiss()
                         return
                     }
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
-                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
                     if var session = store.sessions.first(where: { $0.id == id }) {
                         session.sessionMood = mood
                         store.updateSession(session)
@@ -514,16 +501,6 @@ struct CloseoutView: View {
                     endingTier = "0"
                 }
             }
-            // Pre-populate avg bets based on recent history for this game.
-            if avgBetActual.isEmpty || avgBetRated.isEmpty {
-                let defaults = store.defaultAvgBets(for: s.game)
-                if avgBetActual.isEmpty, let a = defaults.actual {
-                    avgBetActual = "\(a)"
-                }
-                if avgBetRated.isEmpty, let r = defaults.rated {
-                    avgBetRated = "\(r)"
-                }
-            }
 
             // Load any existing session photo attached while live.
             if let fileName = s.chipEstimatorImageFilename,
@@ -534,9 +511,8 @@ struct CloseoutView: View {
         }
     }
 
-    func save() {
-        guard let co = Int(cashOut), let aba = Int(avgBetActual),
-              let abr = Int(avgBetRated), let et = Int(endingTier) else { return }
+        func save() {
+        guard let co = Int(cashOut), let et = Int(endingTier) else { return }
         let sessionId = s.id
         let netPositive = (co - s.totalBuyIn) > 0
 
@@ -548,11 +524,11 @@ struct CloseoutView: View {
                 }
                 showCelebration = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                    store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
                     dismiss()
                 }
             } else {
-                store.closeSession(cashOut: co, avgBetActual: aba, avgBetRated: abr, endingTier: et, privateNotes: notes)
+                store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
                 dismiss()
             }
             return

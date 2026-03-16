@@ -112,10 +112,12 @@ class SessionStore: ObservableObject {
         #endif
     }
 
-    func closeSession(cashOut: Int, avgBetActual: Int, avgBetRated: Int, endingTier: Int, privateNotes: String? = nil) {
+    func closeSession(cashOut: Int, endingTier: Int, privateNotes: String? = nil) {
         guard var s = liveSession else { return }
-        s.cashOut = cashOut; s.avgBetActual = avgBetActual
-        s.avgBetRated = avgBetRated; s.endingTierPoints = endingTier
+        s.cashOut = cashOut
+        s.avgBetActual = nil
+        s.avgBetRated = nil
+        s.endingTierPoints = endingTier
         if privateNotes != nil { s.privateNotes = privateNotes }
         s.endTime = s.endTime ?? Date(); s.isLive = false; s.status = .complete
         sessions.insert(s, at: 0)
@@ -149,6 +151,39 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    /// Update structured game metadata for the current live session (e.g. Table vs Poker details).
+    func updateLiveSessionGameMetadata(
+        gameCategory: SessionGameCategory?,
+        pokerGameKind: SessionPokerGameKind?,
+        pokerAllowsRebuy: Bool?,
+        pokerAllowsAddOn: Bool?,
+        pokerHasFreeOut: Bool?,
+        pokerVariant: String?,
+        pokerSmallBlind: Int? = nil,
+        pokerBigBlind: Int? = nil,
+        pokerAnte: Int? = nil,
+        pokerLevelMinutes: Int? = nil,
+        pokerStartingStack: Int? = nil
+    ) {
+        guard var s = liveSession else { return }
+        s.gameCategory = gameCategory
+        s.pokerGameKind = pokerGameKind
+        s.pokerAllowsRebuy = pokerAllowsRebuy
+        s.pokerAllowsAddOn = pokerAllowsAddOn
+        s.pokerHasFreeOut = pokerHasFreeOut
+        s.pokerVariant = pokerVariant
+        s.pokerSmallBlind = pokerSmallBlind
+        s.pokerBigBlind = pokerBigBlind
+        s.pokerAnte = pokerAnte
+        s.pokerLevelMinutes = pokerLevelMinutes
+        s.pokerStartingStack = pokerStartingStack
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
     /// Attach or replace the chip estimator image filename on the current live session.
     func setChipEstimatorImageFilename(_ fileName: String?) {
         guard var s = liveSession else { return }
@@ -175,6 +210,7 @@ class SessionStore: ObservableObject {
         liveSession = s
         saveLive()
         #if os(iOS)
+        LiveActivityManager.shared.end()
         pushContext()
         #endif
     }

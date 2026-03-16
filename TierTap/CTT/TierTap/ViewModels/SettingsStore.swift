@@ -27,6 +27,7 @@ private let keyAICallsCount = "ctt_ai_calls_count"
 private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
 private let keySoundProfile = "ctt_sound_profile"
 private let keySubscriptionOverrideCode = "ctt_subscription_override_code"
+private let keyDefaultGameCategory = "ctt_default_game_category"
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -209,6 +210,11 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(favoriteCasinos, forKey: keyFavoriteCasinos) }
     }
 
+    /// Default game category to show in game pickers and analytics (Table or Poker).
+    @Published var defaultGameCategory: SessionGameCategory {
+        didSet { UserDefaults.standard.set(defaultGameCategory.rawValue, forKey: keyDefaultGameCategory) }
+    }
+
     /// Optional shared location filter used across History/Analytics.
     @Published var selectedLocationFilter: String? {
         didSet {
@@ -371,6 +377,12 @@ final class SettingsStore: ObservableObject {
         self.useEighteenXMultipliers = UserDefaults.standard.bool(forKey: keyUseEighteenX)
         self.favoriteGames = UserDefaults.standard.stringArray(forKey: keyFavoriteGames) ?? []
         self.favoriteCasinos = UserDefaults.standard.stringArray(forKey: keyFavoriteCasinos) ?? []
+        if let raw = UserDefaults.standard.string(forKey: keyDefaultGameCategory),
+           let cat = SessionGameCategory(rawValue: raw) {
+            self.defaultGameCategory = cat
+        } else {
+            self.defaultGameCategory = .table
+        }
         self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "green"
         self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
         self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)

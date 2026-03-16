@@ -32,6 +32,7 @@ struct SettingsView: View {
     @State private var gamePickerSelection: String = ""
     @State private var casinoPickerSelection: String = ""
     @State private var subscriptionOverrideText: String = ""
+    @State private var exportGameCategory: SessionGameCategory = .table
 
     var body: some View {
         NavigationStack {
@@ -69,6 +70,7 @@ struct SettingsView: View {
                 primaryColorSelection = settingsStore.primaryColor
                 secondaryColorSelection = settingsStore.secondaryColor
                 subscriptionOverrideText = settingsStore.subscriptionOverrideCode
+                exportGameCategory = settingsStore.defaultGameCategory
             }
             .onChange(of: gamePickerSelection) { new in
                 let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -150,7 +152,7 @@ struct SettingsView: View {
                         if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
                     }
             }
-            Text("Risk of Ruin uses bankroll and unit size. Keep bets at or below unit size to stay within target risk.")
+            Text("Risk of Ruin for table games uses bankroll and unit size. Keep table-game bets at or below unit size to stay within target risk; poker sessions are not included.")
                 .font(.caption).foregroundColor(.gray)
         }
     }
@@ -170,7 +172,7 @@ struct SettingsView: View {
                         settingsStore.targetAveragePerSession = v
                     }
                 }
-            Text("Compare your actual average win/loss per session to this target in the Risk of Ruin screen.")
+            Text("Compare your actual average win/loss per table-game session to this target in the Risk of Ruin screen (poker is excluded).")
                 .font(.caption).foregroundColor(.gray)
         }
     }
@@ -335,6 +337,31 @@ struct SettingsView: View {
                         .cornerRadius(10)
                     }
                 }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Default game type")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Text("Controls whether new sessions and analytics default to table games or poker.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    HStack(spacing: 8) {
+                        GameTypePillSetting(
+                            title: "Table",
+                            isSelected: settingsStore.defaultGameCategory == .table
+                        ) {
+                            settingsStore.defaultGameCategory = .table
+                        }
+                        GameTypePillSetting(
+                            title: "Poker",
+                            isSelected: settingsStore.defaultGameCategory == .poker
+                        ) {
+                            settingsStore.defaultGameCategory = .poker
+                        }
+                    }
+                }
                 
                 Divider().background(Color.gray.opacity(0.3))
                 
@@ -433,6 +460,24 @@ struct SettingsView: View {
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
+            }
+        }
+    }
+
+    private struct GameTypePillSetting: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.3))
+                    .foregroundColor(isSelected ? .black : .white)
+                    .clipShape(Capsule())
             }
         }
     }
@@ -615,6 +660,29 @@ struct SettingsView: View {
             isExpanded: $isDataExportExpanded
         ) {
             VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("CSV game type")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Text("Choose whether to export table sessions or poker sessions. Older sessions without a game type are treated as table games.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    HStack(spacing: 8) {
+                        GameTypePillSetting(
+                            title: "Table",
+                            isSelected: exportGameCategory == .table
+                        ) {
+                            exportGameCategory = .table
+                        }
+                        GameTypePillSetting(
+                            title: "Poker",
+                            isSelected: exportGameCategory == .poker
+                        ) {
+                            exportGameCategory = .poker
+                        }
+                    }
+                }
+
                 Button {
                     exportSessionsAsCSV()
                 } label: {
@@ -701,10 +769,21 @@ struct SettingsView: View {
     }
 
     private func exportSessionsAsCSV() {
-        guard !sessionStore.sessions.isEmpty else { return }
-        isExporting = true
+        let allSessions = sessionStore.sessions
+        guard !allSessions.isEmpty else { return }
 
-        let sessions = sessionStore.sessions
+        let sessions = allSessions.filter { session in
+            let category = session.gameCategory ?? .table
+            return category == exportGameCategory
+        }
+
+        guard !sessions.isEmpty else {
+            exportErrorMessage = "No sessions for the selected game type are available to export."
+            isShowingExportError = true
+            return
+        }
+
+        isExporting = true
 
         DispatchQueue.global(qos: .userInitiated).async {
             let csv = buildCSV(for: sessions)
@@ -746,7 +825,18 @@ struct SettingsView: View {
             "tier_points_earned",
             "tiers_per_hour",
             "tiers_per_100_rated_bet_hour",
-            "status"
+            "status",
+            "game_category",
+            "poker_game_kind",
+            "poker_allows_rebuy",
+            "poker_allows_add_on",
+            "poker_has_free_out",
+            "poker_variant",
+            "poker_small_blind",
+            "poker_big_blind",
+            "poker_ante",
+            "poker_level_minutes",
+            "poker_starting_stack"
         ]
         lines.append(headers.joined(separator: ","))
 
@@ -772,6 +862,18 @@ struct SettingsView: View {
             let tiersPerHour = s.tiersPerHour.map { String(format: "%.4f", $0) } ?? ""
             let tiersPerHundred = s.tiersPerHundredRatedBetHour.map { String(format: "%.4f", $0) } ?? ""
 
+            let gameCategory = (s.gameCategory ?? .table).rawValue
+            let pokerGameKind = s.pokerGameKind?.rawValue ?? ""
+            let pokerAllowsRebuy = s.pokerAllowsRebuy.map { $0 ? "true" : "false" } ?? ""
+            let pokerAllowsAddOn = s.pokerAllowsAddOn.map { $0 ? "true" : "false" } ?? ""
+            let pokerHasFreeOut = s.pokerHasFreeOut.map { $0 ? "true" : "false" } ?? ""
+            let pokerVariant = s.pokerVariant ?? ""
+            let pokerSmallBlind = s.pokerSmallBlind.map { String($0) } ?? ""
+            let pokerBigBlind = s.pokerBigBlind.map { String($0) } ?? ""
+            let pokerAnte = s.pokerAnte.map { String($0) } ?? ""
+            let pokerLevelMinutes = s.pokerLevelMinutes.map { String($0) } ?? ""
+            let pokerStartingStack = s.pokerStartingStack.map { String($0) } ?? ""
+
             let fields: [String] = [
                 s.id.uuidString,
                 s.game,
@@ -789,7 +891,18 @@ struct SettingsView: View {
                 tierEarned,
                 tiersPerHour,
                 tiersPerHundred,
-                s.status.rawValue
+                s.status.rawValue,
+                gameCategory,
+                pokerGameKind,
+                pokerAllowsRebuy,
+                pokerAllowsAddOn,
+                pokerHasFreeOut,
+                pokerVariant,
+                pokerSmallBlind,
+                pokerBigBlind,
+                pokerAnte,
+                pokerLevelMinutes,
+                pokerStartingStack
             ].map { escapeCSVField($0) }
 
             lines.append(fields.joined(separator: ","))
