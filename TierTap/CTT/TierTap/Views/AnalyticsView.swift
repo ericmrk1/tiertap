@@ -1060,7 +1060,7 @@ struct AIAnalyticsSheet: View {
                     .init(role: "user", parts: [.init(text: prompt)])
                 ]
             )
-            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.execute {
+            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
                     options: FunctionInvokeOptions(body: body)

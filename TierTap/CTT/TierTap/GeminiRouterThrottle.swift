@@ -30,4 +30,39 @@ actor GeminiRouterThrottle {
         lastInvokeTime = Date()
         return try await operation()
     }
+
+    /// Runs the given operation with retry/backoff when it fails, primarily
+    /// to handle transient 5xx errors (including 503 "Service Unavailable")
+    /// from the gemini-router edge function.
+    ///
+    /// Delays:
+    /// - First failure: wait 1 second then retry
+    /// - Second failure: wait 2 seconds then retry
+    /// - Third failure: wait 5 seconds, then give up if it still fails
+    func executeWithRetries<T>(_ operation: () async throws -> T) async throws -> T {
+        let backoffDelays: [TimeInterval] = [1, 2, 5]
+        var lastError: Error?
+
+        for (attempt, delay) in backoffDelays.enumerated() {
+            do {
+                // Use the normal throttle for each attempt so we still respect
+                // the global pacing between Gemini calls.
+                return try await execute(operation)
+            } catch {
+                lastError = error
+
+                // Only wait and retry if there are remaining attempts.
+                if attempt < backoffDelays.count - 1 {
+                    // If the error is clearly not transient, we could bail out
+                    // early. For now, we conservatively retry on any error
+                    // so that 503s and other temporary issues get a chance
+                    // to recover before the UI shows a failure.
+                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    continue
+                }
+            }
+        }
+
+        throw lastError ?? NSError(domain: "GeminiRouterThrottle", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error calling Gemini."])
+    }
 }
