@@ -666,6 +666,7 @@ struct AIAnalyticsSheet: View {
     @Environment(\.dismiss) private var dismiss
     
     enum TierTapAIQuestion: String, CaseIterable, Identifiable {
+        // Table-focused questions
         case whereEarnTiersFastest
         case rankProgramsByTierEfficiency
         case rankPropertiesByTierEfficiency
@@ -691,7 +692,57 @@ struct AIAnalyticsSheet: View {
         case consistencyTapPointsIdeas
         case bestFittingRewards
         
+        // Poker-focused questions
+        case pokerProfitabilityOverview
+        case pokerWinrateByGame
+        case pokerROITrends
+        case pokerSessionPatterns
+        case pokerRiskProfile
+        
         var id: String { rawValue }
+        
+        /// Questions intended when analyzing non‑poker (table) sessions.
+        static var tableQuestions: [TierTapAIQuestion] {
+            [
+                .whereEarnTiersFastest,
+                .rankProgramsByTierEfficiency,
+                .rankPropertiesByTierEfficiency,
+                .bestGamePropertyCombos,
+                .optimizeForFastestTierGain,
+                .showRatedVsActualGaps,
+                .whereUnderRated,
+                .trendGapByProperty,
+                .trendGapByGame,
+                .ratingInsightsConfidence,
+                .moodVsPlay,
+                .whenTiltedOrOff,
+                .gentleBreakMoments,
+                .highVolatilitySessions,
+                .riskVolatilityProfile,
+                .stopLossAndBreakNudges,
+                .tapPointsEarningLately,
+                .nextBadgeOrLevel,
+                .consistencyTapPointsIdeas,
+                .bestFittingRewards
+            ]
+        }
+        
+        /// Questions intended when analyzing poker sessions only.
+        static var pokerQuestions: [TierTapAIQuestion] {
+            [
+                .pokerProfitabilityOverview,
+                .pokerWinrateByGame,
+                .pokerROITrends,
+                .pokerSessionPatterns,
+                .pokerRiskProfile,
+                .moodVsPlay,
+                .whenTiltedOrOff,
+                .gentleBreakMoments,
+                .highVolatilitySessions,
+                .riskVolatilityProfile,
+                .stopLossAndBreakNudges
+            ]
+        }
         
         var title: String {
             switch self {
@@ -715,51 +766,66 @@ struct AIAnalyticsSheet: View {
             case .nextBadgeOrLevel: return "What do I need for my next badge or level?"
             case .consistencyTapPointsIdeas: return "Easy ways to earn more TapPoints through consistency"
             case .bestFittingRewards: return "Which rewards best fit my habits?"
+            case .pokerProfitabilityOverview: return "How is my poker profitability overall?"
+            case .pokerWinrateByGame: return "How do my poker results vary by game type?"
+            case .pokerROITrends: return "How is my poker ROI trending over time?"
+            case .pokerSessionPatterns: return "What patterns show up in my poker sessions?"
+            case .pokerRiskProfile: return "What is my risk/volatility profile in poker?"
             }
         }
         
         func instruction(toneLabel: String) -> String {
             switch self {
             case .whereEarnTiersFastest:
-                return "Using the player's historical sessions, focus on where they earn tiers fastest by program, property, and game, emphasizing tiers per hour and tiers per $100 rated bet. Write the response in \(toneLabel), be clear and data-driven, and avoid generic gambling advice."
+                return "From non‑poker sessions only, show where the player earns tiers fastest by program, property, and game, using tiers per hour and tiers per unit of rated bet. Keep it \(toneLabel), concise, and specific to this history."
             case .rankProgramsByTierEfficiency:
-                return "Compare and rank the player's casino loyalty programs by tier-earning efficiency using their past sessions. Explain which programs look strongest for earning tiers, in \(toneLabel), staying neutral and analytical."
+                return "Using table sessions (excluding poker), rank casino loyalty programs by tier‑earning efficiency and briefly note why the top few stand out, in \(toneLabel)."
             case .rankPropertiesByTierEfficiency:
-                return "Compare and rank the properties where the player has recorded sessions by tier-earning efficiency. Highlight the top few standouts and briefly explain why, in \(toneLabel), without being promotional."
+                return "Rank properties from table play by how efficiently they earn tiers. Highlight only a few clear leaders, using \(toneLabel)."
             case .bestGamePropertyCombos:
-                return "Identify combinations of property and game where the player seems to earn tiers efficiently. Summarize the best combos and what patterns you see, in \(toneLabel), using simple, practical language."
+                return "From non‑poker play, list the best property + game combinations for earning tiers efficiently, summarizing patterns in \(toneLabel)."
             case .optimizeForFastestTierGain:
-                return "Given how and where the player actually plays, suggest practical ways to focus on faster tier gain (programs, properties, and games they already use). Use \(toneLabel) and keep recommendations realistic, not prescriptive."
+                return "Given the existing non‑poker play, suggest a few realistic ways to focus on faster tier gain using programs, properties, and games they already use. Keep it \(toneLabel) and non‑prescriptive."
             case .showRatedVsActualGaps:
-                return "Analyze the gap between rated (casino-captured) average bet and the player's estimated actual average bet across sessions. Summarize where gaps appear and how large they seem, in \(toneLabel), staying factual and non-judgmental."
+                return "Analyze gaps between rated and actual average bet in table sessions. Summarize where gaps appear and their rough size, in \(toneLabel), staying factual."
             case .whereUnderRated:
-                return "Look for patterns where rated average bet appears consistently lower than actual average bet. Gently describe any properties or games that look under-rated, using a neutral, non-accusatory tone even if patterns are clear, and write the answer in \(toneLabel)."
+                return "From non‑poker sessions, look for places where rated average bet is consistently below actual. Gently describe any properties or games that look under‑rated, using \(toneLabel)."
             case .trendGapByProperty:
-                return "Describe how the rating gap between actual and rated bet has behaved by property over time. Focus on trends (getting better, worse, or staying similar) in \(toneLabel), avoiding blame or accusations."
+                return "Describe how the rating gap between actual and rated bet in table play has trended by property over time (better, worse, similar), in \(toneLabel)."
             case .trendGapByGame:
-                return "Describe how the rating gap between actual and rated bet has behaved by game over time. Focus on patterns and trends in \(toneLabel), without speculating about casino intent."
+                return "Describe how the rating gap between actual and rated bet in table play has trended by game over time, focusing on patterns in \(toneLabel)."
             case .ratingInsightsConfidence:
-                return "Assess how strong or weak the rating insights are, based on how many sessions have both rated and actual bets and how consistent the gaps look. Explain confidence levels in \(toneLabel), being transparent and cautious about over-claiming."
+                return "Assess how strong or weak the table rating insights are based on sample size and consistency. Explain confidence levels briefly in \(toneLabel)."
             case .moodVsPlay:
-                return "Correlate the player's recorded moods and comfort levels with how their sessions actually went (length, net result, volatility, tiers). Use a supportive, non-preachy tone within \(toneLabel), focusing on self-awareness rather than judgment."
+                return "Correlate recorded moods with how sessions went (length, net, volatility, tiers) for the selected game set. Use \(toneLabel) and focus on gentle self‑awareness."
             case .whenTiltedOrOff:
-                return "Look for situations where the player reports feeling 'off' or 'tilted' and describe any patterns in games, properties, or session characteristics. Explain gently, using \(toneLabel), and avoid sounding like a lecture."
+                return "Look for situations where the player reports feeling 'off' or 'tilted' and describe patterns in games, properties, or session characteristics, using \(toneLabel) and soft language."
             case .gentleBreakMoments:
-                return "Suggest circumstances in the player's history where a soft 'take a break' nudge could have been helpful (e.g., long sessions, repeated negative moods). Keep the language very gentle, non-judgmental, and aligned with \(toneLabel)."
+                return "Suggest a few circumstances from the selected game set where a soft 'take a break' nudge could have helped (very long sessions, repeated negative moods), in gentle \(toneLabel)."
             case .highVolatilitySessions:
-                return "Identify sessions that look high-volatility based on buy-ins, adds, duration, and swings in win/loss. Explain them with careful, educational framing around variance and risk, in \(toneLabel), without glamorizing wins or shaming losses."
+                return "Identify sessions that look high‑volatility (large swings, big buy‑ins or adds, long durations) and describe them with calm variance/risk framing in \(toneLabel)."
             case .riskVolatilityProfile:
-                return "Using the player's most common games and session patterns, describe their typical risk and volatility profile in simple terms. Keep the tone educational and calm within \(toneLabel), and avoid prescriptive betting advice."
+                return "Using the selected game set, describe the player's typical risk and volatility profile in simple terms, using \(toneLabel) and avoiding betting advice."
             case .stopLossAndBreakNudges:
-                return "Based on the player's patterns, suggest a few gentle, time- or loss-based moments where a stop-loss reminder or 'take a break' nudge could make sense. Use very soft, non-preachy language consistent with \(toneLabel)."
+                return "Based on the selected game set, suggest a few gentle time‑ or loss‑based moments where a stop‑loss or break reminder could make sense, in \(toneLabel)."
             case .tapPointsEarningLately:
-                return "Using the player's recent engagement patterns (sessions logged, streaks, consistency, sharing or referrals if visible), describe how they appear to be earning engagement-style rewards such as TapPoints. Stay focused on engagement, not gambling outcomes, and write in \(toneLabel)."
+                return "Using recent engagement patterns (sessions logged, streaks, consistency), describe how they appear to be earning engagement‑style rewards such as TapPoints, in \(toneLabel)."
             case .nextBadgeOrLevel:
-                return "Given how often and how consistently the player engages with the app, suggest realistic next-badge or level-style milestones. Emphasize healthy, track-focused behavior rather than more gambling, in \(toneLabel)."
+                return "Given how often and how consistently the player engages with the app, suggest a few realistic next‑badge or level‑style milestones, emphasizing healthy, track‑focused behavior in \(toneLabel)."
             case .consistencyTapPointsIdeas:
-                return "Recommend simple, low-friction ways for the player to earn more engagement rewards through consistency (like logging sessions promptly and maintaining streaks), using \(toneLabel), and avoid implying they should gamble more."
+                return "Recommend simple ways to earn more engagement rewards through consistency (logging sessions promptly, maintaining streaks), using \(toneLabel) and avoiding any push to gamble more."
             case .bestFittingRewards:
-                return "Based on the player's travel and play patterns, suggest reward or perk styles that would likely fit them best (e.g., travel perks, status-oriented rewards). Keep the focus on engagement and experience, not on promising winnings, and stay within \(toneLabel)."
+                return "Based on travel and play patterns, suggest reward or perk styles that would likely fit them best (e.g., travel or status perks), keeping the focus on engagement and experience in \(toneLabel)."
+            case .pokerProfitabilityOverview:
+                return "Using only poker sessions, summarize overall poker profitability, win/loss counts, and any clear patterns by property or game, in \(toneLabel)."
+            case .pokerWinrateByGame:
+                return "From poker sessions only, compare results by poker game type (e.g., cash vs tournaments, game variants) and highlight where results look stronger or weaker, in \(toneLabel)."
+            case .pokerROITrends:
+                return "Using only poker sessions, describe how poker ROI and net results have trended over time, calling out any clear upswings or downswings, in \(toneLabel)."
+            case .pokerSessionPatterns:
+                return "From poker sessions only, describe patterns in session length, stakes, and outcomes, and what that might suggest about pacing and game selection, using \(toneLabel)."
+            case .pokerRiskProfile:
+                return "Using just poker sessions, explain the player's risk and volatility profile in poker (swings, buy‑ins, adds) in simple terms, in \(toneLabel), without giving betting strategy."
             }
         }
     }
@@ -770,6 +836,7 @@ struct AIAnalyticsSheet: View {
     @State private var errorMessage: String?
     
     @State private var selectedQuestion: TierTapAIQuestion = .whereEarnTiersFastest
+    @State private var selectedAnalyticsCategory: SessionGameCategory = .table
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -781,10 +848,31 @@ struct AIAnalyticsSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 20) {
                     VStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
+                        HStack {
                             Text("AI Analysis")
                                 .font(.title2.bold())
                                 .foregroundColor(.white)
+                            Spacer()
+                            HStack(spacing: 8) {
+                                GameTypePillAI(
+                                    title: "Table",
+                                    isSelected: selectedAnalyticsCategory == .table
+                                ) {
+                                    selectedAnalyticsCategory = .table
+                                    if !TierTapAIQuestion.tableQuestions.contains(selectedQuestion) {
+                                        selectedQuestion = TierTapAIQuestion.tableQuestions.first ?? .whereEarnTiersFastest
+                                    }
+                                }
+                                GameTypePillAI(
+                                    title: "Poker",
+                                    isSelected: selectedAnalyticsCategory == .poker
+                                ) {
+                                    selectedAnalyticsCategory = .poker
+                                    if !TierTapAIQuestion.pokerQuestions.contains(selectedQuestion) {
+                                        selectedQuestion = TierTapAIQuestion.pokerQuestions.first ?? .pokerProfitabilityOverview
+                                    }
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
@@ -793,7 +881,7 @@ struct AIAnalyticsSheet: View {
                                 .font(.caption.bold())
                                 .foregroundColor(.white.opacity(0.8))
                             Menu {
-                                ForEach(TierTapAIQuestion.allCases) { question in
+                                ForEach(questionsForCurrentCategory, id: \.self) { question in
                                     Button(question.title) {
                                         selectedQuestion = question
                                     }
@@ -899,6 +987,35 @@ struct AIAnalyticsSheet: View {
         }
     }
     
+    /// Small pill toggle used within the AI sheet.
+    private struct GameTypePillAI: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+        
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isSelected ? .black : .white)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+    
+    /// Currently available questions given the selected game category.
+    private var questionsForCurrentCategory: [TierTapAIQuestion] {
+        switch selectedAnalyticsCategory {
+        case .table:
+            return TierTapAIQuestion.tableQuestions
+        case .poker:
+            return TierTapAIQuestion.pokerQuestions
+        }
+    }
+    
     private func callAI() async {
         guard SupabaseConfig.isConfigured, let client = supabase else {
             await MainActor.run {
@@ -916,7 +1033,27 @@ struct AIAnalyticsSheet: View {
         }
         
         let allSessions = sessionStore.sessions
-        let closedSessions = allSessions.filter { $0.winLoss != nil }
+        
+        // Filter sessions by selected AI category.
+        let closedSessions: [Session] = allSessions.filter { session in
+            guard session.winLoss != nil else { return false }
+            switch selectedAnalyticsCategory {
+            case .table:
+                return session.gameCategory != .poker
+            case .poker:
+                return session.gameCategory == .poker
+            }
+        }
+        
+        if closedSessions.isEmpty {
+            await MainActor.run {
+                errorMessage = selectedAnalyticsCategory == .poker
+                ? "You do not have any completed poker sessions yet. Switch to Table or log some poker sessions first."
+                : "You do not have any completed table sessions yet for AI to analyze."
+            }
+            return
+        }
+        
         let sortedRecent = closedSessions.sorted { $0.startTime > $1.startTime }
         let recentSessions = Array(sortedRecent.prefix(20))
         
@@ -929,7 +1066,7 @@ struct AIAnalyticsSheet: View {
         let winRate: Double? = total > 0 ? Double(wins) / Double(total) : nil
         
         let rorResult = RiskOfRuinMath.compute(
-            sessions: allSessions,
+            sessions: closedSessions,
             bankroll: settingsStore.bankroll,
             unitSize: settingsStore.unitSize,
             targetAveragePerSession: settingsStore.targetAveragePerSession,
@@ -986,37 +1123,22 @@ struct AIAnalyticsSheet: View {
         }.joined(separator: "\n")
         
         let statsBlock = """
-        Player settings:
-        - Bankroll: \(currency)\(settingsStore.bankroll)
-        - Unit size: \(currency)\(settingsStore.unitSize)
-        
-        History summary:
-        - Closed sessions: \(total)
-        - Wins: \(wins), Losses: \(losses), Breakeven: \(breakeven)
-        - Net result: \(netString)
-        - Average per session: \(avgString)
-        - Session win rate: \(winRateString)
-        - Estimated risk of ruin: \(rorPercentString)
+        Settings: bankroll \(currency)\(settingsStore.bankroll), unit \(currency)\(settingsStore.unitSize)
+        Summary: sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString)
         """
         
         let toneInstruction = settingsStore.aiTone.promptLabel
         let questionPrompt = selectedQuestion.instruction(toneLabel: toneInstruction)
+        let gameLabel = selectedAnalyticsCategory == .poker ? "poker" : "non‑poker table"
+        
         let prompt = """
-        You are a gambling session analytics assistant for the TierTap app.
-        
-        The player has asked the following question:
-        \"\(selectedQuestion.title)\"
-        
-        Your task:
-        \(questionPrompt)
-        
-        Use the data below to ground your answer. If the data is thin for a specific angle, say so briefly instead of guessing.
-        Prefer short paragraphs over bullet points and keep the answer focused on what this specific player is showing in their history.
-        
-        Data:
+        You are an analytics assistant for TierTap.
+        Question: \"\(selectedQuestion.title)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history.
+        Task: \(questionPrompt)
+        Data summary:
         \(statsBlock)
-        
-        Recent sessions (most recent first):
+        Recent \(gameLabel) sessions (most recent first):
         \(recentLines)
         """
         
