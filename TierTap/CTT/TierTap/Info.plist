@@ -6,6 +6,27 @@
 	<string></string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Supabase auth callback</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.app.tiertap</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tiertap</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -15,35 +36,5 @@
 	</dict>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TierTap uses your location to suggest nearby casinos so you can quickly tag where you played.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>TierTap uses the camera so you can take a profile photo.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>TierTap needs access to your photo library so you can choose a profile photo.</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.app.tiertap</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string>Supabase auth callback</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-		</dict>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 </dict>
 </plist>

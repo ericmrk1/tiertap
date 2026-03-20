@@ -125,8 +125,7 @@ final class AuthStore: ObservableObject {
         otpSent = false
         defer { isLoading = false }
         do {
-            let redirectTo = URL(string: "com.app.tiertap://login-callback")!
-            try await client.auth.signInWithOTP(email: trimmed, redirectTo: redirectTo)
+            try await client.auth.signInWithOTP(email: trimmed, redirectTo: SupabaseConfig.authRedirectURL)
             otpSent = true
             infoMessage = "Check your inbox for the sign-in link."
         } catch {
@@ -215,10 +214,11 @@ final class AuthStore: ObservableObject {
         }
     }
 
-    /// Handle OAuth and magic link callback (call from .onOpenURL).
-    /// Uses the SDK’s session(from:) so the client persists the session and auth state updates.
+    /// Handle OAuth and magic link callback (call from `.onOpenURL`).
+    /// Expects the custom TierTap URL scheme from `SupabaseConfig.authRedirectURL`, not a web localhost redirect.
     func handleOpenURL(_ url: URL) {
-        guard url.scheme == "com.app.tiertap" else { return }
+        guard let scheme = SupabaseConfig.authRedirectURL.scheme,
+              url.scheme?.caseInsensitiveCompare(scheme) == .orderedSame else { return }
         guard let client = supabase else { return }
         Task {
             do {
@@ -256,10 +256,9 @@ final class AuthStore: ObservableObject {
         }
         isLoading = true
         errorMessage = nil
-        let redirectTo = URL(string: "com.app.tiertap://login-callback")!
         Task {
             do {
-                _ = try await client.auth.signInWithOAuth(provider: .google, redirectTo: redirectTo) { [weak self] webSession in
+                _ = try await client.auth.signInWithOAuth(provider: .google, redirectTo: SupabaseConfig.authRedirectURL) { [weak self] webSession in
                     let provider = OAuthPresentationContextProvider()
                     webSession.presentationContextProvider = provider
                     // Use a fresh browser session each time so re-login after sign out works reliably.

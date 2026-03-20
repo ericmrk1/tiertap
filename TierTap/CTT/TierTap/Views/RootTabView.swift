@@ -411,27 +411,6 @@ struct CommunityAuthSheet: View {
     @Binding var emailInput: String
     var onDismiss: () -> Void
 
-    private enum EmailAuthMode: String, CaseIterable, Identifiable {
-        case signIn
-        case signUp
-
-        var id: String { rawValue }
-
-        var title: String {
-            switch self {
-            case .signIn: return "Sign in"
-            case .signUp: return "Sign up"
-            }
-        }
-
-        var buttonTitle: String {
-            switch self {
-            case .signIn: return "Sign in with email"
-            case .signUp: return "Create email account"
-            }
-        }
-    }
-
     @State private var profileDisplayName: String = ""
     @State private var profileEmojis: String = ""
     @State private var profilePhoto: UIImage?
@@ -439,9 +418,6 @@ struct CommunityAuthSheet: View {
     @State private var profileSaved = false
     @State private var isShowingCameraPicker = false
     @State private var isShowingLibraryPicker = false
-    @State private var emailAuthMode: EmailAuthMode = .signUp
-    @State private var emailPassword: String = ""
-    @State private var emailPasswordConfirm: String = ""
 
     private var logoImage: Image {
         if let processed = TransparentLogoCache.image {
@@ -741,18 +717,16 @@ struct CommunityAuthSheet: View {
                 .disabled(authStore.isLoading)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Email account")
+                    Text("Email")
                         .font(.headline)
                         .foregroundColor(.white)
 
-                    Picker("Email auth mode", selection: $emailAuthMode) {
-                        ForEach(EmailAuthMode.allCases) { mode in
-                            Text(mode.title).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    Text("We'll email a one-time sign-in link — no password.")
+                        .font(.footnote)
+                        .foregroundColor(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
 
-                    TextField("Email", text: $emailInput)
+                    TextField("you@example.com", text: $emailInput)
                         .textContentType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -761,26 +735,6 @@ struct CommunityAuthSheet: View {
                         .background(Color.white.opacity(0.15))
                         .cornerRadius(10)
                         .foregroundColor(.white)
-
-                    SecureField("Password", text: $emailPassword)
-                        .textContentType(.password)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .padding(12)
-                        .background(Color.white.opacity(0.15))
-                        .cornerRadius(10)
-                        .foregroundColor(.white)
-
-                    if emailAuthMode == .signUp {
-                        SecureField("Confirm password", text: $emailPasswordConfirm)
-                            .textContentType(.password)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .padding(12)
-                            .background(Color.white.opacity(0.15))
-                            .cornerRadius(10)
-                            .foregroundColor(.white)
-                    }
 
                     if let info = authStore.infoMessage {
                         Text(info)
@@ -798,30 +752,29 @@ struct CommunityAuthSheet: View {
 
                     Button {
                         let trimmedEmail = emailInput.trimmingCharacters(in: .whitespacesAndNewlines)
-                        switch emailAuthMode {
-                        case .signIn:
-                            Task { await authStore.signInWithEmailPassword(email: trimmedEmail, password: emailPassword) }
-                        case .signUp:
-                            Task { await authStore.signUpWithEmailPassword(email: trimmedEmail, password: emailPassword) }
-                        }
+                        Task { await authStore.signInWithOTP(email: trimmedEmail) }
                     } label: {
                         if authStore.isLoading {
                             ProgressView()
                                 .tint(.white)
                                 .frame(maxWidth: .infinity)
                         } else {
-                            Text(emailAuthMode.buttonTitle)
+                            Text(authStore.otpSent ? "Magic link sent" : "Send magic link")
                                 .frame(maxWidth: .infinity)
                         }
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(
                         authStore.isLoading ||
-                        emailInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                        emailPassword.isEmpty ||
-                        (emailAuthMode == .signUp && emailPasswordConfirm.isEmpty) ||
-                        (emailAuthMode == .signUp && emailPasswordConfirm != emailPassword)
+                        emailInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     )
+
+                    if authStore.otpSent {
+                        Text("Open the link in the email on this device to finish signing in. You can leave this screen open or close it.")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
 
                 Button {

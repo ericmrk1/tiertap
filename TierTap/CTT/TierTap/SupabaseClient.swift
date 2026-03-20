@@ -25,6 +25,12 @@ enum SupabaseConfig {
         url != nil && anonKey != nil
     }
 
+    /// Redirect for magic links and OAuth. Must be listed under Supabase Auth → URL Configuration → **Redirect URLs**.
+    /// Use this custom scheme for TierTap — do not rely on `http://localhost` as the email link target.
+    static var authRedirectURL: URL {
+        URL(string: "com.app.tiertap://login-callback")!
+    }
+
     /// True when the app is running as a TestFlight build (on device). Used to relax limits for testers.
     static var isTestFlight: Bool {
         #if targetEnvironment(simulator)
