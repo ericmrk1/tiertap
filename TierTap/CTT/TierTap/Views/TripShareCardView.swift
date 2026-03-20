@@ -1,4 +1,19 @@
 import SwiftUI
+import UIKit
+
+/// Padding and inner width shared by the card and map snapshot so bitmaps match the layout slot.
+private enum TripShareLayoutMetrics {
+    /// 420pt card with 28pt side padding → 364pt content width (baseline for scaling photo/map heights).
+    static let referenceContentWidth: CGFloat = 364
+
+    static func horizontalPadding(cardWidth: CGFloat) -> CGFloat {
+        min(28, max(16, cardWidth * 0.065))
+    }
+
+    static func contentWidth(cardWidth: CGFloat) -> CGFloat {
+        cardWidth - 2 * horizontalPadding(cardWidth: cardWidth)
+    }
+}
 
 /// Fixed-layout summary for `ImageRenderer` / sharing.
 struct TripShareCardView: View {
@@ -7,6 +22,8 @@ struct TripShareCardView: View {
     var coverImage: UIImage?
     /// Map snapshot of flight legs (great-circle routes), when legs have coordinates.
     var flightRouteImage: UIImage?
+    /// Horizontal layout width (points). Use ``TripShareImageBuilder/cardWidthPoints`` so the PNG fits phone share previews.
+    var cardWidth: CGFloat
 
     @EnvironmentObject var settingsStore: SettingsStore
 
@@ -80,7 +97,7 @@ struct TripShareCardView: View {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: flightRouteImage != nil ? 170 : 220)
+                        .frame(width: contentInnerWidth, height: photoStripHeight)
                         .clipped()
                         .cornerRadius(14)
                 }
@@ -89,7 +106,7 @@ struct TripShareCardView: View {
                     Image(uiImage: route)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: coverImage != nil ? 170 : 220)
+                        .frame(width: contentInnerWidth, height: photoStripHeight)
                         .clipped()
                         .cornerRadius(14)
                         .overlay(
@@ -182,14 +199,39 @@ struct TripShareCardView: View {
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.5))
             }
-            .padding(28)
+            .padding(cardHorizontalPadding)
         }
-        .frame(width: 420)
+        .frame(width: cardWidth)
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var cardHorizontalPadding: CGFloat {
+        TripShareLayoutMetrics.horizontalPadding(cardWidth: cardWidth)
+    }
+
+    private var contentInnerWidth: CGFloat {
+        TripShareLayoutMetrics.contentWidth(cardWidth: cardWidth)
+    }
+
+    /// Height for cover / route strips, scaled to **content** width (avoids unconstrained bitmaps).
+    private var photoStripHeight: CGFloat {
+        let base: CGFloat = flightRouteImage != nil && coverImage != nil ? 170 : 220
+        let w = contentInnerWidth
+        let scale = w / TripShareLayoutMetrics.referenceContentWidth
+        return (base * scale).rounded(.down)
     }
 }
 
 enum TripShareImageBuilder {
+    /// Card width in points: slightly narrower than the screen so share-sheet and Messages previews don’t clip sides.
+    @MainActor
+    static var cardWidthPoints: CGFloat {
+        let w = UIScreen.main.bounds.width
+        let margin: CGFloat = 36
+        let capped = min(420, w - margin)
+        return max(300, capped).rounded(.down)
+    }
+
     @MainActor
     static func render(
         trip: Trip,
@@ -197,16 +239,20 @@ enum TripShareImageBuilder {
         coverImage: UIImage?,
         settingsStore: SettingsStore
     ) async -> UIImage? {
-        let mapH: CGFloat = coverImage != nil ? 200 : 240
+        let width = cardWidthPoints
+        let innerW = TripShareLayoutMetrics.contentWidth(cardWidth: width)
+        let mapBaseH: CGFloat = coverImage != nil ? 200 : 240
+        let mapH = mapBaseH * (innerW / TripShareLayoutMetrics.referenceContentWidth)
         let routeImage = await TripFlightRouteSnapshot.makeImage(
             legs: trip.flights.legs,
-            mapSize: CGSize(width: 420, height: mapH)
+            mapSize: CGSize(width: innerW, height: mapH.rounded(.down))
         )
         let card = TripShareCardView(
             trip: trip,
             sessions: sessions,
             coverImage: coverImage,
-            flightRouteImage: routeImage
+            flightRouteImage: routeImage,
+            cardWidth: width
         )
         .environmentObject(settingsStore)
         let renderer = ImageRenderer(content: card)
