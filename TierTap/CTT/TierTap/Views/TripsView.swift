@@ -161,9 +161,8 @@ struct TripsView: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.green)
                 .frame(width: 56, height: 56)
-                .background(Color.black)
+                .background(Color.green).foregroundColor(.black)
                 .clipShape(Circle())
                 .overlay(
                     Circle()

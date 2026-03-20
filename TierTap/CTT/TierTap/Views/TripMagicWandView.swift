@@ -265,7 +265,7 @@ struct TripMagicWandView: View {
             VStack(alignment: .leading, spacing: 22) {
                 wandSectionHeader("AI trip suggestions", systemImage: "wand.and.sparkles")
 
-                Text("TierTap groups completed sessions that are not already on a trip. Gemini proposes names, dates, location labels, and notes—the same upcoming, current, and historical buckets as the Trips tab.")
+                Text("TierTap groups completed sessions that are not already on a trip. TierTap proposes names, dates, location labels, and notes—the same upcoming, current, and historical buckets as the Trips tab.")
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.9))
 
