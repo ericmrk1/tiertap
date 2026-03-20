@@ -146,26 +146,6 @@ private struct TableGameRow: Codable {
 }
 
 enum TableGamesAPI {
-    /// Insert a game name into the `TableGames` table if possible.
-    /// Failures are ignored so this never blocks the UI.
-    static func insertIfPossible(_ name: String) {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        guard let client = supabase else { return }
-
-        Task {
-            do {
-                let payload = TableGameRow(id: nil, created_at: nil, game_id: nil, name: trimmed, alias: nil)
-                _ = try await client.database
-                    .from(SupabaseTables.tableGames)
-                    .insert(payload)
-                    .execute()
-            } catch {
-                // Intentionally ignore errors; TableGames is best-effort.
-            }
-        }
-    }
-
     /// Load distinct game names from Supabase. Returns empty array on any failure.
     static func loadDistinctNames() async -> [String] {
         guard let client = supabase else { return [] }
@@ -201,7 +181,7 @@ private struct CasinoLocationRow: Codable {
 }
 
 enum CasinoLocationsAPI {
-    /// Best-effort insert of a picked casino with rich metadata.
+    /// Best-effort insert of a picked casino with rich metadata. Skips insert without valid GPS coordinates.
     static func insertPicked(
         name: String,
         addressComponents: [String: String]?,
@@ -212,6 +192,7 @@ enum CasinoLocationsAPI {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
         guard let client = supabase else { return }
+        guard let coordinate, CLLocationCoordinate2DIsValid(coordinate) else { return }
 
         let addressDict = addressComponents ?? [:]
 
@@ -224,38 +205,8 @@ enum CasinoLocationsAPI {
             name: trimmed,
             address: addressDict.isEmpty ? nil : addressDict,
             country: countryValue,
-            latitude: coordinate?.latitude,
-            longitude: coordinate?.longitude,
-            public: isPublic,
-            user_id: userId
-        )
-
-        Task {
-            do {
-                _ = try await client.database
-                    .from(SupabaseTables.casinoLocations)
-                    .insert(payload)
-                    .execute()
-            } catch {
-                // Best-effort only; ignore failures.
-            }
-        }
-    }
-
-    /// Best-effort insert of a manually typed casino name with no extra metadata.
-    static func insertTyped(name: String, isPublic: Bool, userId: UUID?) {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-        guard let client = supabase else { return }
-
-        let payload = CasinoLocationRow(
-            id: nil,
-            created_at: nil,
-            name: trimmed,
-            address: nil,
-            country: nil,
-            latitude: nil,
-            longitude: nil,
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
             public: isPublic,
             user_id: userId
         )

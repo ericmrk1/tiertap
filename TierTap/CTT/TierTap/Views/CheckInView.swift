@@ -707,10 +707,6 @@ struct CheckInView: View {
         }
 
         guard let tier = Int(startingTier), let buy = Int(initialBuyIn) else { return }
-        // Best-effort insert of the chosen game into Supabase master list.
-        TableGamesAPI.insertIfPossible(selectedGame)
-        // Best-effort insert of the casino location; when typed we won't have coordinates.
-        CasinoLocationsAPI.insertTyped(name: casino, isPublic: isCasinoPublic, userId: nil)
         store.startSession(game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy)
         // Persist structured game metadata on the live session.
         let category: SessionGameCategory? = gameCategory
