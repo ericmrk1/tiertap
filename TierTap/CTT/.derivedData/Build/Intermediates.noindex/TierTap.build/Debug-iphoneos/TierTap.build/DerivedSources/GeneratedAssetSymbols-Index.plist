@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>colors</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameAccentColor</string>
+			<key>relativePath</key>
+			<string>./AccentColor.colorset</string>
+			<key>swiftSymbol</key>
+			<string>accent</string>
+		</dict>
+	</array>
+	<key>images</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameLogoSplash</string>
+			<key>relativePath</key>
+			<string>./LogoSplash.imageset</string>
+			<key>swiftSymbol</key>
+			<string>logoSplash</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameTierTapLogo</string>
+			<key>relativePath</key>
+			<string>./TierTapLogo.imageset</string>
+			<key>swiftSymbol</key>
+			<string>tierTapLogo</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameTierTapCPokerChip</string>
+			<key>relativePath</key>
+			<string>./TierTap_C_PokerChip.imageset</string>
+			<key>swiftSymbol</key>
+			<string>tierTapCPokerChip</string>
+		</dict>
+	</array>
+	<key>symbols</key>
+	<array/>
+</dict>
+</plist>

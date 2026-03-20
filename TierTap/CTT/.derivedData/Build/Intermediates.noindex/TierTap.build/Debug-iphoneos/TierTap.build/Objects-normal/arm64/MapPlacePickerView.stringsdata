@@ -1,0 +1,96 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/MapPlacePickerView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search the map",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current location",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. Las Vegas, Bellagio, home address",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Searching…",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Or enter manually",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 169
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 172
+        }
+      },
+      {
+        "comment": "",
+        "key": "Note (optional)",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use manual entry",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Results",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 208
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search above, or pick a pin on the map.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 214
+        }
+      }
+    ]
+  },
+  "version": 1
+}

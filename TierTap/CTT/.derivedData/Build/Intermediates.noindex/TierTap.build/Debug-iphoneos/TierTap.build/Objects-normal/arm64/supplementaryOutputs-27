@@ -1,0 +1,37 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/PhotoHelpers.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/EditSessionView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionCalendarView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionDetailView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.swiftdeps"
+  }
+}

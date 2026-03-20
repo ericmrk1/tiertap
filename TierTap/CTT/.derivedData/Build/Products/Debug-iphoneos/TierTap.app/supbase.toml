@@ -1,0 +1,2 @@
+  [functions.gemini-router]
+  verify_jwt = true

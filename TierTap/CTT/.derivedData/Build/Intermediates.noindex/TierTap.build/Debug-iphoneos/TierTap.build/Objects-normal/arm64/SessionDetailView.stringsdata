@@ -1,0 +1,40 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Session Detail",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 220
+        }
+      },
+      {
+        "comment": "",
+        "key": "Complete session — add avg bet & ending tier",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tiers per 100 %@ metric requires rated avg bet ≥ 100",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 226
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -471,6 +471,7 @@ final class SettingsStore: ObservableObject {
 
     /// Whether the user can make another AI call today on the free tier.
     func canUseAI() -> Bool {
+        if isSubscriptionOverrideActive { return true }
         #if targetEnvironment(simulator)
         // Do not enforce AI limits in the simulator so development is not blocked.
         return true
@@ -486,6 +487,7 @@ final class SettingsStore: ObservableObject {
         // Skip counting AI calls in the simulator.
         return
         #else
+        if isSubscriptionOverrideActive { return }
         resetAICallCounterIfNeeded()
         guard aiCallsToday < maxAICallsPerDay else { return }
         aiCallsToday += 1

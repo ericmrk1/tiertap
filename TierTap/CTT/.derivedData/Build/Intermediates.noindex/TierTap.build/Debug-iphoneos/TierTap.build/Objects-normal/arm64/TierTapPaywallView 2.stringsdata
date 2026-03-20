@@ -1,0 +1,136 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPaywallView 2.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "TierTap Pro",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Restore Purchases",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 246
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unlock TierTap Pro",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "Smarter play decisions, powered by AI.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 80
+        }
+      },
+      {
+        "comment": "",
+        "key": "Requirements",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active TierTap Pro subscription.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Signed in with a valid TierTap account (email, Apple, or Google).",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "What you get",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "You're currently subscribed",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 159
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ • %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "To change your subscription, choose a different plan below and tap \"Change plan\".",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage and cancel subscriptions in your device Settings under Apple ID → Subscriptions.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 258
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apple EULA",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 264
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy Policy",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current plan",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 346
+        }
+      }
+    ]
+  },
+  "version": 1
+}

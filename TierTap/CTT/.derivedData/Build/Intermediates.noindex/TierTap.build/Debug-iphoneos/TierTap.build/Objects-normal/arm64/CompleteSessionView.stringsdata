@@ -1,0 +1,152 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CompleteSessionView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Complete Session",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 226
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points Decreased",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 265
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose a photo source",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in: %@%lld",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bet or buy-in exceeds unit size (%@%lld).",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session Summary",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private notes (not shared)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip photo (optional)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 152
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add chip photo",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Replace chip photo",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save as Complete",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 216
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 266
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Anyway",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ending tier (%@) is lower than starting tier (%lld). Save anyway?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": "Camera",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo Library",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 331
+        }
+      }
+    ]
+  },
+  "version": 1
+}

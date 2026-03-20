@@ -1,0 +1,23 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/LiveActivity/LiveActivityManager.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/SettingsStore.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RiskOfRuinView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.swiftdeps"
+  }
+}

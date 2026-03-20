@@ -1,0 +1,37 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/GamesList.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/Session.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Session.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Session.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Session.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Session.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Session.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/Trip.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Trip.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Trip.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Trip.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Trip.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/Trip.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/LocationManager.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CasinoLocationPickerView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/TierTap.build/Debug-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.swiftdeps"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/CallbackManager.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/CallbackManager.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/CallbackManager.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/CallbackManager.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/CallbackManager.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/CallbackManager.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/Defaults.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Defaults.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Defaults.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Defaults.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Defaults.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Defaults.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/Delegated.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Delegated.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Delegated.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Delegated.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Delegated.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Delegated.swiftdeps"
+  }
+}

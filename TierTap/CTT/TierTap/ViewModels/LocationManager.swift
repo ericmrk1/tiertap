@@ -19,6 +19,17 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         }
     }
 
+    /// Request a single location fix (when already authorized). If not authorized, triggers the normal permission flow.
+    func requestSingleLocationUpdate() {
+        guard CLLocationManager.locationServicesEnabled() else { return }
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            manager.requestLocation()
+        default:
+            requestWhenInUse()
+        }
+    }
+
     // MARK: - CLLocationManagerDelegate
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

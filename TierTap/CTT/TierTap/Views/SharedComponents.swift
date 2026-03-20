@@ -4,6 +4,12 @@ import AudioToolbox
 import UIKit
 
 #if os(iOS)
+/// Use with `sheet(item:)` so the share UI is only created once the image exists (avoids empty `UIActivityViewController` on first open).
+struct ShareableImageItem: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
 

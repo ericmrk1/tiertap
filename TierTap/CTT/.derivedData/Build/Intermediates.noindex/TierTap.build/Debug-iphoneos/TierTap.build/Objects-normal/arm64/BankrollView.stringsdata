@@ -1,0 +1,168 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/BankrollView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Bankroll",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share bankroll graph",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Bankroll",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Bankroll",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Complete sessions to see your bankroll trend.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 241
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll Over Time",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "No bankroll history yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 263
+        }
+      },
+      {
+        "comment": "",
+        "key": "History",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 258
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings bankroll updated to this value.",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 281
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll after: %@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 285
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Bankroll",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 326
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter new bankroll value. This updates the bankroll in Settings and starts tracking from this value.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 311
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll (%@)",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 317
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 332
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add sessions to see your bankroll trend.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 376
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll Over Time",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current: %@%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 366
+        }
+      }
+    ]
+  },
+  "version": 1
+}

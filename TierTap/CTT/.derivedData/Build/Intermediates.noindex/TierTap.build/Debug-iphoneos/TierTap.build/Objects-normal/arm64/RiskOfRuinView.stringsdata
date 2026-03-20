@@ -1,0 +1,128 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RiskOfRuinView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Risk of Ruin",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chance of busting out",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add closed sessions to see your average win/loss per session and compare to your target.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 135
+        }
+      },
+      {
+        "comment": "",
+        "key": "Set a target in Settings to compare.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "Average vs target",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Actual average",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Target average",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gap",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win rate (sessions)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bet exceeds target unit",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your current buy-in or average bet is above your set unit size (%@%lld). Consider lowering bet size to stay within bankroll management target.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "How it's calculated",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 216
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 218
+        }
+      }
+    ]
+  },
+  "version": 1
+}

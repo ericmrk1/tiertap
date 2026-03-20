@@ -35,6 +35,7 @@ struct AnalyticsView: View {
 #endif
 
     @State private var selectedAnalyticsCategory: SessionGameCategory = .table
+    @State private var isRiskOfRuinPresented: Bool = false
 
     private var allClosedSessions: [Session] {
         sessionStore.sessions.filter { $0.winLoss != nil }
@@ -301,6 +302,12 @@ struct AnalyticsView: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
         }
+        .adaptiveSheet(isPresented: $isRiskOfRuinPresented) {
+            RiskOfRuinView()
+                .environmentObject(sessionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
         .adaptiveSheet(isPresented: $isShareSelectionPresented) {
             AnalyticsShareSelectionSheet(
                 closedSessions: closedSessions,
@@ -493,12 +500,58 @@ struct AnalyticsView: View {
         let losses = losingSessions.count
         let breakeven = breakEvenSessions.count
         let winRate = total > 0 ? Double(wins) / Double(total) : 0
+        let isTableOverview = selectedAnalyticsCategory == .table
+        let grossPL = totalProfit + totalLoss
+        let profitVolumePct: Int? = (isTableOverview && grossPL > 0)
+            ? Int((Double(totalProfit) / Double(grossPL) * 100).rounded())
+            : nil
+        let lossVolumePct: Int? = (isTableOverview && grossPL > 0)
+            ? Int((Double(totalLoss) / Double(grossPL) * 100).rounded())
+            : nil
+
+        func sessionShareLabel(_ count: Int) -> String {
+            guard isTableOverview, total > 0 else { return "\(count)" }
+            let p = Int((Double(count) / Double(total) * 100).rounded())
+            return "\(count) (\(p)%)"
+        }
+
+        let profitPillValue: String = {
+            if isTableOverview, let p = profitVolumePct {
+                return "\(settingsStore.currencySymbol)\(totalProfit) (\(p)%)"
+            }
+            return "\(settingsStore.currencySymbol)\(totalProfit)"
+        }()
+
+        let lossPillValue: String = {
+            if isTableOverview, let p = lossVolumePct {
+                return "-\(settingsStore.currencySymbol)\(totalLoss) (\(p)%)"
+            }
+            return "-\(settingsStore.currencySymbol)\(totalLoss)"
+        }()
+
+        let riskOfRuinHeaderPercent: String = {
+            guard isTableOverview else { return "" }
+            let ror = RiskOfRuinMath.compute(
+                sessions: closedSessions,
+                bankroll: settingsStore.bankroll,
+                unitSize: settingsStore.unitSize,
+                targetAveragePerSession: settingsStore.targetAveragePerSession,
+                currentBetAmount: nil
+            )
+            if ror.sessionCount == 0 { return "—" }
+            let pct = ror.riskOfRuin * 100
+            if pct >= 99.5 { return "~100%" }
+            if pct <= 0.5 { return "<1%" }
+            return String(format: "%.1f%%", pct)
+        }()
 
         return VStack(spacing: 12) {
-            HStack {
-                Text(selectedAnalyticsCategory == .table ? "Table Session Overview" : "Poker Session Overview")
-                    .font(.headline)
-                    .foregroundColor(.white)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(selectedAnalyticsCategory == .table ? "Table Session Overview" : "Poker Session Overview")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("\(total) sessions")
@@ -518,14 +571,39 @@ struct AnalyticsView: View {
 
             HStack(spacing: 12) {
                 MetricPill(title: "Win rate", value: String(format: "%.0f%%", winRate * 100), color: .green)
-                MetricPill(title: "Profit", value: "\(settingsStore.currencySymbol)\(totalProfit)", color: .green)
-                MetricPill(title: "Loss", value: "-\(settingsStore.currencySymbol)\(totalLoss)", color: .red)
+                MetricPill(title: "Profit", value: profitPillValue, color: .green)
+                MetricPill(title: "Loss", value: lossPillValue, color: .red)
             }
 
             HStack(spacing: 12) {
-                MetricPill(title: "Wins", value: "\(wins)", color: .green)
-                MetricPill(title: "Losses", value: "\(losses)", color: .red)
-                MetricPill(title: "Even", value: "\(breakeven)", color: .gray)
+                MetricPill(title: "Wins", value: sessionShareLabel(wins), color: .green)
+                MetricPill(title: "Losses", value: sessionShareLabel(losses), color: .red)
+                MetricPill(title: "Even", value: sessionShareLabel(breakeven), color: .gray)
+            }
+
+            if selectedAnalyticsCategory == .table {
+                Button {
+                    isRiskOfRuinPresented = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chart.bar.doc.horizontal")
+                        Text("Risk of Ruin")
+                            .font(.caption.weight(.semibold))
+                        Spacer(minLength: 8)
+                        Text(riskOfRuinHeaderPercent)
+                            .font(.caption.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.95))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.22))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Risk of Ruin")
+                .accessibilityValue("Overall estimated risk of ruin \(riskOfRuinHeaderPercent)")
             }
         }
         .padding()

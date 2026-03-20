@@ -6,14 +6,19 @@ const corsHeaders = new Headers({
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 });
 
+const LOGGING_MODE = false;
+
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_PRODUCTION");
 const GEMINI_MODEL_NAME = Deno.env.get("GEMINI_MODEL_NAME");
+const IOS_APP_NAME = Deno.env.get("IOS_APP_NAME");
 
 if (!GEMINI_API_KEY) {
   console.error("GEMINI_API_KEY is not set in environment variables");
 }
 
 // gemini-2.5-flash is current model here.
+// gemini-2.5-flash-lite is better....
+
 
 console.log("gemini-proxy function loaded");
 
@@ -56,21 +61,29 @@ Deno.serve(async (req: Request) => {
   let bodyForGemini: BodyInit | null = null;
   try {
     const raw = await req.clone().text();
-    console.log("Incoming request body (to forward to Gemini):", raw);
+
+    if (LOGGING_MODE)
+    {
+      console.log("Incoming request body (to forward to Gemini):", raw);
+    }
+
     bodyForGemini = raw;
   } catch (e) {
     console.error("Error reading incoming body for logging:", e);
     bodyForGemini = req.body;
   }
 
-  console.log( "Throttle.....")
+  if (LOGGING_MODE) {
+    console.log( "Throttle.....")
+  }
+
   await new Promise(r => setTimeout(r, 100))
 
   // Build headers for Gemini
   const headers = new Headers();
   headers.set("content-type", "application/json");
   headers.set("x-goog-api-key", GEMINI_API_KEY);
-  headers.set("x-ios-bundle-identifier", "com.app.runkicks"); // keep if using iOS-restricted key
+  headers.set("x-ios-bundle-identifier", IOS_APP_NAME); // keep if using iOS-restricted key
 
   console.log("Outgoing Gemini headers:", Object.fromEntries(headers));
 
@@ -93,9 +106,12 @@ Deno.serve(async (req: Request) => {
   const geminiStatusText = geminiResponse.statusText;
   const geminiText = await geminiResponse.text();
 
-  console.log("Gemini response status:", geminiStatus, geminiStatusText);
-  console.log("Gemini response body:", geminiText);
-
+  if (LOGGING_MODE)
+  {
+    console.log("Gemini response status:", geminiStatus, geminiStatusText);
+    console.log("Gemini response body:", geminiText);
+  }
+  
   const responseHeaders = new Headers(geminiResponse.headers);
   corsHeaders.forEach((value, key) => responseHeaders.set(key, value));
   responseHeaders.set("content-type", "application/json");

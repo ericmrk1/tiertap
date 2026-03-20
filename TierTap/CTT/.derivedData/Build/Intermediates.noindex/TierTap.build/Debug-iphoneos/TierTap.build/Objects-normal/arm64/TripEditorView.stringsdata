@@ -1,0 +1,336 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripEditorView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "New trip",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 216
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit trip",
+        "location": {
+          "startingColumn": 63,
+          "startingLine": 216
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add multiple hotels or stays. Each can have its own dates (new ones default to this trip’s start and end).",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions that overlap your trip dates (inclusive) are selected automatically. Toggle any session to add or remove it.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 156
+        }
+      },
+      {
+        "comment": "",
+        "key": "No completed sessions yet.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 160
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trip title (optional)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trip type",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 182
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trip notes",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "End",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 80
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search map",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add hotel",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add home",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add flight leg",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 196
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 226
+        }
+      },
+      {
+        "comment": "",
+        "key": "This stay was removed.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 283
+        }
+      },
+      {
+        "comment": "",
+        "key": "This flight leg was removed.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 657
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 331
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search map",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 339
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stay from",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 356
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stay through",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 368
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "In range",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 500
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 494
+        }
+      },
+      {
+        "comment": "",
+        "key": "Airline",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 533
+        }
+      },
+      {
+        "comment": "",
+        "key": "Flight number",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 538
+        }
+      },
+      {
+        "comment": "",
+        "key": "Seat",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 543
+        }
+      },
+      {
+        "comment": "",
+        "key": "Departure",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 578
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear departure date",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 587
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add departure date & time",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 595
+        }
+      },
+      {
+        "comment": "",
+        "key": "Leg %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 523
+        }
+      },
+      {
+        "comment": "",
+        "key": "Origin",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 550
+        }
+      },
+      {
+        "comment": "",
+        "key": "From",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "Map",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 556
+        }
+      },
+      {
+        "comment": "",
+        "key": "Destination",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 563
+        }
+      },
+      {
+        "comment": "",
+        "key": "To",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 564
+        }
+      },
+      {
+        "comment": "",
+        "key": "Map",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 569
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,80 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CasinoLocationPickerView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Select Casino",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 46
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search by ZIP code or address",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. 89109 or 123 Main St",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "Searching for nearby casinos…",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved Locations",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casinos Near You",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 183
+        }
+      },
+      {
+        "comment": "",
+        "key": "No nearby casinos found. Try again closer to a property or check saved locations.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "Waiting for your location…",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 193
+        }
+      }
+    ]
+  },
+  "version": 1
+}

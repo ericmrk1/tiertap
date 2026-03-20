@@ -1,0 +1,248 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HomeView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Resume Live Session",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Buy-In",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 75
+        }
+      },
+      {
+        "comment": "",
+        "key": "Check In",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Past Session",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "History",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in: %@%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "LIVE NOW",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 182
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private notes",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 202
+        }
+      },
+      {
+        "comment": "",
+        "key": "Strategy/Odds",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions · %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "Levels explained",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share level",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 284
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 383
+        }
+      },
+      {
+        "comment": "",
+        "key": "Awesome!",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 428
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions · %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 434
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Levels",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 528
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your progress",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 465
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session milestones (scale of 10,000)",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 481
+        }
+      },
+      {
+        "comment": "",
+        "key": "Level bands (1–1,000)",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 506
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your level (1–1,000) is based on sessions logged, tier point gains, and sessions where you enter both rated and actual avg bet. Each level needs 50 more raw score. Session milestones are on a scale of 10,000.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions logged",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 470
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current batch: %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 473
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 491
+        }
+      },
+      {
+        "comment": "",
+        "key": "Levels %lld–%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 510
+        }
+      },
+      {
+        "comment": "",
+        "key": "· %@",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 513
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 534
+        }
+      }
+    ]
+  },
+  "version": 1
+}

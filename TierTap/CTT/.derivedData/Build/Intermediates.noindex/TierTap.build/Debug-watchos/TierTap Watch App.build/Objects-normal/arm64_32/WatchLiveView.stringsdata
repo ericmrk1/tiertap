@@ -1,0 +1,56 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchLiveView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Remote",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "In: $%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rebuy",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 39
+        }
+      },
+      {
+        "comment": "",
+        "key": "LIVE",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 22
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop session",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 53
+        }
+      }
+    ]
+  },
+  "version": 1
+}

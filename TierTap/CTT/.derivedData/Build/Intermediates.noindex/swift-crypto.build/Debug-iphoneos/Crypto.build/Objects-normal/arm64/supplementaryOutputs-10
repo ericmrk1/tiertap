@@ -1,0 +1,58 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Message Authentication Codes/HMAC/HMAC.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/HMAC.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/HMAC.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/HMAC.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/HMAC.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/HMAC.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Message Authentication Codes/MACFunctions.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MACFunctions.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MACFunctions.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MACFunctions.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MACFunctions.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MACFunctions.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Message Authentication Codes/MessageAuthenticationCode.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MessageAuthenticationCode.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MessageAuthenticationCode.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MessageAuthenticationCode.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MessageAuthenticationCode.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MessageAuthenticationCode.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/PRF/AES.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/AES.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/AES.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/AES.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/AES.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/AES.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Signatures/BoringSSL/ECDSASignature_boring.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSASignature_boring.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSASignature_boring.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSASignature_boring.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSASignature_boring.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSASignature_boring.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Signatures/BoringSSL/ECDSA_boring.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSA_boring.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSA_boring.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSA_boring.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSA_boring.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/ECDSA_boring.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Signatures/BoringSSL/EdDSA_boring.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/EdDSA_boring.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/EdDSA_boring.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/EdDSA_boring.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/EdDSA_boring.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/EdDSA_boring.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/swift-crypto/Sources/Crypto/Signatures/BoringSSL/MLDSA_boring.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MLDSA_boring.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MLDSA_boring.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MLDSA_boring.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MLDSA_boring.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/swift-crypto.build/Debug-iphoneos/Crypto.build/Objects-normal/arm64/MLDSA_boring.swiftdeps"
+  }
+}

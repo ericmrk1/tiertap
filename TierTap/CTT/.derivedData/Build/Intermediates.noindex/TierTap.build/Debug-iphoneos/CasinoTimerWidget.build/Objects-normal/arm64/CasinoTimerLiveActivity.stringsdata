@@ -1,0 +1,40 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/CasinoTimerWidget/CasinoTimerLiveActivity.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "LIVE SESSION",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in: $%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap · Table Session Active",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 66
+        }
+      }
+    ]
+  },
+  "version": 1
+}

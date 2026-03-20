@@ -13,6 +13,9 @@ actor GeminiRouterThrottle {
 
     static let shared = GeminiRouterThrottle(minInterval: 2.0)
 
+    /// Pacing for trip “magic wand” suggestions: at most one gemini-router call every 5 seconds.
+    static let tripSuggestions = GeminiRouterThrottle(minInterval: 5.0)
+
     init(minInterval: TimeInterval = 2.0) {
         self.minInterval = minInterval
     }

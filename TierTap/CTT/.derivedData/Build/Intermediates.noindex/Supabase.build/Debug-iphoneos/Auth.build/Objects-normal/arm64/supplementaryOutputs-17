@@ -1,0 +1,23 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Auth/AuthAdmin.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdmin.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdmin.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdmin.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdmin.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdmin.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Auth/AuthAdminOAuth.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdminOAuth.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdminOAuth.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdminOAuth.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdminOAuth.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthAdminOAuth.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Auth/AuthClient.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthClient.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthClient.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthClient.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthClient.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Auth.build/Objects-normal/arm64/AuthClient.swiftdeps"
+  }
+}

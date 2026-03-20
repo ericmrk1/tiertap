@@ -1,0 +1,480 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export Failed",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nothing to share.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of Ruin for table games uses bankroll and unit size. Keep table-game bets at or below unit size to stay within target risk; poker sessions are not included.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 155
+        }
+      },
+      {
+        "comment": "",
+        "key": "Currency",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@ — %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Compare your actual average win/loss per table-game session to this target in the Risk of Ruin screen (poker is excluded).",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "Prompt for session mood after ending",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tone of voice",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "Controls how the TierTap AI summarizes your sessions. Default is **Sarcastic**.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 213
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tone of voice",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "Manage TierTap Pro",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Upgrade to TierTap Pro",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Developer subscription override",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 261
+        }
+      },
+      {
+        "comment": "",
+        "key": "Override is active for this build; subscription checks are bypassed.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter override code",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 264
+        }
+      },
+      {
+        "comment": "",
+        "key": "Favorite casino games",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 291
+        }
+      },
+      {
+        "comment": "",
+        "key": "No favorite games yet. Tap **Add game from picker** to select from the game list.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 296
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add game from picker",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "Default game type",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Controls whether new sessions and analytics default to table games or poker.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 347
+        }
+      },
+      {
+        "comment": "",
+        "key": "Common casino locations",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 369
+        }
+      },
+      {
+        "comment": "",
+        "key": "No favorite locations yet. Tap **Add casino from picker** to select from the casino map/search.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 374
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add casino from picker",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quick amounts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 422
+        }
+      },
+      {
+        "comment": "",
+        "key": "Common denominations",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 425
+        }
+      },
+      {
+        "comment": "",
+        "key": "When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for %@18-style bets.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 440
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. 20, 100, 500, 1000, 10000",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 428
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use %@18 increment mode",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "When on, major actions like check-in, buy-ins, closing out sessions, and sharing will play quick casino-style chimes and success haptics.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 450
+        }
+      },
+      {
+        "comment": "",
+        "key": "Each profile uses its own set of external casino sound effects (e.g. classic chips, softer chimes, or arcade-style pings).",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 459
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casino chimes & haptics",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 448
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sound profile",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 453
+        }
+      },
+      {
+        "comment": "",
+        "key": "Presets",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 494
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save current as preset",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 536
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom colors",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 556
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary color",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 559
+        }
+      },
+      {
+        "comment": "",
+        "key": "Secondary",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 566
+        }
+      },
+      {
+        "comment": "",
+        "key": "Secondary color",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 569
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preview",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 583
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary → Secondary",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 587
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Supabase keys to enable sign-in and sync.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 617
+        }
+      },
+      {
+        "comment": "",
+        "key": "You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 648
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign out",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 641
+        }
+      },
+      {
+        "comment": "",
+        "key": "Signed in",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 626
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exports your recorded sessions to a .csv file so you can back up your data or analyze it elsewhere. Uses the iOS Share sheet to send to Files, email, or other apps.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 707
+        }
+      },
+      {
+        "comment": "",
+        "key": "CSV game type",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 664
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose whether to export table sessions or poker sessions. Older sessions without a game type are treated as table games.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 667
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export sessions as CSV",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "If you need help — Gamblers Anonymous",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 725
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 737
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sponsor",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 748
+        }
+      },
+      {
+        "comment": "",
+        "key": "EULA",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 759
+        }
+      }
+    ]
+  },
+  "version": 1
+}

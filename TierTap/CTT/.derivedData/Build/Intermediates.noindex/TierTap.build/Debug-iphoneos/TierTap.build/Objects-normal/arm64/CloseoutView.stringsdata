@@ -1,0 +1,416 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "End Session",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 391
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip estimator error",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 395
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points Decreased",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 415
+        }
+      },
+      {
+        "comment": "",
+        "key": "Resume Timer",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop Timer",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "·",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "·",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Timer stopped",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Timer running",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Adjust cash out",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "−%@%lld",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 147
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lost everything",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Double or nothing",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Triple",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exceeds unit %@%lld.",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
+        "key": "W/L",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 98,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 218
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 219
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hrs",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hourly W/L",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 227
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@%lld",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 229
+        }
+      },
+      {
+        "comment": "",
+        "key": "ROI %",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private notes (not shared)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 253
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session photo",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 267
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add a photo from your session",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 288
+        }
+      },
+      {
+        "comment": "",
+        "key": "Camera",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 301
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo Library",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 313
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Session",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 346
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel — Return to Session",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 355
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip Estimator",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 376
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 399
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 416
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Anyway",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ending tier (%@) is lower than starting tier (%lld). Save anyway?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 419
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip Estimator",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 757
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip Estimator",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 616
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add a photo of your chips",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 643
+        }
+      },
+      {
+        "comment": "",
+        "key": "Camera",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 656
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo Library",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 668
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimating…",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 688
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimate with AI",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 688
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimated value",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 701
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 704
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use as cash-out amount",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 712
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimating chip value…",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 744
+        }
+      },
+      {
+        "comment": "",
+        "key": "Analyzing your photo with TierTap AI.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 747
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 761
+        }
+      }
+    ]
+  },
+  "version": 1
+}

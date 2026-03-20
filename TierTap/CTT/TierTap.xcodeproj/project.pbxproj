@@ -35,6 +35,9 @@
 		8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692681C1D425214EB9F4B3A2 /* TierTapApp.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
 		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
+		ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */; };
+		APRT1E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */; };
+		ARPTJ2E2F3A4B5C6D7E8F9A0B1 /* Airports.json in Resources */ = {isa = PBXBuildFile; fileRef = ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */; };
 		AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */; };
 		BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */; };
 		BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */; };
@@ -60,6 +63,16 @@
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
+		TRIPB1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */; };
+		TMDL1E2F3A4B5C6D7E8F9A0B1 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */; };
+		TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */; };
+		MPCK1E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */; };
+		FMAP1E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */; };
+		TSCD1E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */; };
+		TEDR1E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */; };
+		TDTA1E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */; };
+		TLSK1E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */; };
+		TWND2E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */; };
 		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
 		SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */; };
 		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
@@ -155,6 +168,9 @@
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
 		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirlineCatalog.swift; sourceTree = "<group>"; };
+		APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportCatalog.swift; sourceTree = "<group>"; };
+		ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Airports.json; sourceTree = "<group>"; };
 		AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
 		B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
@@ -180,6 +196,16 @@
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
 		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsView.swift; sourceTree = "<group>"; };
+		TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
+		TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripStore.swift; sourceTree = "<group>"; };
+		MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPlacePickerView.swift; sourceTree = "<group>"; };
+		FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRouteMapView.swift; sourceTree = "<group>"; };
+		TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareCardView.swift; sourceTree = "<group>"; };
+		TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEditorView.swift; sourceTree = "<group>"; };
+		TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailView.swift; sourceTree = "<group>"; };
+		TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLinkSessionsSheet.swift; sourceTree = "<group>"; };
+		TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMagicWandView.swift; sourceTree = "<group>"; };
 		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
 		SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMoodPickerView.swift; sourceTree = "<group>"; };
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
@@ -271,6 +297,14 @@
 				GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */,
 				ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */,
 				ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */,
+				TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */,
+				MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */,
+				FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */,
+				TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */,
+				TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */,
+				TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */,
+				TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */,
+				TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -278,7 +312,10 @@
 		23A3142A7EAE1591E127EBC1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */,
+				APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */,
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
+				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
 				TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */,
@@ -343,6 +380,7 @@
 			isa = PBXGroup;
 			children = (
 				9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */,
+				TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */,
 				ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */,
 				LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */,
 				AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */,
@@ -379,6 +417,7 @@
 				2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */,
 				BE9B9607B2D22C77E1D06D68 /* Info.plist */,
 				PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */,
+				ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */,
 				SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */,
 			);
 			path = TierTap;
@@ -533,6 +572,7 @@
 				2E255D4C2F61FAF900CAF0D7 /* victory_confetti.wav in Resources */,
 				2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */,
 				2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */,
+				ARPTJ2E2F3A4B5C6D7E8F9A0B1 /* Airports.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -592,13 +632,25 @@
 			files = (
 				8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */,
 				RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */,
+				TRIPB1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift in Sources */,
+				MPCK1E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift in Sources */,
+				FMAP1E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift in Sources */,
+				TSCD1E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift in Sources */,
+				TEDR1E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift in Sources */,
+				TDTA1E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift in Sources */,
+				TLSK1E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift in Sources */,
+				TWND2E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift in Sources */,
 				PPCV1E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift in Sources */,
 				ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */,
+				ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */,
+				APRT1E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift in Sources */,
 				CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */,
 				LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */,
 				C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */,
+				TMDL1E2F3A4B5C6D7E8F9A0B1 /* Trip.swift in Sources */,
 				CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */,
 				4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */,
+				TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */,
 				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,

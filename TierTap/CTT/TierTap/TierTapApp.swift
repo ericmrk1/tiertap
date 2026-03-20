@@ -5,6 +5,7 @@ import StoreKit
 @main
 struct TierTapApp: App {
     @StateObject private var store = SessionStore()
+    @StateObject private var tripStore = TripStore()
     @StateObject private var settingsStore = SettingsStore()
     @StateObject private var authStore = AuthStore()
     @StateObject private var subscriptionStore = SubscriptionStore()
@@ -14,6 +15,7 @@ struct TierTapApp: App {
 
     init() {
         BankrollDatabase.shared.open()
+        AirportCatalog.preloadAtLaunch()
     }
 
     var body: some Scene {
@@ -29,6 +31,7 @@ struct TierTapApp: App {
                 }
             }
             .environmentObject(store)
+            .environmentObject(tripStore)
             .environmentObject(settingsStore)
             .environmentObject(authStore)
             .environmentObject(subscriptionStore)

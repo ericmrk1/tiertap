@@ -1,0 +1,272 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SharedComponents.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search games",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select Game",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading games…",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Favorites",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Games",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "All games",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win rate: %@ over %lld sessions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "Poker Performance",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 276
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add a few poker sessions to see ROI trends over time.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 357
+        }
+      },
+      {
+        "comment": "",
+        "key": "Poker ROI Over Time",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 351
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier points",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 390
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Initial Buy-In",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 495
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total buy-in: %@%lld",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 466
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select one or more amounts.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 467
+        }
+      },
+      {
+        "comment": "",
+        "key": "Good Luck - Buying in for %@%lld",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 479
+        }
+      },
+      {
+        "comment": "",
+        "key": "Good Luck",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 480
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 501
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-In",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 615
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Buy-In",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 535
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap a common denomination or enter a custom amount.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 538
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 550
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom amount",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 561
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Custom Amount to Total",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 570
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current buy-in total: %@%lld",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 580
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap amounts to build a buy-in, then confirm.",
+        "location": {
+          "startingColumn": 126,
+          "startingLine": 580
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 603
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add %@%lld",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 593
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Buy-In",
+        "location": {
+          "startingColumn": 112,
+          "startingLine": 593
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 621
+        }
+      }
+    ]
+  },
+  "version": 1
+}

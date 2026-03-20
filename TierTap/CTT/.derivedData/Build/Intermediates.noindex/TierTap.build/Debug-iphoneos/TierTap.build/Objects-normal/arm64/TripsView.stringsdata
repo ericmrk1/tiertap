@@ -1,0 +1,136 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Trips",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete this trip?",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "New trip",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "“%@” will be removed. Trip photos stored on this device will be deleted.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 104
+        }
+      },
+      {
+        "comment": "",
+        "key": "No trips yet",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 137
+        }
+      },
+      {
+        "comment": "",
+        "key": "Track getaways, stays, flights, and the sessions that happened on each trip. Tap the + button to create one.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "Newest months appear first. Expand a month to browse.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 164
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 194
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 252
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share summary image",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 259
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 281
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld flights",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 285
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 361
+        }
+      }
+    ]
+  },
+  "version": 1
+}

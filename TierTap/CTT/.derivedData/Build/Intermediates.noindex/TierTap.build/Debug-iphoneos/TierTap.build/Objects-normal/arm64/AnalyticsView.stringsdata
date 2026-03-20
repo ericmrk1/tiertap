@@ -1,0 +1,696 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AnalyticsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Analytics",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI analysis",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 279
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filters",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 362
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filter by location",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 388
+        }
+      },
+      {
+        "comment": "",
+        "key": "All",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 398
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 429
+        }
+      },
+      {
+        "comment": "",
+        "key": "From",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 436
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 440
+        }
+      },
+      {
+        "comment": "",
+        "key": "All",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 446
+        }
+      },
+      {
+        "comment": "",
+        "key": "To",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 456
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "All",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 466
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 466
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Analytics Yet",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 486
+        }
+      },
+      {
+        "comment": "",
+        "key": "Play and complete a few sessions to unlock win/loss, tier point, and pace-of-play analytics.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of Ruin",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 605
+        }
+      },
+      {
+        "comment": "",
+        "key": "Overall estimated risk of ruin %@",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 606
+        }
+      },
+      {
+        "comment": "",
+        "key": "Table Session Overview",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "Poker Session Overview",
+        "location": {
+          "startingColumn": 91,
+          "startingLine": 551
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 557
+        }
+      },
+      {
+        "comment": "",
+        "key": "All locations",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 565
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of Ruin",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 590
+        }
+      },
+      {
+        "comment": "",
+        "key": "Graph style",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 622
+        }
+      },
+      {
+        "comment": "",
+        "key": "Graph style",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 617
+        }
+      },
+      {
+        "comment": "",
+        "key": "Game type",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 720
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI Analysis",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1053
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1013
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ask TierTap as often as you like with your TierTap Pro subscription.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1019
+        }
+      },
+      {
+        "comment": "",
+        "key": "Asking TierTap AI…",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 985
+        }
+      },
+      {
+        "comment": "",
+        "key": "AI Analysis",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 930
+        }
+      },
+      {
+        "comment": "",
+        "key": "Question",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 958
+        }
+      },
+      {
+        "comment": "",
+        "key": "Answer",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 991
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ask TierTap",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1037
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1059
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions with both actual and rated average bet yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1384
+        }
+      },
+      {
+        "comment": "",
+        "key": "Above 0 means your rated (captured) average bet is higher than your actual average bet, which is good. Below 0 means you’re effectively overbetting relative to what the casino tracks.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1389
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1394
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bet Rating vs Actual",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1363
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld good",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1372
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bad",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1375
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shows how often you both win money and gain tier points in the same session.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1439
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win vs. Tier Gain",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1423
+        }
+      },
+      {
+        "comment": "",
+        "key": "Intersection",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1455
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld of %lld sessions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1459
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1504
+        }
+      },
+      {
+        "comment": "",
+        "key": "Both",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1507
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1517
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1528
+        }
+      },
+      {
+        "comment": "",
+        "key": "How much you’ve won vs. lost across all completed sessions.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1561
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1566
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win/Loss Distribution",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1552
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1596
+        }
+      },
+      {
+        "comment": "",
+        "key": "No tier point data yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1628
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cumulative tier points earned across your recorded sessions.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1636
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1641
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Progress Over Time",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1623
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1714
+        }
+      },
+      {
+        "comment": "",
+        "key": "No session moods recorded yet. Enable \"Prompt for session mood\" in Settings → Sessions and end a session to record how each session felt.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1739
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1771
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session moods",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1734
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1751
+        }
+      },
+      {
+        "comment": "",
+        "key": "No game breakdown yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1808
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1840
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions by Game",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1803
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldx",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1820
+        }
+      },
+      {
+        "comment": "",
+        "key": "No tier point data yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1911
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1944
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points by Loyalty Program",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 1906
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld pts",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1924
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Analytics",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 2307
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include in share",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 2243
+        }
+      },
+      {
+        "comment": "",
+        "key": "We’ll generate images for the selected analytics and open the system share sheet so you can send them however you like.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 2298
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bet Rating vs Actual",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2285
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win vs. Tier Gain (Venn)",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2286
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win/Loss Distribution",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2287
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Progress Over Time",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2288
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions by Game",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points by Loyalty Program",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2291
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session moods",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2293
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select All",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 2257
+        }
+      },
+      {
+        "comment": "",
+        "key": "Deselect All",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 2277
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2313
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2319
+        }
+      }
+    ]
+  },
+  "version": 1
+}

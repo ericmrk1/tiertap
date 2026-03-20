@@ -1,0 +1,40 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchStartView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Remote",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 14
+        }
+      },
+      {
+        "comment": "",
+        "key": "No session in progress",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start a session on your iPhone to control it from here",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 21
+        }
+      }
+    ]
+  },
+  "version": 1
+}

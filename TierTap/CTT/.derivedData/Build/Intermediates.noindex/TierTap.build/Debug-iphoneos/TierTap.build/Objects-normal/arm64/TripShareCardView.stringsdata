@@ -1,0 +1,96 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripShareCardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Shared from TierTap",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 166
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap Trip",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stay",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@: %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Flights",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "(%@)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ → %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions (%lld)",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 135
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions linked.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "…and %lld more",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 144
+        }
+      }
+    ]
+  },
+  "version": 1
+}

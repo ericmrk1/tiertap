@@ -1,0 +1,24 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionMoodPickerView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Session mood",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "🧠 How did the session feel?",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 18
+        }
+      }
+    ]
+  },
+  "version": 1
+}

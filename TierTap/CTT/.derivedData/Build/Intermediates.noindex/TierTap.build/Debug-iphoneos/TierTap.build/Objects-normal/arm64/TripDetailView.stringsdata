@@ -1,0 +1,224 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Delete this trip?",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trip",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share trip summary",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit trip",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete trip",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "This trip no longer exists.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Past trip",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 173
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current / upcoming",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add photos from your camera or library.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 218
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photos",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "Where you stayed",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 280
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 285
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ → %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "Seat %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add origin & destination on the map in Edit to see the route.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "Flights",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 343
+        }
+      },
+      {
+        "comment": "",
+        "key": "(%@)",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 346
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions (%lld)",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 373
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions linked. Edit the trip to attach sessions.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 377
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 396
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 90,
+          "startingLine": 396
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 420
+        }
+      },
+      {
+        "comment": "",
+        "key": "Flight route",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 451
+        }
+      },
+      {
+        "comment": "",
+        "key": "Missing coordinates for this leg.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 447
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 457
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,624 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RootTabView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Analytics",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 25
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trips",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 37
+        }
+      },
+      {
+        "comment": "",
+        "key": "Community",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 44
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Community",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 254
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading community sessions…",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Connect Supabase to see the community feed.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign in to view the community feed.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use the Account button in the top right to sign in.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 179
+        }
+      },
+      {
+        "comment": "",
+        "key": "No community sessions have been published yet.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "Be the first to publish your sessions using the button at the bottom.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "Load more",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 227
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show session locations on map",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": "🌐",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 265
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish Sessions",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 462
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Profile",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 506
+        }
+      },
+      {
+        "comment": "",
+        "key": "Display name",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 567
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your name",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 570
+        }
+      },
+      {
+        "comment": "",
+        "key": "Take photo",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 538
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose from library",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 554
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 587
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 638
+        }
+      },
+      {
+        "comment": "",
+        "key": "You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 839
+        }
+      },
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 683
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your TierTap Account",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 626
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign in to unlock advanced AI features, sync your data, and join Community sessions.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 630
+        }
+      },
+      {
+        "comment": "",
+        "key": "Signed in",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 655
+        }
+      },
+      {
+        "comment": "",
+        "key": "Why create an account?",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "Advanced AI summaries and guidance for your sessions.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 696
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync your sessions and bankroll safely across devices.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 697
+        }
+      },
+      {
+        "comment": "",
+        "key": "See and publish Community sessions with other players.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 698
+        }
+      },
+      {
+        "comment": "",
+        "key": "Back up your data so you never lose your history.",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 699
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign in with Apple",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 714
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign in with Google",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 731
+        }
+      },
+      {
+        "comment": "",
+        "key": "Email account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 744
+        }
+      },
+      {
+        "comment": "",
+        "key": "Email auth mode",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 748
+        }
+      },
+      {
+        "comment": "",
+        "key": "Email",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 755
+        }
+      },
+      {
+        "comment": "",
+        "key": "Password",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 765
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm password",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 775
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue without an account",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 830
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show %@ on map",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1248
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rating Diff N/A",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1296
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rating diff %lld percent",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 1294
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld pts",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1312
+        }
+      },
+      {
+        "comment": "",
+        "key": "PTS",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1322
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filters",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1360
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1364
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date & time range",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1379
+        }
+      },
+      {
+        "comment": "",
+        "key": "From",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1393
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 1397
+        }
+      },
+      {
+        "comment": "",
+        "key": "To",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1407
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 1411
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1437
+        }
+      },
+      {
+        "comment": "",
+        "key": "Games",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 1432
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1490
+        }
+      },
+      {
+        "comment": "",
+        "key": "Locations",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 1485
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apply Filters",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1538
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session Map",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1607
+        }
+      },
+      {
+        "comment": "",
+        "key": "No mapped casino locations for this feed yet.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1582
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1613
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish Sessions",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1781
+        }
+      },
+      {
+        "comment": "",
+        "key": "No completed sessions available to publish.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1712
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add a short comment (optional)",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1749
+        }
+      },
+      {
+        "comment": "",
+        "key": "One line in the feed. %lld/%lld characters",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1750
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose sessions to publish",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1765
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select All Sessions",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1726
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear All",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 1739
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. Great run today",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 1753
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1787
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1800
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 1904
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 1904
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1913
+        }
+      }
+    ]
+  },
+  "version": 1
+}

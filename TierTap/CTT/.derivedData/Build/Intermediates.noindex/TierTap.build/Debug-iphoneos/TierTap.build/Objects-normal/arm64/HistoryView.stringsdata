@@ -1,0 +1,288 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "No Sessions Yet",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Complete a session to see your history.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear Date Filter",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session Calendar",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to pick a date",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search by casino or game",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filter by location",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions match your filters.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 168
+        }
+      },
+      {
+        "comment": "",
+        "key": "Try adjusting the search, date, or location filters.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session History",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 222
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Session?",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 297
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share sessions",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 245
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 278
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 298
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 299
+        }
+      },
+      {
+        "comment": "",
+        "key": "This session will be permanently removed. This cannot be undone.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 306
+        }
+      },
+      {
+        "comment": "",
+        "key": "Incomplete",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 501
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld pts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 530
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 78,
+          "startingLine": 530
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Sessions",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 633
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions available to share.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 567
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose sessions to share",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 603
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select All Sessions",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 581
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear All",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 594
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 605
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include win/losses",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 612
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 639
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 645
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 689
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 689
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 698
+        }
+      }
+    ]
+  },
+  "version": 1
+}

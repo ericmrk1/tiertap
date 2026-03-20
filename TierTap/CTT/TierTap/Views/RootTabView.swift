@@ -5,7 +5,7 @@ import UIKit
 enum MainTab: Hashable {
     case sessions
     case history
-    case risk
+    case trips
     case analytics
     case community
     case settings
@@ -26,11 +26,11 @@ struct RootTabView: View {
                 }
                 .tag(MainTab.analytics)
 
-            RiskOfRuinView()
+            TripsView()
                 .tabItem {
-                    Label("Risk of Ruin", systemImage: "chart.bar.doc.horizontal")
+                    Label("Trips", systemImage: "suitcase.fill")
                 }
-                .tag(MainTab.risk)
+                .tag(MainTab.trips)
 
             HomeView()
                 .tabItem {
@@ -77,6 +77,7 @@ struct CommunitySessionsView: View {
     @State private var showMapSheet = false
     @State private var mapSessions: [TableGamePostRow] = []
     @State private var hasMoreFeedPages = false
+    @State private var locationLookup: [String: CLLocationCoordinate2D] = [:]
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -393,10 +394,10 @@ struct CommunitySessionsView: View {
             }
             .adaptiveSheet(isPresented: $showMapSheet) {
                 CommunityFeedMapSheet(
-                    sessions: mapSessions
+                    sessions: mapSessions,
+                    locationLookup: locationLookup
                 )
                 .environmentObject(settingsStore)
-                .environmentObject(authStore)
             }
             }
         }
@@ -968,6 +969,7 @@ extension CommunitySessionsView {
                 selectedLocations = selectedLocations.intersection(locationsSet)
                 isLoadingFeed = false
             }
+            await preloadLocationLookup(for: items)
         } catch {
             // Ignore benign cancellation errors (e.g. user navigating away mid-load)
             if (error as? CancellationError) != nil {
@@ -1068,6 +1070,7 @@ extension CommunitySessionsView {
                 selectedLocations = selectedLocations.intersection(locationsSet)
                 isLoadingFeed = false
             }
+            await preloadLocationLookup(for: allItems)
         } catch {
             if (error as? CancellationError) != nil {
                 await MainActor.run {
@@ -1092,6 +1095,60 @@ extension CommunitySessionsView {
                 feedErrorMessage = "Could not load more community sessions. Please try again."
                 isLoadingFeed = false
             }
+        }
+    }
+
+    private func preloadLocationLookup(for sessions: [TableGamePostRow]) async {
+        guard SupabaseConfig.isConfigured, authStore.isSignedIn else { return }
+        guard let client = supabase else { return }
+
+        let uniqueNames = Set(
+            sessions.compactMap { row in
+                (row.location ?? row.session_details?.casino)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            .filter { !$0.isEmpty }
+        )
+
+        guard !uniqueNames.isEmpty else { return }
+
+        do {
+            let data = try await client.database
+                .from(SupabaseTables.casinoLocations)
+                .select("name, latitude, longitude")
+                .limit(500)
+                .execute()
+                .data
+
+            struct LocationRow: Decodable {
+                let name: String?
+                let latitude: Double?
+                let longitude: Double?
+            }
+
+            let decoded = try JSONDecoder().decode([LocationRow].self, from: data)
+
+            var newLookup: [String: CLLocationCoordinate2D] = [:]
+
+            for row in decoded {
+                guard
+                    let name = row.name?.trimmingCharacters(in: .whitespacesAndNewlines),
+                    uniqueNames.contains(name),
+                    let lat = row.latitude,
+                    let lon = row.longitude
+                else {
+                    continue
+                }
+                newLookup[name] = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            }
+
+            await MainActor.run {
+                for (name, coord) in newLookup {
+                    locationLookup[name] = coord
+                }
+            }
+        } catch {
+            // Silent failure; maps will simply have fewer or no pins.
         }
     }
 
@@ -1505,9 +1562,9 @@ struct CommunityMapLocation: Identifiable {
 
 struct CommunityFeedMapSheet: View {
     let sessions: [TableGamePostRow]
+    let locationLookup: [String: CLLocationCoordinate2D]
 
     @EnvironmentObject var settingsStore: SettingsStore
-    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var locations: [CommunityMapLocation] = []
@@ -1515,17 +1572,13 @@ struct CommunityFeedMapSheet: View {
         center: CLLocationCoordinate2D(latitude: 39.5, longitude: -98.35),
         span: MKCoordinateSpan(latitudeDelta: 40, longitudeDelta: 40)
     )
-    @State private var isLoading = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
 
-                if locations.isEmpty && isLoading {
-                    ProgressView("Loading locations…")
-                        .tint(.white)
-                } else if locations.isEmpty {
+                if locations.isEmpty {
                     Text("No mapped casino locations for this feed yet.")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.9))
@@ -1563,17 +1616,13 @@ struct CommunityFeedMapSheet: View {
                     .foregroundColor(.green)
                 }
             }
-            .task {
-                await loadLocations()
+            .onAppear {
+                populateLocationsFromLookup()
             }
         }
     }
 
-    private func loadLocations() async {
-        guard !isLoading else { return }
-        guard SupabaseConfig.isConfigured, authStore.isSignedIn else { return }
-        guard let client = supabase else { return }
-
+    private func populateLocationsFromLookup() {
         let uniqueNames = Set(
             sessions.compactMap { row in
                 (row.location ?? row.session_details?.casino)?
@@ -1584,52 +1633,16 @@ struct CommunityFeedMapSheet: View {
 
         guard !uniqueNames.isEmpty else { return }
 
-        await MainActor.run {
-            isLoading = true
+        let mapped: [CommunityMapLocation] = uniqueNames.compactMap { name in
+            guard let coord = locationLookup[name] else { return nil }
+            return CommunityMapLocation(
+                name: name,
+                coordinate: coord
+            )
         }
 
-        do {
-            let data = try await client.database
-                .from(SupabaseTables.casinoLocations)
-                .select("name, latitude, longitude")
-                .limit(500)
-                .execute()
-                .data
-
-            struct LocationRow: Decodable {
-                let name: String?
-                let latitude: Double?
-                let longitude: Double?
-            }
-
-            let decoded = try JSONDecoder().decode([LocationRow].self, from: data)
-
-            let mapped: [CommunityMapLocation] = decoded.compactMap { row in
-                guard
-                    let name = row.name?.trimmingCharacters(in: .whitespacesAndNewlines),
-                    uniqueNames.contains(name),
-                    let lat = row.latitude,
-                    let lon = row.longitude
-                else {
-                    return nil
-                }
-
-                return CommunityMapLocation(
-                    name: name,
-                    coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)
-                )
-            }
-
-            await MainActor.run {
-                locations = mapped
-                isLoading = false
-                updateRegion()
-            }
-        } catch {
-            await MainActor.run {
-                isLoading = false
-            }
-        }
+        locations = mapped
+        updateRegion()
     }
 
     private func updateRegion() {

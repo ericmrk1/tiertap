@@ -1,0 +1,600 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CheckInView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Check In",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 642
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active Session",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 672
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gaming Details",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 168
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casino Game",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type of Game",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Limit Texas Hold’em",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 229
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pot Limit Omaha",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 230
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pot Limit Omaha Hi-Lo",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fixed Limit Hold’em",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "Spread Limit Hold’em",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 233
+        }
+      },
+      {
+        "comment": "",
+        "key": "Short Deck Hold’em (6+)",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 234
+        }
+      },
+      {
+        "comment": "",
+        "key": "Omaha Hi",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "Omaha Hi-Lo",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "5 Card Omaha",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 237
+        }
+      },
+      {
+        "comment": "",
+        "key": "5 Card Omaha Hi-Lo",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 238
+        }
+      },
+      {
+        "comment": "",
+        "key": "7 Card Stud",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "7 Card Stud Hi-Lo",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "Razz",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 241
+        }
+      },
+      {
+        "comment": "",
+        "key": "5 Card Draw",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 242
+        }
+      },
+      {
+        "comment": "",
+        "key": "2-7 Triple Draw",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 243
+        }
+      },
+      {
+        "comment": "",
+        "key": "2-7 Single Draw",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chinese Poker",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 245
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open Face Chinese",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 246
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mixed Game (H.O.R.S.E.)",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mixed Game (8-Game)",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 248
+        }
+      },
+      {
+        "comment": "",
+        "key": "Other Poker",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 249
+        }
+      },
+      {
+        "comment": "",
+        "key": "Blinds & Structure",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 271
+        }
+      },
+      {
+        "comment": "",
+        "key": "SB",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 277
+        }
+      },
+      {
+        "comment": "",
+        "key": "SB",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 280
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 282
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 282
+        }
+      },
+      {
+        "comment": "",
+        "key": "BB",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "BB",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 293
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ante",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ante",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 306
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 308
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 308
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$2",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 319
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$3",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 331
+        }
+      },
+      {
+        "comment": "",
+        "key": "$2/$5",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 343
+        }
+      },
+      {
+        "comment": "",
+        "key": "$5/$10",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 355
+        }
+      },
+      {
+        "comment": "",
+        "key": "$10/$20",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 367
+        }
+      },
+      {
+        "comment": "",
+        "key": "$20/$40",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 379
+        }
+      },
+      {
+        "comment": "",
+        "key": "$40/$80",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 391
+        }
+      },
+      {
+        "comment": "",
+        "key": "$100/$200",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 403
+        }
+      },
+      {
+        "comment": "",
+        "key": "$200/$400",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 415
+        }
+      },
+      {
+        "comment": "",
+        "key": "$300/$600",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 427
+        }
+      },
+      {
+        "comment": "",
+        "key": "$400/$800",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 439
+        }
+      },
+      {
+        "comment": "",
+        "key": "$500/$1000",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 451
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$3/$5",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 463
+        }
+      },
+      {
+        "comment": "",
+        "key": "Level mins",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 479
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting stack",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 482
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cost",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 485
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter casino name",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 524
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casino Location",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 501
+        }
+      },
+      {
+        "comment": "",
+        "key": "Public",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 505
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 505
+        }
+      },
+      {
+        "comment": "",
+        "key": "Find casino near me",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 531
+        }
+      },
+      {
+        "comment": "",
+        "key": "Check your casino loyalty app. Use wheel or type exact.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 565
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting Tier Points",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 549
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 554
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select Rewards",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 555
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exact value",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 570
+        }
+      },
+      {
+        "comment": "",
+        "key": "Initial Buy-In",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 582
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose cash",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 589
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 589
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exact amount",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 602
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in (%@%@) exceeds your unit size (%@%lld). Consider lowering to stay within bankroll target.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 612
+        }
+      },
+      {
+        "comment": "",
+        "key": "Let’s F@#$@ Go!",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 628
+        }
+      },
+      {
+        "comment": "",
+        "key": "Resume Existing",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 673
+        }
+      },
+      {
+        "comment": "",
+        "key": "End & Start New",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 674
+        }
+      },
+      {
+        "comment": "",
+        "key": "You have a live session. Resume it or end it to start a new one?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 676
+        }
+      }
+    ]
+  },
+  "version": 1
+}

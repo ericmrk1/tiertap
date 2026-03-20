@@ -1,0 +1,23 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/Deprecated.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Deprecated.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Deprecated.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Deprecated.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Deprecated.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/Deprecated.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/HeartbeatTimer.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/HeartbeatTimer.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/HeartbeatTimer.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/HeartbeatTimer.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/HeartbeatTimer.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/HeartbeatTimer.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/PhoenixTransport.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/PhoenixTransport.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/PhoenixTransport.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/PhoenixTransport.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/PhoenixTransport.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.derivedData/Build/Intermediates.noindex/Supabase.build/Debug-iphoneos/Realtime.build/Objects-normal/arm64/PhoenixTransport.swiftdeps"
+  }
+}
