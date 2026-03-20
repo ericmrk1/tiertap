@@ -57,9 +57,16 @@ struct CloseoutView: View {
     }
     var previewWL: Int? { Int(cashOut).map { $0 - s.totalBuyIn } }
     /// Hourly win/loss rate based on total W/L and hours played.
+    /// Requires a meaningful duration so we never divide by ~0 (which happens briefly after
+    /// `closeSession` clears `liveSession` and `s` falls back to a placeholder session).
     var previewHourlyWinLoss: Double? {
-        guard let wl = previewWL, previewHours > 0 else { return nil }
-        return Double(wl) / previewHours
+        guard let wl = previewWL else { return nil }
+        let h = previewHours
+        // At least 1 second — below that, $/hr is misleading and can overflow to infinity.
+        guard h >= 1.0 / 3600.0, h.isFinite else { return nil }
+        let rate = Double(wl) / h
+        guard rate.isFinite else { return nil }
+        return rate
     }
     /// ROI % based on initial buy-in only.
     var previewROI: Double? {
@@ -222,10 +229,10 @@ struct CloseoutView: View {
                                     Text("Hrs").font(.caption2).foregroundColor(.gray)
                                     Text(String(format: "%.2f", previewHours)).font(.subheadline).foregroundColor(.white)
                                 }
-                                if let hourly = previewHourlyWinLoss {
+                                if let hourly = previewHourlyWinLoss,
+                                   let amount = Int(exactly: round(hourly)) {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("Hourly W/L").font(.caption2).foregroundColor(.gray)
-                                        let amount = Int(round(hourly))
                                         Text("\(amount >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(amount))")
                                             .font(.subheadline)
                                             .foregroundColor(amount >= 0 ? .green : .red)
