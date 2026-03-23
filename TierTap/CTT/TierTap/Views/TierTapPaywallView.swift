@@ -59,6 +59,12 @@ struct TierTapPaywallView: View {
                     }
                     .foregroundColor(.white)
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Account page") {
+                        showAccountSheet = true
+                    }
+                    .foregroundColor(.white)
+                }
             }
             .onAppear {
                 // Try to select a sensible default on first appear.

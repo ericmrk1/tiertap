@@ -3,6 +3,7 @@ import CryptoKit
 import Foundation
 import Supabase
 import SwiftUI
+import UIKit
 
 /// Manages Supabase auth state for the Community tab. Sign in via magic link (email OTP) or Sign in with Apple.
 @MainActor
@@ -14,9 +15,14 @@ final class AuthStore: ObservableObject {
     @Published var infoMessage: String?
     @Published var otpSent = false
 
+    /// On-disk JPEG for the profile avatar (Application Support). Not synced to Supabase metadata.
+    @Published private(set) var localProfilePhoto: URL?
+
     private var authStateTask: Task<Void, Never>?
     private var appleAuthDelegate: AppleSignInDelegate?
     private var oauthPresentationProvider: OAuthPresentationContextProvider?
+    /// Prevents concurrent `auth.update` calls that remove legacy `profile_photo_url` from metadata.
+    private var profilePhotoMetadataWipeInFlight = false
 
     var isSignedIn: Bool { session != nil }
     var userEmail: String? { session?.user.email }
@@ -44,13 +50,18 @@ final class AuthStore: ObservableObject {
     /// Profile emojis set by the user (stored in metadata).
     var userProfileEmojis: String? { stringFromUserMetadata("profile_emojis") }
 
-    /// Profile photo stored as base64-encoded JPEG in user metadata.
-    var userProfilePhotoBase64: String? { stringFromUserMetadata("profile_photo_base64") }
+    /// Public URL of the profile photo in the `avatars` bucket (`{userId}/avatar.jpg`).
+    /// Intentionally **not** read from `user_metadata.profile_photo_url` so the JWT stays small.
+    var userProfilePhotoURL: URL? {
+        guard let client = supabase, let userId = session?.user.id else { return nil }
+        let path = "\(userId)/avatar.jpg"
+        return try? client.storage.from("avatars").getPublicURL(path: path)
+    }
 
-    /// Decoded profile photo data (if available).
-    var userProfilePhotoData: Data? {
-        guard let base64 = userProfilePhotoBase64 else { return nil }
-        return Data(base64Encoded: base64)
+    /// Image loaded from `localProfilePhoto` when the file exists.
+    var localProfilePhotoImage: UIImage? {
+        guard let url = localProfilePhoto, url.isFileURL else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 
     /// Short label for UI: display name or "email@example.com" when no name is available.
@@ -60,22 +71,127 @@ final class AuthStore: ObservableObject {
         return email
     }
 
-    /// Update profile display name, emojis, and/or photo in Supabase user metadata.
-    func updateProfile(displayName: String?, emojis: String?, photoBase64: String?) async {
+    /// Update profile display name and/or emojis in Supabase user metadata.
+    /// To update the profile photo, call `uploadProfilePhoto(_:)` separately.
+    func updateProfile(displayName: String?, emojis: String?) async {
         guard let client = supabase else { return }
         var data: [String: AnyJSON] = [:]
         if let name = displayName { data["display_name"] = .string(name) }
         if let e = emojis { data["profile_emojis"] = .string(e) }
-        if let photo = photoBase64 { data["profile_photo_base64"] = .string(photo) }
         guard !data.isEmpty else { return }
         do {
             _ = try await client.auth.update(user: .init(data: data))
-            // Auth state observer will receive .userUpdated and update session
             if let newSession = try? await client.auth.session {
                 await MainActor.run { session = newSession }
             }
         } catch {
             await MainActor.run { errorMessage = error.localizedDescription }
+        }
+    }
+
+    /// Upload a profile photo to Supabase Storage at `{userId}/avatar.jpg`.
+    /// Does **not** write `profile_photo_url` (or any photo field) to user metadata — use
+    /// ``userProfilePhotoURL`` for the deterministic public URL.
+    ///
+    /// - Parameter imageData: JPEG data for the profile photo (compress before calling).
+    func uploadProfilePhoto(_ imageData: Data) async throws {
+        guard let client = supabase else { return }
+        guard let userId = session?.user.id else {
+            throw AuthError.notSignedIn
+        }
+
+        let path = "\(userId)/avatar.jpg"
+
+        // Upload to the `avatars` bucket (upsert = replace existing photo).
+        _ = try await client.storage
+            .from("avatars")
+            .upload(
+                path,
+                data: imageData,
+                options: FileOptions(
+                    cacheControl: "3600",
+                    contentType: "image/jpeg",
+                    upsert: true
+                )
+            )
+    }
+
+    /// Remove the profile photo object from Storage only (no user metadata updates).
+    func deleteProfilePhoto() async throws {
+        guard let client = supabase else { return }
+        guard let userId = session?.user.id else {
+            throw AuthError.notSignedIn
+        }
+
+        let path = "\(userId)/avatar.jpg"
+        _ = try? await client.storage.from("avatars").remove(paths: [path])
+    }
+
+    /// Writes JPEG data next to app support and sets `localProfilePhoto` to that file URL.
+    func saveProfilePhotoLocally(_ data: Data) throws {
+        guard let userId = session?.user.id else {
+            throw AuthError.notSignedIn
+        }
+        let url = try localProfilePhotoFileURL(for: userId)
+        try data.write(to: url, options: .atomic)
+        localProfilePhoto = url
+    }
+
+    /// Removes the on-disk profile photo and clears `localProfilePhoto`.
+    func deleteLocalProfilePhoto() throws {
+        guard let userId = session?.user.id else {
+            throw AuthError.notSignedIn
+        }
+        let url = try localProfilePhotoFileURL(for: userId)
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+        localProfilePhoto = nil
+    }
+
+    private func localProfilePhotoFileURL(for userId: UUID) throws -> URL {
+        let base = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let dir = base.appendingPathComponent("TierTapProfilePhotos", isDirectory: true)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("\(userId.uuidString).jpg")
+    }
+
+    private func refreshLocalProfilePhotoFromDisk() {
+        guard let userId = session?.user.id else {
+            localProfilePhoto = nil
+            return
+        }
+        guard let url = try? localProfilePhotoFileURL(for: userId),
+              FileManager.default.fileExists(atPath: url.path) else {
+            localProfilePhoto = nil
+            return
+        }
+        localProfilePhoto = url
+    }
+
+    /// Removes legacy `profile_photo_url` from Supabase `user_metadata` so it is not embedded in the JWT.
+    private func scheduleWipeProfilePhotoURLFromMetadataIfNeeded() {
+        guard let client = supabase, let user = session?.user else { return }
+        guard user.userMetadata["profile_photo_url"] != nil else { return }
+        guard !profilePhotoMetadataWipeInFlight else { return }
+        profilePhotoMetadataWipeInFlight = true
+        Task {
+            do {
+                _ = try await client.auth.update(user: .init(data: [
+                    "profile_photo_url": .null
+                ]))
+                if let newSession = try? await client.auth.session {
+                    await MainActor.run { self.session = newSession }
+                }
+            } catch {
+                // If the server rejects null, the next auth event can retry; inFlight prevents a tight loop.
+            }
+            await MainActor.run { self.profilePhotoMetadataWipeInFlight = false }
         }
     }
 
@@ -103,6 +219,8 @@ final class AuthStore: ObservableObject {
                     self.session = state.session
                     self.otpSent = false
                     self.errorMessage = nil
+                    self.refreshLocalProfilePhotoFromDisk()
+                    self.scheduleWipeProfilePhotoURLFromMetadataIfNeeded()
                 }
             }
         }
@@ -164,9 +282,6 @@ final class AuthStore: ObservableObject {
                 email: trimmedEmail,
                 password: password
             )
-            // Depending on your Supabase email confirmation settings, this may immediately create a session
-            // or require the user to confirm via email first. Either way, the auth state observer will keep
-            // `session` in sync; we just show a helpful message here.
             infoMessage = "If required, check your email to confirm your TierTap account."
         } catch {
             if let urlError = error as? URLError, urlError.code == .badURL {
@@ -238,10 +353,16 @@ final class AuthStore: ObservableObject {
 
     func signOut() {
         guard let client = supabase else { return }
+        let userId = session?.user.id
         Task {
+            if let userId, let url = try? localProfilePhotoFileURL(for: userId),
+               FileManager.default.fileExists(atPath: url.path) {
+                try? FileManager.default.removeItem(at: url)
+            }
             try? await client.auth.signOut()
             await MainActor.run {
                 session = nil
+                localProfilePhoto = nil
                 otpSent = false
                 errorMessage = nil
             }
@@ -336,7 +457,7 @@ final class AuthStore: ObservableObject {
             )
             session = authSession
 
-            // Apple only provides full name on first sign-in; save to user metadata
+            // Apple only provides full name on first sign-in; save to user metadata.
             if let nameComponents = credential.fullName {
                 var fullName = [nameComponents.givenName, nameComponents.familyName]
                     .compactMap { $0 }
@@ -378,6 +499,18 @@ final class AuthStore: ObservableObject {
         let data = Data(input.utf8)
         let hash = SHA256.hash(data: data)
         return hash.compactMap { String(format: "%02x", $0) }.joined()
+    }
+}
+
+// MARK: - Auth Errors
+
+enum AuthError: LocalizedError {
+    case notSignedIn
+
+    var errorDescription: String? {
+        switch self {
+        case .notSignedIn: return "You must be signed in to perform this action."
+        }
     }
 }
 

@@ -9,7 +9,7 @@ struct SettingsView: View {
     @State private var unitSizeText: String = ""
     @State private var targetAverageText: String = ""
     @State private var denominationsText: String = ""
-    @State private var primaryColorSelection: Color = .green
+    @State private var primaryColorSelection: Color = .black
     @State private var secondaryColorSelection: Color = .blue
     @State private var isBankrollExpanded: Bool = false
     @State private var isRiskOfRuinExpanded: Bool = false

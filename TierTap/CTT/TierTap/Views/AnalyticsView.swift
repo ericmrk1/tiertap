@@ -251,8 +251,7 @@ struct AnalyticsView: View {
                         } label: {
                             HStack(spacing: 6) {
                                 if authStore.isSignedIn,
-                                   let data = authStore.userProfilePhotoData,
-                                   let uiImage = UIImage(data: data) {
+                                   let uiImage = authStore.localProfilePhotoImage {
                                     Image(uiImage: uiImage)
                                         .resizable()
                                         .scaledToFill()
@@ -266,7 +265,7 @@ struct AnalyticsView: View {
                                     Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
                                 }
                                 if authStore.isSignedIn {
-                                    if authStore.userProfilePhotoData == nil,
+                                    if authStore.localProfilePhotoImage == nil,
                                        let emojis = authStore.userProfileEmojis,
                                        !emojis.isEmpty {
                                         Text(emojis)

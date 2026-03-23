@@ -383,7 +383,7 @@ final class SettingsStore: ObservableObject {
         } else {
             self.defaultGameCategory = .table
         }
-        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "green"
+        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
         self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
         self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)
         self.secondaryColorHex = UserDefaults.standard.string(forKey: keySecondaryColorHex)
@@ -438,7 +438,7 @@ final class SettingsStore: ObservableObject {
         }
         if self.themePresets.isEmpty {
             let defaults: [ThemePreset] = [
-                ThemePreset(id: UUID(), name: "Casino Dark", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .blue)),
+                ThemePreset(id: UUID(), name: "Casino Blue", primaryHex: Self.hexString(from: .black), secondaryHex: Self.hexString(from: .blue)),
                 ThemePreset(id: UUID(), name: "Apple Standard", primaryHex: Self.hexString(from: .blue), secondaryHex: Self.hexString(from: .teal)),
                 ThemePreset(id: UUID(), name: "Emerald Night", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .teal)),
                 ThemePreset(id: UUID(), name: "Royal Blue", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .blue)),
@@ -618,7 +618,7 @@ final class SettingsStore: ObservableObject {
 
     /// Convenience for turning a preset into concrete SwiftUI colors.
     func colors(for preset: ThemePreset) -> (Color, Color) {
-        let primary = color(fromHex: preset.primaryHex) ?? .green
+        let primary = color(fromHex: preset.primaryHex) ?? .black
         let secondary = color(fromHex: preset.secondaryHex) ?? .blue
         return (primary, secondary)
     }
@@ -626,6 +626,7 @@ final class SettingsStore: ObservableObject {
     /// Fallback mapping from legacy color names to SwiftUI colors.
     private func color(fromName name: String) -> Color {
         switch name {
+        case "black": return .black
         case "red": return .red
         case "orange": return .orange
         case "yellow": return .yellow
@@ -635,6 +636,7 @@ final class SettingsStore: ObservableObject {
         case "indigo": return .indigo
         case "purple": return .purple
         case "pink": return .pink
+        case "green": return .green
         default: return .green
         }
     }
@@ -663,13 +665,13 @@ final class SettingsStore: ObservableObject {
         var b: CGFloat = 0
         var a: CGFloat = 0
         guard uiColor.getRed(&r, green: &g, blue: &b, alpha: &a) else {
-            return "#00FF00" // fall back to green
+            return "#000000"
         }
         let value = (Int(r * 255) << 16) | (Int(g * 255) << 8) | Int(b * 255)
         return String(format: "#%06X", value)
         #else
         // Reasonable default on non-iOS platforms.
-        return "#00FF00"
+        return "#000000"
         #endif
     }
 
@@ -684,6 +686,9 @@ final class SettingsStore: ObservableObject {
         if uiColor.getHue(&h, saturation: &s, brightness: &b, alpha: &a) {
             let hue = h * 360.0
             if b < 0.25 {
+                if s < 0.2 {
+                    return "black"
+                }
                 return "indigo"
             }
             if s < 0.2 {
@@ -711,6 +716,6 @@ final class SettingsStore: ObservableObject {
             }
         }
         #endif
-        return "green"
+        return "black"
     }
 }

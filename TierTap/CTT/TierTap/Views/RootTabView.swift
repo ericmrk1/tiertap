@@ -275,8 +275,7 @@ struct CommunitySessionsView: View {
                     } label: {
                         HStack(spacing: 6) {
                             if authStore.isSignedIn,
-                               let data = authStore.userProfilePhotoData,
-                               let uiImage = UIImage(data: data) {
+                               let uiImage = authStore.localProfilePhotoImage {
                                 Image(uiImage: uiImage)
                                     .resizable()
                                     .scaledToFill()
@@ -290,7 +289,7 @@ struct CommunitySessionsView: View {
                                 Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
                             }
                             if authStore.isSignedIn {
-                                if authStore.userProfilePhotoData == nil,
+                                if authStore.localProfilePhotoImage == nil,
                                    let emojis = authStore.userProfileEmojis,
                                    !emojis.isEmpty {
                                     Text(emojis)
@@ -451,18 +450,12 @@ struct CommunityAuthSheet: View {
         .onAppear {
             profileDisplayName = authStore.userDisplayName ?? ""
             profileEmojis = authStore.userProfileEmojis ?? ""
-            if let data = authStore.userProfilePhotoData {
-                profilePhoto = UIImage(data: data)
-            }
+            profilePhoto = authStore.localProfilePhotoImage
         }
         .onChange(of: authStore.session?.user.id) { _ in
             profileDisplayName = authStore.userDisplayName ?? ""
             profileEmojis = authStore.userProfileEmojis ?? ""
-            if let data = authStore.userProfilePhotoData {
-                profilePhoto = UIImage(data: data)
-            } else {
-                profilePhoto = nil
-            }
+            profilePhoto = authStore.localProfilePhotoImage
         }
         .onChange(of: profilePhoto) { _ in
             if authStore.isSignedIn {
@@ -550,6 +543,28 @@ struct CommunityAuthSheet: View {
                     .background(Color.white.opacity(0.15))
                     .cornerRadius(12)
                     .foregroundColor(.white)
+                    .submitLabel(.done)
+                    .onSubmit { saveProfile() }
+
+                Button {
+                    saveProfile()
+                } label: {
+                    HStack(spacing: 8) {
+                        if isSavingProfile {
+                            ProgressView()
+                                .tint(.white)
+                        }
+                        Text(isSavingProfile ? "Saving…" : "Save profile")
+                            .font(.subheadline.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.22))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+                .disabled(isSavingProfile)
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -572,16 +587,16 @@ struct CommunityAuthSheet: View {
         profileSaved = false
         isSavingProfile = true
         Task {
-            var photoBase64: String?
-            if let image = profilePhoto,
-               let data = image.jpegData(compressionQuality: 0.8) {
-                photoBase64 = data.base64EncodedString()
-            }
             await authStore.updateProfile(
                 displayName: profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines),
-                emojis: profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines),
-                photoBase64: photoBase64
+                emojis: profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines)
             )
+            if let image = profilePhoto,
+               let data = image.jpegData(compressionQuality: 0.8) {
+                try? authStore.saveProfilePhotoLocally(data)
+            } else {
+                try? authStore.deleteLocalProfilePhoto()
+            }
             await MainActor.run {
                 isSavingProfile = false
                 profileSaved = true
