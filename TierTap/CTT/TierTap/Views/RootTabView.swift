@@ -17,6 +17,7 @@ struct RootTabView: View {
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @State private var selectedTab: MainTab = .sessions
+    @State private var showGASupportFromMoodDownswing = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -52,6 +53,17 @@ struct RootTabView: View {
                 .tag(MainTab.settings)
         }
         .tint(settingsStore.primaryColor)
+        .onReceive(NotificationCenter.default.publisher(for: .sessionMoodDownswingNeedsGASupport)) { _ in
+            showGASupportFromMoodDownswing = true
+        }
+        #if os(iOS)
+        .adaptiveSheet(isPresented: $showGASupportFromMoodDownswing) {
+            GASupportSheet(onDismiss: {
+                showGASupportFromMoodDownswing = false
+            })
+            .environmentObject(settingsStore)
+        }
+        #endif
     }
 }
 

@@ -15,7 +15,6 @@ struct CompleteSessionView: View {
     @State private var showCelebration = false
     @State private var showEmotionPicker = false
     @State private var completedSessionId: UUID?
-    @State private var showGASheet = false
     @State private var privateNotes = ""
     @State private var chipEstimatorImageFilename: String?
     @State private var chipPreviewImage: UIImage?
@@ -301,20 +300,15 @@ struct CompleteSessionView: View {
                     updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
                     store.updateSession(updated)
                     completedSessionId = nil
-                    if store.recentMoodDownswingDetected() {
+                    let downswing = store.recentMoodDownswingDetected()
+                    showEmotionPicker = false
+                    if downswing {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            showGASheet = true
+                            NotificationCenter.default.post(name: .sessionMoodDownswingNeedsGASupport, object: nil)
                         }
                     }
                     dismiss()
                 }
-                .environmentObject(settingsStore)
-            }
-            .adaptiveSheet(isPresented: $showGASheet) {
-                GASupportSheet(onDismiss: {
-                    showGASheet = false
-                    dismiss()
-                })
                 .environmentObject(settingsStore)
             }
             .confirmationDialog(

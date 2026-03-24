@@ -4,7 +4,6 @@ import SwiftUI
 /// Each cell maps to one of the stored SessionMood values.
 struct SessionMoodPickerView: View {
     @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) var dismiss
     let onSelect: (SessionMood) -> Void
 
     private let gridSize = 5
@@ -30,7 +29,6 @@ struct SessionMoodPickerView: View {
                                 let mood = moodAt(row: row, col: col)
                                 Button {
                                     onSelect(mood)
-                                    dismiss()
                                 } label: {
                                     Text(mood.label)
                                         .font(.caption.bold())

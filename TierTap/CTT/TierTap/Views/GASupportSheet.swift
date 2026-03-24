@@ -78,6 +78,11 @@ struct GAWebsite {
     static var url: URL? { URL(string: gaWebsiteURL) }
 }
 
+extension Notification.Name {
+    /// Posted after a session mood is saved when a downswing pattern is detected; `RootTabView` presents `GASupportSheet`.
+    static let sessionMoodDownswingNeedsGASupport = Notification.Name("sessionMoodDownswingNeedsGASupport")
+}
+
 #Preview {
     GASupportSheet()
         .environmentObject(SettingsStore())
