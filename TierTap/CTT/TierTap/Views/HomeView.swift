@@ -12,9 +12,12 @@ private func tapLevelSaveLast(_ level: Int) {
 struct HomeView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @State private var showCheckIn = false
     @State private var showLive = false
     @State private var showBuyInSheet = false
+    @State private var showCompSheet = false
     @State private var showAddPast = false
     @State private var showHistory = false
     @State private var showBankroll = false
@@ -26,6 +29,10 @@ struct HomeView: View {
     /// Quick-add buy-in denominations for the live buy-in sheet.
     private var quickBuyIns: [Int] {
         [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
+    }
+
+    private var quickCompAmounts: [Int] {
+        [5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000]
     }
 
     /// Logo with black pixels made transparent so the gradient shows through.
@@ -63,24 +70,87 @@ struct HomeView: View {
                                 .padding(.horizontal)
                         }
                         if store.liveSession != nil {
+                            HStack(spacing: 12) {
+                                Button { showAddPast = true } label: {
+                                    Label("Add Past Session", systemImage: "clock.arrow.circlepath")
+                                        .frame(maxWidth: .infinity).padding()
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                                }
+                                Button { showHistory = true } label: {
+                                    Label("History", systemImage: "list.bullet.rectangle")
+                                        .frame(maxWidth: .infinity).padding()
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                                }
+                            }
+                            Button { showBankroll = true } label: {
+                                Label("Bankroll", systemImage: "dollarsign.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(16)
+                                    .font(.title3.bold())
+                            }
                             Button { showLive = true } label: {
-                                Label("Resume Live Session", systemImage: "play.circle.fill")
+                                Label("Finish Live Session", systemImage: "play.circle.fill")
                                     .frame(maxWidth: .infinity).padding()
                                     .background(Color.green).foregroundColor(.black)
                                     .cornerRadius(14).font(.headline)
                             }
-                            Button {
-                                showBuyInSheet = true
-                            } label: {
-                                Label("Add Buy-In", systemImage: "plus.circle")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 18)
-                                    .padding(.horizontal)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.green)
-                                    .cornerRadius(16).font(.title3.bold())
+                            HStack(spacing: 12) {
+                                Button {
+                                    showCompSheet = true
+                                } label: {
+                                    Label("Add Comp", systemImage: "gift.fill")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 18)
+                                        .padding(.horizontal)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.green)
+                                        .cornerRadius(16).font(.title3.bold())
+                                }
+                                Button {
+                                    showBuyInSheet = true
+                                } label: {
+                                    Label("Add Buy-In", systemImage: "plus.circle")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 18)
+                                        .padding(.horizontal)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.green)
+                                        .cornerRadius(16).font(.title3.bold())
+                                }
                             }
                         } else {
+                            Button { showBankroll = true } label: {
+                                Label("Bankroll", systemImage: "dollarsign.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(16)
+                                    .font(.title3.bold())
+                            }
+                        }
+                        if store.liveSession == nil {
+                            HStack(spacing: 12) {
+                                Button { showAddPast = true } label: {
+                                    Label("Add Past Session", systemImage: "clock.arrow.circlepath")
+                                        .frame(maxWidth: .infinity).padding()
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                                }
+                                Button { showHistory = true } label: {
+                                    Label("History", systemImage: "list.bullet.rectangle")
+                                        .frame(maxWidth: .infinity).padding()
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                                }
+                            }
+                        }
+                        if store.liveSession == nil {
                             Button { showCheckIn = true } label: {
                                 Label("Check In", systemImage: "plus.circle.fill")
                                     .frame(maxWidth: .infinity)
@@ -89,29 +159,6 @@ struct HomeView: View {
                                     .background(Color.green).foregroundColor(.black)
                                     .cornerRadius(16).font(.title2.bold())
                             }
-                        }
-                        HStack(spacing: 12) {
-                            Button { showAddPast = true } label: {
-                                Label("Add Past Session", systemImage: "clock.arrow.circlepath")
-                                    .frame(maxWidth: .infinity).padding()
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                            }
-                            Button { showHistory = true } label: {
-                                Label("History", systemImage: "list.bullet.rectangle")
-                                    .frame(maxWidth: .infinity).padding()
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                            }
-                        }
-                        Button { showBankroll = true } label: {
-                            Label("Bankroll", systemImage: "dollarsign.circle.fill")
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 20)
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .foregroundColor(.white)
-                                .cornerRadius(16)
-                                .font(.title3.bold())
                         }
                     }
                     .padding(.horizontal).padding(.bottom, 44)
@@ -154,11 +201,34 @@ struct HomeView: View {
             }
         }
         .adaptiveSheet(isPresented: $showCheckIn) { CheckInView().environmentObject(store).environmentObject(settingsStore) }
-        .adaptiveSheet(isPresented: $showLive) { LiveSessionView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showLive) {
+            LiveSessionView()
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+        }
         .adaptiveSheet(isPresented: $showBuyInSheet) {
             BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
                 store.addBuyIn(amount)
             }
+            .environmentObject(settingsStore)
+        }
+        .adaptiveSheet(isPresented: $showCompSheet) {
+            CompQuickAddSheet(
+                existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
+                existingDollarsCreditsCompTotal: store.liveSession?.totalCompDollarsCredits ?? 0,
+                quickAmounts: quickCompAmounts,
+                sessionGame: store.liveSession?.game ?? "",
+                sessionCasino: store.liveSession?.casino ?? "",
+                sessionCasinoLatitude: store.liveSession?.casinoLatitude,
+                sessionCasinoLongitude: store.liveSession?.casinoLongitude
+            ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
+                store.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: foodKind, foodBeverageOtherDescription: otherDesc, photoJPEG: photoJPEG)
+            }
+            .environmentObject(settingsStore)
+            .environmentObject(subscriptionStore)
+            .environmentObject(authStore)
         }
         .adaptiveSheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
         .adaptiveSheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
@@ -181,9 +251,25 @@ struct LiveNowCard: View {
                     Circle().fill(Color.red).frame(width: 8, height: 8)
                     Text("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
                 }
-                Text(session.casino).font(.headline).foregroundColor(.white)
-                Text(session.game).font(.subheadline).foregroundColor(.gray)
-                Text("Buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)").font(.caption).foregroundColor(.white.opacity(0.7))
+                Text(session.casino).font(.subheadline.weight(.semibold)).foregroundColor(.white)
+                Text(session.game).font(.caption).foregroundColor(.gray)
+                Text("Starting tier \(session.startingTierPoints.formatted(.number.grouping(.automatic)))")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.85))
+                if let prog = session.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
+                    Text(prog)
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineLimit(2)
+                }
+                Text("Total buy-in \(settingsStore.currencySymbol)\(session.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.75))
+                if session.totalComp > 0 {
+                    Text("Total comps \(settingsStore.currencySymbol)\(session.totalComp.formatted(.number.grouping(.automatic)))")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.75))
+                }
             }
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 6) {
@@ -223,7 +309,7 @@ struct LiveNowCard: View {
             StrategyOddsSheet(gameName: session.game)
                 .environmentObject(settingsStore)
         }
-        .adaptiveSheet(isPresented: $showPrivateNotes) {
+        .halfScreenSheet(isPresented: $showPrivateNotes) {
             PrivateNotesSheet(
                 notes: Binding(
                     get: { store.liveSession?.privateNotes ?? "" },

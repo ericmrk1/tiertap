@@ -21,6 +21,29 @@ extension View {
     ) -> some View {
         modifier(AdaptiveSheetItemModifier(item: item, onDismiss: onDismiss, content: content))
     }
+
+    /// Presents a sheet at half screen height on both iPhone and iPad (unlike `adaptiveSheet`, which is full-screen on iPad).
+    func halfScreenSheet<Content: View>(
+        isPresented: Binding<Bool>,
+        onDismiss: (() -> Void)? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        modifier(HalfScreenSheetModifier(isPresented: isPresented, onDismiss: onDismiss, sheetContent: content))
+    }
+}
+
+private struct HalfScreenSheetModifier<SheetContent: View>: ViewModifier {
+    @Binding var isPresented: Bool
+    var onDismiss: (() -> Void)?
+    @ViewBuilder let sheetContent: () -> SheetContent
+
+    func body(content: Content) -> some View {
+        content.sheet(isPresented: $isPresented, onDismiss: onDismiss) {
+            sheetContent()
+                .presentationDetents([.fraction(0.5)])
+                .presentationDragIndicator(.visible)
+        }
+    }
 }
 
 private struct AdaptiveSheetModifier<SheetContent: View>: ViewModifier {

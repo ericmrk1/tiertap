@@ -27,6 +27,8 @@ struct CheckInView: View {
     @State private var pokerStartingStackText: String = ""
     @State private var pokerTournamentCostText: String = "0"
     @State private var showCasinoLocationPicker = false
+    @State private var casinoLatitude: Double?
+    @State private var casinoLongitude: Double?
 
     /// Games to show as main grid: favorites only; fallback to pinned if no favorites set.
     private var displayGames: [String] {
@@ -626,7 +628,9 @@ struct CheckInView: View {
                             if store.liveSession != nil { showExistingAlert = true } else { go() }
                         } label: {
                             Text("Let’s F@#$@ Go!")
-                                .frame(maxWidth: .infinity).padding()
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                                .padding(.horizontal, 16)
                                 .background(isValid ? Color.green : Color.gray)
                                 .foregroundColor(isValid ? .black : .white)
                                 .cornerRadius(14).font(.headline)
@@ -650,14 +654,15 @@ struct CheckInView: View {
             }
             .fullScreenCover(isPresented: $showCasinoLocationPicker) {
                 NavigationStack {
-                    CasinoLocationPickerView(selectedCasino: $casino)
+                    CasinoLocationPickerView(selectedCasino: $casino, selectedLatitude: $casinoLatitude, selectedLongitude: $casinoLongitude)
                         .environmentObject(settingsStore)
                 }
             }
             .adaptiveSheet(isPresented: $showBuyInPicker) {
                 BuyInGridSheet(amounts: buyInGridAmounts, selected: $initialBuyIn)
                     .environmentObject(settingsStore)
-                    .presentationDetents([.medium, .large])
+                    .presentationDetents([.fraction(0.7), .large])
+                    .presentationDragIndicator(.visible)
             }
             .onChange(of: pokerSmallBlind) { newValue in
                 if newValue == 5 && pokerBigBlind != 10 {
@@ -679,10 +684,52 @@ struct CheckInView: View {
                 if casino.isEmpty, let recent = store.mostRecentCasino() {
                     casino = recent
                 }
-                // Use default from Settings for initial game category.
                 gameCategory = settingsStore.defaultGameCategory
+                applyLastSavedGameDefaults()
+                applyCasinoHistoryDefaults()
+            }
+            .onChange(of: casino) { _ in
+                applyCasinoHistoryDefaults()
+            }
+            .onChange(of: gameCategory) { _ in
+                applyLastSavedGameDefaults()
             }
         }
+    }
+
+    /// Pre-fills starting tier points and initial buy-in from the most recent session at this
+    /// exact casino name (when that history exists). Skips while typing a new name that does
+    /// not yet match a saved session.
+    private func applyCasinoHistoryDefaults() {
+        guard store.hasSessionHistory(forExactCasino: casino) else { return }
+        if let tier = store.defaultEndingTierPoints(for: casino) {
+            startingTier = "\(tier)"
+        }
+        if let buy = store.defaultInitialBuyIn(for: casino) {
+            initialBuyIn = "\(buy)"
+        }
+    }
+
+    /// Pre-fills table game name or poker structure from the last session of that type.
+    private func applyLastSavedGameDefaults() {
+        if gameCategory == .table {
+            if !settingsStore.lastTableGameName.isEmpty {
+                selectedGame = settingsStore.lastTableGameName
+            }
+            return
+        }
+        guard let d = settingsStore.lastPokerSessionDefaults else { return }
+        pokerGameKind = d.pokerGameKind
+        pokerAllowsRebuy = d.pokerAllowsRebuy
+        pokerAllowsAddOn = d.pokerAllowsAddOn
+        pokerHasFreezeOut = d.pokerHasFreezeOut
+        pokerVariant = d.pokerVariant
+        pokerSmallBlind = d.pokerSmallBlind
+        pokerBigBlind = d.pokerBigBlind
+        pokerAnte = d.pokerAnte
+        pokerLevelMinutesText = d.pokerLevelMinutesText
+        pokerStartingStackText = d.pokerStartingStackText
+        pokerTournamentCostText = d.pokerTournamentCostText
     }
 
     func go() {
@@ -707,7 +754,13 @@ struct CheckInView: View {
         }
 
         guard let tier = Int(startingTier), let buy = Int(initialBuyIn) else { return }
-        store.startSession(game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy)
+        let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
+        store.startSession(
+            game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy,
+            rewardsProgramName: program.isEmpty ? nil : program,
+            casinoLatitude: casinoLatitude,
+            casinoLongitude: casinoLongitude
+        )
         // Persist structured game metadata on the live session.
         let category: SessionGameCategory? = gameCategory
         let kind: SessionPokerGameKind? = (gameCategory == .poker) ? pokerGameKind : nil
@@ -732,6 +785,21 @@ struct CheckInView: View {
             pokerAnte: ante,
             pokerLevelMinutes: levelMinutes,
             pokerStartingStack: startingStack
+        )
+        settingsStore.recordLastCheckInGameSelection(
+            gameCategory: gameCategory,
+            selectedGame: selectedGame,
+            pokerGameKind: pokerGameKind,
+            pokerAllowsRebuy: pokerAllowsRebuy,
+            pokerAllowsAddOn: pokerAllowsAddOn,
+            pokerHasFreezeOut: pokerHasFreezeOut,
+            pokerVariant: pokerVariant,
+            pokerSmallBlind: pokerSmallBlind,
+            pokerBigBlind: pokerBigBlind,
+            pokerAnte: pokerAnte,
+            pokerLevelMinutesText: pokerLevelMinutesText,
+            pokerStartingStackText: pokerStartingStackText,
+            pokerTournamentCostText: pokerTournamentCostText
         )
         if settingsStore.enableCasinoFeedback {
             CelebrationPlayer.shared.playQuickChime()

@@ -78,6 +78,7 @@ struct CommunitySessionsView: View {
     @State private var mapSessions: [TableGamePostRow] = []
     @State private var hasMoreFeedPages = false
     @State private var locationLookup: [String: CLLocationCoordinate2D] = [:]
+    @State private var isPreloadingLocationLookup = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -211,6 +212,7 @@ struct CommunitySessionsView: View {
                                         mapSessions = [row]
                                         showMapSheet = true
                                     })
+                                        .environmentObject(settingsStore)
                                         .padding(.horizontal)
                                 }
 
@@ -394,7 +396,8 @@ struct CommunitySessionsView: View {
             .adaptiveSheet(isPresented: $showMapSheet) {
                 CommunityFeedMapSheet(
                     sessions: mapSessions,
-                    locationLookup: locationLookup
+                    locationLookup: locationLookup,
+                    isLocationLookupLoading: isPreloadingLocationLookup
                 )
                 .environmentObject(settingsStore)
             }
@@ -1080,6 +1083,7 @@ extension CommunitySessionsView {
 
         guard !uniqueNames.isEmpty else { return }
 
+        await MainActor.run { isPreloadingLocationLookup = true }
         do {
             let data = try await client.database
                 .from(SupabaseTables.casinoLocations)
@@ -1114,8 +1118,10 @@ extension CommunitySessionsView {
                 for (name, coord) in newLookup {
                     locationLookup[name] = coord
                 }
+                isPreloadingLocationLookup = false
             }
         } catch {
+            await MainActor.run { isPreloadingLocationLookup = false }
             // Silent failure; maps will simply have fewer or no pins.
         }
     }
@@ -1126,8 +1132,14 @@ struct CommunityFeedRow: View {
     let item: TableGamePostRow
     let onShowLocation: ((TableGamePostRow) -> Void)?
 
+    @EnvironmentObject private var settingsStore: SettingsStore
+
     private var metrics: TableGamePostMetrics? {
         item.metrics
+    }
+
+    private var currencySymbolForMetrics: String {
+        metrics?.currency_symbol ?? settingsStore.currencySymbol
     }
 
     private var dateString: String {
@@ -1197,44 +1209,59 @@ struct CommunityFeedRow: View {
         let metrics = self.metrics
 
         VStack(alignment: .leading, spacing: 10) {
-            // Top row: casino (upper left) with location link, game (upper right)
-            HStack {
-                HStack(spacing: 6) {
-                    Text(casinoName)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                    if let onShowLocation = onShowLocation {
-                        Button {
-                            onShowLocation(item)
-                        } label: {
-                            Image(systemName: "mappin.and.ellipse")
-                                .font(.caption)
+            // Left: casino + note (stays high). Right: game + net + tier/hr (does not push the note down).
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 6) {
+                        Text(casinoName)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .lineLimit(2)
+                        if let onShowLocation = onShowLocation {
+                            Button {
+                                onShowLocation(item)
+                            } label: {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundColor(.green)
+                            .accessibilityLabel("Show \(casinoName) on map")
                         }
-                        .buttonStyle(.plain)
-                        .foregroundColor(.green)
-                        .accessibilityLabel("Show \(casinoName) on map")
+                    }
+
+                    if let comment = item.session_details?.comment, !comment.isEmpty {
+                        Text(comment)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.85))
+                            .italic()
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(3)
                     }
                 }
-                Spacer()
-                Text(gameName)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white.opacity(0.95))
-                    .lineLimit(1)
-            }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-            if let comment = item.session_details?.comment, !comment.isEmpty {
-                Text(comment)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.85))
-                    .italic()
-                    .lineLimit(1)
-            }
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text(gameName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.95))
+                        .multilineTextAlignment(.trailing)
+                        .lineLimit(2)
 
-            // Bottom area: pts metrics + Rating Diff on same line, date slightly below
-            VStack(alignment: .leading, spacing: 6) {
-                // First line: pts/hr (left) and Rating Diff (right)
-                HStack(alignment: .center) {
+                    if let wl = metrics?.net_win_loss {
+                        let sym = currencySymbolForMetrics
+                        Text(wl >= 0 ? "Net +\(sym)\(wl)" : "Net -\(sym)\(abs(wl))")
+                            .font(.caption.bold())
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(wl >= 0 ? Color.green.opacity(0.75) : Color.red.opacity(0.75))
+                            )
+                            .accessibilityLabel("Net result \(wl >= 0 ? "plus" : "minus") \(abs(wl))")
+                    }
+
                     if let tiers = metrics?.tiers_per_hour {
                         Text(String(format: "%.1f pts/hr", tiers))
                             .font(.caption.bold())
@@ -1246,7 +1273,13 @@ struct CommunityFeedRow: View {
                                     .fill(tiersPerHourColor)
                             )
                     }
+                }
+                .fixedSize(horizontal: true, vertical: false)
+            }
 
+            // Rating Diff; tier delta + date below
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .center) {
                     Spacer()
 
                     if let diff = betDifferentialPercent {
@@ -1531,6 +1564,7 @@ struct CommunityMapLocation: Identifiable {
 struct CommunityFeedMapSheet: View {
     let sessions: [TableGamePostRow]
     let locationLookup: [String: CLLocationCoordinate2D]
+    let isLocationLookupLoading: Bool
 
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
@@ -1541,17 +1575,53 @@ struct CommunityFeedMapSheet: View {
         span: MKCoordinateSpan(latitudeDelta: 40, longitudeDelta: 40)
     )
 
+    private var sessionCasinoNames: Set<String> {
+        Set(
+            sessions.compactMap { row in
+                (row.location ?? row.session_details?.casino)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            .filter { !$0.isEmpty }
+        )
+    }
+
+    /// Drives refresh when async `locationLookup` fills in after the sheet appears, and when `sessions` changes.
+    private var mapRefreshKey: String {
+        let sorted = Array(sessionCasinoNames).sorted().joined(separator: "|")
+        return "\(locationLookup.count)-\(sorted)-\(isLocationLookupLoading)"
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
 
                 if locations.isEmpty {
-                    Text("No mapped casino locations for this feed yet.")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.9))
-                        .multilineTextAlignment(.center)
-                        .padding()
+                    Group {
+                        if isLocationLookupLoading && !sessionCasinoNames.isEmpty {
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .tint(.white)
+                                Text("Loading casino locations…")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding()
+                        } else if sessionCasinoNames.isEmpty {
+                            Text("No casino locations in these sessions.")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .padding()
+                        } else {
+                            Text("No mapped casino locations for this feed yet.")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                                .padding()
+                        }
+                    }
                 } else {
                     Map(coordinateRegion: $region, annotationItems: locations) { loc in
                         MapAnnotation(coordinate: loc.coordinate) {
@@ -1584,7 +1654,7 @@ struct CommunityFeedMapSheet: View {
                     .foregroundColor(.green)
                 }
             }
-            .onAppear {
+            .task(id: mapRefreshKey) {
                 populateLocationsFromLookup()
             }
         }
@@ -1659,6 +1729,10 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var isPublishing = false
     @State private var errorMessage: String?
     @State private var postComment: String = ""
+    /// When on, `tiers_per_hour` is stored in metrics and shown on the feed.
+    @State private var publishTierPerHour = true
+    /// When on, buy-in, cash-out, and net win/loss are stored in metrics and shown on the feed.
+    @State private var publishWinLoss = false
 
     private var allSelected: Bool {
         !sessions.isEmpty && selectedSessionIDs.count == sessions.count
@@ -1728,6 +1802,26 @@ struct CommunitySessionPublishSelectionView: View {
                                     }
                                 }
                                 .listRowBackground(Color(.systemGray6).opacity(0.15))
+                        }
+
+                        Section(
+                            header: Text("Share details").foregroundColor(.gray),
+                            footer: Text("Tier/hour and wins/losses are optional. Wins/losses use each session’s buy-ins and cash-out.")
+                                .foregroundColor(.gray.opacity(0.8))
+                        ) {
+                            Toggle(isOn: $publishTierPerHour) {
+                                Text("Tier / hour")
+                                    .foregroundColor(.white)
+                            }
+                            .tint(.green)
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+
+                            Toggle(isOn: $publishWinLoss) {
+                                Text("Publish wins / losses")
+                                    .foregroundColor(.white)
+                            }
+                            .tint(.green)
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
 
                         Section(header: Text("Choose sessions to publish").foregroundColor(.gray)) {
@@ -1827,7 +1921,9 @@ struct CommunitySessionPublishSelectionView: View {
                 authStore: authStore,
                 currencyCode: settingsStore.currencyCode,
                 currencySymbol: settingsStore.currencySymbol,
-                comment: commentToPublish
+                comment: commentToPublish,
+                publishTierPerHour: publishTierPerHour,
+                publishWinLoss: publishWinLoss
             )
             await MainActor.run {
                 isPublishing = false

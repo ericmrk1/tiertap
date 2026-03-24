@@ -29,12 +29,23 @@ struct WatchLiveView: View {
                     .font(.caption2)
                     .foregroundColor(.secondary)
 
+                Text("Start tier \(s.startingTierPoints.formatted(.number.grouping(.automatic)))")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                if let prog = s.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
+                    Text(prog)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                }
+
                 Text(Session.durationString(elapsed))
-                    .font(.system(.title2, design: .monospaced))
+                    .font(.system(.title3, design: .monospaced))
                     .foregroundColor(.green)
 
-                Text("In: $\(s.totalBuyIn)")
-                    .font(.caption)
+                Text("Total buy-in $\(s.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                    .font(.caption2)
 
                 Text("Rebuy").font(.caption2)
                 HStack(spacing: 6) {

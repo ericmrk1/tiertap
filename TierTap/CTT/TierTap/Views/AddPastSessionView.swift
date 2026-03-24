@@ -79,7 +79,7 @@ struct AddPastSessionView: View {
                     .presentationDetents([.medium, .large])
             }
             .adaptiveSheet(isPresented: $showCasinoPicker) {
-                CasinoLocationPickerView(selectedCasino: $casino)
+                CasinoLocationPickerView(selectedCasino: $casino, selectedLatitude: .constant(nil), selectedLongitude: .constant(nil))
                     .environmentObject(settingsStore)
                     .presentationDetents([.medium, .large])
             }
@@ -94,7 +94,34 @@ struct AddPastSessionView: View {
                     avgBetRated = "\(r)"
                 }
             }
+            .onAppear {
+                gameCategory = settingsStore.defaultGameCategory
+                applyLastSavedGameDefaults()
+            }
+            .onChange(of: gameCategory) { _ in
+                applyLastSavedGameDefaults()
+            }
         }
+    }
+
+    private func applyLastSavedGameDefaults() {
+        if gameCategory == .table {
+            if !settingsStore.lastTableGameName.isEmpty {
+                selectedGame = settingsStore.lastTableGameName
+            }
+            return
+        }
+        guard let d = settingsStore.lastPokerSessionDefaults else { return }
+        pokerGameKind = d.pokerGameKind
+        pokerAllowsRebuy = d.pokerAllowsRebuy
+        pokerAllowsAddOn = d.pokerAllowsAddOn
+        pokerHasFreeOut = d.pokerHasFreezeOut
+        pokerVariant = d.pokerVariant
+        pokerSmallBlindText = d.pokerSmallBlind > 0 ? "\(d.pokerSmallBlind)" : ""
+        pokerBigBlindText = d.pokerBigBlind > 0 ? "\(d.pokerBigBlind)" : ""
+        pokerAnteText = d.pokerAnte > 0 ? "\(d.pokerAnte)" : ""
+        pokerLevelMinutesText = d.pokerLevelMinutesText
+        pokerStartingStackText = d.pokerStartingStackText
     }
 
     @ViewBuilder private var gameSection: some View {
@@ -419,7 +446,8 @@ struct AddPastSessionView: View {
         Button { save() } label: {
             Text("Save Session")
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 32)
                 .background(isValid ? Color.green : Color.gray)
                 .foregroundColor(isValid ? .black : .white)
                 .cornerRadius(14)
@@ -505,6 +533,7 @@ struct AddPastSessionView: View {
             pokerLevelMinutes: levelMinutes,
             pokerStartingStack: startingStack
         )
+        settingsStore.recordLastPlayedGameChoices(from: session)
         store.addPastSession(session)
         dismiss()
     }

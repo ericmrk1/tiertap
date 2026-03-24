@@ -1,8 +1,6 @@
 Already partly there (so the “gap” is smaller than it sounds)
 A (programs): Loyalty program is inferred from casino name keywords for charts like “Tier Points by Loyalty Program,” not stored per session as program + property + city.
-D (location): CasinoLocationPickerView already does MapKit + nearby + address/ZIP search; favorites exist; games have favorite sections in pickers.
-G (mood): SessionMood is already a multi-step check-in (richer than Great/Fine/Off/Tilted).
-E (share controls): Analytics image sharing has toggles (including win/loss); text sharing supports includeWinLoss.
+AddE (share controls): Analytics image sharing has toggles (including win/loss); text sharing supports includeWinLoss.
 J (CSV): Session CSV export is already in Settings.
 Easy wins (not implemented / incomplete, low “qualifications” bar)
 B) Trips + trip dashboard (local-first)

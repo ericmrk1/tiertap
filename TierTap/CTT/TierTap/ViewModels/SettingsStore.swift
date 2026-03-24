@@ -28,6 +28,25 @@ private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
 private let keySoundProfile = "ctt_sound_profile"
 private let keySubscriptionOverrideCode = "ctt_subscription_override_code"
 private let keyDefaultGameCategory = "ctt_default_game_category"
+private let keyLastAddOnBuyIn = "ctt_last_add_on_buy_in"
+private let keyLastFoodBeverageCompKind = "ctt_last_food_beverage_comp_kind"
+private let keyLastTableGame = "ctt_last_table_game"
+private let keyLastPokerDefaults = "ctt_last_poker_defaults"
+
+/// Saved poker choices from the last completed or started session; used to pre-fill check-in.
+struct LastPokerSessionDefaults: Codable, Equatable {
+    var pokerGameKind: SessionPokerGameKind
+    var pokerAllowsRebuy: Bool
+    var pokerAllowsAddOn: Bool
+    var pokerHasFreezeOut: Bool
+    var pokerVariant: String
+    var pokerSmallBlind: Int
+    var pokerBigBlind: Int
+    var pokerAnte: Int
+    var pokerLevelMinutesText: String
+    var pokerStartingStackText: String
+    var pokerTournamentCostText: String
+}
 
 struct ThemePreset: Identifiable, Codable, Equatable {
     let id: UUID
@@ -215,6 +234,44 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(defaultGameCategory.rawValue, forKey: keyDefaultGameCategory) }
     }
 
+    /// Last amount used in the live-session Add Buy-In flow (e.g. tournament add-on). 0 = none saved.
+    @Published var lastAddOnBuyInAmount: Int {
+        didSet {
+            if lastAddOnBuyInAmount > 0 {
+                UserDefaults.standard.set(lastAddOnBuyInAmount, forKey: keyLastAddOnBuyIn)
+            } else {
+                UserDefaults.standard.removeObject(forKey: keyLastAddOnBuyIn)
+            }
+        }
+    }
+
+    /// Last food & beverage category chosen in Add Comp; pre-fills the next entry.
+    @Published var lastFoodBeverageCompKind: FoodBeverageKind {
+        didSet { UserDefaults.standard.set(lastFoodBeverageCompKind.rawValue, forKey: keyLastFoodBeverageCompKind) }
+    }
+
+    /// Last table game name chosen at check-in (or from a saved session). Empty = no saved default.
+    @Published var lastTableGameName: String {
+        didSet {
+            if lastTableGameName.isEmpty {
+                UserDefaults.standard.removeObject(forKey: keyLastTableGame)
+            } else {
+                UserDefaults.standard.set(lastTableGameName, forKey: keyLastTableGame)
+            }
+        }
+    }
+
+    /// Last poker structure/variant from a completed or in-progress session; used to pre-fill check-in.
+    @Published var lastPokerSessionDefaults: LastPokerSessionDefaults? {
+        didSet {
+            if let d = lastPokerSessionDefaults, let data = try? JSONEncoder().encode(d) {
+                UserDefaults.standard.set(data, forKey: keyLastPokerDefaults)
+            } else {
+                UserDefaults.standard.removeObject(forKey: keyLastPokerDefaults)
+            }
+        }
+    }
+
     /// Optional shared location filter used across History/Analytics.
     @Published var selectedLocationFilter: String? {
         didSet {
@@ -383,6 +440,21 @@ final class SettingsStore: ObservableObject {
         } else {
             self.defaultGameCategory = .table
         }
+        let storedAddOn = UserDefaults.standard.integer(forKey: keyLastAddOnBuyIn)
+        self.lastAddOnBuyInAmount = storedAddOn > 0 ? storedAddOn : 0
+        if let raw = UserDefaults.standard.string(forKey: keyLastFoodBeverageCompKind),
+           let fb = FoodBeverageKind(rawValue: raw) {
+            self.lastFoodBeverageCompKind = fb
+        } else {
+            self.lastFoodBeverageCompKind = .meal
+        }
+        self.lastTableGameName = UserDefaults.standard.string(forKey: keyLastTableGame) ?? ""
+        if let data = UserDefaults.standard.data(forKey: keyLastPokerDefaults),
+           let decoded = try? JSONDecoder().decode(LastPokerSessionDefaults.self, from: data) {
+            self.lastPokerSessionDefaults = decoded
+        } else {
+            self.lastPokerSessionDefaults = nil
+        }
         self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
         self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
         self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)
@@ -502,6 +574,71 @@ final class SettingsStore: ObservableObject {
         let event = BankrollResetEvent(date: Date(), value: newValue)
         BankrollDatabase.shared.insertReset(date: event.date, value: event.value)
         bankrollResets = BankrollDatabase.shared.fetchResets()
+    }
+
+    // MARK: - Last game defaults
+
+    /// Updates saved table or poker defaults from a persisted session (e.g. close-out or add past session).
+    func recordLastPlayedGameChoices(from session: Session) {
+        let cat = session.gameCategory ?? .table
+        if cat == .poker {
+            let prevCost = lastPokerSessionDefaults?.pokerTournamentCostText ?? "0"
+            lastPokerSessionDefaults = LastPokerSessionDefaults(
+                pokerGameKind: session.pokerGameKind ?? .cash,
+                pokerAllowsRebuy: session.pokerAllowsRebuy ?? false,
+                pokerAllowsAddOn: session.pokerAllowsAddOn ?? false,
+                pokerHasFreezeOut: session.pokerHasFreeOut ?? false,
+                pokerVariant: session.pokerVariant ?? "No Limit Texas Hold’em",
+                pokerSmallBlind: session.pokerSmallBlind ?? 0,
+                pokerBigBlind: session.pokerBigBlind ?? 0,
+                pokerAnte: session.pokerAnte ?? 0,
+                pokerLevelMinutesText: session.pokerLevelMinutes.map { String($0) } ?? "",
+                pokerStartingStackText: session.pokerStartingStack.map { String($0) } ?? "",
+                pokerTournamentCostText: prevCost
+            )
+        } else {
+            let isPokerSession = session.gameCategory == .poker
+                || session.pokerGameKind != nil
+                || session.pokerVariant != nil
+            if !isPokerSession && !session.game.isEmpty {
+                lastTableGameName = session.game
+            }
+        }
+    }
+
+    /// Persists the full check-in selection, including fields not stored on `Session` (e.g. tournament cost).
+    func recordLastCheckInGameSelection(
+        gameCategory: SessionGameCategory,
+        selectedGame: String,
+        pokerGameKind: SessionPokerGameKind,
+        pokerAllowsRebuy: Bool,
+        pokerAllowsAddOn: Bool,
+        pokerHasFreezeOut: Bool,
+        pokerVariant: String,
+        pokerSmallBlind: Int,
+        pokerBigBlind: Int,
+        pokerAnte: Int,
+        pokerLevelMinutesText: String,
+        pokerStartingStackText: String,
+        pokerTournamentCostText: String
+    ) {
+        if gameCategory == .poker {
+            lastPokerSessionDefaults = LastPokerSessionDefaults(
+                pokerGameKind: pokerGameKind,
+                pokerAllowsRebuy: pokerAllowsRebuy,
+                pokerAllowsAddOn: pokerAllowsAddOn,
+                pokerHasFreezeOut: pokerHasFreezeOut,
+                pokerVariant: pokerVariant,
+                pokerSmallBlind: pokerSmallBlind,
+                pokerBigBlind: pokerBigBlind,
+                pokerAnte: pokerAnte,
+                pokerLevelMinutesText: pokerLevelMinutesText,
+                pokerStartingStackText: pokerStartingStackText,
+                pokerTournamentCostText: pokerTournamentCostText
+            )
+        } else if !selectedGame.isEmpty {
+            lastTableGameName = selectedGame
+        }
     }
 
     // MARK: - Derived helpers

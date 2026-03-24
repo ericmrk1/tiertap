@@ -101,6 +101,29 @@ struct SessionDetailView: View {
                                           value: "\(settingsStore.currencySymbol)\(ev.amount)")
                             }
                             DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(session.totalBuyIn)", bold: true)
+                            if !session.compEvents.isEmpty {
+                                ForEach(session.compEvents) { ev in
+                                    HStack(alignment: .top, spacing: 10) {
+                                        CompEventPhotoThumbnail(compEventID: ev.id, side: 52)
+                                        DetailRow(
+                                            label: {
+                                                if let fbLine = ev.foodBeverageKindDisplayLabel {
+                                                    return "\(ev.kind.title) · \(fbLine) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))"
+                                                }
+                                                return "\(ev.kind.title) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))"
+                                            }(),
+                                            value: {
+                                                var v = "\(settingsStore.currencySymbol)\(ev.amount)"
+                                                if let d = ev.details, !d.isEmpty {
+                                                    v += " — \(d)"
+                                                }
+                                                return v
+                                            }()
+                                        )
+                                    }
+                                }
+                                DetailRow(label: "Total Comps", value: "\(settingsStore.currencySymbol)\(session.totalComp)", bold: true)
+                            }
                             if let co = session.cashOut {
                                 DetailRow(label: "Cash Out", value: "\(settingsStore.currencySymbol)\(co)", bold: true)
                             }

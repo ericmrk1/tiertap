@@ -26,12 +26,16 @@ struct CommunityPublisher {
     /// Returns the number of rows successfully sent.
     /// `currencyCode` and `currencySymbol` are saved into the metrics JSON so the feed can render amounts correctly.
     /// Optional `comment` is stored in each post's session_details JSON and shown in the feed (one line).
+    /// When `publishTierPerHour` is true, `tiers_per_hour` is included in metrics; otherwise it is omitted.
+    /// When `publishWinLoss` is true, buy-in, cash-out, and net win/loss are included in metrics.
     static func publishSessions(
         _ sessions: [Session],
         authStore: AuthStore,
         currencyCode: String,
         currencySymbol: String,
-        comment: String? = nil
+        comment: String? = nil,
+        publishTierPerHour: Bool = true,
+        publishWinLoss: Bool = false
     ) async throws -> Int {
         guard SupabaseConfig.isConfigured else {
             throw CommunityPublisherError.supabaseNotConfigured
@@ -69,11 +73,14 @@ struct CommunityPublisher {
                 duration_seconds: Int(s.duration),
                 starting_tier_points: s.startingTierPoints,
                 ending_tier_points: s.endingTierPoints,
-                tiers_per_hour: s.tiersPerHour,
+                tiers_per_hour: publishTierPerHour ? s.tiersPerHour : nil,
                 avg_bet_actual: s.avgBetActual,
                 avg_bet_rated: s.avgBetRated,
                 currency_code: currencyCode,
-                currency_symbol: currencySymbol
+                currency_symbol: currencySymbol,
+                total_buy_in: publishWinLoss ? s.totalBuyIn : nil,
+                cash_out: publishWinLoss ? s.cashOut : nil,
+                net_win_loss: publishWinLoss ? s.winLoss : nil
             )
 
             return TableGamePostPayload(
@@ -124,11 +131,14 @@ struct TableGamePostMetrics: Codable {
     let avg_bet_rated: Int?
     let currency_code: String?
     let currency_symbol: String?
+    /// Present when the poster opted in to sharing win/loss for this post.
+    let total_buy_in: Int?
+    let cash_out: Int?
+    let net_win_loss: Int?
 }
 
 /// JSON body stored in the `metrics` column when publishing sessions.
-/// This intentionally omits `total_buy_in` and `cash_out` so that win/loss amounts
-/// are not saved in the metrics JSON for shared sessions.
+/// Buy-in, cash-out, and net win/loss are only included when the user enables “Publish wins / losses”.
 struct TableGamePostMetricsPayload: Encodable {
     let duration_seconds: Int?
     let starting_tier_points: Int
@@ -138,6 +148,9 @@ struct TableGamePostMetricsPayload: Encodable {
     let avg_bet_rated: Int?
     let currency_code: String?
     let currency_symbol: String?
+    let total_buy_in: Int?
+    let cash_out: Int?
+    let net_win_loss: Int?
 }
 
 /// Decodable row type for reading from the `TableGamePosts` table.

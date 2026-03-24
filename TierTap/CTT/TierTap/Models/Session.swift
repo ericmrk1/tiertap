@@ -46,6 +46,114 @@ struct BuyInEvent: Identifiable, Codable, Hashable {
     var timestamp: Date
 }
 
+/// Category of complimentary value (for logging; does not affect win/loss math).
+enum CompKind: String, Codable, CaseIterable {
+    case dollarsCredits
+    case foodBeverage
+
+    var title: String {
+        switch self {
+        case .dollarsCredits: return "Dollars / credits"
+        case .foodBeverage: return "Food & beverage"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .dollarsCredits: return "Free play, slot credit, match play…"
+        case .foodBeverage: return "Meals, drinks, room dining…"
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .dollarsCredits: return "dollarsign.circle.fill"
+        case .foodBeverage: return "fork.knife"
+        }
+    }
+}
+
+/// Food & beverage comp subtype (only used when `CompKind` is `.foodBeverage`).
+enum FoodBeverageKind: String, Codable, CaseIterable {
+    case meal
+    case drinks
+    case coffeeSnack
+    case roomService
+    case other
+
+    var label: String {
+        switch self {
+        case .meal: return "Meal"
+        case .drinks: return "Drinks / bar"
+        case .coffeeSnack: return "Coffee / snack"
+        case .roomService: return "Room service"
+        case .other: return "Other"
+        }
+    }
+}
+
+/// Complimentary value received during a session (meals, rooms, free play, etc.).
+struct CompEvent: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var amount: Int
+    var timestamp: Date
+    var kind: CompKind
+    /// Optional note (what you received); stored locally.
+    var details: String?
+    /// Set for food & beverage comps only.
+    var foodBeverageKind: FoodBeverageKind?
+    /// Custom label when `foodBeverageKind` is `.other` (e.g. "buffet", "show tickets").
+    var foodBeverageOtherDescription: String?
+
+    init(id: UUID = UUID(), amount: Int, timestamp: Date, kind: CompKind = .dollarsCredits, details: String? = nil, foodBeverageKind: FoodBeverageKind? = nil, foodBeverageOtherDescription: String? = nil) {
+        self.id = id
+        self.amount = amount
+        self.timestamp = timestamp
+        self.kind = kind
+        self.details = details
+        self.foodBeverageKind = foodBeverageKind
+        self.foodBeverageOtherDescription = foodBeverageOtherDescription
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, amount, timestamp, kind, details, foodBeverageKind, foodBeverageOtherDescription
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        amount = try c.decode(Int.self, forKey: .amount)
+        timestamp = try c.decode(Date.self, forKey: .timestamp)
+        kind = try c.decodeIfPresent(CompKind.self, forKey: .kind) ?? .dollarsCredits
+        details = try c.decodeIfPresent(String.self, forKey: .details)
+        foodBeverageKind = try c.decodeIfPresent(FoodBeverageKind.self, forKey: .foodBeverageKind)
+        foodBeverageOtherDescription = try c.decodeIfPresent(String.self, forKey: .foodBeverageOtherDescription)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(amount, forKey: .amount)
+        try c.encode(timestamp, forKey: .timestamp)
+        try c.encode(kind, forKey: .kind)
+        try c.encodeIfPresent(details, forKey: .details)
+        try c.encodeIfPresent(foodBeverageKind, forKey: .foodBeverageKind)
+        try c.encodeIfPresent(foodBeverageOtherDescription, forKey: .foodBeverageOtherDescription)
+    }
+}
+
+extension CompEvent {
+    /// Label for food & beverage subtype in lists (custom text when kind is `.other`).
+    var foodBeverageKindDisplayLabel: String? {
+        guard let fb = foodBeverageKind else { return nil }
+        if fb == .other {
+            let o = foodBeverageOtherDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return o.isEmpty ? fb.label : "Other · \(o)"
+        }
+        return fb.label
+    }
+}
+
 enum SessionGameCategory: String, Codable {
     case table
     case poker
@@ -60,11 +168,16 @@ struct Session: Identifiable, Codable, Equatable {
     var id = UUID()
     var game: String
     var casino: String
+    /// WGS84 latitude when the user picked a location from the map at check-in; optional.
+    var casinoLatitude: Double?
+    /// WGS84 longitude when the user picked a location from the map at check-in; optional.
+    var casinoLongitude: Double?
     var startTime: Date
     var endTime: Date?
     var startingTierPoints: Int
     var endingTierPoints: Int?
     var buyInEvents: [BuyInEvent] = []
+    var compEvents: [CompEvent] = []
     var cashOut: Int?
     var avgBetActual: Int?
     var avgBetRated: Int?
@@ -73,6 +186,8 @@ struct Session: Identifiable, Codable, Equatable {
     var sessionMood: SessionMood?
     /// Private notes; stored locally only, never shared to community/database.
     var privateNotes: String?
+    /// Loyalty program name chosen at check-in (e.g. MGM Rewards), if any.
+    var rewardsProgramName: String?
     /// Optional filename for a locally stored chip estimator photo associated with this session.
     var chipEstimatorImageFilename: String?
 
@@ -96,8 +211,8 @@ struct Session: Identifiable, Codable, Equatable {
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
 
     enum CodingKeys: String, CodingKey {
-        case id, game, casino, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes
+        case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
+        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName
         case chipEstimatorImageFilename
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
@@ -108,11 +223,14 @@ struct Session: Identifiable, Codable, Equatable {
         id = try c.decode(UUID.self, forKey: .id)
         game = try c.decode(String.self, forKey: .game)
         casino = try c.decode(String.self, forKey: .casino)
+        casinoLatitude = try c.decodeIfPresent(Double.self, forKey: .casinoLatitude)
+        casinoLongitude = try c.decodeIfPresent(Double.self, forKey: .casinoLongitude)
         startTime = try c.decode(Date.self, forKey: .startTime)
         endTime = try c.decodeIfPresent(Date.self, forKey: .endTime)
         startingTierPoints = try c.decode(Int.self, forKey: .startingTierPoints)
         endingTierPoints = try c.decodeIfPresent(Int.self, forKey: .endingTierPoints)
         buyInEvents = try c.decodeIfPresent([BuyInEvent].self, forKey: .buyInEvents) ?? []
+        compEvents = try c.decodeIfPresent([CompEvent].self, forKey: .compEvents) ?? []
         cashOut = try c.decodeIfPresent(Int.self, forKey: .cashOut)
         avgBetActual = try c.decodeIfPresent(Int.self, forKey: .avgBetActual)
         avgBetRated = try c.decodeIfPresent(Int.self, forKey: .avgBetRated)
@@ -120,6 +238,7 @@ struct Session: Identifiable, Codable, Equatable {
         status = try c.decodeIfPresent(SessionStatus.self, forKey: .status) ?? .complete
         sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
         privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
+        rewardsProgramName = try c.decodeIfPresent(String.self, forKey: .rewardsProgramName)
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
         gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
         pokerGameKind = try c.decodeIfPresent(SessionPokerGameKind.self, forKey: .pokerGameKind)
@@ -134,10 +253,13 @@ struct Session: Identifiable, Codable, Equatable {
         pokerStartingStack = try c.decodeIfPresent(Int.self, forKey: .pokerStartingStack)
     }
 
-    init(id: UUID = UUID(), game: String, casino: String, startTime: Date, endTime: Date? = nil,
+    init(id: UUID = UUID(), game: String, casino: String, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil,
+         startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
+         compEvents: [CompEvent] = [],
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
          status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
+         rewardsProgramName: String? = nil,
          chipEstimatorImageFilename: String? = nil,
          gameCategory: SessionGameCategory? = nil,
          pokerGameKind: SessionPokerGameKind? = nil,
@@ -153,11 +275,14 @@ struct Session: Identifiable, Codable, Equatable {
         self.id = id
         self.game = game
         self.casino = casino
+        self.casinoLatitude = casinoLatitude
+        self.casinoLongitude = casinoLongitude
         self.startTime = startTime
         self.endTime = endTime
         self.startingTierPoints = startingTierPoints
         self.endingTierPoints = endingTierPoints
         self.buyInEvents = buyInEvents
+        self.compEvents = compEvents
         self.cashOut = cashOut
         self.avgBetActual = avgBetActual
         self.avgBetRated = avgBetRated
@@ -165,6 +290,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.status = status
         self.sessionMood = sessionMood
         self.privateNotes = privateNotes
+        self.rewardsProgramName = rewardsProgramName
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
         self.gameCategory = gameCategory
         self.pokerGameKind = pokerGameKind
@@ -184,11 +310,14 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encode(id, forKey: .id)
         try c.encode(game, forKey: .game)
         try c.encode(casino, forKey: .casino)
+        try c.encodeIfPresent(casinoLatitude, forKey: .casinoLatitude)
+        try c.encodeIfPresent(casinoLongitude, forKey: .casinoLongitude)
         try c.encode(startTime, forKey: .startTime)
         try c.encodeIfPresent(endTime, forKey: .endTime)
         try c.encode(startingTierPoints, forKey: .startingTierPoints)
         try c.encodeIfPresent(endingTierPoints, forKey: .endingTierPoints)
         try c.encode(buyInEvents, forKey: .buyInEvents)
+        try c.encode(compEvents, forKey: .compEvents)
         try c.encodeIfPresent(cashOut, forKey: .cashOut)
         try c.encodeIfPresent(avgBetActual, forKey: .avgBetActual)
         try c.encodeIfPresent(avgBetRated, forKey: .avgBetRated)
@@ -196,6 +325,7 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encode(status, forKey: .status)
         try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
         try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
+        try c.encodeIfPresent(rewardsProgramName, forKey: .rewardsProgramName)
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
         try c.encodeIfPresent(gameCategory, forKey: .gameCategory)
         try c.encodeIfPresent(pokerGameKind, forKey: .pokerGameKind)
@@ -211,6 +341,13 @@ struct Session: Identifiable, Codable, Equatable {
     }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
+
+    var totalComp: Int { compEvents.reduce(0) { $0 + $1.amount } }
+
+    /// Sum of comps logged as dollars / credits (excludes food & beverage).
+    var totalCompDollarsCredits: Int {
+        compEvents.filter { $0.kind == .dollarsCredits }.reduce(0) { $0 + $1.amount }
+    }
 
     var duration: TimeInterval {
         (endTime ?? Date()).timeIntervalSince(startTime)

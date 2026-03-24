@@ -3,9 +3,12 @@ import SwiftUI
 struct LiveSessionView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
     @State private var elapsed: TimeInterval = 0
     @State private var showBuyInSheet = false
+    @State private var showCompSheet = false
     @State private var showCloseout = false
     @State private var showStrategyOdds = false
     @State private var showPrivateNotes = false
@@ -27,6 +30,10 @@ struct LiveSessionView: View {
     /// Quick-add buy-in denominations for the live buy-in sheet.
     private var quickBuyIns: [Int] {
         [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
+    }
+
+    private var quickCompAmounts: [Int] {
+        [5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000]
     }
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
@@ -100,17 +107,79 @@ struct LiveSessionView: View {
                                             .font(.caption).foregroundColor(.gray)
                                     }
                                 }
-                                Button {
-                                    showBuyInSheet = true
-                                } label: {
-                                    Label("Add Buy-In", systemImage: "plus.circle")
-                                        .font(.headline)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 14)
-                                        .padding(.horizontal)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.green)
-                                        .cornerRadius(14)
+                                HStack(spacing: 12) {
+                                    Button {
+                                        showCompSheet = true
+                                    } label: {
+                                        Label("Add Comp", systemImage: "gift.fill")
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 14)
+                                            .padding(.horizontal)
+                                            .background(Color(.systemGray6).opacity(0.25))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(14)
+                                    }
+                                    Button {
+                                        showBuyInSheet = true
+                                    } label: {
+                                        Label("Add Buy-In", systemImage: "plus.circle")
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 14)
+                                            .padding(.horizontal)
+                                            .background(Color(.systemGray6).opacity(0.25))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(14)
+                                    }
+                                }
+                            }
+                            .padding()
+                            .background(Color(.systemGray6).opacity(0.15))
+                            .cornerRadius(16)
+
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    Text("Comps").font(.headline).foregroundColor(.white)
+                                    Spacer()
+                                    Text("Total: \(settingsStore.currencySymbol)\(s.totalComp)")
+                                        .font(.title3.bold()).foregroundColor(.white)
+                                }
+                                if s.compEvents.isEmpty {
+                                    Text("No comps logged yet.")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                } else {
+                                    ForEach(s.compEvents) { ev in
+                                        HStack(alignment: .firstTextBaseline) {
+                                            Image(systemName: ev.kind.symbolName)
+                                                .foregroundColor(.green).font(.caption)
+                                            CompEventPhotoThumbnail(compEventID: ev.id, side: 40)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                HStack(spacing: 6) {
+                                                    Text(ev.kind.title)
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                    if let fbLine = ev.foodBeverageKindDisplayLabel {
+                                                        Text("· \(fbLine)")
+                                                            .font(.caption)
+                                                            .foregroundColor(.green)
+                                                    }
+                                                    Text("\(settingsStore.currencySymbol)\(ev.amount)")
+                                                        .foregroundColor(.white)
+                                                }
+                                                if let d = ev.details, !d.isEmpty {
+                                                    Text(d)
+                                                        .font(.caption2)
+                                                        .foregroundColor(.gray)
+                                                        .lineLimit(2)
+                                                }
+                                            }
+                                            Spacer()
+                                            Text(ev.timestamp, style: .time)
+                                                .font(.caption).foregroundColor(.gray)
+                                        }
+                                    }
                                 }
                             }
                             .padding()
@@ -133,7 +202,9 @@ struct LiveSessionView: View {
                                 }
                             } label: {
                                 Label("Stop & Close Out", systemImage: "stop.circle.fill")
-                                    .frame(maxWidth: .infinity).padding()
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 16)
                                     .background(Color.red.opacity(0.85))
                                     .foregroundColor(.white).cornerRadius(14).font(.headline)
                             }
@@ -175,12 +246,28 @@ struct LiveSessionView: View {
                 }
                 .environmentObject(settingsStore)
             }
+            .adaptiveSheet(isPresented: $showCompSheet) {
+                CompQuickAddSheet(
+                    existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
+                    existingDollarsCreditsCompTotal: store.liveSession?.totalCompDollarsCredits ?? 0,
+                    quickAmounts: quickCompAmounts,
+                    sessionGame: store.liveSession?.game ?? "",
+                    sessionCasino: store.liveSession?.casino ?? "",
+                    sessionCasinoLatitude: store.liveSession?.casinoLatitude,
+                    sessionCasinoLongitude: store.liveSession?.casinoLongitude
+                ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
+                    store.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: foodKind, foodBeverageOtherDescription: otherDesc, photoJPEG: photoJPEG)
+                }
+                .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+            }
             .adaptiveSheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
             .adaptiveSheet(isPresented: $showStrategyOdds) {
                 StrategyOddsSheet(gameName: s.game)
                     .environmentObject(settingsStore)
             }
-            .adaptiveSheet(isPresented: $showPrivateNotes) {
+            .halfScreenSheet(isPresented: $showPrivateNotes) {
                 PrivateNotesSheet(
                     notes: Binding(
                         get: { store.liveSession?.privateNotes ?? "" },

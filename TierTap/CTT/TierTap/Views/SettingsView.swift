@@ -105,7 +105,7 @@ struct SettingsView: View {
                 GamePickerView(selectedGame: $gamePickerSelection)
             }
             .adaptiveSheet(isPresented: $isShowingCasinoPicker) {
-                CasinoLocationPickerView(selectedCasino: $casinoPickerSelection)
+                CasinoLocationPickerView(selectedCasino: $casinoPickerSelection, selectedLatitude: .constant(nil), selectedLongitude: .constant(nil))
             }
             .adaptiveSheet(isPresented: $isShowingSubscriptionPaywall) {
                 TierTapPaywallView()

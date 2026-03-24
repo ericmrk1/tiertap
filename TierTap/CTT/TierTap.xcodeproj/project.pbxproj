@@ -18,6 +18,7 @@
 		2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */; };
 		2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */; };
 		2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */; };
+		2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */; };
 		2E9D7B8C2F621216004015F4 /* PhotoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */; };
 		2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */; };
 		2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */; };
@@ -152,6 +153,7 @@
 		2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = coins_clinking.wav; sourceTree = "<group>"; };
 		2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory_confetti.wav; sourceTree = "<group>"; };
 		2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipEstimatorPhotoStorage.swift; sourceTree = "<group>"; };
+		2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompPhotoStorage.swift; sourceTree = "<group>"; };
 		2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHelpers.swift; sourceTree = "<group>"; };
 		2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TierTapPaywallView 2.swift"; sourceTree = "<group>"; };
 		2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionStore 2.swift"; sourceTree = "<group>"; };
@@ -315,6 +317,7 @@
 				ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */,
 				APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */,
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
+				2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */,
 				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
@@ -663,6 +666,7 @@
 				BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */,
+				2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
 				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,

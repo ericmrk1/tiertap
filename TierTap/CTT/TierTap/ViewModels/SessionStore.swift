@@ -37,11 +37,24 @@ class SessionStore: ObservableObject {
             case "startSession":
                 guard let game = params["game"] as? String, let casino = params["casino"] as? String,
                       let st = params["startingTier"] as? Int, let bi = params["initialBuyIn"] as? Int else { return nil }
-                self.startSession(game: game, casino: casino, startingTier: st, initialBuyIn: bi)
+                let program = params["rewardsProgramName"] as? String
+                self.startSession(game: game, casino: casino, startingTier: st, initialBuyIn: bi, rewardsProgramName: program)
                 return (self.sessions, self.liveSession)
             case "addBuyIn":
                 guard let amount = params["amount"] as? Int else { return nil }
                 self.addBuyIn(amount)
+                return (self.sessions, self.liveSession)
+            case "addComp":
+                guard let amount = params["amount"] as? Int else { return nil }
+                let kind = (params["kind"] as? String).flatMap { CompKind(rawValue: $0) } ?? .dollarsCredits
+                let rawDetails = params["details"] as? String
+                let trimmed = rawDetails?.trimmingCharacters(in: .whitespacesAndNewlines)
+                let details = (trimmed?.isEmpty == false) ? trimmed : nil
+                let fb = (params["foodBeverageKind"] as? String).flatMap { FoodBeverageKind(rawValue: $0) }
+                let rawOther = params["foodBeverageOtherDescription"] as? String
+                let trimmedOther = rawOther?.trimmingCharacters(in: .whitespacesAndNewlines)
+                let otherDesc = (trimmedOther?.isEmpty == false) ? trimmedOther : nil
+                self.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: fb, foodBeverageOtherDescription: otherDesc)
                 return (self.sessions, self.liveSession)
             case "closeSessionCashOutOnly":
                 guard let cashOut = params["cashOut"] as? Int else { return nil }
@@ -76,18 +89,21 @@ class SessionStore: ObservableObject {
     }
 
     // MARK: Live
-    func startSession(game: String, casino: String, startingTier: Int, initialBuyIn: Int) {
+    func startSession(game: String, casino: String, startingTier: Int, initialBuyIn: Int, rewardsProgramName: String? = nil, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("startSession", params: [
+        var p: [String: Any] = [
             "game": game, "casino": casino, "startingTier": startingTier, "initialBuyIn": initialBuyIn
-        ]) { [weak self] sessions, liveSession in
+        ]
+        if let name = rewardsProgramName { p["rewardsProgramName"] = name }
+        SessionSyncManager.shared.sendAction("startSession", params: p) { [weak self] sessions, liveSession in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
         #endif
         let ev = BuyInEvent(amount: initialBuyIn, timestamp: Date())
-        let s = Session(game: game, casino: casino, startTime: Date(),
-                        startingTierPoints: startingTier, buyInEvents: [ev], isLive: true)
+        let s = Session(game: game, casino: casino, casinoLatitude: casinoLatitude, casinoLongitude: casinoLongitude, startTime: Date(),
+                        startingTierPoints: startingTier, buyInEvents: [ev], isLive: true,
+                        rewardsProgramName: rewardsProgramName)
         liveSession = s
         saveLive()
         #if os(iOS)
@@ -108,6 +124,39 @@ class SessionStore: ObservableObject {
         liveSession = s; saveLive()
         #if os(iOS)
         LiveActivityManager.shared.update(totalBuyIn: s.totalBuyIn)
+        pushContext()
+        #endif
+    }
+
+    /// `photoJPEG` is optional JPEG bytes for a comp receipt; stored on disk only (not in session JSON).
+    func addComp(amount: Int, kind: CompKind = .dollarsCredits, details: String? = nil, foodBeverageKind: FoodBeverageKind? = nil, foodBeverageOtherDescription: String? = nil, photoJPEG: Data? = nil) {
+        let trimmed = details?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedDetails = (trimmed?.isEmpty == false) ? trimmed : nil
+        let storedFB: FoodBeverageKind? = (kind == .foodBeverage) ? foodBeverageKind : nil
+        let trimmedOther = foodBeverageOtherDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedOther: String? = (kind == .foodBeverage && storedFB == .other && trimmedOther?.isEmpty == false) ? trimmedOther : nil
+        #if os(watchOS)
+        var p: [String: Any] = ["amount": amount, "kind": kind.rawValue]
+        if let storedDetails { p["details"] = storedDetails }
+        if let storedFB { p["foodBeverageKind"] = storedFB.rawValue }
+        if let storedOther { p["foodBeverageOtherDescription"] = storedOther }
+        SessionSyncManager.shared.sendAction("addComp", params: p) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard var s = liveSession else { return }
+        let eventId = UUID()
+        let ev = CompEvent(id: eventId, amount: amount, timestamp: Date(), kind: kind, details: storedDetails, foodBeverageKind: storedFB, foodBeverageOtherDescription: storedOther)
+        s.compEvents.append(ev)
+        liveSession = s
+        #if os(iOS)
+        if let jpeg = photoJPEG {
+            CompPhotoStorage.saveJPEGData(jpeg, compEventID: eventId)
+        }
+        #endif
+        saveLive()
+        #if os(iOS)
         pushContext()
         #endif
     }
@@ -196,6 +245,11 @@ class SessionStore: ObservableObject {
     }
 
     func discardLiveSession() {
+        #if os(iOS)
+        if let s = liveSession {
+            CompPhotoStorage.deleteImages(for: s.compEvents)
+        }
+        #endif
         liveSession = nil; clearLive()
         #if os(iOS)
         LiveActivityManager.shared.end()
@@ -259,6 +313,11 @@ class SessionStore: ObservableObject {
     }
 
     func deleteSession(at offsets: IndexSet) {
+        #if os(iOS)
+        for idx in offsets {
+            CompPhotoStorage.deleteImages(for: sessions[idx].compEvents)
+        }
+        #endif
         sessions.remove(atOffsets: offsets)
         saveSessions()
         #if os(iOS)
@@ -267,6 +326,9 @@ class SessionStore: ObservableObject {
     }
 
     func deleteSession(_ session: Session) {
+        #if os(iOS)
+        CompPhotoStorage.deleteImages(for: session.compEvents)
+        #endif
         sessions.removeAll { $0.id == session.id }
         saveSessions()
         #if os(iOS)
@@ -327,6 +389,23 @@ class SessionStore: ObservableObject {
             return withEnding.endingTierPoints
         }
         return matching.first?.startingTierPoints
+    }
+
+    /// Most recent initial buy-in at this casino (first buy-in of the latest session there), if any.
+    func defaultInitialBuyIn(for casino: String) -> Int? {
+        guard !casino.isEmpty else { return nil }
+        let matching = sessions
+            .filter { $0.casino == casino }
+            .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+        guard let bi = matching.first?.initialBuyIn, bi > 0 else { return nil }
+        return bi
+    }
+
+    /// True if at least one saved session uses this exact casino name (used to avoid applying
+    /// location defaults while the user is still typing a new casino name).
+    func hasSessionHistory(forExactCasino casino: String) -> Bool {
+        guard !casino.isEmpty else { return false }
+        return sessions.contains { $0.casino == casino }
     }
 
     /// Returns true if recent sessions with mood show a downswing (3+ of last 5 with “bad” mood).

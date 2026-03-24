@@ -13,6 +13,8 @@ struct NearbyCasino: Identifiable {
 
 struct CasinoLocationPickerView: View {
     @Binding var selectedCasino: String
+    @Binding var selectedLatitude: Double?
+    @Binding var selectedLongitude: Double?
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var settingsStore: SettingsStore
 
@@ -348,6 +350,8 @@ struct CasinoLocationPickerView: View {
 
     private func select(casino: NearbyCasino) {
         selectedCasino = casino.name
+        selectedLatitude = casino.coordinate.latitude
+        selectedLongitude = casino.coordinate.longitude
 
         // Attempt to persist this casino location in Supabase with rich metadata.
         let coordinate = casino.coordinate

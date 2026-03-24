@@ -88,21 +88,43 @@ struct CloseoutView: View {
                     VStack(spacing: 12) {
                         // Top: Stop/Resume Timer primary button + compact header (one line)
                         VStack(spacing: 8) {
-                            Button {
-                                if timerStopped {
-                                    store.resumeLiveSessionTimer()
-                                } else {
-                                    store.stopLiveSessionTimer()
+                            HStack(alignment: .center, spacing: 12) {
+                                Button {
+                                    if timerStopped {
+                                        store.resumeLiveSessionTimer()
+                                    } else {
+                                        store.stopLiveSessionTimer()
+                                    }
+                                } label: {
+                                    Label(timerStopped ? "Resume Timer" : "Stop Timer",
+                                          systemImage: timerStopped ? "play.circle.fill" : "stop.circle.fill")
+                                        .font(.headline)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 20)
+                                        .background(timerStopped ? Color.green : Color.red)
+                                        .foregroundColor(timerStopped ? .black : .white)
+                                        .cornerRadius(12)
                                 }
-                            } label: {
-                                Label(timerStopped ? "Resume Timer" : "Stop Timer",
-                                      systemImage: timerStopped ? "play.circle.fill" : "stop.circle.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(timerStopped ? Color.green : Color.red)
-                                    .foregroundColor(timerStopped ? .black : .white)
-                                    .cornerRadius(12)
+
+                                if timerStopped {
+                                    HStack(spacing: 16) {
+                                        Button {
+                                            openUberAppOrWeb()
+                                        } label: {
+                                            Text("🚕")
+                                                .font(.system(size: 36))
+                                        }
+                                        .accessibilityLabel("Open Uber")
+
+                                        Button {
+                                            openOpenTableAppOrWeb()
+                                        } label: {
+                                            Text("🍽️")
+                                                .font(.system(size: 36))
+                                        }
+                                        .accessibilityLabel("Open OpenTable")
+                                    }
+                                }
                             }
 
                             HStack {
@@ -351,7 +373,7 @@ struct CloseoutView: View {
                                 } else { save() }
                             } label: {
                                 Text("Save Session")
-                                    .frame(maxWidth: .infinity).padding(.vertical, 12)
+                                    .frame(maxWidth: .infinity).padding(.vertical, 24)
                                     .background(isValid ? Color.green : Color.gray)
                                     .foregroundColor(isValid ? .black : .white)
                                     .cornerRadius(12).font(.headline)
@@ -429,7 +451,7 @@ struct CloseoutView: View {
                 if closedSessionId != nil, let co = Int(cashOut),
                    let et = Int(endingTier) {
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
-                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
+                    closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
                     closedSessionId = nil
                     dismiss()
                 }
@@ -443,7 +465,7 @@ struct CloseoutView: View {
                         return
                     }
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
-                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
+                    closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
                     if var session = store.sessions.first(where: { $0.id == id }) {
                         session.sessionMood = mood
                         store.updateSession(session)
@@ -518,7 +540,14 @@ struct CloseoutView: View {
         }
     }
 
-        func save() {
+    private func closeSessionPersistingLastGameDefaults(cashOut: Int, endingTier: Int, privateNotes: String?) {
+        if let live = store.liveSession {
+            settingsStore.recordLastPlayedGameChoices(from: live)
+        }
+        store.closeSession(cashOut: cashOut, endingTier: endingTier, privateNotes: privateNotes)
+    }
+
+    func save() {
         guard let co = Int(cashOut), let et = Int(endingTier) else { return }
         let sessionId = s.id
         let netPositive = (co - s.totalBuyIn) > 0
@@ -531,11 +560,11 @@ struct CloseoutView: View {
                 }
                 showCelebration = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                    store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
+                    closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
                     dismiss()
                 }
             } else {
-                store.closeSession(cashOut: co, endingTier: et, privateNotes: notes)
+                closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
                 dismiss()
             }
             return
@@ -568,6 +597,24 @@ struct CloseoutView: View {
         sessionPhoto = image
         if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: s.id) {
             store.setChipEstimatorImageFilename(fileName)
+        }
+    }
+
+    private func openUberAppOrWeb() {
+        guard let appURL = URL(string: "uber://") else { return }
+        UIApplication.shared.open(appURL) { success in
+            if !success, let webURL = URL(string: "https://www.uber.com/") {
+                UIApplication.shared.open(webURL)
+            }
+        }
+    }
+
+    private func openOpenTableAppOrWeb() {
+        guard let appURL = URL(string: "opentable://") else { return }
+        UIApplication.shared.open(appURL) { success in
+            if !success, let webURL = URL(string: "https://www.opentable.com") {
+                UIApplication.shared.open(webURL)
+            }
         }
     }
 }
@@ -609,7 +656,12 @@ struct ChipEstimatorSheetView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
+                LinearGradient(
+                    colors: [settingsStore.secondaryColor, settingsStore.primaryColor],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 20) {

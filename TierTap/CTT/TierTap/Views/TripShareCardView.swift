@@ -47,6 +47,51 @@ struct TripShareCardView: View {
         }
     }
 
+    /// Sessions with a mood, oldest → newest (for trend / sparkline).
+    private var moodsChronological: [SessionMood] {
+        sessions
+            .filter { $0.sessionMood != nil }
+            .sorted { ($0.endTime ?? $0.startTime) < ($1.endTime ?? $1.startTime) }
+            .compactMap(\.sessionMood)
+    }
+
+    private var tripMoodCounts: [(mood: SessionMood, count: Int)] {
+        let grouped = Dictionary(grouping: moodsChronological, by: { $0 }).mapValues { $0.count }
+        return SessionMood.allCases
+            .compactMap { mood in (grouped[mood]).map { (mood: mood, count: $0) } }
+            .filter { $0.count > 0 }
+            .sorted { $0.count > $1.count }
+    }
+
+    /// Ordinal 0 (rough) … 8 (epic) for averaging and trend.
+    private func moodOrdinal(_ mood: SessionMood) -> Int {
+        guard let idx = SessionMood.allCases.firstIndex(of: mood) else { return 0 }
+        return SessionMood.allCases.count - 1 - idx
+    }
+
+    /// First-half vs second-half average mood (chronological sessions with mood).
+    private var moodTrendLabelAndColor: (text: String, color: Color)? {
+        let moods = moodsChronological
+        guard moods.count >= 2 else { return nil }
+        let ordinals = moods.map { moodOrdinal($0) }
+        let n = ordinals.count
+        let mid = n / 2
+        let firstAvg = Double(ordinals[0..<mid].reduce(0, +)) / Double(max(mid, 1))
+        let secondAvg = Double(ordinals[mid..<n].reduce(0, +)) / Double(n - mid)
+        let delta = secondAvg - firstAvg
+        if delta > 1.0 {
+            return ("Trend: improving", Color.green.opacity(0.95))
+        }
+        if delta < -1.0 {
+            return ("Trend: cooling off", Color.orange.opacity(0.95))
+        }
+        return ("Trend: steady", Color.white.opacity(0.65))
+    }
+
+    private var tripMoodMaxCount: Double {
+        max(tripMoodCounts.map { Double($0.count) }.max() ?? 1, 1)
+    }
+
     var body: some View {
         ZStack {
             LinearGradient(
@@ -186,6 +231,50 @@ struct TripShareCardView: View {
                     }
                 }
 
+                if !tripMoodCounts.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Session moods", systemImage: "face.smiling.fill")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        if moodsChronological.count >= 2 {
+                            TripShareMoodSparkline(
+                                moods: moodsChronological,
+                                lineGradient: settingsStore.primaryGradient
+                            )
+                                .frame(width: contentInnerWidth, height: 40)
+                            if let trend = moodTrendLabelAndColor {
+                                Text(trend.text)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(trend.color)
+                            }
+                        }
+                        ForEach(tripMoodCounts.prefix(6), id: \.mood) { row in
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack {
+                                    Text(row.mood.label)
+                                        .font(.caption2)
+                                        .foregroundColor(.white.opacity(0.92))
+                                    Spacer()
+                                    Text("\(row.count)×")
+                                        .font(.caption2.bold())
+                                        .foregroundColor(.white.opacity(0.55))
+                                }
+                                GeometryReader { geo in
+                                    let barW = max(2, geo.size.width * CGFloat(Double(row.count) / tripMoodMaxCount))
+                                    ZStack(alignment: .leading) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.white.opacity(0.12))
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(settingsStore.primaryGradient)
+                                            .frame(width: barW)
+                                    }
+                                }
+                                .frame(height: 8)
+                            }
+                        }
+                    }
+                }
+
                 if !trip.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text(trip.notes)
                         .font(.footnote)
@@ -219,6 +308,54 @@ struct TripShareCardView: View {
         let w = contentInnerWidth
         let scale = w / TripShareLayoutMetrics.referenceContentWidth
         return (base * scale).rounded(.down)
+    }
+}
+
+/// Chronological mood sparkline (better mood toward the top of the strip).
+private struct TripShareMoodSparkline: View {
+    let moods: [SessionMood]
+    let lineGradient: LinearGradient
+
+    private var maxIdx: CGFloat {
+        CGFloat(SessionMood.allCases.count - 1)
+    }
+
+    private func yForMood(_ mood: SessionMood, height: CGFloat) -> CGFloat {
+        guard let idx = SessionMood.allCases.firstIndex(of: mood) else { return height / 2 }
+        let ord = maxIdx - CGFloat(idx)
+        let pad: CGFloat = 5
+        return pad + (1 - ord / maxIdx) * max(0, height - 2 * pad)
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.white.opacity(0.08))
+                Path { path in
+                    for (i, m) in moods.enumerated() {
+                        let x = CGFloat(i) / CGFloat(moods.count - 1) * w
+                        let y = yForMood(m, height: h)
+                        if i == 0 {
+                            path.move(to: CGPoint(x: x, y: y))
+                        } else {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                    }
+                }
+                .stroke(lineGradient, style: StrokeStyle(lineWidth: 2, lineJoin: .round))
+                ForEach(Array(moods.enumerated()), id: \.offset) { i, m in
+                    let x = CGFloat(i) / CGFloat(moods.count - 1) * w
+                    let y = yForMood(m, height: h)
+                    Circle()
+                        .fill(Color.white.opacity(0.95))
+                        .frame(width: 6, height: 6)
+                        .position(x: x, y: y)
+                }
+            }
+        }
     }
 }
 

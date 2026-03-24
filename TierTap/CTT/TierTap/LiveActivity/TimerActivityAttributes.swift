@@ -7,6 +7,8 @@ struct TimerActivityAttributes: ActivityAttributes {
         var casino: String
         var game: String
         var totalBuyIn: Int
+        var startingTierPoints: Int
+        var rewardsProgramName: String?
     }
     var sessionID: String
 }
