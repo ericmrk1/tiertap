@@ -1899,10 +1899,6 @@ struct CommunitySessionPublishSelectionView: View {
     /// When on, comp count and total estimated comp value (from logged comps) are stored and shown on the feed.
     @State private var publishCompDetails = false
 
-    private var allSelected: Bool {
-        !sessions.isEmpty && selectedSessionIDs.count == sessions.count
-    }
-
     private var sortedSessions: [Session] {
         sessions.sorted { $0.startTime > $1.startTime }
     }
@@ -1997,60 +1993,6 @@ struct CommunitySessionPublishSelectionView: View {
                             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
-
-                        Section {
-                            HStack(spacing: 10) {
-                                Button {
-                                    selectedSessionIDs = Set(sessions.map { $0.id })
-                                } label: {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "checkmark.circle.fill")
-                                        Text("Select All Sessions")
-                                            .lineLimit(2)
-                                            .minimumScaleFactor(0.8)
-                                            .multilineTextAlignment(.center)
-                                    }
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 6)
-                                    .background(settingsStore.primaryGradient)
-                                    .cornerRadius(12)
-                                    .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
-                                }
-                                .buttonStyle(.plain)
-
-                                Button {
-                                    selectedSessionIDs.removeAll()
-                                } label: {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "xmark.circle.fill")
-                                        Text("Clear All")
-                                    }
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 6)
-                                    .background(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(red: 0.92, green: 0.28, blue: 0.26),
-                                                Color(red: 0.52, green: 0.1, blue: 0.14)
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
-                                    .cornerRadius(12)
-                                    .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                            .listRowBackground(Color(.systemGray6).opacity(0.15))
-                        }
                     }
                     .listStyle(.insetGrouped)
                     .scrollContentBackground(.hidden)
@@ -2067,23 +2009,9 @@ struct CommunitySessionPublishSelectionView: View {
                     }
                     .foregroundColor(.green)
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button {
-                        Task { await publishSelectedSessions() }
-                    } label: {
-                        if isPublishing {
-                            ProgressView()
-                                .tint(.white)
-                        } else {
-                            Text("Publish")
-                        }
-                    }
-                    .foregroundColor(selectedSessionIDs.isEmpty || isPublishing ? .gray : .green)
-                    .disabled(selectedSessionIDs.isEmpty || isPublishing)
-                }
             }
             .safeAreaInset(edge: .bottom) {
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     if let message = errorMessage {
                         Text(message)
                             .font(.caption)
@@ -2094,6 +2022,57 @@ struct CommunitySessionPublishSelectionView: View {
                             .background(Color.black.opacity(0.6))
                     }
                     if !sessions.isEmpty {
+                        HStack(spacing: 10) {
+                            Button {
+                                selectedSessionIDs = Set(sessions.map { $0.id })
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text("Select All Sessions")
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.8)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 6)
+                                .background(settingsStore.primaryGradient)
+                                .cornerRadius(12)
+                                .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                selectedSessionIDs.removeAll()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "xmark.circle.fill")
+                                    Text("Clear All")
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 6)
+                                .background(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(red: 0.92, green: 0.28, blue: 0.26),
+                                            Color(red: 0.52, green: 0.1, blue: 0.14)
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .cornerRadius(12)
+                                .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal)
+
                         Button {
                             Task { await publishSelectedSessions() }
                         } label: {
@@ -2109,8 +2088,8 @@ struct CommunitySessionPublishSelectionView: View {
                             .font(.headline)
                             .foregroundColor(.green)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 30)
-                            .background(Color.black).opacity(0.7)
+                            .padding(.vertical, 18)
+                            .background(Color.black.opacity(0.7))
                             .cornerRadius(16)
                         }
                         .buttonStyle(.plain)
@@ -2119,7 +2098,13 @@ struct CommunitySessionPublishSelectionView: View {
                         .padding(.horizontal)
                     }
                 }
+                .padding(.top, 8)
                 .padding(.bottom, 8)
+                .background(
+                    settingsStore.primaryGradient
+                        .opacity(0.95)
+                        .ignoresSafeArea(edges: .bottom)
+                )
             }
         }
     }
