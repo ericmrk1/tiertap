@@ -12,7 +12,8 @@ struct RiskOfRuinView: View {
             bankroll: settingsStore.bankroll,
             unitSize: settingsStore.unitSize,
             targetAveragePerSession: settingsStore.targetAveragePerSession,
-            currentBetAmount: currentBet
+            currentBetAmount: currentBet,
+            useExpectedValue: settingsStore.analyticsUseExpectedValue
         )
     }
 
@@ -101,7 +102,9 @@ struct RiskOfRuinView: View {
                 .frame(width: 160, height: 160)
                 Spacer()
             }
-            Text("risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings.")
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "risk of ruin — based on table‑game sessions (poker excluded), using EV (cash net plus logged comps) for win/loss per session, with your bankroll/unit settings."
+                 : "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings, using cash net per session.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()
@@ -214,7 +217,9 @@ struct RiskOfRuinView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("How it's calculated")
                 .font(.caption.bold()).foregroundColor(.gray)
-            Text("Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.")
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings. Match “Results basis” on Analytics."
+                 : "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()

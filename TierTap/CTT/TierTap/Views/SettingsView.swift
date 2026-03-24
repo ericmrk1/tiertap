@@ -818,6 +818,9 @@ struct SettingsView: View {
             "total_buy_in",
             "cash_out",
             "win_loss",
+            "total_comp",
+            "expected_value",
+            "ev_per_hour",
             "avg_bet_actual",
             "avg_bet_rated",
             "starting_tier_points",
@@ -851,6 +854,9 @@ struct SettingsView: View {
             let totalBuyIn = s.totalBuyIn
             let cashOut = s.cashOut.map { String($0) } ?? ""
             let winLoss = s.winLoss.map { String($0) } ?? ""
+            let totalComp = String(s.totalComp)
+            let expectedValue = s.expectedValue.map { String($0) } ?? ""
+            let evPerHour = s.expectedValuePerHour.map { String(format: "%.4f", $0) } ?? ""
 
             let avgBetActual = s.avgBetActual.map { String($0) } ?? ""
             let avgBetRated = s.avgBetRated.map { String($0) } ?? ""
@@ -884,6 +890,9 @@ struct SettingsView: View {
                 String(totalBuyIn),
                 cashOut,
                 winLoss,
+                totalComp,
+                expectedValue,
+                evPerHour,
                 avgBetActual,
                 avgBetRated,
                 startingTier,

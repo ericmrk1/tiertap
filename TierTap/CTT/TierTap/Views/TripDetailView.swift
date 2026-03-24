@@ -421,7 +421,11 @@ struct TripDetailView: View {
                                     .foregroundColor(.gray)
                             }
                             Spacer()
-                            if let wl = session.winLoss {
+                            if session.totalComp > 0, let ev = session.expectedValue {
+                                Text(ev >= 0 ? "EV +\(settingsStore.currencySymbol)\(ev)" : "EV -\(settingsStore.currencySymbol)\(abs(ev))")
+                                    .font(.caption.bold())
+                                    .foregroundColor(ev >= 0 ? .green : .red)
+                            } else if let wl = session.winLoss {
                                 Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
                                     .font(.caption.bold())
                                     .foregroundColor(wl >= 0 ? .green : .red)
@@ -492,16 +496,12 @@ struct TripDetailView: View {
 
     private func prepareShare() {
         guard let t = trip else { return }
-        let coverName = t.photoFilenames.first
-        var cover: UIImage?
-        if let n = coverName {
-            cover = tripStore.loadPhoto(tripId: t.id, filename: n)
-        }
+        let tripPhotos = t.photoFilenames.compactMap { tripStore.loadPhoto(tripId: t.id, filename: $0) }
         Task { @MainActor in
             if let image = await TripShareImageBuilder.render(
                 trip: t,
                 sessions: linkedSessions(for: t),
-                coverImage: cover,
+                tripPhotos: tripPhotos,
                 settingsStore: settingsStore
             ) {
                 shareImageItem = ShareableImageItem(image: image)

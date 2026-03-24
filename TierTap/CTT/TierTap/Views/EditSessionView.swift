@@ -6,6 +6,8 @@ struct EditSessionView: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
 
     @State private var selectedGame: String = ""
@@ -34,6 +36,20 @@ struct EditSessionView: View {
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
     @State private var showGamePicker = false
+
+    /// Working copy of comps; new entries use the same storage as live sessions (`CompPhotoStorage` by event id).
+    @State private var compEvents: [CompEvent] = []
+    @State private var showCompSheet = false
+    @State private var compToEdit: CompEvent?
+
+    private static let quickCompAmounts: [Int] = [
+        5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000
+    ]
+
+    private var compTotal: Int { compEvents.reduce(0) { $0 + $1.amount } }
+    private var compDollarsCreditsTotal: Int {
+        compEvents.filter { $0.kind == .dollarsCredits }.reduce(0) { $0 + $1.amount }
+    }
 
     // Session photo attachment
     @State private var sessionPhoto: UIImage?
@@ -201,6 +217,190 @@ struct EditSessionView: View {
                         .background(Color(.systemGray6).opacity(0.15))
                         .cornerRadius(16)
 
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Comps").font(.headline).foregroundColor(.white)
+                                Spacer()
+                                Text("Total: \(settingsStore.currencySymbol)\(compTotal)")
+                                    .font(.title3.bold()).foregroundColor(.white)
+                            }
+                            if compEvents.isEmpty {
+                                Text("No comps logged yet.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            } else {
+                                Text("Tap a row to edit, or use the menu to delete.")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                ForEach(compEvents) { ev in
+                                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                        Button {
+                                            compToEdit = ev
+                                        } label: {
+                                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                                Image(systemName: ev.kind.symbolName)
+                                                    .foregroundColor(.green).font(.caption)
+                                                VStack(alignment: .leading, spacing: 2) {
+                                                    HStack(spacing: 6) {
+                                                        Text(ev.kind.title)
+                                                            .font(.caption)
+                                                            .foregroundColor(.gray)
+                                                        if let fbLine = ev.foodBeverageKindDisplayLabel {
+                                                            Text("· \(fbLine)")
+                                                                .font(.caption)
+                                                                .foregroundColor(.green)
+                                                        }
+                                                        Text("\(settingsStore.currencySymbol)\(ev.amount)")
+                                                            .foregroundColor(.white)
+                                                    }
+                                                    if let d = ev.details, !d.isEmpty {
+                                                        Text(d)
+                                                            .font(.caption2)
+                                                            .foregroundColor(.gray)
+                                                            .lineLimit(2)
+                                                    }
+                                                }
+                                                Spacer(minLength: 4)
+                                                Text(ev.timestamp, style: .time)
+                                                    .font(.caption).foregroundColor(.gray)
+                                                Image(systemName: "chevron.right")
+                                                    .font(.caption2.weight(.semibold))
+                                                    .foregroundColor(.gray.opacity(0.8))
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .contentShape(Rectangle())
+                                        }
+                                        .buttonStyle(.plain)
+                                        Menu {
+                                            Button("Edit") { compToEdit = ev }
+                                            Button("Delete", role: .destructive) { removeComp(ev) }
+                                        } label: {
+                                            Image(systemName: "ellipsis.circle")
+                                                .font(.title3)
+                                                .foregroundColor(.white.opacity(0.75))
+                                                .frame(width: 36, height: 36)
+                                        }
+                                    }
+                                }
+                            }
+                            Button {
+                                showCompSheet = true
+                            } label: {
+                                Label("Add Comp", systemImage: "gift.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .padding(.horizontal)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(14)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.15))
+                        .cornerRadius(16)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Session Photos", systemImage: "photo.on.rectangle.angled")
+                                .font(.headline)
+                                .foregroundColor(.white)
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Session")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                        .background(Color(.systemGray6).opacity(0.2))
+                                        .cornerRadius(12)
+
+                                    if let image = sessionPhoto {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .cornerRadius(10)
+                                            .padding(4)
+                                    } else {
+                                        VStack(spacing: 6) {
+                                            Image(systemName: "camera.viewfinder")
+                                                .font(.system(size: 24))
+                                                .foregroundColor(.gray)
+                                            Text("Add a photo from this session")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                        .padding(16)
+                                    }
+                                }
+                                .frame(maxHeight: 220)
+
+                                HStack(spacing: 12) {
+                                    Button {
+                                        sessionPhotoSource = .camera
+                                    } label: {
+                                        Label("Camera", systemImage: "camera")
+                                            .font(.caption.bold())
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color.blue.opacity(0.9))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(16)
+                                    }
+
+                                    Button {
+                                        sessionPhotoSource = .photoLibrary
+                                    } label: {
+                                        Label("Photo Library", systemImage: "photo")
+                                            .font(.caption.bold())
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color(.systemGray6).opacity(0.35))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(16)
+                                    }
+
+                                    if sessionPhoto != nil {
+                                        Spacer()
+                                        Button(role: .destructive) {
+                                            sessionPhoto = nil
+                                            chipPhotoFilename = nil
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.caption)
+                                                .foregroundColor(.red)
+                                                .padding(8)
+                                        }
+                                    }
+                                }
+                            }
+
+                            if compEvents.contains(where: { compHasReceiptPhoto($0.id) }) {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("Comp receipts")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.gray)
+                                    ForEach(compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
+                                        HStack(alignment: .center, spacing: 10) {
+                                            CompEventPhotoThumbnail(compEventID: ev.id, side: 52)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("\(ev.kind.title) · \(settingsStore.currencySymbol)\(ev.amount)")
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.white)
+                                                Text(ev.timestamp, style: .time)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                            }
+                                            Spacer()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.15))
+                        .cornerRadius(16)
+
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Private notes (not shared)")
                                 .font(.caption.bold())
@@ -212,79 +412,6 @@ struct EditSessionView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                                 .scrollContentBackground(.hidden)
-                        }
-                        .padding()
-                        .background(Color(.systemGray6).opacity(0.15))
-                        .cornerRadius(16)
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Session photo")
-                                .font(.caption.bold())
-                                .foregroundColor(.gray)
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
-                                    .background(Color(.systemGray6).opacity(0.2))
-                                    .cornerRadius(12)
-
-                                if let image = sessionPhoto {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(10)
-                                        .padding(4)
-                                } else {
-                                    VStack(spacing: 6) {
-                                        Image(systemName: "camera.viewfinder")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(.gray)
-                                        Text("Add a photo from this session")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
-                                    .padding(16)
-                                }
-                            }
-                            .frame(maxHeight: 220)
-
-                            HStack(spacing: 12) {
-                                Button {
-                                    sessionPhotoSource = .camera
-                                } label: {
-                                    Label("Camera", systemImage: "camera")
-                                        .font(.caption.bold())
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(Color.blue.opacity(0.9))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                }
-
-                                Button {
-                                    sessionPhotoSource = .photoLibrary
-                                } label: {
-                                    Label("Photo Library", systemImage: "photo")
-                                        .font(.caption.bold())
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(Color(.systemGray6).opacity(0.35))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                }
-
-                                if sessionPhoto != nil {
-                                    Spacer()
-                                    Button(role: .destructive) {
-                                        sessionPhoto = nil
-                                        chipPhotoFilename = nil
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.caption)
-                                            .foregroundColor(.red)
-                                            .padding(8)
-                                    }
-                                }
-                            }
                         }
                         .padding()
                         .background(Color(.systemGray6).opacity(0.15))
@@ -312,6 +439,37 @@ struct EditSessionView: View {
                 }
             }
             .onAppear { prefill() }
+            .adaptiveSheet(isPresented: $showCompSheet) {
+                CompQuickAddSheet(
+                    existingSessionCompTotal: compTotal,
+                    existingDollarsCreditsCompTotal: compDollarsCreditsTotal,
+                    quickAmounts: Self.quickCompAmounts,
+                    sessionGame: selectedGame,
+                    sessionCasino: casino,
+                    sessionCasinoLatitude: session.casinoLatitude,
+                    sessionCasinoLongitude: session.casinoLongitude
+                ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
+                    appendComp(
+                        kind: kind,
+                        amount: amount,
+                        details: details,
+                        foodBeverageKind: foodKind,
+                        foodBeverageOtherDescription: otherDesc,
+                        photoJPEG: photoJPEG
+                    )
+                }
+                .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+            }
+            .adaptiveSheet(item: $compToEdit) { ev in
+                EditCompEventSheet(original: ev) { updated in
+                    if let i = compEvents.firstIndex(where: { $0.id == updated.id }) {
+                        compEvents[i] = updated
+                    }
+                }
+                .environmentObject(settingsStore)
+            }
             .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame).presentationDetents([.medium, .large])
             }
@@ -363,6 +521,8 @@ struct EditSessionView: View {
         pokerAnteText = session.pokerAnte.map { "\($0)" } ?? ""
         pokerLevelMinutesText = session.pokerLevelMinutes.map { "\($0)" } ?? ""
         pokerStartingStackText = session.pokerStartingStack.map { "\($0)" } ?? ""
+
+        compEvents = session.compEvents
 
         chipPhotoFilename = session.chipEstimatorImageFilename
         if let fileName = chipPhotoFilename,
@@ -420,7 +580,7 @@ struct EditSessionView: View {
             startingTierPoints: st,
             endingTierPoints: et,
             buyInEvents: [ev],
-            compEvents: session.compEvents,
+            compEvents: compEvents,
             cashOut: co,
             avgBetActual: Int(avgBetActual),
             avgBetRated: Int(avgBetRated),
@@ -487,5 +647,300 @@ struct EditSessionView: View {
         if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: session.id) {
             chipPhotoFilename = fileName
         }
+    }
+
+    private func compHasReceiptPhoto(_ id: UUID) -> Bool {
+        guard let url = CompPhotoStorage.url(for: id) else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+
+    private func removeComp(_ ev: CompEvent) {
+        if compToEdit?.id == ev.id {
+            compToEdit = nil
+        }
+        #if os(iOS)
+        CompPhotoStorage.deleteImage(compEventID: ev.id)
+        #endif
+        compEvents.removeAll { $0.id == ev.id }
+    }
+
+    /// Mirrors `SessionStore.addComp` for the edited session’s working `compEvents` list.
+    private func appendComp(
+        kind: CompKind,
+        amount: Int,
+        details: String?,
+        foodBeverageKind: FoodBeverageKind?,
+        foodBeverageOtherDescription: String?,
+        photoJPEG: Data?
+    ) {
+        let trimmed = details?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedDetails = (trimmed?.isEmpty == false) ? trimmed : nil
+        let storedFB: FoodBeverageKind? = (kind == .foodBeverage) ? foodBeverageKind : nil
+        let trimmedOther = foodBeverageOtherDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedOther: String? = (kind == .foodBeverage && storedFB == .other && trimmedOther?.isEmpty == false) ? trimmedOther : nil
+        let eventId = UUID()
+        let ev = CompEvent(
+            id: eventId,
+            amount: amount,
+            timestamp: Date(),
+            kind: kind,
+            details: storedDetails,
+            foodBeverageKind: storedFB,
+            foodBeverageOtherDescription: storedOther
+        )
+        compEvents.append(ev)
+        #if os(iOS)
+        if let jpeg = photoJPEG {
+            CompPhotoStorage.saveJPEGData(jpeg, compEventID: eventId)
+        }
+        #endif
+    }
+}
+
+/// Edit an existing comp while preserving `CompEvent.id` so receipt photos stay linked on disk.
+private struct EditCompEventSheet: View {
+    let original: CompEvent
+    let onSave: (CompEvent) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var amountText: String
+    @State private var selectedKind: CompKind
+    @State private var detailsText: String
+    @State private var foodBeverageKind: FoodBeverageKind
+    @State private var foodBeverageOtherText: String
+    @State private var timestamp: Date
+    @State private var compPhoto: UIImage?
+    @State private var photoExplicitlyRemoved = false
+    @State private var compPhotoSource: CompPhotoSource?
+
+    private enum CompPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
+
+    init(original: CompEvent, onSave: @escaping (CompEvent) -> Void) {
+        self.original = original
+        self.onSave = onSave
+        _amountText = State(initialValue: "\(original.amount)")
+        _selectedKind = State(initialValue: original.kind)
+        _detailsText = State(initialValue: original.details ?? "")
+        _foodBeverageKind = State(initialValue: original.foodBeverageKind ?? .meal)
+        _foodBeverageOtherText = State(initialValue: original.foodBeverageOtherDescription ?? "")
+        _timestamp = State(initialValue: original.timestamp)
+    }
+
+    private var parsedAmount: Int? {
+        Int(amountText.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+
+    private var canSave: Bool {
+        guard let a = parsedAmount, a > 0 else { return false }
+        return true
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Amount (\(settingsStore.currencySymbol))")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            TextField("0", text: $amountText)
+                                .keyboardType(.numberPad)
+                                .textFieldStyle(DarkTextFieldStyle())
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Comp type")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            HStack(spacing: 8) {
+                                compKindPill(.dollarsCredits)
+                                compKindPill(.foodBeverage)
+                            }
+                        }
+
+                        if selectedKind == .foodBeverage {
+                            Picker("Food & beverage", selection: $foodBeverageKind) {
+                                ForEach(FoodBeverageKind.allCases, id: \.self) { k in
+                                    Text(k.label).tag(k)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(.white)
+
+                            if foodBeverageKind == .other {
+                                TextField("Describe (e.g. buffet)", text: $foodBeverageOtherText)
+                                    .textFieldStyle(DarkTextFieldStyle())
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Details (optional)")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            TextField("Host name, promo…", text: $detailsText, axis: .vertical)
+                                .lineLimit(3...6)
+                                .textFieldStyle(DarkTextFieldStyle())
+                        }
+
+                        DatePicker("Date & time", selection: $timestamp, displayedComponents: [.date, .hourAndMinute])
+                            .colorScheme(.dark)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Receipt photo")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
+                                    .background(Color(.systemGray6).opacity(0.2))
+                                    .cornerRadius(12)
+
+                                if let img = compPhoto {
+                                    Image(uiImage: img)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .cornerRadius(10)
+                                        .padding(4)
+                                } else {
+                                    Text(photoExplicitlyRemoved ? "Photo removed" : "No photo")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                        .padding(16)
+                                }
+                            }
+                            .frame(maxHeight: 180)
+
+                            HStack(spacing: 12) {
+                                Button {
+                                    compPhotoSource = .camera
+                                } label: {
+                                    Label("Camera", systemImage: "camera")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue.opacity(0.9))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+                                Button {
+                                    compPhotoSource = .photoLibrary
+                                } label: {
+                                    Label("Library", systemImage: "photo")
+                                        .font(.caption.bold())
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                }
+                                if compPhoto != nil {
+                                    Button(role: .destructive) {
+                                        compPhoto = nil
+                                        photoExplicitlyRemoved = true
+                                    } label: {
+                                        Label("Remove", systemImage: "trash")
+                                            .font(.caption.bold())
+                                    }
+                                }
+                            }
+                        }
+
+                        Button {
+                            save()
+                        } label: {
+                            Text("Save comp")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(canSave ? Color.green : Color.gray)
+                                .foregroundColor(canSave ? .black : .white)
+                                .cornerRadius(14)
+                        }
+                        .disabled(!canSave)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("Edit comp")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }.foregroundColor(.green)
+                }
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            if let url = CompPhotoStorage.url(for: original.id),
+               let img = UIImage(contentsOfFile: url.path) {
+                compPhoto = img
+            }
+        }
+        .adaptiveSheet(item: $compPhotoSource) { source in
+            switch source {
+            case .camera:
+                CameraPicker(selectedImage: .constant(nil)) { image in
+                    compPhoto = image
+                    photoExplicitlyRemoved = false
+                }
+            case .photoLibrary:
+                ImagePicker(selectedImage: .constant(nil)) { image in
+                    compPhoto = image
+                    photoExplicitlyRemoved = false
+                }
+            }
+        }
+    }
+
+    private func compKindPill(_ kind: CompKind) -> some View {
+        Button {
+            selectedKind = kind
+        } label: {
+            Text(kind.title)
+                .font(.caption.bold())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(selectedKind == kind ? Color.green : Color(.systemGray6).opacity(0.25))
+                .foregroundColor(selectedKind == kind ? .black : .white)
+                .clipShape(Capsule())
+        }
+    }
+
+    private func save() {
+        guard let amt = parsedAmount, amt > 0 else { return }
+        let trimmedDetails = detailsText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let details: String? = trimmedDetails.isEmpty ? nil : trimmedDetails
+        let fb: FoodBeverageKind? = (selectedKind == .foodBeverage) ? foodBeverageKind : nil
+        let otherTrim = foodBeverageOtherText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let other: String? = (selectedKind == .foodBeverage && fb == .other && !otherTrim.isEmpty) ? otherTrim : nil
+
+        let updated = CompEvent(
+            id: original.id,
+            amount: amt,
+            timestamp: timestamp,
+            kind: selectedKind,
+            details: details,
+            foodBeverageKind: fb,
+            foodBeverageOtherDescription: other
+        )
+        if photoExplicitlyRemoved {
+            CompPhotoStorage.deleteImage(compEventID: original.id)
+        } else if let img = compPhoto, let jpeg = img.jpegData(compressionQuality: 0.9) {
+            CompPhotoStorage.saveJPEGData(jpeg, compEventID: original.id)
+        }
+        onSave(updated)
+        dismiss()
     }
 }

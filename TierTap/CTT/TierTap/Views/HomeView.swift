@@ -231,7 +231,13 @@ struct HomeView: View {
             .environmentObject(authStore)
         }
         .adaptiveSheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
-        .adaptiveSheet(isPresented: $showHistory) { HistoryView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showHistory) {
+            HistoryView()
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
+        }
         .adaptiveSheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
     }
 }

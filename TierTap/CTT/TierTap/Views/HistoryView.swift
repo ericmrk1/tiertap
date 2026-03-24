@@ -1,10 +1,17 @@
 import SwiftUI
 import UIKit
 
+/// Which local image to use as the background when sharing a session as a photo with metrics overlaid.
+enum SessionSharePhotoBase: Equatable, Hashable {
+    case sessionChip
+    case comp(UUID)
+}
+
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSession: Session?
     @State private var sessionToEdit: Session?
@@ -292,6 +299,8 @@ struct HistoryView: View {
                 EditSessionView(session: s)
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(authStore)
             }
             .alert("Delete Session?", isPresented: showDeleteAlert) {
                 Button("Cancel", role: .cancel) { sessionToDelete = nil }
@@ -305,12 +314,16 @@ struct HistoryView: View {
                 Text("This session will be permanently removed. This cannot be undone.")
             }
             .adaptiveSheet(isPresented: $isShareSelectorPresented) {
-                SessionShareSelectionView(sessions: filteredSessions) { selected, shareAsPhoto, includeWinLosses in
+                SessionShareSelectionView(
+                    sessions: filteredSessions,
+                    photoOptions: { sessionSharePhotoOptions(for: $0) }
+                ) { selected, shareAsPhoto, includeWinLosses, photoBase in
                     guard !selected.isEmpty else { return }
                     pendingShareItems = createShareItems(
                         for: selected,
                         shareAsPhoto: shareAsPhoto,
-                        includeWinLosses: includeWinLosses
+                        includeWinLosses: includeWinLosses,
+                        photoBase: photoBase
                     )
                 }
                 .environmentObject(settingsStore)
@@ -345,9 +358,28 @@ struct HistoryView: View {
 }
 
 extension HistoryView {
-    private func createShareItems(for sessions: [Session], shareAsPhoto: Bool, includeWinLosses: Bool) -> [Any] {
+    /// Labels and sources for shareable photos: session chip image plus any comp receipt images on disk.
+    fileprivate func sessionSharePhotoOptions(for session: Session) -> [(label: String, base: SessionSharePhotoBase)] {
+        var out: [(String, SessionSharePhotoBase)] = []
+        if let fileName = session.chipEstimatorImageFilename,
+           let url = ChipEstimatorPhotoStorage.url(for: fileName),
+           FileManager.default.fileExists(atPath: url.path) {
+            out.append(("Session photo", .sessionChip))
+        }
+        for ev in session.compEvents {
+            guard let url = CompPhotoStorage.url(for: ev.id),
+                  FileManager.default.fileExists(atPath: url.path) else { continue }
+            let kind = ev.kind.title
+            let amt = "\(settingsStore.currencySymbol)\(ev.amount)"
+            let time = ev.timestamp.formatted(date: .omitted, time: .shortened)
+            out.append(("Comp · \(kind) · \(amt) · \(time)", .comp(ev.id)))
+        }
+        return out
+    }
+
+    private func createShareItems(for sessions: [Session], shareAsPhoto: Bool, includeWinLosses: Bool, photoBase: SessionSharePhotoBase?) -> [Any] {
         #if os(iOS)
-        if shareAsPhoto, let image = sharePhoto(for: sessions, includeWinLosses: includeWinLosses) {
+        if shareAsPhoto, let image = sharePhoto(for: sessions, includeWinLosses: includeWinLosses, photoBase: photoBase) {
             return [image]
         }
         #endif
@@ -361,11 +393,52 @@ extension HistoryView {
     }
 
     #if os(iOS)
-    private func sharePhoto(for sessions: [Session], includeWinLosses: Bool) -> UIImage? {
-        guard let session = sessions.first(where: { $0.chipEstimatorImageFilename != nil }),
-              let fileName = session.chipEstimatorImageFilename,
-              let url = ChipEstimatorPhotoStorage.url(for: fileName),
-              let baseImage = UIImage(contentsOfFile: url.path) else {
+    /// When the user did not pick a specific image, prefer session chip in session order, then first comp photo on disk.
+    private func defaultSharePhotoBase(for sessions: [Session]) -> (session: Session, base: SessionSharePhotoBase)? {
+        for s in sessions {
+            if let fn = s.chipEstimatorImageFilename,
+               let url = ChipEstimatorPhotoStorage.url(for: fn),
+               FileManager.default.fileExists(atPath: url.path) {
+                return (s, .sessionChip)
+            }
+        }
+        for s in sessions {
+            for ev in s.compEvents {
+                guard let url = CompPhotoStorage.url(for: ev.id),
+                      FileManager.default.fileExists(atPath: url.path) else { continue }
+                return (s, .comp(ev.id))
+            }
+        }
+        return nil
+    }
+
+    private func loadShareBaseImage(session: Session, base: SessionSharePhotoBase) -> UIImage? {
+        switch base {
+        case .sessionChip:
+            guard let fileName = session.chipEstimatorImageFilename,
+                  let url = ChipEstimatorPhotoStorage.url(for: fileName) else { return nil }
+            return UIImage(contentsOfFile: url.path)
+        case .comp(let id):
+            guard let url = CompPhotoStorage.url(for: id) else { return nil }
+            return UIImage(contentsOfFile: url.path)
+        }
+    }
+
+    private func sharePhoto(for sessions: [Session], includeWinLosses: Bool, photoBase: SessionSharePhotoBase?) -> UIImage? {
+        let session: Session
+        let base: SessionSharePhotoBase
+
+        if let picked = photoBase, let s = sessions.first {
+            session = s
+            base = picked
+        } else if let pair = defaultSharePhotoBase(for: sessions) {
+            session = pair.session
+            base = pair.base
+        } else {
+            return nil
+        }
+
+        guard let baseImage = loadShareBaseImage(session: session, base: base) else {
             return nil
         }
 
@@ -430,7 +503,7 @@ extension HistoryView {
                 ]
             ))
 
-            // Line 3: stats
+            // Line 3: primary stats (buy-in / cash / result / tier)
             var statsParts: [String] = []
 
             if includeWinLosses {
@@ -461,6 +534,35 @@ extension HistoryView {
                 let statsLine = statsParts.joined(separator: "   •   ")
                 lines.append(NSAttributedString(
                     string: statsLine,
+                    attributes: [
+                        .font: bodyFont,
+                        .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
+                        .paragraphStyle: paragraph
+                    ]
+                ))
+            }
+
+            // Line 4: comps + EV on their own row so they are not clipped when the primary stats line is long.
+            var compsEvParts: [String] = []
+            if !session.compEvents.isEmpty {
+                if session.totalComp > 0 {
+                    let c = "\(settingsStore.currencySymbol)\(session.totalComp)"
+                    compsEvParts.append("Comps \(c)")
+                } else {
+                    let n = session.compEvents.count
+                    compsEvParts.append(n == 1 ? "1 comp" : "\(n) comps")
+                }
+            }
+            if includeWinLosses, session.totalComp > 0, let ev = session.expectedValue {
+                let sign = ev >= 0 ? "+" : "-"
+                let evText = "\(settingsStore.currencySymbol)\(abs(ev))"
+                compsEvParts.append("EV \(sign)\(evText)")
+            }
+
+            if !compsEvParts.isEmpty {
+                let compsEvLine = compsEvParts.joined(separator: "   •   ")
+                lines.append(NSAttributedString(
+                    string: compsEvLine,
                     attributes: [
                         .font: bodyFont,
                         .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
@@ -538,13 +640,18 @@ struct SessionRow: View {
 
 struct SessionShareSelectionView: View {
     let sessions: [Session]
-    let onShare: (_ sessions: [Session], _ shareAsPhoto: Bool, _ includeWinLosses: Bool) -> Void
+    /// Returns labeled share backgrounds for the session (session photo + comp receipt images on disk).
+    let photoOptions: (Session) -> [(label: String, base: SessionSharePhotoBase)]
+    let onShare: (_ sessions: [Session], _ shareAsPhoto: Bool, _ includeWinLosses: Bool, _ photoBase: SessionSharePhotoBase?) -> Void
 
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSessionIDs: Set<UUID> = []
     @State private var shareAsPhoto: Bool = false
     @State private var includeWinLosses: Bool = true
+    @State private var showPhotoBasePicker = false
+    @State private var photoPickerSession: Session?
+    @State private var photoPickerOptions: [(label: String, base: SessionSharePhotoBase)] = []
 
     private var allSelected: Bool {
         !sessions.isEmpty && selectedSessionIDs.count == sessions.count
@@ -642,19 +749,75 @@ struct SessionShareSelectionView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Share") {
-                        let chosen = sortedSessions.filter { selectedSessionIDs.contains($0.id) }
-                        guard !chosen.isEmpty else { return }
-                        if settingsStore.enableCasinoFeedback {
-                            CelebrationPlayer.shared.playQuickChime()
-                        }
-                        onShare(chosen, shareAsPhoto, includeWinLosses)
-                        dismiss()
+                        shareTapped()
                     }
                     .foregroundColor(selectedSessionIDs.isEmpty ? .gray : .green)
                     .disabled(selectedSessionIDs.isEmpty)
                 }
             }
+            .adaptiveSheet(isPresented: $showPhotoBasePicker) {
+                if let s = photoPickerSession {
+                    SessionSharePhotoBasePickerSheet(
+                        casinoLine: "\(s.casino) · \(s.game)",
+                        options: photoPickerOptions
+                    ) { base in
+                        if settingsStore.enableCasinoFeedback {
+                            CelebrationPlayer.shared.playQuickChime()
+                        }
+                        onShare([s], true, includeWinLosses, base)
+                        showPhotoBasePicker = false
+                        photoPickerSession = nil
+                        photoPickerOptions = []
+                        dismiss()
+                    }
+                    .environmentObject(settingsStore)
+                }
+            }
+            .onChange(of: showPhotoBasePicker) { isShowing in
+                if !isShowing {
+                    photoPickerSession = nil
+                    photoPickerOptions = []
+                }
+            }
         }
+    }
+
+    private func shareTapped() {
+        let chosen = sortedSessions.filter { selectedSessionIDs.contains($0.id) }
+        guard !chosen.isEmpty else { return }
+
+        if !shareAsPhoto {
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.playQuickChime()
+            }
+            onShare(chosen, false, includeWinLosses, nil)
+            dismiss()
+            return
+        }
+
+        // Photo share: if exactly one session has multiple candidate images, pick which to use first.
+        if chosen.count == 1, let session = chosen.first {
+            let opts = photoOptions(session)
+            if opts.count > 1 {
+                photoPickerSession = session
+                photoPickerOptions = opts
+                showPhotoBasePicker = true
+                return
+            }
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.playQuickChime()
+            }
+            let singleBase = opts.first?.base
+            onShare(chosen, true, includeWinLosses, singleBase)
+            dismiss()
+            return
+        }
+
+        if settingsStore.enableCasinoFeedback {
+            CelebrationPlayer.shared.playQuickChime()
+        }
+        onShare(chosen, true, includeWinLosses, nil)
+        dismiss()
     }
 
     private func toggleSelection(for session: Session) {
@@ -662,6 +825,68 @@ struct SessionShareSelectionView: View {
             selectedSessionIDs.remove(session.id)
         } else {
             selectedSessionIDs.insert(session.id)
+        }
+    }
+}
+
+/// Lets the user pick session chip vs. comp receipt when more than one image exists for the share overlay.
+private struct SessionSharePhotoBasePickerSheet: View {
+    let casinoLine: String
+    let options: [(label: String, base: SessionSharePhotoBase)]
+    let onPick: (SessionSharePhotoBase) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                List {
+                    Section {
+                        Text(casinoLine)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.white.opacity(0.95))
+                            .listRowBackground(Color(.systemGray6).opacity(0.12))
+                        Text("Metrics will be drawn on the image you choose.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .listRowBackground(Color(.systemGray6).opacity(0.12))
+                    }
+
+                    Section(header: Text("Background image").foregroundColor(.gray)) {
+                        ForEach(Array(options.enumerated()), id: \.offset) { _, item in
+                            Button {
+                                onPick(item.base)
+                            } label: {
+                                HStack(alignment: .top) {
+                                    Text(item.label)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .foregroundColor(.green.opacity(0.85))
+                                }
+                            }
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
+            }
+            .navigationTitle("Choose photo")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+            }
         }
     }
 }

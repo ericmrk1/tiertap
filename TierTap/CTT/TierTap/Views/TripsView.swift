@@ -429,16 +429,12 @@ struct TripsView: View {
     }
 
     private func shareTrip(_ trip: Trip) {
-        let coverName = trip.photoFilenames.first
-        var cover: UIImage?
-        if let n = coverName {
-            cover = tripStore.loadPhoto(tripId: trip.id, filename: n)
-        }
+        let tripPhotos = trip.photoFilenames.compactMap { tripStore.loadPhoto(tripId: trip.id, filename: $0) }
         Task { @MainActor in
             if let image = await TripShareImageBuilder.render(
                 trip: trip,
                 sessions: linkedSessions(for: trip),
-                coverImage: cover,
+                tripPhotos: tripPhotos,
                 settingsStore: settingsStore
             ) {
                 listShareImageItem = ShareableImageItem(image: image)

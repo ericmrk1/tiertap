@@ -85,16 +85,21 @@ struct AnalyticsView: View {
         Array(Set(allClosedSessions.map { $0.casino })).sorted()
     }
 
+    /// Per-session result for charts and win rate: cash net or EV (net + comps).
+    private func sessionOutcome(_ session: Session) -> Int {
+        session.analyticsOutcome(useExpectedValue: settingsStore.analyticsUseExpectedValue) ?? 0
+    }
+
     private var winningSessions: [Session] {
-        closedSessions.filter { ($0.winLoss ?? 0) > 0 }
+        closedSessions.filter { sessionOutcome($0) > 0 }
     }
 
     private var losingSessions: [Session] {
-        closedSessions.filter { ($0.winLoss ?? 0) < 0 }
+        closedSessions.filter { sessionOutcome($0) < 0 }
     }
 
     private var breakEvenSessions: [Session] {
-        closedSessions.filter { ($0.winLoss ?? 0) == 0 }
+        closedSessions.filter { sessionOutcome($0) == 0 }
     }
 
     private var sessionsWithTierGain: [Session] {
@@ -102,15 +107,19 @@ struct AnalyticsView: View {
     }
 
     private var vennIntersectionCount: Int {
-        closedSessions.filter { ($0.winLoss ?? 0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
+        closedSessions.filter { sessionOutcome($0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
     }
 
     private var totalProfit: Int {
-        closedSessions.compactMap { $0.winLoss }.filter { $0 > 0 }.reduce(0, +)
+        closedSessions.map { sessionOutcome($0) }.filter { $0 > 0 }.reduce(0, +)
     }
 
     private var totalLoss: Int {
-        abs(closedSessions.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
+        abs(closedSessions.map { sessionOutcome($0) }.filter { $0 < 0 }.reduce(0, +))
+    }
+
+    private var vennLeftLabel: String {
+        settingsStore.analyticsUseExpectedValue ? "Positive EV" : "Winning sessions"
     }
 
     /// Sessions that have a mood set (for mood bar chart).
@@ -204,6 +213,7 @@ struct AnalyticsView: View {
                             headerSummary
                             filtersSection
                             gameCategoryToggle
+                            resultsBasisSection
                             graphTypePicker
                             selectedGraph
                             secondaryGraphs
@@ -291,6 +301,7 @@ struct AnalyticsView: View {
         }
         .adaptiveSheet(isPresented: $isAISheetPresented) {
             AIAnalyticsSheet()
+                .environmentObject(sessionStore)
                 .environmentObject(settingsStore)
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
@@ -325,7 +336,8 @@ struct AnalyticsView: View {
                     closedSessions: closedSessions,
                     gradient: settingsStore.primaryGradient,
                     currencySymbol: settingsStore.currencySymbol,
-                    locationFilterText: analyticsLocationFilterText
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
                 )
                 pendingShareSelection = nil
 
@@ -535,7 +547,8 @@ struct AnalyticsView: View {
                 bankroll: settingsStore.bankroll,
                 unitSize: settingsStore.unitSize,
                 targetAveragePerSession: settingsStore.targetAveragePerSession,
-                currentBetAmount: nil
+                currentBetAmount: nil,
+                useExpectedValue: settingsStore.analyticsUseExpectedValue
             )
             if ror.sessionCount == 0 { return "—" }
             let pct = ror.riskOfRuin * 100
@@ -550,6 +563,11 @@ struct AnalyticsView: View {
                     Text(selectedAnalyticsCategory == .table ? "Table Session Overview" : "Poker Session Overview")
                         .font(.headline)
                         .foregroundColor(.white)
+                    Text(settingsStore.analyticsUseExpectedValue
+                         ? "Results use EV (cash net + logged comps)."
+                         : "Results use cash net (comps excluded).")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
@@ -640,7 +658,7 @@ struct AnalyticsView: View {
                 )
             case .venn:
                 VennDiagramCard(
-                    leftLabel: "Winning sessions",
+                    leftLabel: vennLeftLabel,
                     rightLabel: "Tier gain",
                     leftCount: winningSessions.count,
                     rightCount: sessionsWithTierGain.count,
@@ -658,7 +676,11 @@ struct AnalyticsView: View {
                     gradient: settingsStore.primaryGradient,
                     currencySymbol: settingsStore.currencySymbol,
                     dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
+                    locationFilterText: analyticsLocationFilterText,
+                    chartTitle: settingsStore.analyticsUseExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
+                    basisCaption: settingsStore.analyticsUseExpectedValue
+                        ? "Totals use expected value (cash net + comps)."
+                        : "Totals use cash net (comps excluded)."
                 )
             case .tierProgress:
                 TierProgressLineChartCard(
@@ -700,14 +722,16 @@ struct AnalyticsView: View {
                     gradient: settingsStore.primaryGradient,
                     currencySymbol: settingsStore.currencySymbol,
                     dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
                 )
                 PokerROITrendChartCard(
                     sessions: closedSessions,
                     gradient: settingsStore.primaryGradient,
                     currencySymbol: settingsStore.currencySymbol,
                     dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
                 )
             }
         }
@@ -732,6 +756,24 @@ struct AnalyticsView: View {
             ) {
                 selectedAnalyticsCategory = .poker
             }
+        }
+    }
+
+    private var resultsBasisSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Results basis")
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+            Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
+                Text("Cash net").tag(false)
+                Text("EV (incl. comps)").tag(true)
+            }
+            .pickerStyle(.segmented)
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps."
+                 : "Win rate and dollar totals reflect table/poker cash only; comps are ignored.")
+                .font(.caption2)
+                .foregroundColor(.gray)
         }
     }
 }
@@ -768,14 +810,19 @@ struct AIAnalyticsSheet: View {
         case nextBadgeOrLevel
         case consistencyTapPointsIdeas
         case bestFittingRewards
-        
+
+        case tableCompsVsCashNet
+        case tableEvHotspots
+
         // Poker-focused questions
         case pokerProfitabilityOverview
         case pokerWinrateByGame
         case pokerROITrends
         case pokerSessionPatterns
         case pokerRiskProfile
-        
+        case pokerCompsVsCashNet
+        case pokerEvVsCashRoi
+
         var id: String { rawValue }
         
         /// Questions intended when analyzing non‑poker (table) sessions.
@@ -800,7 +847,9 @@ struct AIAnalyticsSheet: View {
                 .tapPointsEarningLately,
                 .nextBadgeOrLevel,
                 .consistencyTapPointsIdeas,
-                .bestFittingRewards
+                .bestFittingRewards,
+                .tableCompsVsCashNet,
+                .tableEvHotspots
             ]
         }
         
@@ -812,6 +861,8 @@ struct AIAnalyticsSheet: View {
                 .pokerROITrends,
                 .pokerSessionPatterns,
                 .pokerRiskProfile,
+                .pokerCompsVsCashNet,
+                .pokerEvVsCashRoi,
                 .moodVsPlay,
                 .whenTiltedOrOff,
                 .gentleBreakMoments,
@@ -843,11 +894,15 @@ struct AIAnalyticsSheet: View {
             case .nextBadgeOrLevel: return "What do I need for my next badge or level?"
             case .consistencyTapPointsIdeas: return "Easy ways to earn more TapPoints through consistency"
             case .bestFittingRewards: return "Which rewards best fit my habits?"
+            case .tableCompsVsCashNet: return "How do comps change my table results vs. cash net?"
+            case .tableEvHotspots: return "Where do EV (with comps) and cash net disagree most?"
             case .pokerProfitabilityOverview: return "How is my poker profitability overall?"
             case .pokerWinrateByGame: return "How do my poker results vary by game type?"
             case .pokerROITrends: return "How is my poker ROI trending over time?"
             case .pokerSessionPatterns: return "What patterns show up in my poker sessions?"
             case .pokerRiskProfile: return "What is my risk/volatility profile in poker?"
+            case .pokerCompsVsCashNet: return "How do comps change my poker results vs. cash net?"
+            case .pokerEvVsCashRoi: return "How does EV-based ROI compare to cash ROI in poker?"
             }
         }
         
@@ -893,6 +948,10 @@ struct AIAnalyticsSheet: View {
                 return "Recommend simple ways to earn more engagement rewards through consistency (logging sessions promptly, maintaining streaks), using \(toneLabel) and avoiding any push to gamble more."
             case .bestFittingRewards:
                 return "Based on travel and play patterns, suggest reward or perk styles that would likely fit them best (e.g., travel or status perks), keeping the focus on engagement and experience in \(toneLabel)."
+            case .tableCompsVsCashNet:
+                return "Using non‑poker table sessions only, compare cash net results to expected value (net + logged comps). Summarize how comps shift the picture (win rate, totals, a few standout sessions) in \(toneLabel)."
+            case .tableEvHotspots:
+                return "From table sessions only, call out properties or games where EV (with comps) looks meaningfully better or worse than cash net—without naming specific dollar amounts as advice, in \(toneLabel)."
             case .pokerProfitabilityOverview:
                 return "Using only poker sessions, summarize overall poker profitability, win/loss counts, and any clear patterns by property or game, in \(toneLabel)."
             case .pokerWinrateByGame:
@@ -903,6 +962,10 @@ struct AIAnalyticsSheet: View {
                 return "From poker sessions only, describe patterns in session length, stakes, and outcomes, and what that might suggest about pacing and game selection, using \(toneLabel)."
             case .pokerRiskProfile:
                 return "Using just poker sessions, explain the player's risk and volatility profile in poker (swings, buy‑ins, adds) in simple terms, in \(toneLabel), without giving betting strategy."
+            case .pokerCompsVsCashNet:
+                return "Using poker sessions only, compare cash net to EV (including comps). Summarize how comps change profitability and win‑rate‑style session counts, in \(toneLabel)."
+            case .pokerEvVsCashRoi:
+                return "Using poker sessions only, contrast ROI using cash net vs. ROI using EV (comps included) per session, and describe what that implies about the mix of comps vs. felt results, in \(toneLabel)."
             }
         }
     }
@@ -950,6 +1013,21 @@ struct AIAnalyticsSheet: View {
                                     }
                                 }
                             }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Results basis")
+                                .font(.caption.bold())
+                                .foregroundColor(.white.opacity(0.8))
+                            Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
+                                Text("Cash net").tag(false)
+                                Text("EV (incl. comps)").tag(true)
+                            }
+                            .pickerStyle(.segmented)
+                            Text("AI summaries and win/loss stats use this setting, matching the Analytics tab.")
+                                .font(.caption2)
+                                .foregroundColor(.white.opacity(0.55))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
@@ -1134,20 +1212,30 @@ struct AIAnalyticsSheet: View {
         let sortedRecent = closedSessions.sorted { $0.startTime > $1.startTime }
         let recentSessions = Array(sortedRecent.prefix(20))
         
+        let useEV = settingsStore.analyticsUseExpectedValue
+        func outcome(_ s: Session) -> Int {
+            s.analyticsOutcome(useExpectedValue: useEV) ?? 0
+        }
+
         let total = closedSessions.count
-        let wins = closedSessions.filter { ($0.winLoss ?? 0) > 0 }.count
-        let losses = closedSessions.filter { ($0.winLoss ?? 0) < 0 }.count
-        let breakeven = closedSessions.filter { ($0.winLoss ?? 0) == 0 }.count
-        let net = closedSessions.compactMap { $0.winLoss }.reduce(0, +)
+        let wins = closedSessions.filter { outcome($0) > 0 }.count
+        let losses = closedSessions.filter { outcome($0) < 0 }.count
+        let breakeven = closedSessions.filter { outcome($0) == 0 }.count
+        let net = closedSessions.map { outcome($0) }.reduce(0, +)
         let avgPerSession: Double? = total > 0 ? Double(net) / Double(total) : nil
         let winRate: Double? = total > 0 ? Double(wins) / Double(total) : nil
+
+        let netCashTotal = closedSessions.compactMap { $0.winLoss }.reduce(0, +)
+        let netEVTotal = closedSessions.compactMap { $0.expectedValue }.reduce(0, +)
+        let compsLoggedTotal = closedSessions.map { $0.totalComp }.reduce(0, +)
         
         let rorResult = RiskOfRuinMath.compute(
             sessions: closedSessions,
             bankroll: settingsStore.bankroll,
             unitSize: settingsStore.unitSize,
             targetAveragePerSession: settingsStore.targetAveragePerSession,
-            currentBetAmount: nil
+            currentBetAmount: nil,
+            useExpectedValue: useEV
         )
         
         let currency = settingsStore.currencySymbol
@@ -1181,6 +1269,16 @@ struct AIAnalyticsSheet: View {
             let wl = session.winLoss ?? 0
             let wlSign = wl > 0 ? "+" : (wl < 0 ? "-" : "")
             let wlText = wl == 0 ? "even" : "\(wlSign)\(currency)\(abs(wl))"
+            let comps = session.totalComp
+            let ev = session.expectedValue.map { v in
+                let sgn = v > 0 ? "+" : (v < 0 ? "-" : "")
+                return v == 0 ? "even" : "\(sgn)\(currency)\(abs(v))"
+            } ?? "n/a"
+            let basisLine: String = {
+                let v = outcome(session)
+                let sgn = v > 0 ? "+" : (v < 0 ? "-" : "")
+                return v == 0 ? "even" : "\(sgn)\(currency)\(abs(v))"
+            }()
             let points = session.tierPointsEarned ?? 0
             let mood = session.sessionMood?.label ?? "none"
             let hours = String(format: "%.1f hrs", session.hoursPlayed)
@@ -1196,12 +1294,26 @@ struct AIAnalyticsSheet: View {
                 }
             }()
             let dateText = df.string(from: session.startTime)
-            return "\(dateText): \(session.casino) — \(session.game), \(wlText), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
+            return "\(dateText): \(session.casino) — \(session.game), cash \(wlText), comps \(currency)\(comps), EV \(ev), result for selected basis \(basisLine), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
         }.joined(separator: "\n")
+
+        let basisName = useEV ? "EV (includes comps)" : "Cash net"
+        let cashNetAggString: String = {
+            if netCashTotal == 0 { return "break-even" }
+            let sign = netCashTotal > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(netCashTotal))"
+        }()
+        let evAggString: String = {
+            if netEVTotal == 0 { return "break-even" }
+            let sign = netEVTotal > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(netEVTotal))"
+        }()
         
         let statsBlock = """
         Settings: bankroll \(currency)\(settingsStore.bankroll), unit \(currency)\(settingsStore.unitSize)
-        Summary: sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString)
+        Results basis for counts/net/win rate below: \(basisName) (user-selected in Analytics).
+        Summary (\(basisName)): sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString) (table games only; poker excluded from RoR).
+        Aggregates for comparison: cash net total \(cashNetAggString), EV total \(evAggString), comps logged \(currency)\(compsLoggedTotal).
         """
         
         let toneInstruction = settingsStore.aiTone.promptLabel
@@ -1435,7 +1547,7 @@ struct VennDiagramCard: View {
             )
             .frame(height: 220)
 
-            Text("Shows how often you both win money and gain tier points in the same session.")
+            Text("Shows how often you both have a positive session result (per your results basis) and gain tier points in the same session.")
                 .font(.caption)
                 .foregroundColor(.gray)
 
@@ -1543,12 +1655,14 @@ struct WinLossBarChartCard: View {
     let currencySymbol: String
     var dateRangeText: String? = nil
     var locationFilterText: String? = nil
+    var chartTitle: String = "Win/Loss Distribution"
+    var basisCaption: String? = nil
 
     var body: some View {
         let maxValue = max(Double(totalProfit), Double(totalLoss), 1)
 
         return VStack(alignment: .leading, spacing: 12) {
-            Label("Win/Loss Distribution", systemImage: "chart.bar.fill")
+            Label(chartTitle, systemImage: "chart.bar.fill")
                 .font(.headline)
                 .foregroundColor(.white)
 
@@ -1557,7 +1671,7 @@ struct WinLossBarChartCard: View {
                 BarRow(label: "Total loss", value: Double(totalLoss), maxValue: maxValue, gradient: LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing), currencySymbol: currencySymbol)
             }
 
-            Text("How much you’ve won vs. lost across all completed sessions.")
+            Text(basisCaption ?? "How much you’ve won vs. lost across all completed sessions.")
                 .font(.caption)
                 .foregroundColor(.gray)
 
@@ -1963,15 +2077,21 @@ private func buildAnalyticsShareImages(
     closedSessions: [Session],
     gradient: LinearGradient,
     currencySymbol: String,
-    locationFilterText: String? = nil
+    locationFilterText: String? = nil,
+    useExpectedValue: Bool = false
 ) -> [UIImage] {
     var images: [UIImage] = []
 
-    let winningSessions = closedSessions.filter { ($0.winLoss ?? 0) > 0 }
+    func outcome(_ s: Session) -> Int {
+        s.analyticsOutcome(useExpectedValue: useExpectedValue) ?? 0
+    }
+
+    let winningSessions = closedSessions.filter { outcome($0) > 0 }
     let sessionsWithTierGain = closedSessions.filter { ($0.tierPointsEarned ?? 0) > 0 }
-    let vennIntersectionCount = closedSessions.filter { ($0.winLoss ?? 0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
-    let totalProfit = closedSessions.compactMap { $0.winLoss }.filter { $0 > 0 }.reduce(0, +)
-    let totalLoss = abs(closedSessions.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
+    let vennIntersectionCount = closedSessions.filter { outcome($0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
+    let totalProfit = closedSessions.map { outcome($0) }.filter { $0 > 0 }.reduce(0, +)
+    let totalLoss = abs(closedSessions.map { outcome($0) }.filter { $0 < 0 }.reduce(0, +))
+    let vennLeftLabel = useExpectedValue ? "Positive EV" : "Winning sessions"
 
     let betCaptureDiffByDate: [(date: Date, diff: Int)] = {
         let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
@@ -2030,7 +2150,7 @@ private func buildAnalyticsShareImages(
 
     if selection.includeVenn {
         let card = VennDiagramCard(
-            leftLabel: "Winning sessions",
+            leftLabel: vennLeftLabel,
             rightLabel: "Tier gain",
             leftCount: winningSessions.count,
             rightCount: sessionsWithTierGain.count,
@@ -2053,7 +2173,11 @@ private func buildAnalyticsShareImages(
             gradient: gradient,
             currencySymbol: currencySymbol,
             dateRangeText: dateRangeText,
-            locationFilterText: locationFilterText
+            locationFilterText: locationFilterText,
+            chartTitle: useExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
+            basisCaption: useExpectedValue
+                ? "Totals use expected value (cash net + comps)."
+                : "Totals use cash net (comps excluded)."
         )
         if let image = renderAnalyticsCard(card) {
             images.append(image)
@@ -2079,7 +2203,8 @@ private func buildAnalyticsShareImages(
                 gradient: gradient,
                 currencySymbol: currencySymbol,
                 dateRangeText: dateRangeText,
-                locationFilterText: locationFilterText
+                locationFilterText: locationFilterText,
+                useExpectedValue: useExpectedValue
             )
             if let image = renderAnalyticsCard(card) {
                 images.append(image)
@@ -2104,7 +2229,8 @@ private func buildAnalyticsShareImages(
                 gradient: gradient,
                 currencySymbol: currencySymbol,
                 dateRangeText: dateRangeText,
-                locationFilterText: locationFilterText
+                locationFilterText: locationFilterText,
+                useExpectedValue: useExpectedValue
             )
             if let image = renderAnalyticsCard(card) {
                 images.append(image)

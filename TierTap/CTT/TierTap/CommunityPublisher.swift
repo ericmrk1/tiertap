@@ -27,7 +27,8 @@ struct CommunityPublisher {
     /// `currencyCode` and `currencySymbol` are saved into the metrics JSON so the feed can render amounts correctly.
     /// Optional `comment` is stored in each post's session_details JSON and shown in the feed (one line).
     /// When `publishTierPerHour` is true, `tiers_per_hour` is included in metrics; otherwise it is omitted.
-    /// When `publishWinLoss` is true, buy-in, cash-out, and net win/loss are included in metrics.
+    /// When `publishWinLoss` is true, buy-in, cash-out, net win/loss, total comps, and EV (expected value = net + comps) are included in metrics.
+    /// When `publishCompDetails` is true, `comp_count` and `comp_value_total` (sum of logged comp amounts) are included for sessions that have comps.
     static func publishSessions(
         _ sessions: [Session],
         authStore: AuthStore,
@@ -35,7 +36,8 @@ struct CommunityPublisher {
         currencySymbol: String,
         comment: String? = nil,
         publishTierPerHour: Bool = true,
-        publishWinLoss: Bool = false
+        publishWinLoss: Bool = false,
+        publishCompDetails: Bool = false
     ) async throws -> Int {
         guard SupabaseConfig.isConfigured else {
             throw CommunityPublisherError.supabaseNotConfigured
@@ -69,6 +71,7 @@ struct CommunityPublisher {
                 comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t }
             )
 
+            let includeCompSummary = publishCompDetails && !s.compEvents.isEmpty
             let metrics = TableGamePostMetricsPayload(
                 duration_seconds: Int(s.duration),
                 starting_tier_points: s.startingTierPoints,
@@ -80,7 +83,11 @@ struct CommunityPublisher {
                 currency_symbol: currencySymbol,
                 total_buy_in: publishWinLoss ? s.totalBuyIn : nil,
                 cash_out: publishWinLoss ? s.cashOut : nil,
-                net_win_loss: publishWinLoss ? s.winLoss : nil
+                net_win_loss: publishWinLoss ? s.winLoss : nil,
+                total_comp: publishWinLoss ? s.totalComp : nil,
+                expected_value: publishWinLoss ? s.expectedValue : nil,
+                comp_count: includeCompSummary ? s.compEvents.count : nil,
+                comp_value_total: includeCompSummary ? s.totalComp : nil
             )
 
             return TableGamePostPayload(
@@ -135,6 +142,14 @@ struct TableGamePostMetrics: Codable {
     let total_buy_in: Int?
     let cash_out: Int?
     let net_win_loss: Int?
+    /// Total comps (currency units) when shared with win/loss.
+    let total_comp: Int?
+    /// Win/loss plus comps (EV) when shared with win/loss.
+    let expected_value: Int?
+    /// Number of comp line items when the poster shared comp details (independent of win/loss).
+    let comp_count: Int?
+    /// Sum of logged comp amounts (estimated cash value) when the poster shared comp details.
+    let comp_value_total: Int?
 }
 
 /// JSON body stored in the `metrics` column when publishing sessions.
@@ -151,6 +166,10 @@ struct TableGamePostMetricsPayload: Encodable {
     let total_buy_in: Int?
     let cash_out: Int?
     let net_win_loss: Int?
+    let total_comp: Int?
+    let expected_value: Int?
+    let comp_count: Int?
+    let comp_value_total: Int?
 }
 
 /// Decodable row type for reading from the `TableGamePosts` table.

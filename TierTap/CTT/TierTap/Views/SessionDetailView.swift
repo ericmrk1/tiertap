@@ -47,18 +47,45 @@ struct SessionDetailView: View {
                         .frame(maxWidth: .infinity).padding()
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
 
-                        if let fileName = session.chipEstimatorImageFilename,
-                           let url = ChipEstimatorPhotoStorage.url(for: fileName),
-                           let uiImage = UIImage(contentsOfFile: url.path) {
-                            DetailSection(title: "Session photo", icon: "camera.viewfinder") {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(12)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                    )
+                        if hasSessionPhotosContent {
+                            DetailSection(title: "Session Photos", icon: "photo.on.rectangle.angled") {
+                                VStack(alignment: .leading, spacing: 16) {
+                                    if let fileName = session.chipEstimatorImageFilename,
+                                       let url = ChipEstimatorPhotoStorage.url(for: fileName),
+                                       let uiImage = UIImage(contentsOfFile: url.path) {
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            Text("Session")
+                                                .font(.caption.bold())
+                                                .foregroundColor(.gray)
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .cornerRadius(12)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                                )
+                                        }
+                                    }
+                                    ForEach(session.compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            Text("Comp receipt · \(settingsStore.currencySymbol)\(ev.amount) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))")
+                                                .font(.caption.bold())
+                                                .foregroundColor(.gray)
+                                            if let url = CompPhotoStorage.url(for: ev.id),
+                                               let ui = UIImage(contentsOfFile: url.path) {
+                                                Image(uiImage: ui)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .cornerRadius(12)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 12)
+                                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                                    )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -73,6 +100,11 @@ struct SessionDetailView: View {
                                 MetricCard(title: "Win/Loss",
                                            value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                            color: wl >= 0 ? .green : .red)
+                            }
+                            if let ev = session.expectedValue {
+                                MetricCard(title: "EV",
+                                           value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
+                                           color: ev >= 0 ? .green : .red)
                             }
                             if let rate = session.winRatePerHour {
                                 MetricCard(title: "Win Rate",
@@ -103,24 +135,10 @@ struct SessionDetailView: View {
                             DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(session.totalBuyIn)", bold: true)
                             if !session.compEvents.isEmpty {
                                 ForEach(session.compEvents) { ev in
-                                    HStack(alignment: .top, spacing: 10) {
-                                        CompEventPhotoThumbnail(compEventID: ev.id, side: 52)
-                                        DetailRow(
-                                            label: {
-                                                if let fbLine = ev.foodBeverageKindDisplayLabel {
-                                                    return "\(ev.kind.title) · \(fbLine) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))"
-                                                }
-                                                return "\(ev.kind.title) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))"
-                                            }(),
-                                            value: {
-                                                var v = "\(settingsStore.currencySymbol)\(ev.amount)"
-                                                if let d = ev.details, !d.isEmpty {
-                                                    v += " — \(d)"
-                                                }
-                                                return v
-                                            }()
-                                        )
-                                    }
+                                    DetailRow(
+                                        label: ev.timestamp.formatted(date: .omitted, time: .shortened),
+                                        value: "\(settingsStore.currencySymbol)\(ev.amount)"
+                                    )
                                 }
                                 DetailRow(label: "Total Comps", value: "\(settingsStore.currencySymbol)\(session.totalComp)", bold: true)
                             }
@@ -131,6 +149,11 @@ struct SessionDetailView: View {
                                 DetailRow(label: "Win/Loss",
                                           value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                           valueColor: wl >= 0 ? .green : .red, bold: true)
+                            }
+                            if let ev = session.expectedValue {
+                                DetailRow(label: "EV (win/loss + comps)",
+                                          value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
+                                          valueColor: ev >= 0 ? .green : .red, bold: true)
                             }
                         }
 
@@ -255,6 +278,20 @@ struct SessionDetailView: View {
                     .environmentObject(settingsStore)
             }
         }
+    }
+
+    private func compHasReceiptPhoto(_ id: UUID) -> Bool {
+        guard let url = CompPhotoStorage.url(for: id) else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+
+    private var hasSessionPhotosContent: Bool {
+        if let fileName = session.chipEstimatorImageFilename,
+           let url = ChipEstimatorPhotoStorage.url(for: fileName),
+           FileManager.default.fileExists(atPath: url.path) {
+            return true
+        }
+        return session.compEvents.contains { compHasReceiptPhoto($0.id) }
     }
 }
 

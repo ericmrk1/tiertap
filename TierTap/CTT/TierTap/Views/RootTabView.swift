@@ -73,7 +73,7 @@ struct CommunitySessionsView: View {
     @State private var availableGames: [String] = []
     @State private var availableLocations: [String] = []
     @State private var filterStartDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date().addingTimeInterval(-24 * 60 * 60)
-    @State private var filterEndDate: Date = Date()
+    @State private var filterEndDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @State private var showMapSheet = false
     @State private var mapSessions: [TableGamePostRow] = []
     @State private var hasMoreFeedPages = false
@@ -209,8 +209,7 @@ struct CommunitySessionsView: View {
                             LazyVStack(spacing: 12) {
                                 ForEach(visibleFeedSessions) { item in
                                     CommunityFeedRow(item: item, onShowLocation: { row in
-                                        mapSessions = [row]
-                                        showMapSheet = true
+                                        presentCommunityMap(with: [row])
                                     })
                                         .environmentObject(settingsStore)
                                         .padding(.horizontal)
@@ -261,8 +260,7 @@ struct CommunitySessionsView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     if SupabaseConfig.isConfigured, authStore.isSignedIn, !visibleFeedSessions.isEmpty {
                         Button {
-                            mapSessions = visibleFeedSessions
-                            showMapSheet = true
+                            presentCommunityMap(with: visibleFeedSessions)
                         } label: {
                             Text("🌐")
                                 .font(.title2)
@@ -863,6 +861,15 @@ struct EmojiPickerView: View {
 extension CommunitySessionsView {
     private var communityPageSize: Int { 100 }
 
+    /// Opens the map sheet and ensures casino coordinates are loaded (or refreshed) for the given sessions.
+    private func presentCommunityMap(with sessions: [TableGamePostRow]) {
+        mapSessions = sessions
+        showMapSheet = true
+        Task {
+            await preloadLocationLookup(for: sessions)
+        }
+    }
+
     private func loadCommunityFeedIfNeeded() async {
         guard SupabaseConfig.isConfigured, authStore.isSignedIn else { return }
         if !feedSessions.isEmpty || isLoadingFeed { return }
@@ -1142,11 +1149,34 @@ struct CommunityFeedRow: View {
         metrics?.currency_symbol ?? settingsStore.currencySymbol
     }
 
-    private var dateString: String {
+    /// Full date/time for accessibility (always absolute).
+    private var dateStringAccessibility: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: item.created_at)
+    }
+
+    /// Shown in the card corner: Today/Yesterday + time, or medium date + short time.
+    private var feedDateDisplay: String {
+        let date = item.created_at
+        let cal = Calendar.current
+        let timeOnly = DateFormatter()
+        timeOnly.timeStyle = .short
+        timeOnly.dateStyle = .none
+        let timeStr = timeOnly.string(from: date)
+
+        if cal.isDateInToday(date) {
+            return "Today, \(timeStr)"
+        }
+        if cal.isDateInYesterday(date) {
+            return "Yesterday, \(timeStr)"
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
     private var betDifferentialPercent: Double? {
@@ -1208,10 +1238,9 @@ struct CommunityFeedRow: View {
         let gameName = item.game ?? item.session_details?.game ?? "Unknown game"
         let metrics = self.metrics
 
-        VStack(alignment: .leading, spacing: 10) {
-            // Left: casino + note (stays high). Right: game + net + tier/hr (does not push the note down).
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
                         Text(casinoName)
                             .font(.headline)
@@ -1230,6 +1259,11 @@ struct CommunityFeedRow: View {
                         }
                     }
 
+                    Text(gameName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.95))
+                        .lineLimit(2)
+
                     if let comment = item.session_details?.comment, !comment.isEmpty {
                         Text(comment)
                             .font(.caption)
@@ -1241,101 +1275,218 @@ struct CommunityFeedRow: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .trailing, spacing: 6) {
-                    Text(gameName)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white.opacity(0.95))
-                        .multilineTextAlignment(.trailing)
-                        .lineLimit(2)
-
-                    if let wl = metrics?.net_win_loss {
-                        let sym = currencySymbolForMetrics
-                        Text(wl >= 0 ? "Net +\(sym)\(wl)" : "Net -\(sym)\(abs(wl))")
-                            .font(.caption.bold())
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(wl >= 0 ? Color.green.opacity(0.75) : Color.red.opacity(0.75))
-                            )
-                            .accessibilityLabel("Net result \(wl >= 0 ? "plus" : "minus") \(abs(wl))")
-                    }
-
-                    if let tiers = metrics?.tiers_per_hour {
-                        Text(String(format: "%.1f pts/hr", tiers))
-                            .font(.caption.bold())
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(tiersPerHourColor)
-                            )
-                    }
-                }
-                .fixedSize(horizontal: true, vertical: false)
+                Text(feedDateDisplay)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.7))
+                    .multilineTextAlignment(.trailing)
+                    .fixedSize(horizontal: true, vertical: true)
+                    .accessibilityLabel("Posted \(dateStringAccessibility)")
             }
 
-            // Rating Diff; tier delta + date below
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .center) {
-                    Spacer()
-
-                    if let diff = betDifferentialPercent {
-                        Text("Rating Diff " + String(format: "%+.0f%%", diff))
-                            .font(.caption.bold())
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule()
-                                    .fill(betDifferentialColor)
-                            )
-                            .accessibilityLabel("Rating diff \(Int(diff)) percent")
-                    } else if metrics?.avg_bet_actual != nil || metrics?.avg_bet_rated != nil {
-                        Text("Rating Diff N/A")
-                            .font(.caption.bold())
-                            .foregroundColor(.white.opacity(0.85))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                            )
-                    }
+            CommunityFeedChipFlowLayout(horizontalSpacing: 6, verticalSpacing: 6) {
+                if let wl = metrics?.net_win_loss {
+                    let sym = currencySymbolForMetrics
+                    Text(wl >= 0 ? "Net +\(sym)\(wl)" : "Net -\(sym)\(abs(wl))")
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(wl >= 0 ? Color.green.opacity(0.75) : Color.red.opacity(0.75))
+                        )
+                        .accessibilityLabel("Net result \(wl >= 0 ? "plus" : "minus") \(abs(wl))")
                 }
 
-                // Second line: tier delta (left) and date (right)
-                HStack(alignment: .center) {
-                    if let delta = tierDelta {
-                        let sign = delta >= 0 ? "+" : ""
-                        Text("\(sign)\(delta) pts")
-                            .font(.caption.bold())
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(tierDeltaColor)
-                            )
-                    } else if metrics?.tiers_per_hour == nil {
-                        Text("PTS")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.7))
+                if let tc = metrics?.total_comp, tc > 0, let ev = metrics?.expected_value {
+                    let sym = currencySymbolForMetrics
+                    Text(ev >= 0 ? "EV +\(sym)\(ev)" : "EV -\(sym)\(abs(ev))")
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(ev >= 0 ? Color.teal.opacity(0.75) : Color.orange.opacity(0.75))
+                        )
+                        .accessibilityLabel("Expected value \(ev >= 0 ? "plus" : "minus") \(abs(ev)), including comps")
+                }
+
+                if let cc = metrics?.comp_count, cc > 0 {
+                    let sym = currencySymbolForMetrics
+                    let countLabel = cc == 1 ? "1 comp" : "\(cc) comps"
+                    Group {
+                        if let cv = metrics?.comp_value_total {
+                            Text("\(countLabel) · \(sym)\(cv) est.")
+                        } else {
+                            Text(countLabel)
+                        }
                     }
+                    .font(.caption.bold())
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.purple.opacity(0.7))
+                    )
+                    .accessibilityLabel(
+                        metrics?.comp_value_total.map { "\(cc) comps, estimated total value \(sym)\($0)" }
+                            ?? "\(cc) comps"
+                    )
+                }
 
-                    Spacer()
+                if let tiers = metrics?.tiers_per_hour {
+                    Text(String(format: "%.1f pts/hr", tiers))
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(tiersPerHourColor)
+                        )
+                }
 
-                    Text(dateString)
-                        .font(.caption2)
+                if let diff = betDifferentialPercent {
+                    Text("Rating Diff " + String(format: "%+.0f%%", diff))
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(betDifferentialColor)
+                        )
+                        .accessibilityLabel("Rating diff \(Int(diff)) percent")
+                } else if metrics?.avg_bet_actual != nil || metrics?.avg_bet_rated != nil {
+                    Text("Rating Diff N/A")
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.85))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                        )
+                }
+
+                if let delta = tierDelta {
+                    let sign = delta >= 0 ? "+" : ""
+                    Text("\(sign)\(delta) pts")
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(tierDeltaColor)
+                        )
+                } else if metrics?.tiers_per_hour == nil {
+                    Text("PTS")
+                        .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                 }
             }
         }
         .padding(12)
         .background(Color.black.opacity(0.35))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+/// Wraps metric chips left-to-right and onto new rows to keep the community feed card short.
+private struct CommunityFeedChipFlowLayout: Layout {
+    var horizontalSpacing: CGFloat = 6
+    var verticalSpacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        CommunityFeedChipFlowLayout.computeFrames(
+            maxWidth: proposal.width,
+            subviews: subviews,
+            horizontalSpacing: horizontalSpacing,
+            verticalSpacing: verticalSpacing
+        ).size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = CommunityFeedChipFlowLayout.computeFrames(
+            maxWidth: proposal.width,
+            subviews: subviews,
+            horizontalSpacing: horizontalSpacing,
+            verticalSpacing: verticalSpacing
+        )
+        for index in subviews.indices {
+            guard index < result.frames.count else { continue }
+            let frame = result.frames[index]
+            subviews[index].place(
+                at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
+                anchor: .topLeading,
+                proposal: ProposedViewSize(frame.size)
+            )
+        }
+    }
+
+    private static func computeFrames(
+        maxWidth: CGFloat?,
+        subviews: LayoutSubviews,
+        horizontalSpacing: CGFloat,
+        verticalSpacing: CGFloat
+    ) -> (frames: [CGRect], size: CGSize) {
+        guard !subviews.isEmpty else {
+            return ([], .zero)
+        }
+
+        let containerW: CGFloat
+        if let w = maxWidth, w.isFinite, w > 0 {
+            containerW = w
+        } else {
+            var frames: [CGRect] = []
+            var x: CGFloat = 0
+            var maxH: CGFloat = 0
+            for subview in subviews {
+                let size = subview.sizeThatFits(.unspecified)
+                if size.width < 0.5 && size.height < 0.5 {
+                    frames.append(.zero)
+                    continue
+                }
+                frames.append(CGRect(origin: CGPoint(x: x, y: 0), size: size))
+                x += size.width + horizontalSpacing
+                maxH = max(maxH, size.height)
+            }
+            let width = max(0, x - (subviews.isEmpty ? 0 : horizontalSpacing))
+            return (frames, CGSize(width: width, height: maxH))
+        }
+
+        // Single pass: wrap at container width.
+        var frames: [CGRect] = []
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var lineHeight: CGFloat = 0
+        var contentWidth: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if size.width < 0.5 && size.height < 0.5 {
+                frames.append(.zero)
+                continue
+            }
+            if x > 0, x + size.width > containerW {
+                x = 0
+                y += lineHeight + verticalSpacing
+                lineHeight = 0
+            }
+            frames.append(CGRect(origin: CGPoint(x: x, y: y), size: size))
+            contentWidth = max(contentWidth, x + size.width)
+            lineHeight = max(lineHeight, size.height)
+            x += size.width + horizontalSpacing
+        }
+
+        let totalHeight = y + lineHeight
+        let size = CGSize(width: min(containerW, contentWidth), height: totalHeight)
+        return (frames, size)
     }
 }
 
@@ -1556,9 +1707,10 @@ struct CommunityFeedFiltersView: View {
 // MARK: - Community feed map
 
 struct CommunityMapLocation: Identifiable {
-    let id = UUID()
     let name: String
     let coordinate: CLLocationCoordinate2D
+
+    var id: String { name }
 }
 
 struct CommunityFeedMapSheet: View {
@@ -1569,7 +1721,6 @@ struct CommunityFeedMapSheet: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var locations: [CommunityMapLocation] = []
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 39.5, longitude: -98.35),
         span: MKCoordinateSpan(latitudeDelta: 40, longitudeDelta: 40)
@@ -1585,10 +1736,30 @@ struct CommunityFeedMapSheet: View {
         )
     }
 
-    /// Drives refresh when async `locationLookup` fills in after the sheet appears, and when `sessions` changes.
+    /// Pins are always derived from the latest `locationLookup` (no stale `@State` cache).
+    private var resolvedMapLocations: [CommunityMapLocation] {
+        let uniqueNames = Set(
+            sessions.compactMap { row in
+                (row.location ?? row.session_details?.casino)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            .filter { !$0.isEmpty }
+        )
+        return uniqueNames.compactMap { name in
+            guard let coord = locationLookup[name] else { return nil }
+            return CommunityMapLocation(name: name, coordinate: coord)
+        }
+    }
+
+    /// Drives `region` updates when lookup data arrives or sessions change.
     private var mapRefreshKey: String {
         let sorted = Array(sessionCasinoNames).sorted().joined(separator: "|")
-        return "\(locationLookup.count)-\(sorted)-\(isLocationLookupLoading)"
+        let matched = sessionCasinoNames.filter { locationLookup[$0] != nil }.count
+        return "\(locationLookup.count)-\(matched)-\(sorted)-\(isLocationLookupLoading)"
+    }
+
+    private var showLoadingPlaceholder: Bool {
+        isLocationLookupLoading && !sessionCasinoNames.isEmpty && resolvedMapLocations.isEmpty
     }
 
     var body: some View {
@@ -1596,9 +1767,9 @@ struct CommunityFeedMapSheet: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
 
-                if locations.isEmpty {
+                if resolvedMapLocations.isEmpty {
                     Group {
-                        if isLocationLookupLoading && !sessionCasinoNames.isEmpty {
+                        if showLoadingPlaceholder {
                             VStack(spacing: 16) {
                                 ProgressView()
                                     .tint(.white)
@@ -1623,7 +1794,7 @@ struct CommunityFeedMapSheet: View {
                         }
                     }
                 } else {
-                    Map(coordinateRegion: $region, annotationItems: locations) { loc in
+                    Map(coordinateRegion: $region, annotationItems: resolvedMapLocations) { loc in
                         MapAnnotation(coordinate: loc.coordinate) {
                             VStack(spacing: 4) {
                                 Image(systemName: "mappin.circle.fill")
@@ -1654,36 +1825,16 @@ struct CommunityFeedMapSheet: View {
                     .foregroundColor(.green)
                 }
             }
-            .task(id: mapRefreshKey) {
-                populateLocationsFromLookup()
+            .onChange(of: mapRefreshKey) { _ in
+                updateRegion(for: resolvedMapLocations)
+            }
+            .onAppear {
+                updateRegion(for: resolvedMapLocations)
             }
         }
     }
 
-    private func populateLocationsFromLookup() {
-        let uniqueNames = Set(
-            sessions.compactMap { row in
-                (row.location ?? row.session_details?.casino)?
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-            }
-            .filter { !$0.isEmpty }
-        )
-
-        guard !uniqueNames.isEmpty else { return }
-
-        let mapped: [CommunityMapLocation] = uniqueNames.compactMap { name in
-            guard let coord = locationLookup[name] else { return nil }
-            return CommunityMapLocation(
-                name: name,
-                coordinate: coord
-            )
-        }
-
-        locations = mapped
-        updateRegion()
-    }
-
-    private func updateRegion() {
+    private func updateRegion(for locations: [CommunityMapLocation]) {
         guard !locations.isEmpty else { return }
         let lats = locations.map { $0.coordinate.latitude }
         let lons = locations.map { $0.coordinate.longitude }
@@ -1733,6 +1884,8 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var publishTierPerHour = true
     /// When on, buy-in, cash-out, and net win/loss are stored in metrics and shown on the feed.
     @State private var publishWinLoss = false
+    /// When on, comp count and total estimated comp value (from logged comps) are stored and shown on the feed.
+    @State private var publishCompDetails = false
 
     private var allSelected: Bool {
         !sessions.isEmpty && selectedSessionIDs.count == sessions.count
@@ -1741,6 +1894,10 @@ struct CommunitySessionPublishSelectionView: View {
     private var sortedSessions: [Session] {
         sessions.sorted { $0.startTime > $1.startTime }
     }
+
+    /// Approximate row height for `CommunitySessionSelectableRow` at default text size (2 lines + padding). List shows `sessionListVisibleRowCount` rows tall.
+    private static let sessionListRowHeight: CGFloat = 58
+    private static let sessionListVisibleRowCount: CGFloat = 3
 
     var body: some View {
         NavigationStack {
@@ -1757,36 +1914,6 @@ struct CommunitySessionPublishSelectionView: View {
                     }
                 } else {
                     List {
-                        Section {
-                            HStack {
-                                Button {
-                                    selectedSessionIDs = Set(sessions.map { $0.id })
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                        Text("Select All Sessions")
-                                            .foregroundColor(.white)
-                                    }
-                                }
-
-                                Spacer()
-
-                                Button {
-                                    selectedSessionIDs.removeAll()
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "xmark.circle")
-                                            .foregroundColor(.red)
-                                        Text("Clear All")
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .listRowBackground(Color(.systemGray6).opacity(0.2))
-                        }
-
                         Section(
                             header: Text("Add a short comment (optional)").foregroundColor(.gray),
                             footer: Text("One line in the feed. \(postComment.count)/\(ProfanityChecker.maxCommentLength) characters")
@@ -1805,13 +1932,25 @@ struct CommunitySessionPublishSelectionView: View {
                         }
 
                         Section(
-                            header: Text("Share details").foregroundColor(.gray),
-                            footer: Text("Tier/hour and wins/losses are optional. Wins/losses use each session’s buy-ins and cash-out.")
+                            header: Text("Share details").foregroundColor(.secondary),
+                            footer: Text("Tier/hour, comps, and wins/losses are optional.")
                                 .foregroundColor(.gray.opacity(0.8))
                         ) {
                             Toggle(isOn: $publishTierPerHour) {
                                 Text("Tier / hour")
                                     .foregroundColor(.white)
+                            }
+                            .tint(.green)
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+
+                            Toggle(isOn: $publishCompDetails) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Comp details")
+                                        .foregroundColor(.white)
+                                    Text("Count and total estimated value")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
                             }
                             .tint(.green)
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
@@ -1824,16 +1963,81 @@ struct CommunitySessionPublishSelectionView: View {
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
 
-                        Section(header: Text("Choose sessions to publish").foregroundColor(.gray)) {
-                            ForEach(sortedSessions) { session in
-                                CommunitySessionSelectableRow(
-                                    session: session,
-                                    isSelected: selectedSessionIDs.contains(session.id)
-                                ) {
-                                    toggleSelection(for: session)
+                        Section(header: Text("Choose sessions to publish").foregroundColor(.primary)) {
+                            ScrollView {
+                                LazyVStack(spacing: 0) {
+                                    ForEach(Array(sortedSessions.enumerated()), id: \.element.id) { index, session in
+                                        CommunitySessionSelectableRow(
+                                            session: session,
+                                            isSelected: selectedSessionIDs.contains(session.id)
+                                        ) {
+                                            toggleSelection(for: session)
+                                        }
+                                        if index < sortedSessions.count - 1 {
+                                            Divider()
+                                                .background(Color.white.opacity(0.12))
+                                        }
+                                    }
                                 }
-                                .listRowBackground(Color(.systemGray6).opacity(0.15))
                             }
+                            .frame(height: Self.sessionListRowHeight * Self.sessionListVisibleRowCount)
+                            .scrollIndicators(.visible)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+                        }
+
+                        Section {
+                            HStack(spacing: 10) {
+                                Button {
+                                    selectedSessionIDs = Set(sessions.map { $0.id })
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                        Text("Select All Sessions")
+                                            .lineLimit(2)
+                                            .minimumScaleFactor(0.8)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 6)
+                                    .background(settingsStore.primaryGradient)
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
+                                }
+                                .buttonStyle(.plain)
+
+                                Button {
+                                    selectedSessionIDs.removeAll()
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "xmark.circle.fill")
+                                        Text("Clear All")
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 6)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.92, green: 0.28, blue: 0.26),
+                                                Color(red: 0.52, green: 0.1, blue: 0.14)
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .cornerRadius(12)
+                                    .shadow(color: .black.opacity(0.28), radius: 5, x: 0, y: 2)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
                     }
                     .listStyle(.insetGrouped)
@@ -1867,15 +2071,43 @@ struct CommunitySessionPublishSelectionView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if let message = errorMessage {
-                    Text(message)
-                        .font(.caption)
-                        .foregroundColor(.red)
+                VStack(spacing: 8) {
+                    if let message = errorMessage {
+                        Text(message)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .background(Color.black.opacity(0.6))
+                    }
+                    if !sessions.isEmpty {
+                        Button {
+                            Task { await publishSelectedSessions() }
+                        } label: {
+                            Group {
+                                if isPublishing {
+                                    ProgressView()
+                                        .tint(.black)
+                                } else {
+                                    Text("Publish")
+                                        .fontWeight(.semibold)
+                                }
+                            }
+                            .font(.headline)
+                            .foregroundColor(.green)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 30)
+                            .background(Color.black).opacity(0.7)
+                            .cornerRadius(16)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(selectedSessionIDs.isEmpty || isPublishing)
+                        .opacity(selectedSessionIDs.isEmpty && !isPublishing ? 0.5 : 1)
                         .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .background(Color.black.opacity(0.6))
+                    }
                 }
+                .padding(.bottom, 8)
             }
         }
     }
@@ -1923,7 +2155,8 @@ struct CommunitySessionPublishSelectionView: View {
                 currencySymbol: settingsStore.currencySymbol,
                 comment: commentToPublish,
                 publishTierPerHour: publishTierPerHour,
-                publishWinLoss: publishWinLoss
+                publishWinLoss: publishWinLoss,
+                publishCompDetails: publishCompDetails
             )
             await MainActor.run {
                 isPublishing = false

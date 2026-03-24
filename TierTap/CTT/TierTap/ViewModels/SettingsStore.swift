@@ -32,6 +32,7 @@ private let keyLastAddOnBuyIn = "ctt_last_add_on_buy_in"
 private let keyLastFoodBeverageCompKind = "ctt_last_food_beverage_comp_kind"
 private let keyLastTableGame = "ctt_last_table_game"
 private let keyLastPokerDefaults = "ctt_last_poker_defaults"
+private let keyAnalyticsUseExpectedValue = "ctt_analytics_use_expected_value"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
 struct LastPokerSessionDefaults: Codable, Equatable {
@@ -390,6 +391,11 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(aiTone.rawValue, forKey: keyAITone) }
     }
 
+    /// When true, analytics (and matching AI summaries) treat session results as **EV** (cash net + comps). When false, **cash net** only.
+    @Published var analyticsUseExpectedValue: Bool {
+        didSet { UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue) }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -489,6 +495,11 @@ final class SettingsStore: ObservableObject {
             self.aiTone = tone
         } else {
             self.aiTone = .sarcastic
+        }
+        if UserDefaults.standard.object(forKey: keyAnalyticsUseExpectedValue) != nil {
+            self.analyticsUseExpectedValue = UserDefaults.standard.bool(forKey: keyAnalyticsUseExpectedValue)
+        } else {
+            self.analyticsUseExpectedValue = false
         }
 
         self.subscriptionOverrideCode = UserDefaults.standard.string(forKey: keySubscriptionOverrideCode) ?? ""

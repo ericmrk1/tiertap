@@ -38,9 +38,23 @@ struct SessionShareFormatter {
                 } else {
                     parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing even on the session.")
                 }
+                if session.totalComp > 0, let ev = session.expectedValue {
+                    parts.append("Including \(currencySymbol)\(session.totalComp) in comps, your expected value (EV) for the session was \(currencySymbol)\(ev).")
+                } else if session.totalComp > 0 {
+                    parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
+                }
             } else if let cashOut = session.cashOut {
                 parts.append("You cashed out with \(currencySymbol)\(cashOut).")
+                if session.totalComp > 0 {
+                    parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
+                }
+            } else if session.totalComp > 0 {
+                parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
             }
+        }
+
+        if let compLines = compEventsSummary(for: session, currencySymbol: currencySymbol) {
+            parts.append(compLines)
         }
 
         if let points = session.tierPointsEarned {
@@ -56,8 +70,34 @@ struct SessionShareFormatter {
         return parts.joined(separator: " ")
     }
 
+    /// One sentence listing each logged comp (with or without receipt photos).
+    private static func compEventsSummary(for session: Session, currencySymbol: String) -> String? {
+        guard !session.compEvents.isEmpty else { return nil }
+        let sorted = session.compEvents.sorted { $0.timestamp < $1.timestamp }
+        let maxItems = 12
+        let shown = Array(sorted.prefix(maxItems))
+        let items = shown.map { ev -> String in
+            let kind: String
+            if ev.kind == .foodBeverage, let fb = ev.foodBeverageKindDisplayLabel {
+                kind = "\(ev.kind.title) · \(fb)"
+            } else {
+                kind = ev.kind.title
+            }
+            let t = ev.timestamp.formatted(date: .omitted, time: .shortened)
+            return "\(kind) \(currencySymbol)\(ev.amount) at \(t)"
+        }
+        var out = "Comps logged: " + items.joined(separator: "; ") + "."
+        if sorted.count > maxItems {
+            out += " (and \(sorted.count - maxItems) more)"
+        }
+        return out
+    }
+
     private static func isPositive(_ session: Session) -> Bool {
-        if let wl = session.winLoss {
+        if let ev = session.expectedValue {
+            if ev > 0 { return true }
+            if ev < 0 { return false }
+        } else if let wl = session.winLoss {
             if wl > 0 { return true }
             if wl < 0 { return false }
         }

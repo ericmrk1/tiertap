@@ -19,7 +19,8 @@ private enum TripShareLayoutMetrics {
 struct TripShareCardView: View {
     let trip: Trip
     let sessions: [Session]
-    var coverImage: UIImage?
+    /// Trip photos in gallery order (first is shown as the hero strip; rest as thumbnails).
+    var tripPhotos: [UIImage] = []
     /// Map snapshot of flight legs (great-circle routes), when legs have coordinates.
     var flightRouteImage: UIImage?
     /// Horizontal layout width (points). Use ``TripShareImageBuilder/cardWidthPoints`` so the PNG fits phone share previews.
@@ -34,17 +35,85 @@ struct TripShareCardView: View {
         return "\(f.string(from: trip.startDate)) – \(f.string(from: trip.endDate))"
     }
 
+    private var coverImage: UIImage? { tripPhotos.first }
+
+    /// Linked-session comp rollup (same notion as per-session totals in Session detail).
+    private var tripCompTotal: Int {
+        sessions.reduce(0) { $0 + $1.totalComp }
+    }
+
+    private var tripCompDollarsCredits: Int {
+        sessions.reduce(0) { $0 + $1.totalCompDollarsCredits }
+    }
+
+    private var tripCompFoodBeverage: Int {
+        sessions.reduce(0) { acc, s in
+            acc + s.compEvents.filter { $0.kind == .foodBeverage }.reduce(0) { $0 + $1.amount }
+        }
+    }
+
+    private var additionalTripPhotos: [UIImage] {
+        Array(tripPhotos.dropFirst().prefix(8))
+    }
+
+    /// Up to two rows of four thumbnails so images stay legible on narrow cards.
+    private var additionalTripPhotoRows: [[UIImage]] {
+        let extras = additionalTripPhotos
+        guard !extras.isEmpty else { return [] }
+        let perRow = 4
+        return stride(from: 0, to: extras.count, by: perRow).map { start in
+            Array(extras[start..<min(start + perRow, extras.count)])
+        }
+    }
+
     private var sessionLines: [String] {
         sessions.prefix(8).map { s in
-            let wl: String
-            if let w = s.winLoss {
-                let sym = settingsStore.currencySymbol
-                wl = w >= 0 ? "+\(sym)\(w)" : "-\(sym)\(abs(w))"
+            let result: String
+            let sym = settingsStore.currencySymbol
+            if let ev = s.expectedValue {
+                result = ev >= 0 ? "EV +\(sym)\(ev)" : "EV -\(sym)\(abs(ev))"
+            } else if let w = s.winLoss {
+                result = w >= 0 ? "+\(sym)\(w)" : "-\(sym)\(abs(w))"
             } else {
-                wl = "—"
+                result = "—"
             }
-            return "\(s.casino) · \(s.game) · \(wl)"
+            return "\(s.casino) · \(s.game) · \(result)"
         }
+    }
+
+    /// Linked sessions with comps, oldest → newest by session start (for a readable comp list).
+    private var sessionsChronological: [Session] {
+        sessions.sorted { $0.startTime < $1.startTime }
+    }
+
+    /// Flat list of (session, comp) for share card detail rows.
+    private var compRowsChronological: [(session: Session, comp: CompEvent)] {
+        sessionsChronological.flatMap { s in
+            s.compEvents.sorted { $0.timestamp < $1.timestamp }.map { (s, $0) }
+        }
+    }
+
+    private var compRowsForShare: [(session: Session, comp: CompEvent)] {
+        Array(compRowsChronological.prefix(14))
+    }
+
+    private var compRowsOverflowCount: Int {
+        let n = compRowsChronological.count
+        return n > 14 ? n - 14 : 0
+    }
+
+    /// Sum of per-session EV where cash-out (and thus EV) is known.
+    private var tripExpectedValueSum: Int? {
+        let values = sessions.compactMap(\.expectedValue)
+        guard !values.isEmpty else { return nil }
+        return values.reduce(0, +)
+    }
+
+    private func compKindLabel(_ c: CompEvent) -> String {
+        if c.kind == .foodBeverage, let fb = c.foodBeverageKindDisplayLabel {
+            return "\(c.kind.title) · \(fb)"
+        }
+        return c.kind.title
     }
 
     /// Sessions with a mood, oldest → newest (for trend / sparkline).
@@ -208,6 +277,32 @@ struct TripShareCardView: View {
                     }
                 }
 
+                if !additionalTripPhotos.isEmpty {
+                    let thumbSpacing: CGFloat = 8
+                    let thumbH = max(76, min(photoStripHeight * 0.58, 118) * (contentInnerWidth / TripShareLayoutMetrics.referenceContentWidth))
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Photos (\(tripPhotos.count))")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white.opacity(0.78))
+                        VStack(alignment: .leading, spacing: thumbSpacing) {
+                            ForEach(Array(additionalTripPhotoRows.enumerated()), id: \.offset) { _, row in
+                                let cols = row.count
+                                let thumbW = (contentInnerWidth - thumbSpacing * CGFloat(cols - 1)) / CGFloat(cols)
+                                HStack(spacing: thumbSpacing) {
+                                    ForEach(Array(row.enumerated()), id: \.offset) { _, ui in
+                                        Image(uiImage: ui)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: thumbW, height: thumbH)
+                                            .clipped()
+                                            .cornerRadius(10)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Sessions (\(sessions.count))")
                         .font(.headline)
@@ -227,6 +322,68 @@ struct TripShareCardView: View {
                             Text("…and \(sessions.count - sessionLines.count) more")
                                 .font(.caption2)
                                 .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
+                }
+
+                if let tripEV = tripExpectedValueSum {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Trip EV")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text("\(tripEV >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(tripEV).formatted(.number.grouping(.automatic)))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(tripEV >= 0 ? Color.green.opacity(0.95) : Color.red.opacity(0.95))
+                    }
+                }
+
+                if tripCompTotal > 0 || !compRowsChronological.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Comps (trip)", systemImage: "gift.fill")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        if tripCompTotal > 0 {
+                            Text("Total comps \(settingsStore.currencySymbol)\(tripCompTotal.formatted(.number.grouping(.automatic)))")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.green.opacity(0.95))
+                            if tripCompDollarsCredits > 0 {
+                                Text("• \(CompKind.dollarsCredits.title): \(settingsStore.currencySymbol)\(tripCompDollarsCredits.formatted(.number.grouping(.automatic)))")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.88))
+                            }
+                            if tripCompFoodBeverage > 0 {
+                                Text("• \(CompKind.foodBeverage.title): \(settingsStore.currencySymbol)\(tripCompFoodBeverage.formatted(.number.grouping(.automatic)))")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.88))
+                            }
+                        }
+                        if !compRowsChronological.isEmpty {
+                            Text("Items")
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.white.opacity(0.78))
+                                .padding(.top, tripCompTotal > 0 ? 4 : 0)
+                            ForEach(compRowsForShare, id: \.comp.id) { row in
+                                HStack(alignment: .top, spacing: 10) {
+                                    CompEventPhotoThumbnail(compEventID: row.comp.id, side: 44, showPlaceholderWhenMissing: true)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("\(compKindLabel(row.comp)) · \(settingsStore.currencySymbol)\(row.comp.amount.formatted(.number.grouping(.automatic)))")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundColor(.white.opacity(0.95))
+                                        Text("\(row.session.casino) · \(row.session.game)")
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.72))
+                                        Text(row.comp.timestamp, style: .time)
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.55))
+                                    }
+                                    Spacer(minLength: 0)
+                                }
+                            }
+                            if compRowsOverflowCount > 0 {
+                                Text("…and \(compRowsOverflowCount) more")
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
                         }
                     }
                 }
@@ -373,12 +530,12 @@ enum TripShareImageBuilder {
     static func render(
         trip: Trip,
         sessions: [Session],
-        coverImage: UIImage?,
+        tripPhotos: [UIImage],
         settingsStore: SettingsStore
     ) async -> UIImage? {
         let width = cardWidthPoints
         let innerW = TripShareLayoutMetrics.contentWidth(cardWidth: width)
-        let mapBaseH: CGFloat = coverImage != nil ? 200 : 240
+        let mapBaseH: CGFloat = !tripPhotos.isEmpty ? 200 : 240
         let mapH = mapBaseH * (innerW / TripShareLayoutMetrics.referenceContentWidth)
         let routeImage = await TripFlightRouteSnapshot.makeImage(
             legs: trip.flights.legs,
@@ -387,7 +544,7 @@ enum TripShareImageBuilder {
         let card = TripShareCardView(
             trip: trip,
             sessions: sessions,
-            coverImage: coverImage,
+            tripPhotos: tripPhotos,
             flightRouteImage: routeImage,
             cardWidth: width
         )

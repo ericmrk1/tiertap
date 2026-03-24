@@ -60,21 +60,26 @@ enum RiskOfRuinMath {
     }
 
     /// Compute all RoR stats from session history and settings.
+    /// - Parameter useExpectedValue: When true, winning/losing counts and averages use EV (cash net + comps) per session; when false, cash net only.
     static func compute(
         sessions: [Session],
         bankroll: Int,
         unitSize: Int,
         targetAveragePerSession: Double?,
-        currentBetAmount: Int? = nil
+        currentBetAmount: Int? = nil,
+        useExpectedValue: Bool = false
     ) -> RiskOfRuinResult {
         // Exclude poker sessions (only use table games for RoR).
         let closed = sessions.filter { $0.winLoss != nil && $0.gameCategory != .poker }
-        let wins = closed.filter { ($0.winLoss ?? 0) > 0 }.count
-        let losses = closed.filter { ($0.winLoss ?? 0) < 0 }.count
+        func outcome(_ s: Session) -> Int {
+            s.analyticsOutcome(useExpectedValue: useExpectedValue) ?? 0
+        }
+        let wins = closed.filter { outcome($0) > 0 }.count
+        let losses = closed.filter { outcome($0) < 0 }.count
         let total = closed.count
 
         let actualAvg: Double? = total > 0
-            ? Double(closed.compactMap { $0.winLoss }.reduce(0, +)) / Double(total)
+            ? Double(closed.map { outcome($0) }.reduce(0, +)) / Double(total)
             : nil
 
         let sessionBasedRoR = sessionBasedRiskOfRuin(

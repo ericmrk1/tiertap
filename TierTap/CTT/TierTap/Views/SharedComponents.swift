@@ -242,17 +242,23 @@ struct PokerPerformanceSummaryCard: View {
     let currencySymbol: String
     let dateRangeText: String?
     let locationFilterText: String?
+    /// When true, net, hourly, ROI, and win rate use EV (cash + comps); when false, cash net only.
+    var useExpectedValue: Bool = false
 
     private var closedWithWL: [Session] {
         sessions.filter { $0.winLoss != nil && $0.gameCategory == .poker }
     }
 
+    private func outcome(_ s: Session) -> Int {
+        s.analyticsOutcome(useExpectedValue: useExpectedValue) ?? 0
+    }
+
     private var totalProfit: Int {
-        closedWithWL.compactMap { $0.winLoss }.filter { $0 > 0 }.reduce(0, +)
+        closedWithWL.map { outcome($0) }.filter { $0 > 0 }.reduce(0, +)
     }
 
     private var totalLoss: Int {
-        abs(closedWithWL.compactMap { $0.winLoss }.filter { $0 < 0 }.reduce(0, +))
+        abs(closedWithWL.map { outcome($0) }.filter { $0 < 0 }.reduce(0, +))
     }
 
     private var totalHours: Double {
@@ -260,7 +266,7 @@ struct PokerPerformanceSummaryCard: View {
     }
 
     private var hourlyRate: Double? {
-        let net = closedWithWL.compactMap { $0.winLoss }.reduce(0, +)
+        let net = closedWithWL.map { outcome($0) }.reduce(0, +)
         guard totalHours > 0 else { return nil }
         return Double(net) / totalHours
     }
@@ -268,12 +274,12 @@ struct PokerPerformanceSummaryCard: View {
     private var roiPercent: Double? {
         let totalInitial = closedWithWL.compactMap { $0.initialBuyIn }.reduce(0, +)
         guard totalInitial > 0 else { return nil }
-        let net = closedWithWL.compactMap { $0.winLoss }.reduce(0, +)
+        let net = closedWithWL.map { outcome($0) }.reduce(0, +)
         return (Double(net) / Double(totalInitial)) * 100.0
     }
 
     private var winRate: Double? {
-        let wins = closedWithWL.filter { ($0.winLoss ?? 0) > 0 }.count
+        let wins = closedWithWL.filter { outcome($0) > 0 }.count
         guard !closedWithWL.isEmpty else { return nil }
         return Double(wins) / Double(closedWithWL.count)
     }
@@ -290,6 +296,12 @@ struct PokerPerformanceSummaryCard: View {
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
+            }
+
+            if useExpectedValue {
+                Text("Basis: EV (cash net + comps)")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
             }
 
             HStack(spacing: 12) {
@@ -335,6 +347,7 @@ struct PokerROITrendChartCard: View {
     let currencySymbol: String
     let dateRangeText: String?
     let locationFilterText: String?
+    var useExpectedValue: Bool = false
 
     private struct Point: Identifiable {
         let id = UUID()
@@ -347,8 +360,9 @@ struct PokerROITrendChartCard: View {
             .filter { $0.gameCategory == .poker && $0.winLoss != nil && ($0.initialBuyIn ?? 0) > 0 }
             .sorted { $0.startTime < $1.startTime }
         return poker.compactMap { s in
-            guard let wl = s.winLoss, let bi = s.initialBuyIn, bi > 0 else { return nil }
-            let roi = (Double(wl) / Double(bi)) * 100.0
+            guard let bi = s.initialBuyIn, bi > 0 else { return nil }
+            let numer = Double(s.analyticsOutcome(useExpectedValue: useExpectedValue) ?? 0)
+            let roi = (numer / Double(bi)) * 100.0
             return Point(date: s.startTime, roi: roi)
         }
     }
@@ -360,6 +374,11 @@ struct PokerROITrendChartCard: View {
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
+            }
+            if useExpectedValue {
+                Text("Per session: EV (cash + comps) ÷ initial buy-in")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
             }
             if points.isEmpty {
                 Text("Add a few poker sessions to see ROI trends over time.")
@@ -672,10 +691,13 @@ struct BuyInQuickAddSheet: View {
 struct CompEventPhotoThumbnail: View {
     let compEventID: UUID
     var side: CGFloat = 44
+    /// When true (e.g. trip share card), shows a gift icon if no JPEG is on disk so rows still align.
+    var showPlaceholderWhenMissing: Bool = false
 
     var body: some View {
         Group {
             if let url = CompPhotoStorage.url(for: compEventID),
+               FileManager.default.fileExists(atPath: url.path),
                let ui = UIImage(contentsOfFile: url.path) {
                 Image(uiImage: ui)
                     .resizable()
@@ -683,6 +705,15 @@ struct CompEventPhotoThumbnail: View {
                     .frame(width: side, height: side)
                     .clipped()
                     .cornerRadius(8)
+            } else if showPlaceholderWhenMissing {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.white.opacity(0.12))
+                    Image(systemName: "gift.fill")
+                        .font(.system(size: max(12, side * 0.32)))
+                        .foregroundColor(.white.opacity(0.45))
+                }
+                .frame(width: side, height: side)
             }
         }
     }

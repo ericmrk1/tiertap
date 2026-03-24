@@ -358,6 +358,16 @@ struct Session: Identifiable, Codable, Equatable {
         guard let c = cashOut else { return nil }
         return c - totalBuyIn
     }
+    /// Expected value: table net (win/loss) plus total comps, in currency units. Nil when cash-out is unknown.
+    var expectedValue: Int? {
+        guard let wl = winLoss else { return nil }
+        return wl + totalComp
+    }
+    /// EV per hour when win/loss and duration are known.
+    var expectedValuePerHour: Double? {
+        guard let ev = expectedValue, hoursPlayed > 0 else { return nil }
+        return Double(ev) / hoursPlayed
+    }
     /// Net result per hour (win rate) in currency units, if both win/loss and hours are available.
     var winRatePerHour: Double? {
         guard let wl = winLoss, hoursPlayed > 0 else { return nil }
@@ -384,5 +394,11 @@ struct Session: Identifiable, Codable, Equatable {
     static func durationString(_ t: TimeInterval) -> String {
         let h = Int(t) / 3600, m = (Int(t) % 3600) / 60, s = Int(t) % 60
         return String(format: "%02d:%02d:%02d", h, m, s)
+    }
+
+    /// Result used for analytics win/loss and rates: cash **net** (default) or **EV** (net + logged comps).
+    func analyticsOutcome(useExpectedValue: Bool) -> Int? {
+        guard winLoss != nil else { return nil }
+        return useExpectedValue ? expectedValue : winLoss
     }
 }
