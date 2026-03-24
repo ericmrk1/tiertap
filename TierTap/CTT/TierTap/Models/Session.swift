@@ -154,14 +154,70 @@ extension CompEvent {
     }
 }
 
-enum SessionGameCategory: String, Codable {
+enum SessionGameCategory: String, Codable, CaseIterable {
     case table
+    case slots
     case poker
+
+    /// Short label for the game-type selector (table / slots / poker).
+    var pickerTitle: String {
+        switch self {
+        case .table: return "Table games"
+        case .slots: return "Slots"
+        case .poker: return "Poker"
+        }
+    }
 }
 
 enum SessionPokerGameKind: String, Codable {
     case cash
     case tournament
+}
+
+/// High-level reel / layout style for slots (optional on each session).
+enum SessionSlotFormat: String, Codable, CaseIterable {
+    case classicStepper
+    case video
+    case waysAllWays
+    case clusterGrid
+    case dynamicWays
+    case notSure
+    case other
+
+    var label: String {
+        switch self {
+        case .classicStepper: return "Classic / 3-reel"
+        case .video: return "Video"
+        case .waysAllWays: return "Ways / all-ways"
+        case .clusterGrid: return "Cluster / grid"
+        case .dynamicWays: return "Dynamic ways (e.g. Megaways-style)"
+        case .notSure: return "Not sure"
+        case .other: return "Other"
+        }
+    }
+}
+
+/// Dominant feature family for slots (optional on each session).
+enum SessionSlotFeature: String, Codable, CaseIterable {
+    case freeSpinsBonus
+    case holdSpin
+    case progressive
+    case multiplier
+    case standard
+    case notSure
+    case other
+
+    var label: String {
+        switch self {
+        case .freeSpinsBonus: return "Free spins / bonus"
+        case .holdSpin: return "Hold & spin"
+        case .progressive: return "Progressive / jackpot"
+        case .multiplier: return "Multiplier-focused"
+        case .standard: return "Standard / no standout feature"
+        case .notSure: return "Not sure"
+        case .other: return "Other"
+        }
+    }
 }
 
 struct Session: Identifiable, Codable, Equatable {
@@ -206,6 +262,16 @@ struct Session: Identifiable, Codable, Equatable {
     var pokerAnte: Int?
     var pokerLevelMinutes: Int?
     var pokerStartingStack: Int?
+    /// Optional slot machine format (reel/layout style).
+    var slotFormat: SessionSlotFormat?
+    /// Custom text when `slotFormat` is `.other`.
+    var slotFormatOther: String?
+    /// Optional dominant slot feature.
+    var slotFeature: SessionSlotFeature?
+    /// Custom text when `slotFeature` is `.other`.
+    var slotFeatureOther: String?
+    /// Freeform notes (denom, room, etc.).
+    var slotNotes: String?
 
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
@@ -216,6 +282,7 @@ struct Session: Identifiable, Codable, Equatable {
         case chipEstimatorImageFilename
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
+        case slotFormat, slotFormatOther, slotFeature, slotFeatureOther, slotNotes
     }
 
     init(from decoder: Decoder) throws {
@@ -251,6 +318,11 @@ struct Session: Identifiable, Codable, Equatable {
         pokerAnte = try c.decodeIfPresent(Int.self, forKey: .pokerAnte)
         pokerLevelMinutes = try c.decodeIfPresent(Int.self, forKey: .pokerLevelMinutes)
         pokerStartingStack = try c.decodeIfPresent(Int.self, forKey: .pokerStartingStack)
+        slotFormat = try c.decodeIfPresent(SessionSlotFormat.self, forKey: .slotFormat)
+        slotFormatOther = try c.decodeIfPresent(String.self, forKey: .slotFormatOther)
+        slotFeature = try c.decodeIfPresent(SessionSlotFeature.self, forKey: .slotFeature)
+        slotFeatureOther = try c.decodeIfPresent(String.self, forKey: .slotFeatureOther)
+        slotNotes = try c.decodeIfPresent(String.self, forKey: .slotNotes)
     }
 
     init(id: UUID = UUID(), game: String, casino: String, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil,
@@ -271,7 +343,12 @@ struct Session: Identifiable, Codable, Equatable {
          pokerBigBlind: Int? = nil,
          pokerAnte: Int? = nil,
          pokerLevelMinutes: Int? = nil,
-         pokerStartingStack: Int? = nil) {
+         pokerStartingStack: Int? = nil,
+         slotFormat: SessionSlotFormat? = nil,
+         slotFormatOther: String? = nil,
+         slotFeature: SessionSlotFeature? = nil,
+         slotFeatureOther: String? = nil,
+         slotNotes: String? = nil) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -303,6 +380,11 @@ struct Session: Identifiable, Codable, Equatable {
         self.pokerAnte = pokerAnte
         self.pokerLevelMinutes = pokerLevelMinutes
         self.pokerStartingStack = pokerStartingStack
+        self.slotFormat = slotFormat
+        self.slotFormatOther = slotFormatOther
+        self.slotFeature = slotFeature
+        self.slotFeatureOther = slotFeatureOther
+        self.slotNotes = slotNotes
     }
 
     func encode(to encoder: Encoder) throws {
@@ -338,6 +420,11 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(pokerAnte, forKey: .pokerAnte)
         try c.encodeIfPresent(pokerLevelMinutes, forKey: .pokerLevelMinutes)
         try c.encodeIfPresent(pokerStartingStack, forKey: .pokerStartingStack)
+        try c.encodeIfPresent(slotFormat, forKey: .slotFormat)
+        try c.encodeIfPresent(slotFormatOther, forKey: .slotFormatOther)
+        try c.encodeIfPresent(slotFeature, forKey: .slotFeature)
+        try c.encodeIfPresent(slotFeatureOther, forKey: .slotFeatureOther)
+        try c.encodeIfPresent(slotNotes, forKey: .slotNotes)
     }
 
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
@@ -400,5 +487,55 @@ struct Session: Identifiable, Codable, Equatable {
     func analyticsOutcome(useExpectedValue: Bool) -> Int? {
         guard winLoss != nil else { return nil }
         return useExpectedValue ? expectedValue : winLoss
+    }
+
+    /// Display label for slot format including "Other" detail when present.
+    var slotFormatDisplayLabel: String? {
+        guard let f = slotFormat else { return nil }
+        if f == .other {
+            let o = slotFormatOther?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return o.isEmpty ? f.label : "Other · \(o)"
+        }
+        return f.label
+    }
+
+    /// Display label for slot feature including "Other" detail when present.
+    var slotFeatureDisplayLabel: String? {
+        guard let f = slotFeature else { return nil }
+        if f == .other {
+            let o = slotFeatureOther?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return o.isEmpty ? f.label : "Other · \(o)"
+        }
+        return f.label
+    }
+
+    /// True when any slot metadata is stored.
+    var hasSlotMetadata: Bool {
+        slotFormat != nil || slotFeature != nil
+            || !(slotNotes?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+    }
+
+    /// Maps UI state to persisted slot fields; clears all when category is not slots.
+    static func persistedSlotMetadata(
+        gameCategory: SessionGameCategory?,
+        format: SessionSlotFormat?,
+        formatOther: String,
+        feature: SessionSlotFeature?,
+        featureOther: String,
+        notes: String
+    ) -> (format: SessionSlotFormat?, formatOther: String?, feature: SessionSlotFeature?, featureOther: String?, notes: String?) {
+        guard gameCategory == .slots else {
+            return (nil, nil, nil, nil, nil)
+        }
+        let fo = formatOther.trimmingCharacters(in: .whitespacesAndNewlines)
+        let feo = featureOther.trimmingCharacters(in: .whitespacesAndNewlines)
+        let n = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        return (
+            format,
+            format == .other ? (fo.isEmpty ? nil : fo) : nil,
+            feature,
+            feature == .other ? (feo.isEmpty ? nil : feo) : nil,
+            n.isEmpty ? nil : n
+        )
     }
 }

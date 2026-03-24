@@ -45,6 +45,7 @@
 		C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
 		CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */; };
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
+		SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */; };
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
@@ -163,6 +164,7 @@
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50E24F578992717D666E68F1 /* TierTap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TierTap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		528BE1A3C52FE346B3217D97 /* GamesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesList.swift; sourceTree = "<group>"; };
+		SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotsList.swift; sourceTree = "<group>"; };
 		59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CasinoTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
@@ -320,6 +322,7 @@
 				2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */,
 				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
+				SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
 				TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */,
 				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
@@ -652,6 +655,7 @@
 				C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */,
 				TMDL1E2F3A4B5C6D7E8F9A0B1 /* Trip.swift in Sources */,
 				CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */,
+				SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */,
 				4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */,
 				TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */,
 				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,

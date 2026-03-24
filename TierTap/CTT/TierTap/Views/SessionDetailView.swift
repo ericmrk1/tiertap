@@ -113,9 +113,6 @@ struct SessionDetailView: View {
                                                          fabs(rate)),
                                            color: rate >= 0 ? .green : .red)
                             }
-                            if session.gameCategory != .poker, let t = session.tiersPerHour {
-                                MetricCard(title: "Pts/Hour", value: String(format: "%.1f", t), color: .white)
-                            }
                         }
 
                         DetailSection(title: "Session Time", icon: "clock") {
@@ -235,6 +232,20 @@ struct SessionDetailView: View {
                                         label: "Starting stack",
                                         value: "\(stack) chips"
                                     )
+                                }
+                            }
+                        }
+
+                        if session.hasSlotMetadata {
+                            DetailSection(title: "Slot details", icon: "square.grid.3x3.fill") {
+                                if let line = session.slotFormatDisplayLabel {
+                                    DetailRow(label: "Format", value: line)
+                                }
+                                if let line = session.slotFeatureDisplayLabel {
+                                    DetailRow(label: "Major feature", value: line)
+                                }
+                                if let n = session.slotNotes?.trimmingCharacters(in: .whitespacesAndNewlines), !n.isEmpty {
+                                    DetailRow(label: "Notes", value: n)
                                 }
                             }
                         }

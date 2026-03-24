@@ -23,6 +23,7 @@ struct SettingsView: View {
     @State private var isSubscriptionExpanded: Bool = true
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
+    @State private var isShowingSlotGamePicker: Bool = false
     @State private var isShowingCasinoPicker: Bool = false
     @State private var isShowingSubscriptionPaywall: Bool = false
     @State private var exportFileURL: URL?
@@ -30,6 +31,7 @@ struct SettingsView: View {
     @State private var exportErrorMessage: String?
     @State private var isShowingExportError: Bool = false
     @State private var gamePickerSelection: String = ""
+    @State private var slotGamePickerSelection: String = ""
     @State private var casinoPickerSelection: String = ""
     @State private var subscriptionOverrideText: String = ""
     @State private var exportGameCategory: SessionGameCategory = .table
@@ -79,6 +81,13 @@ struct SettingsView: View {
                     settingsStore.favoriteGames.append(trimmed)
                 }
             }
+            .onChange(of: slotGamePickerSelection) { new in
+                let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { return }
+                if !settingsStore.favoriteSlotGames.contains(trimmed) {
+                    settingsStore.favoriteSlotGames.append(trimmed)
+                }
+            }
             .onChange(of: casinoPickerSelection) { new in
                 let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmed.isEmpty else { return }
@@ -102,7 +111,14 @@ struct SettingsView: View {
                 Text(exportErrorMessage ?? "An unknown error occurred while exporting your data.")
             }
             .adaptiveSheet(isPresented: $isShowingGamePicker) {
-                GamePickerView(selectedGame: $gamePickerSelection)
+                GamePickerView(selectedGame: $gamePickerSelection, mode: .table)
+                    .environmentObject(settingsStore)
+                    .gamePickerSheetPresentation()
+            }
+            .adaptiveSheet(isPresented: $isShowingSlotGamePicker) {
+                GamePickerView(selectedGame: $slotGamePickerSelection, mode: .slots)
+                    .environmentObject(settingsStore)
+                    .gamePickerSheetPresentation()
             }
             .adaptiveSheet(isPresented: $isShowingCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casinoPickerSelection, selectedLatitude: .constant(nil), selectedLongitude: .constant(nil))
@@ -341,26 +357,74 @@ struct SettingsView: View {
                 Divider().background(Color.gray.opacity(0.3))
 
                 VStack(alignment: .leading, spacing: 8) {
+                    Text("Favorite slot games")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    if settingsStore.favoriteSlotGames.isEmpty {
+                        Text("No favorite slots yet. Tap **Add slot from picker** to choose from the slot list.")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(settingsStore.favoriteSlotGames, id: \.self) { game in
+                                    HStack(spacing: 6) {
+                                        Text(game)
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                        Button {
+                                            settingsStore.favoriteSlotGames.removeAll { $0 == game }
+                                        } label: {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.caption2)
+                                                .foregroundColor(.white.opacity(0.9))
+                                        }
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6).opacity(0.3))
+                                    .cornerRadius(10)
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        slotGamePickerSelection = ""
+                        isShowingSlotGamePicker = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("Add slot from picker")
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Default game type")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
-                    Text("Controls whether new sessions and analytics default to table games or poker.")
+                    Text("Controls whether new sessions and analytics default to table games, slots, or poker.")
                         .font(.caption)
                         .foregroundColor(.gray)
-                    HStack(spacing: 8) {
-                        GameTypePillSetting(
-                            title: "Table",
-                            isSelected: settingsStore.defaultGameCategory == .table
-                        ) {
-                            settingsStore.defaultGameCategory = .table
-                        }
-                        GameTypePillSetting(
-                            title: "Poker",
-                            isSelected: settingsStore.defaultGameCategory == .poker
-                        ) {
-                            settingsStore.defaultGameCategory = .poker
-                        }
-                    }
+                    GameCategoryWheelPicker(
+                        selection: Binding(
+                            get: { settingsStore.defaultGameCategory },
+                            set: { settingsStore.defaultGameCategory = $0 }
+                        ),
+                        heading: "",
+                        compactHeading: true
+                    )
+                    .environmentObject(settingsStore)
                 }
                 
                 Divider().background(Color.gray.opacity(0.3))
@@ -460,24 +524,6 @@ struct SettingsView: View {
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
-            }
-        }
-    }
-
-    private struct GameTypePillSetting: View {
-        let title: String
-        let isSelected: Bool
-        let action: () -> Void
-
-        var body: some View {
-            Button(action: action) {
-                Text(title)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.3))
-                    .foregroundColor(isSelected ? .black : .white)
-                    .clipShape(Capsule())
             }
         }
     }
@@ -664,23 +710,15 @@ struct SettingsView: View {
                     Text("CSV game type")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
-                    Text("Choose whether to export table sessions or poker sessions. Older sessions without a game type are treated as table games.")
+                    Text("Choose whether to export table, slots, or poker sessions. Older sessions without a game type are treated as table games.")
                         .font(.caption)
                         .foregroundColor(.gray)
-                    HStack(spacing: 8) {
-                        GameTypePillSetting(
-                            title: "Table",
-                            isSelected: exportGameCategory == .table
-                        ) {
-                            exportGameCategory = .table
-                        }
-                        GameTypePillSetting(
-                            title: "Poker",
-                            isSelected: exportGameCategory == .poker
-                        ) {
-                            exportGameCategory = .poker
-                        }
-                    }
+                    GameCategoryWheelPicker(
+                        selection: $exportGameCategory,
+                        heading: "CSV scope",
+                        compactHeading: true
+                    )
+                    .environmentObject(settingsStore)
                 }
 
                 Button {

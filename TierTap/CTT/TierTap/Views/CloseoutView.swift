@@ -373,9 +373,16 @@ struct CloseoutView: View {
                             } label: {
                                 Text("Save Session")
                                     .frame(maxWidth: .infinity).padding(.vertical, 24)
-                                    .background(isValid ? Color.green : Color.gray)
-                                    .foregroundColor(isValid ? .black : .white)
-                                    .cornerRadius(12).font(.headline)
+                                    .font(.headline)
+                                    .foregroundColor(isValid ? .white : .white.opacity(0.85))
+                                    .background {
+                                        if isValid {
+                                            GameCategoryBubbleBackground(cornerRadius: 12)
+                                        } else {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.gray)
+                                        }
+                                    }
                             }
                             .disabled(!isValid)
 

@@ -212,7 +212,12 @@ class SessionStore: ObservableObject {
         pokerBigBlind: Int? = nil,
         pokerAnte: Int? = nil,
         pokerLevelMinutes: Int? = nil,
-        pokerStartingStack: Int? = nil
+        pokerStartingStack: Int? = nil,
+        slotFormat: SessionSlotFormat? = nil,
+        slotFormatOther: String? = nil,
+        slotFeature: SessionSlotFeature? = nil,
+        slotFeatureOther: String? = nil,
+        slotNotes: String? = nil
     ) {
         guard var s = liveSession else { return }
         s.gameCategory = gameCategory
@@ -226,6 +231,11 @@ class SessionStore: ObservableObject {
         s.pokerAnte = pokerAnte
         s.pokerLevelMinutes = pokerLevelMinutes
         s.pokerStartingStack = pokerStartingStack
+        s.slotFormat = slotFormat
+        s.slotFormatOther = slotFormatOther
+        s.slotFeature = slotFeature
+        s.slotFeatureOther = slotFeatureOther
+        s.slotNotes = slotNotes
         liveSession = s
         saveLive()
         #if os(iOS)

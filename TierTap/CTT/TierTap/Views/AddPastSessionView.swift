@@ -29,6 +29,11 @@ struct AddPastSessionView: View {
     @State private var pokerAnteText: String = ""
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
+    @State private var slotFormat: SessionSlotFormat?
+    @State private var slotFormatOther: String = ""
+    @State private var slotFeature: SessionSlotFeature?
+    @State private var slotFeatureOther: String = ""
+    @State private var slotNotes: String = ""
 
     @State private var showGamePicker = false
     @State private var showCasinoPicker = false
@@ -74,9 +79,9 @@ struct AddPastSessionView: View {
                 }
             }
             .adaptiveSheet(isPresented: $showGamePicker) {
-                GamePickerView(selectedGame: $selectedGame)
+                GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
                     .environmentObject(settingsStore)
-                    .presentationDetents([.medium, .large])
+                    .gamePickerSheetPresentation()
             }
             .adaptiveSheet(isPresented: $showCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casino, selectedLatitude: .constant(nil), selectedLongitude: .constant(nil))
@@ -98,7 +103,14 @@ struct AddPastSessionView: View {
                 gameCategory = settingsStore.defaultGameCategory
                 applyLastSavedGameDefaults()
             }
-            .onChange(of: gameCategory) { _ in
+            .onChange(of: gameCategory) { newCat in
+                if newCat != .slots {
+                    slotFormat = nil
+                    slotFormatOther = ""
+                    slotFeature = nil
+                    slotFeatureOther = ""
+                    slotNotes = ""
+                }
                 applyLastSavedGameDefaults()
             }
         }
@@ -108,6 +120,25 @@ struct AddPastSessionView: View {
         if gameCategory == .table {
             if !settingsStore.lastTableGameName.isEmpty {
                 selectedGame = settingsStore.lastTableGameName
+            }
+            return
+        }
+        if gameCategory == .slots {
+            if !settingsStore.lastSlotGameName.isEmpty {
+                selectedGame = settingsStore.lastSlotGameName
+            }
+            if let d = settingsStore.lastSlotSessionDefaults {
+                slotFormat = d.slotFormat
+                slotFormatOther = d.slotFormatOther
+                slotFeature = d.slotFeature
+                slotFeatureOther = d.slotFeatureOther
+                slotNotes = d.slotNotes
+            } else {
+                slotFormat = nil
+                slotFormatOther = ""
+                slotFeature = nil
+                slotFeatureOther = ""
+                slotNotes = ""
             }
             return
         }
@@ -129,29 +160,23 @@ struct AddPastSessionView: View {
             Label("Casino Game", systemImage: "suit.club.fill")
                 .font(.headline).foregroundColor(.white)
 
-            HStack(spacing: 8) {
-                GameTypePill(title: "Table", isSelected: gameCategory == .table) {
-                    gameCategory = .table
-                }
-                GameTypePill(title: "Poker", isSelected: gameCategory == .poker) {
-                    gameCategory = .poker
-                    if pokerVariant.isEmpty {
-                        pokerVariant = "No Limit Texas Hold’em"
-                    }
-                }
-            }
+            GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
+                .environmentObject(settingsStore)
 
-            if gameCategory == .table {
-                Button { showGamePicker = true } label: {
-                    HStack {
-                        Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                    }
-                    .padding(12)
-                    .background(Color(.systemGray6).opacity(0.25))
-                    .foregroundColor(selectedGame.isEmpty ? .gray : .white)
-                    .cornerRadius(10)
+            if gameCategory == .table || gameCategory == .slots {
+                GamePickerSelectorRow(
+                    title: selectedGame.isEmpty ? "Select game..." : selectedGame,
+                    isPlaceholder: selectedGame.isEmpty
+                ) { showGamePicker = true }
+                    .environmentObject(settingsStore)
+                if gameCategory == .slots {
+                    SlotSessionMetadataSection(
+                        slotFormat: $slotFormat,
+                        slotFormatOther: $slotFormatOther,
+                        slotFeature: $slotFeature,
+                        slotFeatureOther: $slotFeatureOther,
+                        slotNotes: $slotNotes
+                    )
                 }
             } else {
                 VStack(alignment: .leading, spacing: 8) {
@@ -448,10 +473,16 @@ struct AddPastSessionView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 32)
-                .background(isValid ? Color.green : Color.gray)
-                .foregroundColor(isValid ? .black : .white)
-                .cornerRadius(14)
                 .font(.headline)
+                .foregroundColor(isValid ? .white : .white.opacity(0.85))
+                .background {
+                    if isValid {
+                        GameCategoryBubbleBackground(cornerRadius: 14)
+                    } else {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color.gray)
+                    }
+                }
         }
         .disabled(!isValid)
     }
@@ -505,6 +536,14 @@ struct AddPastSessionView: View {
         let ante: Int? = (gameCategory == .poker) ? Int(pokerAnteText) : nil
         let levelMinutes: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil
         let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: gameCategory,
+            format: slotFormat,
+            formatOther: slotFormatOther,
+            feature: slotFeature,
+            featureOther: slotFeatureOther,
+            notes: slotNotes
+        )
         let session = Session(
             game: selectedGame,
             casino: casino,
@@ -531,7 +570,12 @@ struct AddPastSessionView: View {
             pokerBigBlind: bb,
             pokerAnte: ante,
             pokerLevelMinutes: levelMinutes,
-            pokerStartingStack: startingStack
+            pokerStartingStack: startingStack,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
         )
         settingsStore.recordLastPlayedGameChoices(from: session)
         store.addPastSession(session)

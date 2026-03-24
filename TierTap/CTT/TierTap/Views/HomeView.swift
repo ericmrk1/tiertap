@@ -96,8 +96,9 @@ struct HomeView: View {
                             Button { showLive = true } label: {
                                 Label("Finish Live Session", systemImage: "play.circle.fill")
                                     .frame(maxWidth: .infinity).padding()
-                                    .background(Color.green).foregroundColor(.black)
-                                    .cornerRadius(14).font(.headline)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .background(GameCategoryBubbleBackground(cornerRadius: 14))
                             }
                             HStack(spacing: 12) {
                                 Button {
@@ -156,8 +157,9 @@ struct HomeView: View {
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
                                     .padding(.horizontal)
-                                    .background(Color.green).foregroundColor(.black)
-                                    .cornerRadius(16).font(.title2.bold())
+                                    .font(.title2.bold())
+                                    .foregroundColor(.white)
+                                    .background(GameCategoryBubbleBackground(cornerRadius: 16))
                             }
                         }
                     }

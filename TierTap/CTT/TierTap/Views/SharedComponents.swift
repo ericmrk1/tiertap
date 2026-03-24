@@ -41,14 +41,262 @@ struct GameButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline).multilineTextAlignment(.center)
-                .lineLimit(2).minimumScaleFactor(0.8)
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10).padding(.horizontal, 4)
                 .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
                 .foregroundColor(isSelected ? .black : .white)
                 .cornerRadius(10)
         }
+    }
+}
+
+/// Full-width control that opens the game list — wide text area (scales down before truncating) and layered gradients.
+struct GamePickerSelectorRow: View {
+    @EnvironmentObject var settingsStore: SettingsStore
+    let title: String
+    /// Stronger green accent when the current selection is outside the quick-pick list (Check In).
+    var accentHighlighted: Bool = false
+    var isPlaceholder: Bool = false
+    var showSearchIcon: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                if showSearchIcon {
+                    Image(systemName: "magnifyingglass")
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(isPlaceholder ? Color.gray.opacity(0.9) : Color.white.opacity(0.95))
+                }
+                Text(title)
+                    .font(.body)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(isPlaceholder ? Color.gray.opacity(0.95) : (accentHighlighted ? Color.white : Color.white.opacity(0.95)))
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.white.opacity(isPlaceholder ? 0.35 : 0.55))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(selectorFill)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.26),
+                                        Color.white.opacity(0.05),
+                                        settingsStore.secondaryColor.opacity(0.4)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var selectorFill: LinearGradient {
+        if accentHighlighted {
+            return LinearGradient(
+                stops: [
+                    .init(color: Color.green.opacity(0.42), location: 0),
+                    .init(color: settingsStore.secondaryColor.opacity(0.4), location: 0.52),
+                    .init(color: settingsStore.primaryColor.opacity(0.32), location: 1)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+        return LinearGradient(
+            stops: [
+                .init(color: settingsStore.primaryColor.opacity(0.52), location: 0),
+                .init(color: settingsStore.secondaryColor.opacity(0.4), location: 0.45),
+                .init(color: settingsStore.primaryColor.opacity(0.26), location: 0.78),
+                .init(color: settingsStore.secondaryColor.opacity(0.22), location: 1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
+/// Optional slot format, feature, and notes when game type is Slots (check-in, add/edit session).
+struct SlotSessionMetadataSection: View {
+    @Binding var slotFormat: SessionSlotFormat?
+    @Binding var slotFormatOther: String
+    @Binding var slotFeature: SessionSlotFeature?
+    @Binding var slotFeatureOther: String
+    @Binding var slotNotes: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Slot details (optional)")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.9))
+            Text("Helps categorize play — skip anything you don’t need.")
+                .font(.caption2)
+                .foregroundColor(.gray)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Format")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Picker("Format", selection: $slotFormat) {
+                    Text("Not specified").tag(Optional<SessionSlotFormat>.none)
+                    ForEach(SessionSlotFormat.allCases, id: \.self) { f in
+                        Text(f.label).tag(Optional(f))
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(.white)
+            }
+
+            if slotFormat == .other {
+                TextField("Describe format", text: $slotFormatOther)
+                    .textFieldStyle(DarkTextFieldStyle())
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Major feature")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Picker("Major feature", selection: $slotFeature) {
+                    Text("Not specified").tag(Optional<SessionSlotFeature>.none)
+                    ForEach(SessionSlotFeature.allCases, id: \.self) { f in
+                        Text(f.label).tag(Optional(f))
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(.white)
+            }
+
+            if slotFeature == .other {
+                TextField("Describe feature", text: $slotFeatureOther)
+                    .textFieldStyle(DarkTextFieldStyle())
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Notes")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                TextField("Denom, room, machine notes…", text: $slotNotes, axis: .vertical)
+                    .lineLimit(1...4)
+                    .textFieldStyle(DarkTextFieldStyle())
+            }
+        }
+    }
+}
+
+/// Gradient fill, border, and shadows matching `GameCategoryWheelPicker`’s chrome.
+struct GameCategoryBubbleBackground: View {
+    @EnvironmentObject var settingsStore: SettingsStore
+    var cornerRadius: CGFloat = 16
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white.opacity(0.16), location: 0),
+                            .init(color: settingsStore.primaryColor.opacity(0.48), location: 0.45),
+                            .init(color: Color.black.opacity(0.42), location: 1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            Color.green.opacity(0.82),
+                            Color.white.opacity(0.38),
+                            settingsStore.secondaryColor.opacity(0.68),
+                            settingsStore.primaryColor.opacity(0.45)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2.5
+                )
+        }
+        .shadow(color: Color.green.opacity(0.42), radius: 14, x: 0, y: 0)
+        .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 6)
+    }
+}
+
+/// Table games vs Slots vs Poker — **horizontal** selector inside the same gradient “bubble” (distinct from Cash/Tournament pills).
+struct GameCategoryWheelPicker: View {
+    @Binding var selection: SessionGameCategory
+    @EnvironmentObject var settingsStore: SettingsStore
+    var heading: String = "Game Type"
+    var compactHeading: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if !heading.isEmpty {
+                Text(heading)
+                    .font(compactHeading ? .caption.bold() : .subheadline.bold())
+                    .foregroundColor(.white)
+            }
+            HStack(spacing: 0) {
+                ForEach(SessionGameCategory.allCases, id: \.self) { cat in
+                    categorySegment(cat)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(GameCategoryBubbleBackground(cornerRadius: 16))
+    }
+
+    private func categorySegment(_ cat: SessionGameCategory) -> some View {
+        let isSelected = selection == cat
+        return Button {
+            selection = cat
+        } label: {
+            Text(cat.pickerTitle)
+                .font(compactHeading ? .caption.bold() : .subheadline.bold())
+                .foregroundColor(isSelected ? .black : .white)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, compactHeading ? 8 : 10)
+                .padding(.horizontal, 4)
+                .background(
+                    Group {
+                        if isSelected {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color.green, Color.green.opacity(0.88)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                        }
+                    }
+                )
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -142,20 +390,37 @@ struct CommonAmountButtons: View {
     }
 }
 
+/// Whether the picker lists table games (with optional API-expanded names) or slot titles only.
+enum GamePickerMode {
+    case table
+    case slots
+}
+
 struct GamePickerView: View {
     @Binding var selectedGame: String
+    var mode: GamePickerMode = .table
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var search = ""
     @State private var dynamicGames: [String] = []
     @State private var isLoading = false
 
-    private var favorites: [String] { settingsStore.favoriteGames }
+    private var favorites: [String] {
+        switch mode {
+        case .table: return settingsStore.favoriteGames
+        case .slots: return settingsStore.favoriteSlotGames
+        }
+    }
 
     private var allGamesUnion: [String] {
-        let hardCoded = GamesList.all
-        let combined = Set(hardCoded + dynamicGames)
-        return Array(combined).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        switch mode {
+        case .table:
+            let hardCoded = GamesList.all
+            let combined = Set(hardCoded + dynamicGames)
+            return Array(combined).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        case .slots:
+            return SlotsList.all
+        }
     }
 
     private var filteredAll: [String] {
@@ -173,7 +438,7 @@ struct GamePickerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
+                gamePickerListBackdrop.ignoresSafeArea()
                 List {
                     if isLoading {
                         ProgressView("Loading games…")
@@ -186,7 +451,7 @@ struct GamePickerView: View {
                             }
                         }
                     }
-                    Section(filteredFavorites.isEmpty ? "Games" : "All games") {
+                    Section(filteredFavorites.isEmpty ? (mode == .slots ? "Slot games" : "Games") : (mode == .slots ? "All slot games" : "All games")) {
                         ForEach(filteredOthers, id: \.self) { game in
                             gameRow(game)
                         }
@@ -194,9 +459,20 @@ struct GamePickerView: View {
                 }
                 .listStyle(.plain).scrollContentBackground(.hidden)
             }
-            .searchable(text: $search, prompt: "Search games")
-            .navigationTitle("Select Game").navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .searchable(text: $search, prompt: mode == .slots ? "Search slot games" : "Search games")
+            .navigationTitle(mode == .slots ? "Select Slot Game" : "Select Game").navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(
+                LinearGradient(
+                    stops: [
+                        .init(color: settingsStore.primaryColor.opacity(0.92), location: 0),
+                        .init(color: settingsStore.secondaryColor.opacity(0.78), location: 0.45),
+                        .init(color: settingsStore.primaryColor.opacity(0.65), location: 1)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                for: .navigationBar
+            )
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -204,22 +480,67 @@ struct GamePickerView: View {
                 }
             }
             .task {
-                await loadDynamicGames()
+                if mode == .table {
+                    await loadDynamicGames()
+                }
             }
         }
     }
+
+    /// Layered gradients behind the searchable list (richer than a single two-stop gradient).
+    private var gamePickerListBackdrop: some View {
+        ZStack {
+            settingsStore.primaryGradient
+            LinearGradient(
+                stops: [
+                    .init(color: settingsStore.secondaryColor.opacity(0.55), location: 0),
+                    .init(color: Color.clear, location: 0.52),
+                    .init(color: settingsStore.primaryColor.opacity(0.45), location: 1)
+                ],
+                startPoint: .topTrailing,
+                endPoint: .bottomLeading
+            )
+            LinearGradient(
+                stops: [
+                    .init(color: Color.white.opacity(0.07), location: 0),
+                    .init(color: Color.clear, location: 0.35),
+                    .init(color: Color.black.opacity(0.18), location: 1)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottom
+            )
+        }
+    }
+
     private func gameRow(_ game: String) -> some View {
         Button {
             selectedGame = game
             dismiss()
         } label: {
-            HStack {
-                Text(game).foregroundColor(.white)
-                Spacer()
-                if selectedGame == game { Image(systemName: "checkmark").foregroundColor(.green) }
+            HStack(alignment: .center, spacing: 10) {
+                Text(game)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if selectedGame == game {
+                    Image(systemName: "checkmark").foregroundColor(.green)
+                }
             }
+            .padding(.vertical, 4)
         }
-        .listRowBackground(Color(.systemGray6).opacity(0.15))
+        .listRowBackground(
+            LinearGradient(
+                stops: [
+                    .init(color: Color.white.opacity(0.14), location: 0),
+                    .init(color: Color.white.opacity(0.04), location: 0.55),
+                    .init(color: settingsStore.secondaryColor.opacity(0.12), location: 1)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
     }
 
     private func loadDynamicGames() async {
@@ -230,6 +551,14 @@ struct GamePickerView: View {
             dynamicGames = names
             isLoading = false
         }
+    }
+}
+
+extension View {
+    /// Prefer large height so the list uses full width; medium remains available when dragging.
+    func gamePickerSheetPresentation() -> some View {
+        presentationDetents([.large, .medium])
+            .presentationDragIndicator(.visible)
     }
 }
 

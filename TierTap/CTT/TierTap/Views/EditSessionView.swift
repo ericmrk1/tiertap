@@ -35,6 +35,11 @@ struct EditSessionView: View {
     @State private var pokerAnteText: String = ""
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
+    @State private var slotFormat: SessionSlotFormat?
+    @State private var slotFormatOther: String = ""
+    @State private var slotFeature: SessionSlotFeature?
+    @State private var slotFeatureOther: String = ""
+    @State private var slotNotes: String = ""
     @State private var showGamePicker = false
 
     /// Working copy of comps; new entries use the same storage as live sessions (`CompPhotoStorage` by event id).
@@ -82,29 +87,23 @@ struct EditSessionView: View {
                             Label("Casino Game", systemImage: "suit.club.fill")
                                 .font(.headline).foregroundColor(.white)
 
-                            HStack(spacing: 8) {
-                                GameTypePill(title: "Table", isSelected: gameCategory == .table) {
-                                    gameCategory = .table
-                                }
-                                GameTypePill(title: "Poker", isSelected: gameCategory == .poker) {
-                                    gameCategory = .poker
-                                    if pokerVariant.isEmpty {
-                                        pokerVariant = "No Limit Texas Hold’em"
-                                    }
-                                }
-                            }
+                            GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
+                                .environmentObject(settingsStore)
 
-                            if gameCategory == .table {
-                                Button { showGamePicker = true } label: {
-                                    HStack {
-                                        Text(selectedGame.isEmpty ? "Select game..." : selectedGame)
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                    }
-                                    .padding(12)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(selectedGame.isEmpty ? .gray : .white)
-                                    .cornerRadius(10)
+                            if gameCategory == .table || gameCategory == .slots {
+                                GamePickerSelectorRow(
+                                    title: selectedGame.isEmpty ? "Select game..." : selectedGame,
+                                    isPlaceholder: selectedGame.isEmpty
+                                ) { showGamePicker = true }
+                                    .environmentObject(settingsStore)
+                                if gameCategory == .slots {
+                                    SlotSessionMetadataSection(
+                                        slotFormat: $slotFormat,
+                                        slotFormatOther: $slotFormatOther,
+                                        slotFeature: $slotFeature,
+                                        slotFeatureOther: $slotFeatureOther,
+                                        slotNotes: $slotNotes
+                                    )
                                 }
                             } else {
                                 VStack(alignment: .leading, spacing: 8) {
@@ -439,6 +438,15 @@ struct EditSessionView: View {
                 }
             }
             .onAppear { prefill() }
+            .onChange(of: gameCategory) { newCat in
+                if newCat != .slots {
+                    slotFormat = nil
+                    slotFormatOther = ""
+                    slotFeature = nil
+                    slotFeatureOther = ""
+                    slotNotes = ""
+                }
+            }
             .adaptiveSheet(isPresented: $showCompSheet) {
                 CompQuickAddSheet(
                     existingSessionCompTotal: compTotal,
@@ -471,7 +479,9 @@ struct EditSessionView: View {
                 .environmentObject(settingsStore)
             }
             .adaptiveSheet(isPresented: $showGamePicker) {
-                GamePickerView(selectedGame: $selectedGame).presentationDetents([.medium, .large])
+                GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
+                    .environmentObject(settingsStore)
+                    .gamePickerSheetPresentation()
             }
             .adaptiveSheet(item: $sessionPhotoSource) { source in
                 switch source {
@@ -521,6 +531,11 @@ struct EditSessionView: View {
         pokerAnteText = session.pokerAnte.map { "\($0)" } ?? ""
         pokerLevelMinutesText = session.pokerLevelMinutes.map { "\($0)" } ?? ""
         pokerStartingStackText = session.pokerStartingStack.map { "\($0)" } ?? ""
+        slotFormat = session.slotFormat
+        slotFormatOther = session.slotFormatOther ?? ""
+        slotFeature = session.slotFeature
+        slotFeatureOther = session.slotFeatureOther ?? ""
+        slotNotes = session.slotNotes ?? ""
 
         compEvents = session.compEvents
 
@@ -569,6 +584,14 @@ struct EditSessionView: View {
         let ante: Int? = (gameCategory == .poker) ? Int(pokerAnteText) : nil
         let levelMinutes: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil
         let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: gameCategory,
+            format: slotFormat,
+            formatOther: slotFormatOther,
+            feature: slotFeature,
+            featureOther: slotFeatureOther,
+            notes: slotNotes
+        )
         var updated = Session(
             id: session.id,
             game: selectedGame,
@@ -600,7 +623,12 @@ struct EditSessionView: View {
             pokerBigBlind: bb,
             pokerAnte: ante,
             pokerLevelMinutes: levelMinutes,
-            pokerStartingStack: startingStack
+            pokerStartingStack: startingStack,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
         )
         store.updateSession(updated)
         dismiss()

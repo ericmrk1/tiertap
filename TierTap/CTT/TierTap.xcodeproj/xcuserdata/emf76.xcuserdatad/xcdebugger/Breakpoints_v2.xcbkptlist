@@ -18,6 +18,64 @@
             endingLineNumber = "919"
             landmarkName = "estimateAmount()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 4975d7263b7f4e9a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "919"
+                  endingLineNumber = "919">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 4561a08adc9b6985"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(14) await resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "919"
+                  endingLineNumber = "919">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - b63b65096ea02585"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(27) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "919"
+                  endingLineNumber = "919">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 80a69ee8f398a965"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #6 @Swift.MainActor @Sendable () -&gt; () in TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -36,7 +94,7 @@
             landmarkType = "14">
             <Locations>
                <Location
-                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - 4975d7263b7f4da2"
+                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - 4975d7263b7f4eb9"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -46,11 +104,11 @@
                   urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "911"
-                  endingLineNumber = "911">
+                  startingLineNumber = "918"
+                  endingLineNumber = "918">
                </Location>
                <Location
-                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - e6a1892435b2ea34"
+                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - e6a1892435b2e92f"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -60,11 +118,11 @@
                   urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "911"
-                  endingLineNumber = "911">
+                  startingLineNumber = "918"
+                  endingLineNumber = "918">
                </Location>
                <Location
-                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - e470d7bf71fa50d6"
+                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - e470d7bf71fa53cd"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -74,11 +132,11 @@
                   urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "911"
-                  endingLineNumber = "911">
+                  startingLineNumber = "918"
+                  endingLineNumber = "918">
                </Location>
                <Location
-                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - 94a2d7b59f3c5b27"
+                  uuid = "B7776E31-4107-4038-B22F-B0D0EA81661C - 94a2d7b59f3c583c"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -88,8 +146,8 @@
                   urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "911"
-                  endingLineNumber = "911">
+                  startingLineNumber = "918"
+                  endingLineNumber = "918">
                </Location>
             </Locations>
          </BreakpointContent>

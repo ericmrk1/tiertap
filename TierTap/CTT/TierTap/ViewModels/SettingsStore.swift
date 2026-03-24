@@ -13,6 +13,7 @@ private let keyGoogleSignedIn = "ctt_google_signed_in"
 private let keyCommonDenominations = "ctt_common_denominations"
 private let keyUseEighteenX = "ctt_use_eighteen_x"
 private let keyFavoriteGames = "ctt_favorite_games"
+private let keyFavoriteSlotGames = "ctt_favorite_slot_games"
 private let keyFavoriteCasinos = "ctt_favorite_casinos"
 private let keyPrimaryColorName = "ctt_primary_color_name"
 private let keySecondaryColorName = "ctt_secondary_color_name"
@@ -31,7 +32,9 @@ private let keyDefaultGameCategory = "ctt_default_game_category"
 private let keyLastAddOnBuyIn = "ctt_last_add_on_buy_in"
 private let keyLastFoodBeverageCompKind = "ctt_last_food_beverage_comp_kind"
 private let keyLastTableGame = "ctt_last_table_game"
+private let keyLastSlotGame = "ctt_last_slot_game"
 private let keyLastPokerDefaults = "ctt_last_poker_defaults"
+private let keyLastSlotDefaults = "ctt_last_slot_defaults"
 private let keyAnalyticsUseExpectedValue = "ctt_analytics_use_expected_value"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
@@ -47,6 +50,15 @@ struct LastPokerSessionDefaults: Codable, Equatable {
     var pokerLevelMinutesText: String
     var pokerStartingStackText: String
     var pokerTournamentCostText: String
+}
+
+/// Last slot format / feature / notes; pre-fills check-in when game type is Slots.
+struct LastSlotSessionDefaults: Codable, Equatable {
+    var slotFormat: SessionSlotFormat?
+    var slotFormatOther: String
+    var slotFeature: SessionSlotFeature?
+    var slotFeatureOther: String
+    var slotNotes: String
 }
 
 struct ThemePreset: Identifiable, Codable, Equatable {
@@ -225,12 +237,17 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(favoriteGames, forKey: keyFavoriteGames) }
     }
 
+    /// User-favorited slot titles for the slots check-in grid.
+    @Published var favoriteSlotGames: [String] {
+        didSet { UserDefaults.standard.set(favoriteSlotGames, forKey: keyFavoriteSlotGames) }
+    }
+
     /// User-favorited casino locations for quick selection.
     @Published var favoriteCasinos: [String] {
         didSet { UserDefaults.standard.set(favoriteCasinos, forKey: keyFavoriteCasinos) }
     }
 
-    /// Default game category to show in game pickers and analytics (Table or Poker).
+    /// Default game category to show in game pickers and analytics (Table, Slots, or Poker).
     @Published var defaultGameCategory: SessionGameCategory {
         didSet { UserDefaults.standard.set(defaultGameCategory.rawValue, forKey: keyDefaultGameCategory) }
     }
@@ -262,6 +279,17 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// Last slot title chosen at check-in (or from a saved session). Empty = no saved default.
+    @Published var lastSlotGameName: String {
+        didSet {
+            if lastSlotGameName.isEmpty {
+                UserDefaults.standard.removeObject(forKey: keyLastSlotGame)
+            } else {
+                UserDefaults.standard.set(lastSlotGameName, forKey: keyLastSlotGame)
+            }
+        }
+    }
+
     /// Last poker structure/variant from a completed or in-progress session; used to pre-fill check-in.
     @Published var lastPokerSessionDefaults: LastPokerSessionDefaults? {
         didSet {
@@ -269,6 +297,17 @@ final class SettingsStore: ObservableObject {
                 UserDefaults.standard.set(data, forKey: keyLastPokerDefaults)
             } else {
                 UserDefaults.standard.removeObject(forKey: keyLastPokerDefaults)
+            }
+        }
+    }
+
+    /// Last slot categorization from check-in or a saved session; pre-fills optional slot fields.
+    @Published var lastSlotSessionDefaults: LastSlotSessionDefaults? {
+        didSet {
+            if let d = lastSlotSessionDefaults, let data = try? JSONEncoder().encode(d) {
+                UserDefaults.standard.set(data, forKey: keyLastSlotDefaults)
+            } else {
+                UserDefaults.standard.removeObject(forKey: keyLastSlotDefaults)
             }
         }
     }
@@ -439,6 +478,7 @@ final class SettingsStore: ObservableObject {
         }
         self.useEighteenXMultipliers = UserDefaults.standard.bool(forKey: keyUseEighteenX)
         self.favoriteGames = UserDefaults.standard.stringArray(forKey: keyFavoriteGames) ?? []
+        self.favoriteSlotGames = UserDefaults.standard.stringArray(forKey: keyFavoriteSlotGames) ?? []
         self.favoriteCasinos = UserDefaults.standard.stringArray(forKey: keyFavoriteCasinos) ?? []
         if let raw = UserDefaults.standard.string(forKey: keyDefaultGameCategory),
            let cat = SessionGameCategory(rawValue: raw) {
@@ -455,11 +495,18 @@ final class SettingsStore: ObservableObject {
             self.lastFoodBeverageCompKind = .meal
         }
         self.lastTableGameName = UserDefaults.standard.string(forKey: keyLastTableGame) ?? ""
+        self.lastSlotGameName = UserDefaults.standard.string(forKey: keyLastSlotGame) ?? ""
         if let data = UserDefaults.standard.data(forKey: keyLastPokerDefaults),
            let decoded = try? JSONDecoder().decode(LastPokerSessionDefaults.self, from: data) {
             self.lastPokerSessionDefaults = decoded
         } else {
             self.lastPokerSessionDefaults = nil
+        }
+        if let data = UserDefaults.standard.data(forKey: keyLastSlotDefaults),
+           let decoded = try? JSONDecoder().decode(LastSlotSessionDefaults.self, from: data) {
+            self.lastSlotSessionDefaults = decoded
+        } else {
+            self.lastSlotSessionDefaults = nil
         }
         self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
         self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
@@ -607,6 +654,17 @@ final class SettingsStore: ObservableObject {
                 pokerStartingStackText: session.pokerStartingStack.map { String($0) } ?? "",
                 pokerTournamentCostText: prevCost
             )
+        } else if cat == .slots {
+            if !session.game.isEmpty {
+                lastSlotGameName = session.game
+            }
+            lastSlotSessionDefaults = LastSlotSessionDefaults(
+                slotFormat: session.slotFormat,
+                slotFormatOther: session.slotFormatOther ?? "",
+                slotFeature: session.slotFeature,
+                slotFeatureOther: session.slotFeatureOther ?? "",
+                slotNotes: session.slotNotes ?? ""
+            )
         } else {
             let isPokerSession = session.gameCategory == .poker
                 || session.pokerGameKind != nil
@@ -631,7 +689,12 @@ final class SettingsStore: ObservableObject {
         pokerAnte: Int,
         pokerLevelMinutesText: String,
         pokerStartingStackText: String,
-        pokerTournamentCostText: String
+        pokerTournamentCostText: String,
+        slotFormat: SessionSlotFormat? = nil,
+        slotFormatOther: String = "",
+        slotFeature: SessionSlotFeature? = nil,
+        slotFeatureOther: String = "",
+        slotNotes: String = ""
     ) {
         if gameCategory == .poker {
             lastPokerSessionDefaults = LastPokerSessionDefaults(
@@ -647,7 +710,18 @@ final class SettingsStore: ObservableObject {
                 pokerStartingStackText: pokerStartingStackText,
                 pokerTournamentCostText: pokerTournamentCostText
             )
-        } else if !selectedGame.isEmpty {
+        } else if gameCategory == .slots {
+            if !selectedGame.isEmpty {
+                lastSlotGameName = selectedGame
+            }
+            lastSlotSessionDefaults = LastSlotSessionDefaults(
+                slotFormat: slotFormat,
+                slotFormatOther: slotFormatOther,
+                slotFeature: slotFeature,
+                slotFeatureOther: slotFeatureOther,
+                slotNotes: slotNotes
+            )
+        } else if gameCategory == .table, !selectedGame.isEmpty {
             lastTableGameName = selectedGame
         }
     }

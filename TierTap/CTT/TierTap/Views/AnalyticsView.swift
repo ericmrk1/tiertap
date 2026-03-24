@@ -46,9 +46,14 @@ struct AnalyticsView: View {
         !allClosedSessions.isEmpty
     }
 
-    /// Table-only closed sessions.
+    /// Table-only closed sessions (excludes poker and slots).
     private var tableClosedSessions: [Session] {
-        allClosedSessions.filter { $0.gameCategory != .poker }
+        allClosedSessions.filter { $0.gameCategory != .poker && $0.gameCategory != .slots }
+    }
+
+    /// Slots-only closed sessions.
+    private var slotsClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory == .slots }
     }
 
     /// Poker-only closed sessions.
@@ -62,6 +67,8 @@ struct AnalyticsView: View {
         switch selectedAnalyticsCategory {
         case .table:
             baseAll = tableClosedSessions
+        case .slots:
+            baseAll = slotsClosedSessions
         case .poker:
             baseAll = pokerClosedSessions
         }
@@ -79,6 +86,19 @@ struct AnalyticsView: View {
             base = base.filter { $0.startTime <= endOfTo }
         }
         return base
+    }
+
+    private var analyticsSessionOverviewTitle: String {
+        switch selectedAnalyticsCategory {
+        case .table: return "Table Session Overview"
+        case .slots: return "Slots Session Overview"
+        case .poker: return "Poker Session Overview"
+        }
+    }
+
+    /// Table and slots share the same charts (vs poker-specific cards).
+    private var usesTableStyleAnalytics: Bool {
+        selectedAnalyticsCategory == .table || selectedAnalyticsCategory == .slots
     }
 
     private var availableCasinos: [String] {
@@ -181,24 +201,6 @@ struct AnalyticsView: View {
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
-    }
-
-    private struct GameTypePillAnalytics: View {
-        let title: String
-        let isSelected: Bool
-        let action: () -> Void
-
-        var body: some View {
-            Button(action: action) {
-                Text(title)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
-                    .foregroundColor(isSelected ? .black : .white)
-                    .clipShape(Capsule())
-            }
-        }
     }
 
     var body: some View {
@@ -511,7 +513,7 @@ struct AnalyticsView: View {
         let losses = losingSessions.count
         let breakeven = breakEvenSessions.count
         let winRate = total > 0 ? Double(wins) / Double(total) : 0
-        let isTableOverview = selectedAnalyticsCategory == .table
+        let isTableOverview = selectedAnalyticsCategory == .table || selectedAnalyticsCategory == .slots
         let grossPL = totalProfit + totalLoss
         let profitVolumePct: Int? = (isTableOverview && grossPL > 0)
             ? Int((Double(totalProfit) / Double(grossPL) * 100).rounded())
@@ -560,7 +562,7 @@ struct AnalyticsView: View {
         return VStack(spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(selectedAnalyticsCategory == .table ? "Table Session Overview" : "Poker Session Overview")
+                    Text(analyticsSessionOverviewTitle)
                         .font(.headline)
                         .foregroundColor(.white)
                     Text(settingsStore.analyticsUseExpectedValue
@@ -598,7 +600,7 @@ struct AnalyticsView: View {
                 MetricPill(title: "Even", value: sessionShareLabel(breakeven), color: .gray)
             }
 
-            if selectedAnalyticsCategory == .table {
+            if usesTableStyleAnalytics {
                 Button {
                     isRiskOfRuinPresented = true
                 } label: {
@@ -703,7 +705,7 @@ struct AnalyticsView: View {
                     locationFilterText: analyticsLocationFilterText
                 )
             }
-            if selectedAnalyticsCategory == .table {
+            if usesTableStyleAnalytics {
                 GameBreakdownBars(
                     sessions: closedSessions,
                     gradient: settingsStore.primaryGradient,
@@ -737,26 +739,14 @@ struct AnalyticsView: View {
         }
     }
 
-    /// Toggle between Table and Poker analytics.
+    /// Table / Slots / Poker — horizontal bubble (matches Check In).
     private var gameCategoryToggle: some View {
-        HStack(spacing: 8) {
-            Text("Game type")
-                .font(.subheadline.bold())
-                .foregroundColor(.white)
-            Spacer()
-            GameTypePillAnalytics(
-                title: "Table",
-                isSelected: selectedAnalyticsCategory == .table
-            ) {
-                selectedAnalyticsCategory = .table
-            }
-            GameTypePillAnalytics(
-                title: "Poker",
-                isSelected: selectedAnalyticsCategory == .poker
-            ) {
-                selectedAnalyticsCategory = .poker
-            }
-        }
+        GameCategoryWheelPicker(
+            selection: $selectedAnalyticsCategory,
+            heading: "Game Type",
+            compactHeading: true
+        )
+        .environmentObject(settingsStore)
     }
 
     private var resultsBasisSection: some View {
@@ -771,7 +761,7 @@ struct AnalyticsView: View {
             .pickerStyle(.segmented)
             Text(settingsStore.analyticsUseExpectedValue
                  ? "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps."
-                 : "Win rate and dollar totals reflect table/poker cash only; comps are ignored.")
+                 : "Win rate and dollar totals reflect table, slots, and poker cash only; comps are ignored.")
                 .font(.caption2)
                 .foregroundColor(.gray)
         }
@@ -988,26 +978,23 @@ struct AIAnalyticsSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 20) {
                     VStack(spacing: 16) {
-                        HStack {
+                        VStack(alignment: .leading, spacing: 10) {
                             Text("AI Analysis")
                                 .font(.title2.bold())
                                 .foregroundColor(.white)
-                            Spacer()
-                            HStack(spacing: 8) {
-                                GameTypePillAI(
-                                    title: "Table",
-                                    isSelected: selectedAnalyticsCategory == .table
-                                ) {
-                                    selectedAnalyticsCategory = .table
+                            GameCategoryWheelPicker(
+                                selection: $selectedAnalyticsCategory,
+                                heading: "Session scope",
+                                compactHeading: true
+                            )
+                            .environmentObject(settingsStore)
+                            .onChange(of: selectedAnalyticsCategory) { newValue in
+                                switch newValue {
+                                case .table, .slots:
                                     if !TierTapAIQuestion.tableQuestions.contains(selectedQuestion) {
                                         selectedQuestion = TierTapAIQuestion.tableQuestions.first ?? .whereEarnTiersFastest
                                     }
-                                }
-                                GameTypePillAI(
-                                    title: "Poker",
-                                    isSelected: selectedAnalyticsCategory == .poker
-                                ) {
-                                    selectedAnalyticsCategory = .poker
+                                case .poker:
                                     if !TierTapAIQuestion.pokerQuestions.contains(selectedQuestion) {
                                         selectedQuestion = TierTapAIQuestion.pokerQuestions.first ?? .pokerProfitabilityOverview
                                     }
@@ -1142,29 +1129,10 @@ struct AIAnalyticsSheet: View {
         }
     }
     
-    /// Small pill toggle used within the AI sheet.
-    private struct GameTypePillAI: View {
-        let title: String
-        let isSelected: Bool
-        let action: () -> Void
-        
-        var body: some View {
-            Button(action: action) {
-                Text(title)
-                    .font(.caption.bold())
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
-                    .foregroundColor(isSelected ? .black : .white)
-                    .clipShape(Capsule())
-            }
-        }
-    }
-    
     /// Currently available questions given the selected game category.
     private var questionsForCurrentCategory: [TierTapAIQuestion] {
         switch selectedAnalyticsCategory {
-        case .table:
+        case .table, .slots:
             return TierTapAIQuestion.tableQuestions
         case .poker:
             return TierTapAIQuestion.pokerQuestions
@@ -1194,7 +1162,9 @@ struct AIAnalyticsSheet: View {
             guard session.winLoss != nil else { return false }
             switch selectedAnalyticsCategory {
             case .table:
-                return session.gameCategory != .poker
+                return session.gameCategory != .poker && session.gameCategory != .slots
+            case .slots:
+                return session.gameCategory == .slots
             case .poker:
                 return session.gameCategory == .poker
             }
@@ -1202,9 +1172,14 @@ struct AIAnalyticsSheet: View {
         
         if closedSessions.isEmpty {
             await MainActor.run {
-                errorMessage = selectedAnalyticsCategory == .poker
-                ? "You do not have any completed poker sessions yet. Switch to Table or log some poker sessions first."
-                : "You do not have any completed table sessions yet for AI to analyze."
+                switch selectedAnalyticsCategory {
+                case .poker:
+                    errorMessage = "You do not have any completed poker sessions yet. Switch to Table or Slots or log some poker sessions first."
+                case .slots:
+                    errorMessage = "You do not have any completed slots sessions yet. Switch to Table or log slots play from Check In first."
+                case .table:
+                    errorMessage = "You do not have any completed table sessions yet for AI to analyze."
+                }
             }
             return
         }
@@ -1318,7 +1293,13 @@ struct AIAnalyticsSheet: View {
         
         let toneInstruction = settingsStore.aiTone.promptLabel
         let questionPrompt = selectedQuestion.instruction(toneLabel: toneInstruction)
-        let gameLabel = selectedAnalyticsCategory == .poker ? "poker" : "non‑poker table"
+        let gameLabel: String = {
+            switch selectedAnalyticsCategory {
+            case .poker: return "poker"
+            case .table: return "table"
+            case .slots: return "slots"
+            }
+        }()
         
         let prompt = """
         You are an analytics assistant for TierTap.

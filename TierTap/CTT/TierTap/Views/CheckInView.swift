@@ -26,6 +26,11 @@ struct CheckInView: View {
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
     @State private var pokerTournamentCostText: String = "0"
+    @State private var slotFormat: SessionSlotFormat?
+    @State private var slotFormatOther: String = ""
+    @State private var slotFeature: SessionSlotFeature?
+    @State private var slotFeatureOther: String = ""
+    @State private var slotNotes: String = ""
     @State private var showCasinoLocationPicker = false
     @State private var casinoLatitude: Double?
     @State private var casinoLongitude: Double?
@@ -34,6 +39,21 @@ struct CheckInView: View {
     private var displayGames: [String] {
         if !settingsStore.favoriteGames.isEmpty { return settingsStore.favoriteGames }
         return GamesList.pinned
+    }
+
+    /// Slot titles for the grid when category is Slots (favorites, else pinned).
+    private var displaySlots: [String] {
+        if !settingsStore.favoriteSlotGames.isEmpty { return settingsStore.favoriteSlotGames }
+        return SlotsList.pinned
+    }
+
+    /// Titles for the Table or Slots quick-pick grid.
+    private var activeGameGridTitles: [String] {
+        switch gameCategory {
+        case .table: return displayGames
+        case .slots: return displaySlots
+        case .poker: return []
+        }
     }
 
     /// Simple pill-style toggle used for Table/Poker and Cash/Tournament.
@@ -75,7 +95,8 @@ struct CheckInView: View {
     }
 
     private var isGameInDisplayList: Bool {
-        selectedGame.isEmpty || displayGames.contains(selectedGame)
+        let list = gameCategory == .slots ? displaySlots : displayGames
+        return selectedGame.isEmpty || list.contains(selectedGame)
     }
 
     /// Build a large set of common buy-in amounts from settings denominations + common squares,
@@ -171,47 +192,37 @@ struct CheckInView: View {
                             .font(.headline)
                             .foregroundColor(.white)
 
-                        // Game — Table or Poker, with detailed Poker metadata when selected
+                        // Game — Table / Slots / Poker (wheel); Poker details below when selected
                         VStack(alignment: .leading, spacing: 10) {
-                            HStack(alignment: .center, spacing: 8) {
-                                Label("Casino Game", systemImage: "suit.club.fill")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                Spacer()
-                                HStack(spacing: 8) {
-                                    GameTypePill(title: "Table", isSelected: gameCategory == .table) {
-                                        gameCategory = .table
-                                    }
-                                    GameTypePill(title: "Poker", isSelected: gameCategory == .poker) {
-                                        gameCategory = .poker
-                                        if pokerVariant.isEmpty {
-                                            pokerVariant = "No Limit Texas Hold’em"
-                                        }
-                                    }
-                                }
-                            }
+                            Label("Casino Game", systemImage: "suit.club.fill")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
+                                .environmentObject(settingsStore)
 
-                            if gameCategory == .table {
-                                // Existing table game UI: favorites grid + More games search
+                            if gameCategory == .table || gameCategory == .slots {
+                                // Table or Slots: favorites grid + More games search (slot list is slots-only)
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                                    ForEach(displayGames, id: \.self) { g in
+                                    ForEach(activeGameGridTitles, id: \.self) { g in
                                         GameButton(title: g, isSelected: selectedGame == g) { selectedGame = g }
                                     }
                                 }
-                                Button { showGamePicker = true } label: {
-                                    HStack {
-                                        Image(systemName: "magnifyingglass")
-                                        Text(isGameInDisplayList && selectedGame.isEmpty
-                                             ? "More games..." : selectedGame)
-                                            .lineLimit(1)
-                                        Spacer()
-                                        Image(systemName: "chevron.right")
-                                    }
-                                    .padding(12)
-                                    .background(!isGameInDisplayList
-                                                ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(!isGameInDisplayList ? .white : .gray)
-                                    .cornerRadius(10)
+                                GamePickerSelectorRow(
+                                    title: isGameInDisplayList && selectedGame.isEmpty
+                                        ? "More games..." : selectedGame,
+                                    accentHighlighted: !isGameInDisplayList,
+                                    isPlaceholder: isGameInDisplayList && selectedGame.isEmpty,
+                                    showSearchIcon: true
+                                ) { showGamePicker = true }
+                                    .environmentObject(settingsStore)
+                                if gameCategory == .slots {
+                                    SlotSessionMetadataSection(
+                                        slotFormat: $slotFormat,
+                                        slotFormatOther: $slotFormatOther,
+                                        slotFeature: $slotFeature,
+                                        slotFeatureOther: $slotFeatureOther,
+                                        slotNotes: $slotNotes
+                                    )
                                 }
                             } else {
                                 // Poker-specific controls with blinds & structure beneath
@@ -631,9 +642,16 @@ struct CheckInView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
                                 .padding(.horizontal, 16)
-                                .background(isValid ? Color.green : Color.gray)
-                                .foregroundColor(isValid ? .black : .white)
-                                .cornerRadius(14).font(.headline)
+                                .font(.headline)
+                                .foregroundColor(isValid ? .white : .white.opacity(0.85))
+                                .background {
+                                    if isValid {
+                                        GameCategoryBubbleBackground(cornerRadius: 14)
+                                    } else {
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(Color.gray)
+                                    }
+                                }
                         }
                         .disabled(!isValid)
                         .padding(.bottom, 8)
@@ -648,9 +666,9 @@ struct CheckInView: View {
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .adaptiveSheet(isPresented: $showGamePicker) {
-                GamePickerView(selectedGame: $selectedGame)
+                GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
                     .environmentObject(settingsStore)
-                    .presentationDetents([.medium, .large])
+                    .gamePickerSheetPresentation()
             }
             .fullScreenCover(isPresented: $showCasinoLocationPicker) {
                 NavigationStack {
@@ -691,7 +709,14 @@ struct CheckInView: View {
             .onChange(of: casino) { _ in
                 applyCasinoHistoryDefaults()
             }
-            .onChange(of: gameCategory) { _ in
+            .onChange(of: gameCategory) { newCat in
+                if newCat != .slots {
+                    slotFormat = nil
+                    slotFormatOther = ""
+                    slotFeature = nil
+                    slotFeatureOther = ""
+                    slotNotes = ""
+                }
                 applyLastSavedGameDefaults()
             }
         }
@@ -715,6 +740,25 @@ struct CheckInView: View {
         if gameCategory == .table {
             if !settingsStore.lastTableGameName.isEmpty {
                 selectedGame = settingsStore.lastTableGameName
+            }
+            return
+        }
+        if gameCategory == .slots {
+            if !settingsStore.lastSlotGameName.isEmpty {
+                selectedGame = settingsStore.lastSlotGameName
+            }
+            if let d = settingsStore.lastSlotSessionDefaults {
+                slotFormat = d.slotFormat
+                slotFormatOther = d.slotFormatOther
+                slotFeature = d.slotFeature
+                slotFeatureOther = d.slotFeatureOther
+                slotNotes = d.slotNotes
+            } else {
+                slotFormat = nil
+                slotFormatOther = ""
+                slotFeature = nil
+                slotFeatureOther = ""
+                slotNotes = ""
             }
             return
         }
@@ -773,6 +817,14 @@ struct CheckInView: View {
         let ante: Int? = (gameCategory == .poker && pokerAnte > 0) ? pokerAnte : nil
         let levelMinutes: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil
         let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: gameCategory,
+            format: slotFormat,
+            formatOther: slotFormatOther,
+            feature: slotFeature,
+            featureOther: slotFeatureOther,
+            notes: slotNotes
+        )
         store.updateLiveSessionGameMetadata(
             gameCategory: category,
             pokerGameKind: kind,
@@ -784,7 +836,12 @@ struct CheckInView: View {
             pokerBigBlind: bb,
             pokerAnte: ante,
             pokerLevelMinutes: levelMinutes,
-            pokerStartingStack: startingStack
+            pokerStartingStack: startingStack,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
         )
         settingsStore.recordLastCheckInGameSelection(
             gameCategory: gameCategory,
@@ -799,7 +856,12 @@ struct CheckInView: View {
             pokerAnte: pokerAnte,
             pokerLevelMinutesText: pokerLevelMinutesText,
             pokerStartingStackText: pokerStartingStackText,
-            pokerTournamentCostText: pokerTournamentCostText
+            pokerTournamentCostText: pokerTournamentCostText,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther ?? "",
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther ?? "",
+            slotNotes: slotMeta.notes ?? ""
         )
         if settingsStore.enableCasinoFeedback {
             CelebrationPlayer.shared.playQuickChime()
