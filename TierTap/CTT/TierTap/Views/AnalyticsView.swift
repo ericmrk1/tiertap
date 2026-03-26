@@ -829,11 +829,15 @@ private func aiAnalysisRelaxedFingerprint(
     let bankrollBucket = (bankroll / 500) * 500
     let unitBucket = (unitSize / 25) * 25
     let netBucket = aiAnalysisRelaxedOutcomeBucket(net)
-    let recentSig = recentSessions.map { session in
-        let o = sessionOutcome(session)
-        let b = aiAnalysisRelaxedOutcomeBucket(o)
-        return String(session.id.uuidString.prefix(8)) + ":" + String(b)
-    }.joined(separator: "|")
+    // Order by id so recency (timestamps) does not affect the fingerprint.
+    let recentSig = recentSessions
+        .sorted { $0.id.uuidString < $1.id.uuidString }
+        .map { session in
+            let o = sessionOutcome(session)
+            let b = aiAnalysisRelaxedOutcomeBucket(o)
+            return String(session.id.uuidString.prefix(8)) + ":" + String(b)
+        }
+        .joined(separator: "|")
     return [
         questionRaw,
         category.rawValue,
@@ -1329,7 +1333,7 @@ struct AIAnalyticsSheet: View {
         let df = DateFormatter()
         df.dateStyle = .short
         
-        let recentLines: String = recentSessions.map { session in
+        func recentSessionLineCore(_ session: Session) -> String {
             let wl = session.winLoss ?? 0
             let wlSign = wl > 0 ? "+" : (wl < 0 ? "-" : "")
             let wlText = wl == 0 ? "even" : "\(wlSign)\(currency)\(abs(wl))"
@@ -1357,8 +1361,12 @@ struct AIAnalyticsSheet: View {
                     return "n/a"
                 }
             }()
-            let dateText = df.string(from: session.startTime)
-            return "\(dateText): \(session.casino) — \(session.game), cash \(wlText), comps \(currency)\(comps), EV \(ev), result for selected basis \(basisLine), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
+            return "\(session.casino) — \(session.game), cash \(wlText), comps \(currency)\(comps), EV \(ev), result for selected basis \(basisLine), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
+        }
+        
+        let recentLineCores: [String] = recentSessions.map { recentSessionLineCore($0) }
+        let recentLines: String = zip(recentSessions, recentLineCores).map { session, core in
+            "\(df.string(from: session.startTime)): \(core)"
         }.joined(separator: "\n")
 
         let basisName = useEV ? "EV (includes comps)" : "Cash net"
@@ -1401,7 +1409,17 @@ struct AIAnalyticsSheet: View {
         \(recentLines)
         """
         
-        let promptHash = aiAnalysisPromptHash(prompt)
+        let promptForExactCache = """
+        You are an analytics assistant for TierTap.
+        Question: \"\(selectedQuestion.title)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history.
+        Task: \(questionPrompt)
+        Data summary:
+        \(statsBlock)
+        Recent \(gameLabel) sessions (most recent first):
+        \(recentLineCores.joined(separator: "\n"))
+        """
+        let promptHash = aiAnalysisPromptHash(promptForExactCache)
         let relaxedFingerprint = aiAnalysisRelaxedFingerprint(
             questionRaw: selectedQuestion.rawValue,
             category: selectedAnalyticsCategory,
