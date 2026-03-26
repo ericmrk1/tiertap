@@ -23,6 +23,7 @@ private let keySelectedLocationFilter = "ctt_selected_location_filter"
 private let keyThemePresets = "ctt_theme_presets"
 private let keyPromptSessionMood = "ctt_prompt_session_mood"
 private let keyAITone = "ctt_ai_tone"
+private let keyAITypingSpeed = "ctt_ai_typing_speed"
 private let keyAICallsDate = "ctt_ai_calls_date"
 private let keyAICallsCount = "ctt_ai_calls_count"
 private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
@@ -52,12 +53,8 @@ struct LastPokerSessionDefaults: Codable, Equatable {
     var pokerTournamentCostText: String
 }
 
-/// Last slot format / feature / notes; pre-fills check-in when game type is Slots.
+/// Last slot notes; pre-fills check-in when game type is Slots.
 struct LastSlotSessionDefaults: Codable, Equatable {
-    var slotFormat: SessionSlotFormat?
-    var slotFormatOther: String
-    var slotFeature: SessionSlotFeature?
-    var slotFeatureOther: String
     var slotNotes: String
 }
 
@@ -426,8 +423,55 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// Speed of the typewriter effect when AI answers appear (e.g. Ask TierTap).
+    enum AITypingSpeed: String, CaseIterable, Identifiable, Codable {
+        case slow
+        case medium
+        case fast
+
+        var id: String { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .slow: return "Slow"
+            case .medium: return "Medium"
+            case .fast: return "Fast"
+            }
+        }
+
+        /// Slider position 0…2 for a stepped control.
+        var sliderIndex: Double {
+            switch self {
+            case .slow: return 0
+            case .medium: return 1
+            case .fast: return 2
+            }
+        }
+
+        static func fromSliderIndex(_ value: Double) -> AITypingSpeed {
+            switch Int(value.rounded()) {
+            case 1: return .medium
+            case 2: return .fast
+            default: return .slow
+            }
+        }
+
+        /// Nanoseconds between characters; **slow** matches the original fixed delay.
+        var nanosecondsPerCharacter: UInt64 {
+            switch self {
+            case .slow: return 25_000_000
+            case .medium: return 10_000_000
+            case .fast: return 4_000_000
+            }
+        }
+    }
+
     @Published var aiTone: AITone {
         didSet { UserDefaults.standard.set(aiTone.rawValue, forKey: keyAITone) }
+    }
+
+    @Published var aiTypingSpeed: AITypingSpeed {
+        didSet { UserDefaults.standard.set(aiTypingSpeed.rawValue, forKey: keyAITypingSpeed) }
     }
 
     /// When true, analytics (and matching AI summaries) treat session results as **EV** (cash net + comps). When false, **cash net** only.
@@ -542,6 +586,12 @@ final class SettingsStore: ObservableObject {
             self.aiTone = tone
         } else {
             self.aiTone = .sarcastic
+        }
+        if let storedSpeed = UserDefaults.standard.string(forKey: keyAITypingSpeed),
+           let speed = AITypingSpeed(rawValue: storedSpeed) {
+            self.aiTypingSpeed = speed
+        } else {
+            self.aiTypingSpeed = .fast
         }
         if UserDefaults.standard.object(forKey: keyAnalyticsUseExpectedValue) != nil {
             self.analyticsUseExpectedValue = UserDefaults.standard.bool(forKey: keyAnalyticsUseExpectedValue)
@@ -659,10 +709,6 @@ final class SettingsStore: ObservableObject {
                 lastSlotGameName = session.game
             }
             lastSlotSessionDefaults = LastSlotSessionDefaults(
-                slotFormat: session.slotFormat,
-                slotFormatOther: session.slotFormatOther ?? "",
-                slotFeature: session.slotFeature,
-                slotFeatureOther: session.slotFeatureOther ?? "",
                 slotNotes: session.slotNotes ?? ""
             )
         } else {
@@ -690,10 +736,6 @@ final class SettingsStore: ObservableObject {
         pokerLevelMinutesText: String,
         pokerStartingStackText: String,
         pokerTournamentCostText: String,
-        slotFormat: SessionSlotFormat? = nil,
-        slotFormatOther: String = "",
-        slotFeature: SessionSlotFeature? = nil,
-        slotFeatureOther: String = "",
         slotNotes: String = ""
     ) {
         if gameCategory == .poker {
@@ -714,13 +756,7 @@ final class SettingsStore: ObservableObject {
             if !selectedGame.isEmpty {
                 lastSlotGameName = selectedGame
             }
-            lastSlotSessionDefaults = LastSlotSessionDefaults(
-                slotFormat: slotFormat,
-                slotFormatOther: slotFormatOther,
-                slotFeature: slotFeature,
-                slotFeatureOther: slotFeatureOther,
-                slotNotes: slotNotes
-            )
+            lastSlotSessionDefaults = LastSlotSessionDefaults(slotNotes: slotNotes)
         } else if gameCategory == .table, !selectedGame.isEmpty {
             lastTableGameName = selectedGame
         }

@@ -19,7 +19,7 @@ struct SettingsView: View {
     @State private var isSocialLoginsExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
-    @State private var isAIToneExpanded: Bool = false
+    @State private var isTierTapAIExpanded: Bool = false
     @State private var isSubscriptionExpanded: Bool = true
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
@@ -48,7 +48,7 @@ struct SettingsView: View {
                         favoritesSection
                         sessionsSection
                         themeSection
-                        aiSection
+                        tierTapAISection
                         socialLoginsSection
                         dataExportSection
                         aboutSection
@@ -209,11 +209,11 @@ struct SettingsView: View {
         }
     }
 
-    private var aiSection: some View {
+    private var tierTapAISection: some View {
         SettingsSection(
-            title: "AI assistant",
+            title: "TierTap AI",
             systemImage: "wand.and.stars",
-            isExpanded: $isAIToneExpanded
+            isExpanded: $isTierTapAIExpanded
         ) {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Tone of voice")
@@ -227,6 +227,38 @@ struct SettingsView: View {
                 .pickerStyle(.segmented)
 
                 Text("Controls how the TierTap AI summarizes your sessions. Default is **Sarcastic**.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+
+                Text("Typing speed")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                    .padding(.top, 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Slow")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Spacer()
+                        Text(settingsStore.aiTypingSpeed.displayName)
+                            .font(.caption.bold())
+                            .foregroundColor(.white)
+                        Spacer()
+                        Text("Fast")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                    Slider(
+                        value: Binding(
+                            get: { settingsStore.aiTypingSpeed.sliderIndex },
+                            set: { settingsStore.aiTypingSpeed = SettingsStore.AITypingSpeed.fromSliderIndex($0) }
+                        ),
+                        in: 0...2,
+                        step: 1
+                    )
+                    .tint(.green)
+                }
+                Text("How quickly AI answers appear character by character in **Ask TierTap**. Slow matches the original pace.")
                     .font(.caption)
                     .foregroundColor(.gray)
             }

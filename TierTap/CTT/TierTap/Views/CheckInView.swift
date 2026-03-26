@@ -26,10 +26,6 @@ struct CheckInView: View {
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
     @State private var pokerTournamentCostText: String = "0"
-    @State private var slotFormat: SessionSlotFormat?
-    @State private var slotFormatOther: String = ""
-    @State private var slotFeature: SessionSlotFeature?
-    @State private var slotFeatureOther: String = ""
     @State private var slotNotes: String = ""
     @State private var showCasinoLocationPicker = false
     @State private var casinoLatitude: Double?
@@ -216,13 +212,7 @@ struct CheckInView: View {
                                 ) { showGamePicker = true }
                                     .environmentObject(settingsStore)
                                 if gameCategory == .slots {
-                                    SlotSessionMetadataSection(
-                                        slotFormat: $slotFormat,
-                                        slotFormatOther: $slotFormatOther,
-                                        slotFeature: $slotFeature,
-                                        slotFeatureOther: $slotFeatureOther,
-                                        slotNotes: $slotNotes
-                                    )
+                                    SlotSessionNotesOnlySection(slotNotes: $slotNotes)
                                 }
                             } else {
                                 // Poker-specific controls with blinds & structure beneath
@@ -711,10 +701,6 @@ struct CheckInView: View {
             }
             .onChange(of: gameCategory) { newCat in
                 if newCat != .slots {
-                    slotFormat = nil
-                    slotFormatOther = ""
-                    slotFeature = nil
-                    slotFeatureOther = ""
                     slotNotes = ""
                 }
                 applyLastSavedGameDefaults()
@@ -748,16 +734,8 @@ struct CheckInView: View {
                 selectedGame = settingsStore.lastSlotGameName
             }
             if let d = settingsStore.lastSlotSessionDefaults {
-                slotFormat = d.slotFormat
-                slotFormatOther = d.slotFormatOther
-                slotFeature = d.slotFeature
-                slotFeatureOther = d.slotFeatureOther
                 slotNotes = d.slotNotes
             } else {
-                slotFormat = nil
-                slotFormatOther = ""
-                slotFeature = nil
-                slotFeatureOther = ""
                 slotNotes = ""
             }
             return
@@ -819,10 +797,10 @@ struct CheckInView: View {
         let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
         let slotMeta = Session.persistedSlotMetadata(
             gameCategory: gameCategory,
-            format: slotFormat,
-            formatOther: slotFormatOther,
-            feature: slotFeature,
-            featureOther: slotFeatureOther,
+            format: nil,
+            formatOther: "",
+            feature: nil,
+            featureOther: "",
             notes: slotNotes
         )
         store.updateLiveSessionGameMetadata(
@@ -857,10 +835,6 @@ struct CheckInView: View {
             pokerLevelMinutesText: pokerLevelMinutesText,
             pokerStartingStackText: pokerStartingStackText,
             pokerTournamentCostText: pokerTournamentCostText,
-            slotFormat: slotMeta.format,
-            slotFormatOther: slotMeta.formatOther ?? "",
-            slotFeature: slotMeta.feature,
-            slotFeatureOther: slotMeta.featureOther ?? "",
             slotNotes: slotMeta.notes ?? ""
         )
         if settingsStore.enableCasinoFeedback {

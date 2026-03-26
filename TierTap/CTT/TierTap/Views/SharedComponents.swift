@@ -34,6 +34,25 @@ struct DarkTextFieldStyle: TextFieldStyle {
     }
 }
 
+/// Larger green capsule used for filter panels (e.g. history, community feed, analytics date row).
+struct FilterPanelPillButton: View {
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.green.opacity(0.28))
+                .foregroundColor(.green)
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct GameButton: View {
     let title: String
     let isSelected: Bool
@@ -134,69 +153,18 @@ struct GamePickerSelectorRow: View {
     }
 }
 
-/// Optional slot format, feature, and notes when game type is Slots (check-in, add/edit session).
-struct SlotSessionMetadataSection: View {
-    @Binding var slotFormat: SessionSlotFormat?
-    @Binding var slotFormatOther: String
-    @Binding var slotFeature: SessionSlotFeature?
-    @Binding var slotFeatureOther: String
+/// Optional machine notes when game type is Slots.
+struct SlotSessionNotesOnlySection: View {
     @Binding var slotNotes: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Slot details (optional)")
-                .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.9))
-            Text("Helps categorize play — skip anything you don’t need.")
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Notes (optional)")
                 .font(.caption2)
                 .foregroundColor(.gray)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Format")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                Picker("Format", selection: $slotFormat) {
-                    Text("Not specified").tag(Optional<SessionSlotFormat>.none)
-                    ForEach(SessionSlotFormat.allCases, id: \.self) { f in
-                        Text(f.label).tag(Optional(f))
-                    }
-                }
-                .pickerStyle(.menu)
-                .tint(.white)
-            }
-
-            if slotFormat == .other {
-                TextField("Describe format", text: $slotFormatOther)
-                    .textFieldStyle(DarkTextFieldStyle())
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Major feature")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                Picker("Major feature", selection: $slotFeature) {
-                    Text("Not specified").tag(Optional<SessionSlotFeature>.none)
-                    ForEach(SessionSlotFeature.allCases, id: \.self) { f in
-                        Text(f.label).tag(Optional(f))
-                    }
-                }
-                .pickerStyle(.menu)
-                .tint(.white)
-            }
-
-            if slotFeature == .other {
-                TextField("Describe feature", text: $slotFeatureOther)
-                    .textFieldStyle(DarkTextFieldStyle())
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Notes")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                TextField("Denom, room, machine notes…", text: $slotNotes, axis: .vertical)
-                    .lineLimit(1...4)
-                    .textFieldStyle(DarkTextFieldStyle())
-            }
+            TextField("Denom, room, machine notes…", text: $slotNotes, axis: .vertical)
+                .lineLimit(1...4)
+                .textFieldStyle(DarkTextFieldStyle())
         }
     }
 }
@@ -435,6 +403,16 @@ struct GamePickerView: View {
         let favSet = Set(favorites)
         return filteredAll.filter { !favSet.contains($0) }
     }
+
+    /// Slot picker: offer using typed search text as the game name when it is not an exact list match.
+    private var slotsCustomNameFromSearch: String? {
+        guard mode == .slots else { return nil }
+        let t = search.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return nil }
+        let exactInList = allGamesUnion.contains { $0.caseInsensitiveCompare(t) == .orderedSame }
+        return exactInList ? nil : t
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -443,6 +421,37 @@ struct GamePickerView: View {
                     if isLoading {
                         ProgressView("Loading games…")
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
+                    }
+                    if let custom = slotsCustomNameFromSearch {
+                        Section {
+                            Button {
+                                selectedGame = custom
+                                dismiss()
+                            } label: {
+                                HStack(alignment: .center, spacing: 10) {
+                                    Image(systemName: "pencil.line")
+                                        .foregroundColor(.green)
+                                    Text("Use “\(custom)”")
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                            .listRowBackground(
+                                LinearGradient(
+                                    stops: [
+                                        .init(color: Color.green.opacity(0.22), location: 0),
+                                        .init(color: Color.white.opacity(0.06), location: 1)
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                        } header: {
+                            Text("Not in list")
+                                .foregroundColor(.gray)
+                        }
                     }
                     if !filteredFavorites.isEmpty {
                         Section("Favorites") {
@@ -459,7 +468,7 @@ struct GamePickerView: View {
                 }
                 .listStyle(.plain).scrollContentBackground(.hidden)
             }
-            .searchable(text: $search, prompt: mode == .slots ? "Search slot games" : "Search games")
+            .searchable(text: $search, prompt: mode == .slots ? "Search or type a custom name" : "Search games")
             .navigationTitle(mode == .slots ? "Select Slot Game" : "Select Game").navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(
                 LinearGradient(

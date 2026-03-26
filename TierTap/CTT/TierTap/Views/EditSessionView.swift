@@ -35,10 +35,6 @@ struct EditSessionView: View {
     @State private var pokerAnteText: String = ""
     @State private var pokerLevelMinutesText: String = ""
     @State private var pokerStartingStackText: String = ""
-    @State private var slotFormat: SessionSlotFormat?
-    @State private var slotFormatOther: String = ""
-    @State private var slotFeature: SessionSlotFeature?
-    @State private var slotFeatureOther: String = ""
     @State private var slotNotes: String = ""
     @State private var showGamePicker = false
 
@@ -97,13 +93,7 @@ struct EditSessionView: View {
                                 ) { showGamePicker = true }
                                     .environmentObject(settingsStore)
                                 if gameCategory == .slots {
-                                    SlotSessionMetadataSection(
-                                        slotFormat: $slotFormat,
-                                        slotFormatOther: $slotFormatOther,
-                                        slotFeature: $slotFeature,
-                                        slotFeatureOther: $slotFeatureOther,
-                                        slotNotes: $slotNotes
-                                    )
+                                    SlotSessionNotesOnlySection(slotNotes: $slotNotes)
                                 }
                             } else {
                                 VStack(alignment: .leading, spacing: 8) {
@@ -440,10 +430,6 @@ struct EditSessionView: View {
             .onAppear { prefill() }
             .onChange(of: gameCategory) { newCat in
                 if newCat != .slots {
-                    slotFormat = nil
-                    slotFormatOther = ""
-                    slotFeature = nil
-                    slotFeatureOther = ""
                     slotNotes = ""
                 }
             }
@@ -531,10 +517,6 @@ struct EditSessionView: View {
         pokerAnteText = session.pokerAnte.map { "\($0)" } ?? ""
         pokerLevelMinutesText = session.pokerLevelMinutes.map { "\($0)" } ?? ""
         pokerStartingStackText = session.pokerStartingStack.map { "\($0)" } ?? ""
-        slotFormat = session.slotFormat
-        slotFormatOther = session.slotFormatOther ?? ""
-        slotFeature = session.slotFeature
-        slotFeatureOther = session.slotFeatureOther ?? ""
         slotNotes = session.slotNotes ?? ""
 
         compEvents = session.compEvents
@@ -586,10 +568,10 @@ struct EditSessionView: View {
         let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
         let slotMeta = Session.persistedSlotMetadata(
             gameCategory: gameCategory,
-            format: slotFormat,
-            formatOther: slotFormatOther,
-            feature: slotFeature,
-            featureOther: slotFeatureOther,
+            format: nil,
+            formatOther: "",
+            feature: nil,
+            featureOther: "",
             notes: slotNotes
         )
         var updated = Session(

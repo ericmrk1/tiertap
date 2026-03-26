@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import Supabase
+import CryptoKit
 
 struct AnalyticsShareSelection {
     let includeBetCaptureDiff: Bool
@@ -456,11 +457,9 @@ struct AnalyticsView: View {
                         ), displayedComponents: .date)
                             .labelsHidden()
                             .colorScheme(.dark)
-                        Button(analyticsFromDate == nil ? "All" : "Clear") {
+                        FilterPanelPillButton(title: analyticsFromDate == nil ? "All" : "Clear Filter") {
                             analyticsFromDate = nil
                         }
-                        .font(.caption)
-                        .foregroundColor(.green)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -476,11 +475,9 @@ struct AnalyticsView: View {
                         ), displayedComponents: .date)
                             .labelsHidden()
                             .colorScheme(.dark)
-                        Button(analyticsToDate == nil ? "All" : "Clear") {
+                        FilterPanelPillButton(title: analyticsToDate == nil ? "All" : "Clear Filter") {
                             analyticsToDate = nil
                         }
-                        .font(.caption)
-                        .foregroundColor(.green)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -768,6 +765,89 @@ struct AnalyticsView: View {
     }
 }
 
+// MARK: - AI Analysis gemini-router cache (this screen only)
+
+/// Caches the last successful AI Analysis response so repeated “Ask TierTap” taps
+/// with the same or very similar inputs skip an extra gemini-router call.
+private actor AIAnalysisGeminiCache {
+    static let shared = AIAnalysisGeminiCache()
+
+    private var lastExactPromptHash: String?
+    private var lastRelaxedFingerprint: String?
+    private var lastResponseText: String?
+
+    enum Hit {
+        /// Prompt byte-for-byte match since the last stored response.
+        case exact
+        /// Same question, scope, and coarsely similar session snapshot.
+        case similar
+    }
+
+    func lookup(exactPromptHash: String, relaxedFingerprint: String) -> (text: String, hit: Hit)? {
+        if let h = lastExactPromptHash, h == exactPromptHash, let t = lastResponseText {
+            return (t, .exact)
+        }
+        if let f = lastRelaxedFingerprint, f == relaxedFingerprint, let t = lastResponseText {
+            return (t, .similar)
+        }
+        return nil
+    }
+
+    func store(exactPromptHash: String, relaxedFingerprint: String, text: String) {
+        lastExactPromptHash = exactPromptHash
+        lastRelaxedFingerprint = relaxedFingerprint
+        lastResponseText = text
+    }
+}
+
+private func aiAnalysisPromptHash(_ prompt: String) -> String {
+    let digest = SHA256.hash(data: Data(prompt.utf8))
+    return digest.map { String(format: "%02x", $0) }.joined()
+}
+
+/// Buckets dollar outcomes so tiny edits don’t force a new API round-trip.
+private func aiAnalysisRelaxedOutcomeBucket(_ value: Int) -> Int {
+    let magnitude = max(25, abs(value) / 8)
+    return (value / magnitude) * magnitude
+}
+
+private func aiAnalysisRelaxedFingerprint(
+    questionRaw: String,
+    category: SessionGameCategory,
+    useEV: Bool,
+    tone: String,
+    bankroll: Int,
+    unitSize: Int,
+    total: Int,
+    wins: Int,
+    losses: Int,
+    breakeven: Int,
+    net: Int,
+    recentSessions: [Session],
+    sessionOutcome: (Session) -> Int
+) -> String {
+    let bankrollBucket = (bankroll / 500) * 500
+    let unitBucket = (unitSize / 25) * 25
+    let netBucket = aiAnalysisRelaxedOutcomeBucket(net)
+    let recentSig = recentSessions.map { session in
+        let o = sessionOutcome(session)
+        let b = aiAnalysisRelaxedOutcomeBucket(o)
+        return String(session.id.uuidString.prefix(8)) + ":" + String(b)
+    }.joined(separator: "|")
+    return [
+        questionRaw,
+        category.rawValue,
+        useEV ? "ev" : "cash",
+        tone,
+        "br:\(bankrollBucket)",
+        "u:\(unitBucket)",
+        "t:\(total)",
+        "w:\(wins)-\(losses)-\(breakeven)",
+        "net:\(netBucket)",
+        recentSig
+    ].joined(separator: "\n")
+}
+
 struct AIAnalyticsSheet: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
@@ -1024,20 +1104,29 @@ struct AIAnalyticsSheet: View {
                                 .foregroundColor(.white.opacity(0.8))
                             Menu {
                                 ForEach(questionsForCurrentCategory, id: \.self) { question in
-                                    Button(question.title) {
+                                    Button {
                                         selectedQuestion = question
+                                    } label: {
+                                        Text(question.title)
+                                            .font(.caption)
+                                            .multilineTextAlignment(.leading)
+                                            .fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
                             } label: {
-                                HStack {
+                                HStack(alignment: .top, spacing: 8) {
                                     Text(selectedQuestion.title)
-                                        .font(.body)
+                                        .font(.caption)
                                         .foregroundColor(.white)
                                         .multilineTextAlignment(.leading)
-                                    Spacer()
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                     Image(systemName: "chevron.up.chevron.down")
+                                        .font(.caption.weight(.semibold))
                                         .foregroundColor(.white.opacity(0.7))
+                                        .padding(.top, 1)
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding()
                                 .background(Color.black.opacity(0.25))
                                 .cornerRadius(12)
@@ -1312,6 +1401,38 @@ struct AIAnalyticsSheet: View {
         \(recentLines)
         """
         
+        let promptHash = aiAnalysisPromptHash(prompt)
+        let relaxedFingerprint = aiAnalysisRelaxedFingerprint(
+            questionRaw: selectedQuestion.rawValue,
+            category: selectedAnalyticsCategory,
+            useEV: useEV,
+            tone: toneInstruction,
+            bankroll: settingsStore.bankroll,
+            unitSize: settingsStore.unitSize,
+            total: total,
+            wins: wins,
+            losses: losses,
+            breakeven: breakeven,
+            net: net,
+            recentSessions: recentSessions,
+            sessionOutcome: outcome
+        )
+        
+        if let cached = await AIAnalysisGeminiCache.shared.lookup(
+            exactPromptHash: promptHash,
+            relaxedFingerprint: relaxedFingerprint
+        ) {
+            let moreDataNote = "\n\n—\nOver time, more logged sessions help TierTap give sharper analysis. This answer was reused because your data barely changed since the last run, so we skipped another AI call."
+            let textToShow = cached.hit == .similar ? (cached.text + moreDataNote) : cached.text
+            await MainActor.run {
+                errorMessage = nil
+                fullAnswer = textToShow
+                isLoading = false
+            }
+            await typeOut(textToShow)
+            return
+        }
+        
         await MainActor.run {
             isLoading = true
             errorMessage = nil
@@ -1341,7 +1462,7 @@ struct AIAnalyticsSheet: View {
         }
         
         do {
-            // Record usage before calling the Gemini router so we never exceed the limit for free users.
+            // Record usage only when we actually call the Gemini router (cache hits do not consume quota).
             if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
                 await MainActor.run {
                     settingsStore.registerAICall()
@@ -1365,6 +1486,11 @@ struct AIAnalyticsSheet: View {
                 .compactMap { $0.text }
                 .joined(separator: "\n")
                 ?? "No text response from Gemini."
+            await AIAnalysisGeminiCache.shared.store(
+                exactPromptHash: promptHash,
+                relaxedFingerprint: relaxedFingerprint,
+                text: text
+            )
             await MainActor.run {
                 fullAnswer = text
                 isLoading = false
@@ -1379,11 +1505,12 @@ struct AIAnalyticsSheet: View {
     }
     
     private func typeOut(_ text: String) async {
+        let delayNs = settingsStore.aiTypingSpeed.nanosecondsPerCharacter
         await MainActor.run {
             displayedAnswer = ""
         }
         for character in text {
-            try? await Task.sleep(nanoseconds: 25_000_000)
+            try? await Task.sleep(nanoseconds: delayNs)
             await MainActor.run {
                 displayedAnswer.append(character)
             }

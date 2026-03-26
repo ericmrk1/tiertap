@@ -1514,203 +1514,211 @@ struct CommunityFeedFiltersView: View {
     let onApply: () -> Void
     let onClear: () -> Void
 
-    @State private var isDateExpanded: Bool = false
-    @State private var isGameExpanded: Bool = false
-    @State private var isLocationExpanded: Bool = false
+    /// Single outer panel; expanded by default, collapses after Apply.
+    @State private var isPanelExpanded = true
+
+    private var filterSummary: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        var parts: [String] = [
+            "\(formatter.string(from: filterStartDate)) – \(formatter.string(from: filterEndDate))"
+        ]
+        if !selectedGames.isEmpty {
+            parts.append("\(selectedGames.count) game\(selectedGames.count == 1 ? "" : "s")")
+        }
+        if !selectedLocations.isEmpty {
+            parts.append("\(selectedLocations.count) location\(selectedLocations.count == 1 ? "" : "s")")
+        }
+        return parts.joined(separator: " · ")
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Filters")
-                    .font(.subheadline.bold())
-                    .foregroundColor(.white)
-                Spacer()
-                Button("Clear") {
-                    onClear()
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isPanelExpanded.toggle()
                 }
-                .font(.caption)
-                .foregroundColor(.green)
-            }
-
-            // Date & time range
-            VStack(alignment: .leading, spacing: 8) {
-                Button {
-                    withAnimation {
-                        isDateExpanded.toggle()
+            } label: {
+                HStack(alignment: .center, spacing: 8) {
+                    Label("Filters", systemImage: "line.3.horizontal.decrease.circle")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                        .labelStyle(.titleAndIcon)
+                    Spacer(minLength: 8)
+                    if !isPanelExpanded {
+                        Text(filterSummary)
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.75))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
-                } label: {
+                    Image(systemName: isPanelExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .padding(.vertical, 2)
+            }
+            .buttonStyle(.plain)
+
+            if isPanelExpanded {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack {
+                        Spacer()
+                        FilterPanelPillButton(title: "Clear Filter") {
+                            onClear()
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                isPanelExpanded = true
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
                         Label("Date & time range", systemImage: "calendar")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.9))
-                        Spacer()
-                        Image(systemName: isDateExpanded ? "chevron.up" : "chevron.down")
-                            .font(.caption2)
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                }
-                .buttonStyle(.plain)
 
-                if isDateExpanded {
-                    VStack(alignment: .leading, spacing: 12) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("From")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                            DatePicker(
-                                "",
-                                selection: $filterStartDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
-                            .tint(.white)
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("To")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                            DatePicker(
-                                "",
-                                selection: $filterEndDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
-                            .tint(.white)
-                        }
-                    }
-                }
-            }
-
-            // Game bubbles (multi-select)
-            if !availableGames.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Button {
-                        withAnimation {
-                            isGameExpanded.toggle()
-                        }
-                    } label: {
-                        HStack {
-                            Label("Games", systemImage: "suit.club.fill")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.9))
-                            Spacer()
-                            if !selectedGames.isEmpty {
-                                Text("\(selectedGames.count) selected")
-                                    .font(.caption2)
-                                    .foregroundColor(.green)
+                        VStack(alignment: .leading, spacing: 12) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("From")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.8))
+                                DatePicker(
+                                    "",
+                                    selection: $filterStartDate,
+                                    displayedComponents: [.date, .hourAndMinute]
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
                             }
-                            Image(systemName: isGameExpanded ? "chevron.up" : "chevron.down")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.7))
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("To")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.8))
+                                DatePicker(
+                                    "",
+                                    selection: $filterEndDate,
+                                    displayedComponents: [.date, .hourAndMinute]
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                            }
                         }
                     }
-                    .buttonStyle(.plain)
 
-                    if isGameExpanded {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(availableGames, id: \.self) { game in
-                                    let isSelected = selectedGames.contains(game)
-                                    Button {
-                                        if isSelected {
-                                            selectedGames.remove(game)
-                                        } else {
-                                            selectedGames.insert(game)
+                    if !availableGames.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Label("Games", systemImage: "suit.club.fill")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.9))
+                                Spacer()
+                                if !selectedGames.isEmpty {
+                                    Text("\(selectedGames.count) selected")
+                                        .font(.caption2)
+                                        .foregroundColor(.green)
+                                }
+                            }
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(availableGames, id: \.self) { game in
+                                        let isSelected = selectedGames.contains(game)
+                                        Button {
+                                            if isSelected {
+                                                selectedGames.remove(game)
+                                            } else {
+                                                selectedGames.insert(game)
+                                            }
+                                        } label: {
+                                            Text(game)
+                                                .font(.caption)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                                .foregroundColor(isSelected ? .black : .white)
+                                                .cornerRadius(16)
                                         }
-                                    } label: {
-                                        Text(game)
-                                            .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
-                                            .background(isSelected ? Color.green : Color.white.opacity(0.18))
-                                            .foregroundColor(isSelected ? .black : .white)
-                                            .cornerRadius(16)
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            // Location bubbles (multi-select)
-            if !availableLocations.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Button {
-                        withAnimation {
-                            isLocationExpanded.toggle()
-                        }
-                    } label: {
-                        HStack {
-                            Label("Locations", systemImage: "mappin.and.ellipse")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.9))
-                            Spacer()
-                            if !selectedLocations.isEmpty {
-                                Text("\(selectedLocations.count) selected")
-                                    .font(.caption2)
-                                    .foregroundColor(.green)
+                    if !availableLocations.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Label("Locations", systemImage: "mappin.and.ellipse")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.9))
+                                Spacer()
+                                if !selectedLocations.isEmpty {
+                                    Text("\(selectedLocations.count) selected")
+                                        .font(.caption2)
+                                        .foregroundColor(.green)
+                                }
                             }
-                            Image(systemName: isLocationExpanded ? "chevron.up" : "chevron.down")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                    }
-                    .buttonStyle(.plain)
 
-                    if isLocationExpanded {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(availableLocations, id: \.self) { location in
-                                    let isSelected = selectedLocations.contains(location)
-                                    Button {
-                                        if isSelected {
-                                            selectedLocations.remove(location)
-                                        } else {
-                                            selectedLocations.insert(location)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(availableLocations, id: \.self) { location in
+                                        let isSelected = selectedLocations.contains(location)
+                                        Button {
+                                            if isSelected {
+                                                selectedLocations.remove(location)
+                                            } else {
+                                                selectedLocations.insert(location)
+                                            }
+                                        } label: {
+                                            Text(location)
+                                                .font(.caption)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                                .foregroundColor(isSelected ? .black : .white)
+                                                .cornerRadius(16)
                                         }
-                                    } label: {
-                                        Text(location)
-                                            .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
-                                            .background(isSelected ? Color.green : Color.white.opacity(0.18))
-                                            .foregroundColor(isSelected ? .black : .white)
-                                            .cornerRadius(16)
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            Button {
-                onApply()
-            } label: {
-                HStack {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                        Text("Apply Filters")
+                    Button {
+                        onApply()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isPanelExpanded = false
+                        }
+                    } label: {
+                        HStack {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Image(systemName: "line.3.horizontal.decrease.circle")
+                                Text("Apply Filters")
+                            }
+                        }
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(10)
                     }
+                    .disabled(isLoading)
                 }
-                .font(.subheadline.bold())
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(Color.white.opacity(0.15))
-                .cornerRadius(10)
+                .padding(.top, 10)
             }
-            .disabled(isLoading)
         }
+        .padding(14)
+        .background(Color.white.opacity(0.12))
+        .cornerRadius(16)
         .padding(.horizontal)
         .padding(.top, 8)
     }

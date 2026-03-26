@@ -4,6 +4,8 @@ struct SessionCalendarView: View {
     let sessions: [Session]
     @Binding var selectedDate: Date?
 
+    @State private var displayedMonthStart: Date = SessionCalendarView.startOfMonth(for: Date())
+
     private let calendar = Calendar.current
 
     private var countsByDay: [Date: Int] {
@@ -15,12 +17,16 @@ struct SessionCalendarView: View {
         return dict
     }
 
-    private var baseDate: Date {
-        selectedDate ?? Date()
+    private var monthStart: Date {
+        displayedMonthStart
     }
 
-    private var monthStart: Date {
-        calendar.date(from: calendar.dateComponents([.year, .month], from: baseDate)) ?? baseDate
+    private var currentMonthStart: Date {
+        calendar.date(from: calendar.dateComponents([.year, .month], from: Date())) ?? Date()
+    }
+
+    private var canGoToNextMonth: Bool {
+        monthStart < currentMonthStart
     }
 
     private var dayCells: [DayCell] {
@@ -49,9 +55,33 @@ struct SessionCalendarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(monthTitle)
-                .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.85))
+            HStack(spacing: 8) {
+                Button {
+                    shiftDisplayedMonth(by: -1)
+                } label: {
+                    Image(systemName: "chevron.left.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Previous month")
+
+                Text(monthTitle)
+                    .font(.caption.bold())
+                    .foregroundColor(.white.opacity(0.85))
+                    .frame(maxWidth: .infinity)
+
+                Button {
+                    shiftDisplayedMonth(by: 1)
+                } label: {
+                    Image(systemName: "chevron.right.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(canGoToNextMonth ? Color.white.opacity(0.9) : Color.white.opacity(0.25))
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoToNextMonth)
+                .accessibilityLabel("Next month")
+            }
 
             let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
 
@@ -103,6 +133,26 @@ struct SessionCalendarView: View {
                 }
             }
         }
+        .onAppear {
+            if let selectedDate {
+                displayedMonthStart = Self.startOfMonth(for: selectedDate)
+            }
+        }
+        .onChange(of: selectedDate) { newValue in
+            if let newValue {
+                displayedMonthStart = Self.startOfMonth(for: newValue)
+            }
+        }
+    }
+
+    private func shiftDisplayedMonth(by delta: Int) {
+        if let next = calendar.date(byAdding: .month, value: delta, to: monthStart) {
+            displayedMonthStart = next
+        }
+    }
+
+    private static func startOfMonth(for date: Date) -> Date {
+        Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: date)) ?? date
     }
 
     private func backgroundColor(for count: Int, selected: Bool) -> Color {

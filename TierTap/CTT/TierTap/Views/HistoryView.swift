@@ -17,8 +17,16 @@ struct HistoryView: View {
     @State private var sessionToEdit: Session?
     @State private var sessionToDelete: Session?
     @State private var searchText: String = ""
-    @State private var selectedDate: Date?
-    @State private var isCalendarExpanded: Bool = false
+    /// Collapsed by default; header stays fixed above the scrolling list.
+    @State private var isFilterPanelExpanded: Bool = false
+    @State private var useDateRangeFilter: Bool = false
+    @State private var filterStartDate: Date = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date().addingTimeInterval(-30 * 24 * 60 * 60)
+    @State private var filterEndDate: Date = Date()
+    @State private var selectedHistoryGames: Set<String> = []
+    @State private var selectedHistoryLocations: Set<String> = []
+    @State private var isHistoryDateSectionExpanded: Bool = false
+    @State private var isHistoryGameSectionExpanded: Bool = false
+    @State private var isHistoryLocationSectionExpanded: Bool = false
     @State private var isShareSelectorPresented: Bool = false
     @State private var isShareSheetPresented: Bool = false
     @State private var shareItems: [Any] = []
@@ -34,12 +42,18 @@ struct HistoryView: View {
     private var filteredSessions: [Session] {
         var sessions = store.sessions
 
-        if let filter = settingsStore.selectedLocationFilter, !filter.isEmpty {
-            sessions = sessions.filter { $0.casino == filter }
+        if useDateRangeFilter {
+            let lo = min(filterStartDate, filterEndDate)
+            let hi = max(filterStartDate, filterEndDate)
+            sessions = sessions.filter { $0.startTime >= lo && $0.startTime <= hi }
         }
 
-        if let selectedDate {
-            sessions = sessions.filter { Calendar.current.isDate($0.startTime, inSameDayAs: selectedDate) }
+        if !selectedHistoryLocations.isEmpty {
+            sessions = sessions.filter { selectedHistoryLocations.contains($0.casino) }
+        }
+
+        if !selectedHistoryGames.isEmpty {
+            sessions = sessions.filter { selectedHistoryGames.contains($0.game) }
         }
 
         let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -57,6 +71,24 @@ struct HistoryView: View {
         Array(Set(store.sessions.map { $0.casino })).sorted()
     }
 
+    private var availableGames: [String] {
+        Array(Set(store.sessions.map { $0.game })).sorted()
+    }
+
+    private var historyFiltersActive: Bool {
+        useDateRangeFilter || !selectedHistoryGames.isEmpty || !selectedHistoryLocations.isEmpty ||
+            !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func clearHistoryFilters() {
+        useDateRangeFilter = false
+        filterStartDate = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date().addingTimeInterval(-30 * 24 * 60 * 60)
+        filterEndDate = Date()
+        selectedHistoryGames.removeAll()
+        selectedHistoryLocations.removeAll()
+        searchText = ""
+    }
+
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "clock.arrow.circlepath")
@@ -71,100 +103,254 @@ struct HistoryView: View {
         }
     }
 
-    private var calendarSection: some View {
-        DisclosureGroup(isExpanded: $isCalendarExpanded) {
-            VStack(alignment: .leading, spacing: 8) {
-                SessionCalendarView(sessions: store.sessions, selectedDate: $selectedDate)
-                HStack {
-                    Button("Clear Date Filter") { selectedDate = nil }
-                        .font(.caption)
-                        .foregroundColor(.blue.opacity(0.9))
-                    Spacer()
+    private var historyStickyFilterBubble: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isFilterPanelExpanded.toggle()
                 }
-            }
-            .padding(.top, 4)
-        } label: {
-            HStack {
-                Image(systemName: "calendar")
-                    .foregroundColor(.white)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Session Calendar")
-                        .font(.subheadline.bold())
+            } label: {
+                HStack {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
                         .foregroundColor(.white)
-                    if let selectedDate {
-                        Text(selectedDate, style: .date)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Filters")
+                            .font(.subheadline.bold())
+                            .foregroundColor(.white)
+                        Text(historyFiltersActive ? "Showing filtered sessions" : "All sessions")
                             .font(.caption)
-                            .foregroundColor(.white.opacity(0.8))
-                    } else {
-                        Text("Tap to pick a date")
-                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.72))
+                    }
+                    Spacer()
+                    if historyFiltersActive {
+                        Text("Active")
+                            .font(.caption2.bold())
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.green.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                    Image(systemName: isFilterPanelExpanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+
+            if isFilterPanelExpanded {
+                Divider()
+                    .background(Color.white.opacity(0.14))
+                    .padding(.horizontal, 12)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
                             .foregroundColor(.white.opacity(0.7))
+                        TextField("Search by casino or game", text: $searchText)
+                            .textInputAutocapitalization(.never)
+                            .disableAutocorrection(true)
+                            .foregroundColor(.white)
+                    }
+                    .padding(10)
+                    .background(Color.black.opacity(0.22))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    historyDateRangeSection
+
+                    if !availableGames.isEmpty {
+                        historyGameBubblesSection
+                    }
+
+                    if !availableCasinos.isEmpty {
+                        historyLocationBubblesSection
+                    }
+
+                    HStack {
+                        Spacer()
+                        FilterPanelPillButton(title: "Clear Filter") {
+                            clearHistoryFilters()
+                        }
                     }
                 }
-                Spacer()
-                Image(systemName: isCalendarExpanded ? "chevron.up" : "chevron.down")
-                    .foregroundColor(.white.opacity(0.8))
+                .padding(.horizontal, 14)
+                .padding(.bottom, 14)
+                .padding(.top, 10)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
-            .background(Color.black.opacity(0.25))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
+        .background(Color.black.opacity(0.28))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
         .padding(.horizontal)
         .padding(.top, 8)
     }
 
-    private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.white.opacity(0.7))
-            TextField("Search by casino or game", text: $searchText)
-                .textInputAutocapitalization(.never)
-                .disableAutocorrection(true)
-                .foregroundColor(.white)
-        }
-        .padding(10)
-        .background(Color.black.opacity(0.3))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .padding(.horizontal)
-    }
-
-    @ViewBuilder
-    private var locationFilterBar: some View {
-        if !availableCasinos.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
+    private var historyDateRangeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation { isHistoryDateSectionExpanded.toggle() }
+            } label: {
                 HStack {
-                    Text("Filter by location")
-                        .font(.subheadline.bold())
-                        .foregroundColor(.white)
+                    Label("Date & time range", systemImage: "calendar")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
                     Spacer()
+                    if useDateRangeFilter {
+                        Text("On")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                    }
+                    Image(systemName: isHistoryDateSectionExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.7))
                 }
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        locationFilterButton(title: "All", isSelected: settingsStore.selectedLocationFilter == nil || settingsStore.selectedLocationFilter?.isEmpty == true) {
-                            settingsStore.selectedLocationFilter = nil
+            }
+            .buttonStyle(.plain)
+
+            if isHistoryDateSectionExpanded {
+                VStack(alignment: .leading, spacing: 12) {
+                    Toggle(isOn: $useDateRangeFilter) {
+                        Text("Limit to date range")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                    .tint(.green)
+
+                    if useDateRangeFilter {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("From")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                            DatePicker(
+                                "",
+                                selection: $filterStartDate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                            .tint(.white)
                         }
-                        ForEach(availableCasinos, id: \.self) { casino in
-                            locationFilterButton(title: casino, isSelected: settingsStore.selectedLocationFilter == casino) {
-                                settingsStore.selectedLocationFilter = casino
-                            }
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("To")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                            DatePicker(
+                                "",
+                                selection: $filterEndDate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                            .tint(.white)
                         }
                     }
-                    .padding(.horizontal, 16)
                 }
             }
         }
     }
 
-    private func locationFilterButton(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.caption)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
-                .foregroundColor(isSelected ? .black : .white)
-                .cornerRadius(8)
+    private var historyGameBubblesSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                withAnimation { isHistoryGameSectionExpanded.toggle() }
+            } label: {
+                HStack {
+                    Label("Games", systemImage: "suit.club.fill")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                    Spacer()
+                    if !selectedHistoryGames.isEmpty {
+                        Text("\(selectedHistoryGames.count) selected")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                    }
+                    Image(systemName: isHistoryGameSectionExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isHistoryGameSectionExpanded {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(availableGames, id: \.self) { game in
+                            let isSelected = selectedHistoryGames.contains(game)
+                            Button {
+                                if isSelected {
+                                    selectedHistoryGames.remove(game)
+                                } else {
+                                    selectedHistoryGames.insert(game)
+                                }
+                            } label: {
+                                Text(game)
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                    .foregroundColor(isSelected ? .black : .white)
+                                    .cornerRadius(16)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var historyLocationBubblesSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                withAnimation { isHistoryLocationSectionExpanded.toggle() }
+            } label: {
+                HStack {
+                    Label("Locations", systemImage: "mappin.and.ellipse")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                    Spacer()
+                    if !selectedHistoryLocations.isEmpty {
+                        Text("\(selectedHistoryLocations.count) selected")
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                    }
+                    Image(systemName: isHistoryLocationSectionExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isHistoryLocationSectionExpanded {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(availableCasinos, id: \.self) { location in
+                            let isSelected = selectedHistoryLocations.contains(location)
+                            Button {
+                                if isSelected {
+                                    selectedHistoryLocations.remove(location)
+                                } else {
+                                    selectedHistoryLocations.insert(location)
+                                }
+                            } label: {
+                                Text(location)
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                    .foregroundColor(isSelected ? .black : .white)
+                                    .cornerRadius(16)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -175,7 +361,7 @@ struct HistoryView: View {
                 Text("No sessions match your filters.")
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.8))
-                Text("Try adjusting the search, date, or location filters.")
+                Text("Try adjusting filters or search.")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
             }
@@ -208,11 +394,10 @@ struct HistoryView: View {
     }
 
     private var historyContentView: some View {
-        VStack(spacing: 8) {
-            calendarSection
-            searchBar
-            locationFilterBar
+        VStack(spacing: 0) {
+            historyStickyFilterBubble
             sessionListContent
+                .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
     }
 
