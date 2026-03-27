@@ -6,6 +6,12 @@ import CoreLocation
 /// all subscription-gated functionality without requiring a live StoreKit subscription.
 let SUBSCRIPTION_OVERRIDE_FLAG: Bool = true
 
+/// Bump independently when the chip vs comp estimator models change. Supabase rows are keyed by these strings.
+enum EstimatorQualityStatsModelVersion {
+    static let chip: String = "1"
+    static let comp: String = "1"
+}
+
 /// Shared Supabase client. Keys are read from SupabaseKeys.plist (gitignored).
 /// Copy SupabaseKeys.example.plist to SupabaseKeys.plist and add your project URL and anon key.
 enum SupabaseConfig {
@@ -222,4 +228,108 @@ enum CasinoLocationsAPI {
             }
         }
     }
+}
+
+// MARK: - Chip estimator quality (aggregate stats)
+
+private struct RecordChipEstimatorOutcomeParams: Encodable {
+    let p_environment: String
+    let p_casino_key: String
+    let p_game_key: String
+    let p_model_version: String
+    let p_accepted: Bool
+}
+
+enum ChipEstimatorQualityStatsAPI {
+    /// Records whether the user **accepted** the chip estimator value or **ignored** it (typed another amount, cleared it, etc.).
+    /// Updates are **atomic** on the server (`INSERT … ON CONFLICT …` with increments), so many apps can write the same row without lost counts.
+    ///
+    /// - Parameters:
+    ///   - casinoKey: Stable key for the venue — typically the same string you store as `Session.casino` (trimmed).
+    ///   - gameKey: Stable key for the game — typically `Session.game` (trimmed).
+    ///   - accepted: `true` if the estimate was accepted as-is; `false` if ignored or overridden.
+    static func recordOutcome(casinoKey: String, gameKey: String, accepted: Bool) async throws {
+        guard let client = supabase else {
+            throw ChipEstimatorQualityStatsError.supabaseNotConfigured
+        }
+        let trimmedCasino = casinoKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedGame = gameKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedCasino.isEmpty, !trimmedGame.isEmpty else {
+            throw ChipEstimatorQualityStatsError.emptyCasinoOrGameKey
+        }
+
+        let environment = shouldUseTestSupabaseTables() ? "test" : "production"
+        let payload = RecordChipEstimatorOutcomeParams(
+            p_environment: environment,
+            p_casino_key: trimmedCasino,
+            p_game_key: trimmedGame,
+            p_model_version: EstimatorQualityStatsModelVersion.chip,
+            p_accepted: accepted
+        )
+
+        _ = try await client.database
+            .rpc("record_chip_estimator_outcome", params: payload)
+            .execute()
+    }
+
+    /// Like `recordOutcome(casinoKey:gameKey:accepted:)` but swallows errors (for fire-and-forget telemetry).
+    static func recordOutcomeBestEffort(casinoKey: String, gameKey: String, accepted: Bool) {
+        Task {
+            try? await recordOutcome(casinoKey: casinoKey, gameKey: gameKey, accepted: accepted)
+        }
+    }
+}
+
+enum ChipEstimatorQualityStatsError: Error {
+    case supabaseNotConfigured
+    case emptyCasinoOrGameKey
+}
+
+// MARK: - Comp estimator quality (aggregate stats)
+
+private struct RecordCompEstimatorOutcomeParams: Encodable {
+    let p_environment: String
+    let p_casino_key: String
+    let p_game_key: String
+    let p_model_version: String
+    let p_accepted: Bool
+}
+
+enum CompEstimatorQualityStatsAPI {
+    /// Records whether the user **accepted** the comp value estimate or **declined** it.
+    /// Server-side increment is atomic (same pattern as `ChipEstimatorQualityStatsAPI`).
+    static func recordOutcome(casinoKey: String, gameKey: String, accepted: Bool) async throws {
+        guard let client = supabase else {
+            throw CompEstimatorQualityStatsError.supabaseNotConfigured
+        }
+        let trimmedCasino = casinoKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedGame = gameKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedCasino.isEmpty, !trimmedGame.isEmpty else {
+            throw CompEstimatorQualityStatsError.emptyCasinoOrGameKey
+        }
+
+        let environment = shouldUseTestSupabaseTables() ? "test" : "production"
+        let payload = RecordCompEstimatorOutcomeParams(
+            p_environment: environment,
+            p_casino_key: trimmedCasino,
+            p_game_key: trimmedGame,
+            p_model_version: EstimatorQualityStatsModelVersion.comp,
+            p_accepted: accepted
+        )
+
+        _ = try await client.database
+            .rpc("record_comp_estimator_outcome", params: payload)
+            .execute()
+    }
+
+    static func recordOutcomeBestEffort(casinoKey: String, gameKey: String, accepted: Bool) {
+        Task {
+            try? await recordOutcome(casinoKey: casinoKey, gameKey: gameKey, accepted: accepted)
+        }
+    }
+}
+
+enum CompEstimatorQualityStatsError: Error {
+    case supabaseNotConfigured
+    case emptyCasinoOrGameKey
 }

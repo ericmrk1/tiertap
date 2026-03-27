@@ -74,6 +74,13 @@ struct CloseoutView: View {
         return (Double(wl) / Double(initial)) * 100.0
     }
 
+    /// Cash-out field: green when walking away with a positive amount, red at zero (bust).
+    private var cashOutFieldColors: (text: Color, accent: Color) {
+        guard let n = Int(cashOut) else { return (.white, .green) }
+        if n > 0 { return (.green, .green) }
+        return (.red, .red)
+    }
+
     var timerStopped: Bool { s.endTime != nil }
 
     var body: some View {
@@ -148,7 +155,26 @@ struct CloseoutView: View {
 
                         // Inputs (compact)
                         VStack(spacing: 8) {
-                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount leaving with", value: $cashOut)
+                            HStack(alignment: .center, spacing: 12) {
+                                Text("Cash Out (\(settingsStore.currencySymbol))")
+                                    .font(.subheadline.bold())
+                                    .foregroundColor(.white)
+                                    .fixedSize(horizontal: true, vertical: false)
+                                TextField("Amount leaving with", text: $cashOut)
+                                    .keyboardType(.numberPad)
+                                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
+                                    .frame(maxWidth: .infinity)
+                                    .textFieldStyle(DarkTextFieldStyle(
+                                        textColor: cashOutFieldColors.text,
+                                        accentColor: cashOutFieldColors.accent
+                                    ))
+                            }
+                            .padding()
+                            .background(Color(.systemGray6).opacity(0.15))
+                            .cornerRadius(12)
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Adjust cash out")
                                     .font(.caption.bold())
@@ -765,6 +791,7 @@ struct ChipEstimatorSheetView: View {
                                         .foregroundColor(.green)
 
                                     Button {
+                                        recordChipEstimatorOutcome(accepted: true)
                                         cashOut = String(estimatedAmount)
                                         dismiss()
                                     } label: {
@@ -773,6 +800,21 @@ struct ChipEstimatorSheetView: View {
                                             .padding(.horizontal, 16)
                                             .padding(.vertical, 10)
                                             .background(Color.blue.opacity(0.95))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(18)
+                                    }
+                                    .padding(.bottom, 10)
+
+                                    Button {
+                                        recordChipEstimatorOutcome(accepted: false)
+                                        dismiss()
+                                    } label: {
+                                        Text("Not even close. Will enter manually.")
+                                            .font(.subheadline.bold())
+                                            .multilineTextAlignment(.center)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 10)
+                                            .background(Color.red.opacity(0.95))
                                             .foregroundColor(.white)
                                             .cornerRadius(18)
                                     }
@@ -842,6 +884,18 @@ struct ChipEstimatorSheetView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Quality stats (Supabase)
+
+    private func recordChipEstimatorOutcome(accepted: Bool) {
+        let casinoKey = casino.isEmpty ? "Unknown casino" : casino
+        let gameKey = game.isEmpty ? "Unknown table game" : game
+        ChipEstimatorQualityStatsAPI.recordOutcomeBestEffort(
+            casinoKey: casinoKey,
+            gameKey: gameKey,
+            accepted: accepted
+        )
     }
 
     // MARK: - Estimation
@@ -930,10 +984,73 @@ struct ChipEstimatorSheetView: View {
         You are estimating the total cash value of casino chips shown in this photo.
         The game is \(gameText) and the location is \(casinoText).
 
+        ## 🧠 CHIP VALUE HEURISTICS (extended U.S. conventions — typical, NOT universal; always defer to printed denominations if visible)
+
+        ### Low denominations (common across most casinos)
+        - White: $1
+        - Blue: $1 (poker rooms) OR $10 (table games, less common)
+        - Red: $5
+        - Green: $25
+        - Black: $100
+
+        ### Mid denominations
+        - Purple: $500
+        - Orange: $1,000 (common in poker + some table games)
+        - Yellow: $1,000 (alternate to orange, varies by casino)
+        - Pink: $2.50 (rare, table games only)
+        - Light Blue / Aqua: $0.50 (rare, low-stakes tables)
+
+        ### High denominations (high-limit areas)
+        - Brown: $5,000
+        - Grey: $5,000 (alternate to brown)
+        - Mustard / Dark Yellow: $5,000 (less common)
+        - Salmon / Peach: $10,000
+        - Bright Yellow: $20,000 (less common but used in some casinos)
+        - Teal / Cyan: $25,000
+
+        ### Ultra high denominations (rare, high-limit / VIP)
+        - Light Green / Mint: $25,000 (alternate)
+        - Lavender / Light Purple: $100,000
+        - Metallic Gold / Plaque-style chips: $100,000+
+        - Rectangular plaques (not round chips): $25,000 to $1,000,000+
+
+        ### Rack & felt stacks (rough U.S. conventions — guestimate only)
+        - Dealer chip rack (plastic tray, table games): a full vertical slot/column is typically about 20 chips; count partial fills as a fraction of ~20 (e.g. halfway up ≈ 10). Some trays or deep stacks may look taller or shorter — use photo perspective; when unknown, bias conservative.
+        - Poker chips on the table: organized stacks are often counted in units of ~20 chips per full standard stack (dealers and players frequently stack this way for quick eyeball math). Shorter “barrel” counts of ~10 also appear, especially with thick clay chips or messy piles — prefer actually visible stacks over assuming a full 20.
+        - Mixed piles / loose chips: estimate by comparing height to nearby neat stacks or rack columns; treat the result as an approximate total, not an exact count.
+
+        ---
+
+        ### ⚠️ IMPORTANT VARIATIONS
+        - Poker rooms tend to standardize lower denominations but may reuse colors differently than table games.
+        - High-limit chips often vary significantly by casino — color alone is NOT reliable above $5,000.
+        - Some casinos reuse: Yellow for $1,000 OR $20,000; Blue for $1 OR $10.
+        - Edge spots (patterns on chip edges) are often more reliable than base color in high denominations.
+
+        ---
+
+        ## 🧠 INFERENCE RULES FOR HIGH VALUES
+
+        When estimating chips ≥ $5,000:
+        - Increase uncertainty unless denomination markings are visible.
+        - Prefer ranges internally when uncertain, then output one best-estimate total (see output format below).
+        - Use context clues: high-end table → more likely high denominations; chip rack with uniform high-value colors → likely $5K+; plaques → always treat as ≥ $25K unless text contradicts.
+
+        ---
+
+        ## ✅ PRIORITY ORDER
+
+        When assigning value:
+        1. Printed denomination (highest priority)
+        2. Chip label text or branding
+        3. Consistency within chip set
+        4. Table context (poker vs table game)
+        5. Color conventions (last resort for high denominations)
+
         Only estimate a value if the primary subject of the photo is CLEARLY casino chips, cash, or other casino items that have an obvious, standard cash-equivalent value (for example, chips, plaques, or bills).
         If the photo does not clearly show casino chips, cash, or obvious casino items of monetary value, or if you are not confident it is a casino chip/cash photo, you MUST respond with the single word UNKNOWN.
 
-        If it IS a valid casino chip/cash photo, respond with only a single integer number of dollars (no currency symbol, commas, or extra text).
+        If it IS a valid casino chip/cash photo, respond with only a single integer number of dollars for your best estimate of the total (no currency symbol, commas, or extra text). If you used a range internally, output one integer (e.g. a reasonable midpoint or best single total), not a range.
         Do not explain your reasoning; just return either UNKNOWN or a single integer.
         """
 
@@ -981,6 +1098,7 @@ struct ChipEstimatorSheetView: View {
                 await MainActor.run {
                     isEstimating = false
                     errorMessage = "AI could not identify a clear chip or cash value from this photo. Make sure the image shows casino chips or cash clearly."
+                    recordChipEstimatorOutcome(accepted: false)
                 }
                 return
             }

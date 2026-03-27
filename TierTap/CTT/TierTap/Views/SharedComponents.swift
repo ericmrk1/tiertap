@@ -24,13 +24,16 @@ struct ShareSheet: UIViewControllerRepresentable {
 #endif
 
 struct DarkTextFieldStyle: TextFieldStyle {
+    var textColor: Color = .white
+    var accentColor: Color = .green
+
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(12)
             .background(Color(.systemGray6).opacity(0.25))
-            .foregroundColor(.white)
+            .foregroundColor(textColor)
             .cornerRadius(10)
-            .tint(.green)
+            .tint(accentColor)
     }
 }
 
@@ -1530,6 +1533,7 @@ struct CompQuickAddSheet: View {
                     dollars: estimate.dollars,
                     reason: estimate.reason,
                     onAccept: {
+                        recordCompEstimatorOutcomeForQuickAdd(accepted: true)
                         foodValueText = String(estimate.dollars)
                         let aiNote = "— TierTap AI estimated this comp value."
                         if detailsText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -1539,7 +1543,10 @@ struct CompQuickAddSheet: View {
                         }
                         pendingCompEstimate = nil
                     },
-                    onDecline: { pendingCompEstimate = nil }
+                    onDecline: {
+                        recordCompEstimatorOutcomeForQuickAdd(accepted: false)
+                        pendingCompEstimate = nil
+                    }
                 )
                 .environmentObject(settingsStore)
             }
@@ -1556,6 +1563,16 @@ struct CompQuickAddSheet: View {
             return o.isEmpty ? base : "\(base): \(o)"
         }
         return base
+    }
+
+    private func recordCompEstimatorOutcomeForQuickAdd(accepted: Bool) {
+        let casinoKey = sessionCasino.isEmpty ? "Unknown casino" : sessionCasino
+        let gameKey = sessionGame.isEmpty ? "Unknown table game" : sessionGame
+        CompEstimatorQualityStatsAPI.recordOutcomeBestEffort(
+            casinoKey: casinoKey,
+            gameKey: gameKey,
+            accepted: accepted
+        )
     }
 
     /// Builds a geographic description for the AI: prefers stored GPS from check-in; otherwise best-effort forward geocode of the casino name.
