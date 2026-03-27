@@ -371,10 +371,18 @@ struct GamePickerView: View {
     @Binding var selectedGame: String
     var mode: GamePickerMode = .table
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
     @State private var search = ""
     @State private var dynamicGames: [String] = []
     @State private var isLoading = false
+
+    /// Supabase `TableGames` catalog sync — only for signed-in Pro (or subscription override).
+    private var canLoadCloudGameNames: Bool {
+        authStore.isSignedIn
+            && (subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive)
+    }
 
     private var favorites: [String] {
         switch mode {
@@ -491,9 +499,15 @@ struct GamePickerView: View {
                     Button("Cancel") { dismiss() }.foregroundColor(.green)
                 }
             }
-            .task {
-                if mode == .table {
+            .task(id: "\(mode == .table)-\(canLoadCloudGameNames)") {
+                guard mode == .table else { return }
+                if canLoadCloudGameNames {
                     await loadDynamicGames()
+                } else {
+                    await MainActor.run {
+                        dynamicGames = []
+                        isLoading = false
+                    }
                 }
             }
         }
@@ -556,6 +570,7 @@ struct GamePickerView: View {
     }
 
     private func loadDynamicGames() async {
+        guard canLoadCloudGameNames else { return }
         guard !isLoading else { return }
         isLoading = true
         let names = await TableGamesAPI.loadDistinctNames()

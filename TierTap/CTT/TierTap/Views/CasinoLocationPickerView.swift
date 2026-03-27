@@ -17,6 +17,8 @@ struct CasinoLocationPickerView: View {
     @Binding var selectedLongitude: Double?
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
 
     @StateObject private var locationManager = LocationManager()
     @State private var region = MKCoordinateRegion(
@@ -353,15 +355,18 @@ struct CasinoLocationPickerView: View {
         selectedLatitude = casino.coordinate.latitude
         selectedLongitude = casino.coordinate.longitude
 
-        // Attempt to persist this casino location in Supabase with rich metadata.
-        let coordinate = casino.coordinate
-        CasinoLocationsAPI.insertPicked(
-            name: casino.name,
-            addressComponents: casino.addressComponents,
-            coordinate: coordinate,
-            isPublic: true,
-            userId: nil
-        )
+        let canShareToCloud = authStore.isSignedIn
+            && (subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive)
+        if canShareToCloud {
+            let coordinate = casino.coordinate
+            CasinoLocationsAPI.insertPicked(
+                name: casino.name,
+                addressComponents: casino.addressComponents,
+                coordinate: coordinate,
+                isPublic: true,
+                userId: nil
+            )
+        }
 
         dismiss()
     }

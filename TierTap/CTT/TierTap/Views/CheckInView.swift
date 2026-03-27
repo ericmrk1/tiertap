@@ -3,6 +3,8 @@ import SwiftUI
 struct CheckInView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
     @State private var selectedGame = ""
     @State private var casino = ""
@@ -658,12 +660,16 @@ struct CheckInView: View {
             .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
                     .gamePickerSheetPresentation()
             }
             .fullScreenCover(isPresented: $showCasinoLocationPicker) {
                 NavigationStack {
                     CasinoLocationPickerView(selectedCasino: $casino, selectedLatitude: $casinoLatitude, selectedLongitude: $casinoLongitude)
                         .environmentObject(settingsStore)
+                        .environmentObject(authStore)
+                        .environmentObject(subscriptionStore)
                 }
             }
             .adaptiveSheet(isPresented: $showBuyInPicker) {

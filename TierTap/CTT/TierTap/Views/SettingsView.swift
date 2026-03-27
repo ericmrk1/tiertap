@@ -113,15 +113,22 @@ struct SettingsView: View {
             .adaptiveSheet(isPresented: $isShowingGamePicker) {
                 GamePickerView(selectedGame: $gamePickerSelection, mode: .table)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
                     .gamePickerSheetPresentation()
             }
             .adaptiveSheet(isPresented: $isShowingSlotGamePicker) {
                 GamePickerView(selectedGame: $slotGamePickerSelection, mode: .slots)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
                     .gamePickerSheetPresentation()
             }
             .adaptiveSheet(isPresented: $isShowingCasinoPicker) {
                 CasinoLocationPickerView(selectedCasino: $casinoPickerSelection, selectedLatitude: .constant(nil), selectedLongitude: .constant(nil))
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
             }
             .adaptiveSheet(isPresented: $isShowingSubscriptionPaywall) {
                 TierTapPaywallView()

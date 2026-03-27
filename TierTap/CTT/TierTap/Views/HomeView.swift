@@ -202,7 +202,13 @@ struct HomeView: View {
                 lastComputedLevel = tap.level
             }
         }
-        .adaptiveSheet(isPresented: $showCheckIn) { CheckInView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showCheckIn) {
+            CheckInView()
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
+        }
         .adaptiveSheet(isPresented: $showLive) {
             LiveSessionView()
                 .environmentObject(store)
@@ -232,7 +238,13 @@ struct HomeView: View {
             .environmentObject(subscriptionStore)
             .environmentObject(authStore)
         }
-        .adaptiveSheet(isPresented: $showAddPast) { AddPastSessionView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showAddPast) {
+            AddPastSessionView()
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
+        }
         .adaptiveSheet(isPresented: $showHistory) {
             HistoryView()
                 .environmentObject(store)

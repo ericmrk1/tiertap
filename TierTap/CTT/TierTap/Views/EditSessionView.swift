@@ -467,6 +467,8 @@ struct EditSessionView: View {
             .adaptiveSheet(isPresented: $showGamePicker) {
                 GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
                     .gamePickerSheetPresentation()
             }
             .adaptiveSheet(item: $sessionPhotoSource) { source in
