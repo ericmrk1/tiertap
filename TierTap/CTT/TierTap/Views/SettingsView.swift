@@ -35,6 +35,7 @@ struct SettingsView: View {
     @State private var casinoPickerSelection: String = ""
     @State private var subscriptionOverrideText: String = ""
     @State private var exportGameCategory: SessionGameCategory = .table
+    @State private var isConfirmingSignOut = false
 
     var body: some View {
         NavigationStack {
@@ -135,6 +136,18 @@ struct SettingsView: View {
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
+            }
+            .confirmationDialog(
+                "Sign out of TierTap?",
+                isPresented: $isConfirmingSignOut,
+                titleVisibility: .visible
+            ) {
+                Button("Sign out", role: .destructive) {
+                    authStore.signOut()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.")
             }
         }
     }
@@ -724,7 +737,7 @@ struct SettingsView: View {
                         }
                         Spacer()
                         Button("Sign out", role: .destructive) {
-                            authStore.signOut()
+                            isConfirmingSignOut = true
                         }
                         .font(.subheadline)
                     }
