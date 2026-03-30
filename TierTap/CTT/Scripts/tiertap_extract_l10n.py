@@ -25,6 +25,7 @@ LANG_ORDER = [
     "en",
     "zh-Hans",
     "ja",
+    "ko",
     "vi",
     "es",
     "ar",
@@ -87,10 +88,23 @@ def main() -> None:
     if WATCH_APP.exists():
         roots.append(WATCH_APP)
     literals = extract_literals(roots)
+    existing: dict[str, dict[str, str]] = {}
+    if OUT_JSON.exists():
+        try:
+            existing = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            existing = {}
     table: dict[str, dict[str, str]] = {}
     for en in literals:
+        key = ui_key(en)
         row = {lang: en for lang in LANG_ORDER}
-        table[ui_key(en)] = row
+        if key in existing:
+            old = existing[key]
+            for lang in LANG_ORDER:
+                val = old.get(lang)
+                if val is not None and val.strip() != "":
+                    row[lang] = val
+        table[key] = row
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(table, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {OUT_JSON} with {len(table)} keys from {len(literals)} unique literals")

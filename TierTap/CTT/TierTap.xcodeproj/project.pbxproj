@@ -571,6 +571,7 @@
 				he,
 				hi,
 				ja,
+				ko,
 				vi,
 				"zh-Hans",
 			);

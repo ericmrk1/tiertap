@@ -194,7 +194,7 @@ struct SettingsView: View {
                         .foregroundColor(.white)
                     Picker("App language", selection: $settingsStore.appLanguage) {
                         ForEach(AppLanguage.allCases) { lang in
-                            Text(lang.pickerLabel).tag(lang)
+                            Text(lang.pickerLabel).tag(lang).foregroundColor(.secondary)
                         }
                     }
                     .pickerStyle(.menu)

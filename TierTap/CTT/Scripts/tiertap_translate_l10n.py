@@ -23,6 +23,7 @@ STRINGS_JSON = CTT / "TierTap" / "Localization" / "Strings.json"
 LANG_MAP = {
     "zh-Hans": "zh-CN",
     "ja": "ja",
+    "ko": "ko",
     "vi": "vi",
     "es": "es",
     "ar": "ar",
