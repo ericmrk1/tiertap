@@ -11,20 +11,20 @@ struct WatchStartView: View {
                 .scaledToFit()
                 .frame(width: 48, height: 48)
 
-            Text("TierTap")
+            L10nText("TierTap")
                 .font(.headline)
 
-            Text("No session in progress")
+            L10nText("No session in progress")
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
-            Text("Start a session on your iPhone to control it from here")
+            L10nText("Start a session on your iPhone to control it from here")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
-        .navigationTitle("Remote")
+        .localizedNavigationTitle("Remote")
     }
 }

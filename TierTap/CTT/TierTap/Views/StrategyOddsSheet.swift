@@ -43,7 +43,7 @@ struct StrategyOddsSheet: View {
                         }
 
                         // Disclaimer at bottom
-                        Text("Some of this information may change over time. Rules, paytables, and house edges vary by casino and game version. For current details, consult multiple sources or the casino.")
+                        L10nText("Some of this information may change over time. Rules, paytables, and house edges vary by casino and game version. For current details, consult multiple sources or the casino.")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .padding(.top, 8)

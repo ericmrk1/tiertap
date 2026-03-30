@@ -109,7 +109,7 @@ struct BankrollView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Bankroll")
+            .localizedNavigationTitle("Bankroll")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -203,7 +203,7 @@ struct BankrollView: View {
 
     private var totalCard: some View {
         VStack(spacing: 8) {
-            Text("Current Bankroll")
+            L10nText("Current Bankroll")
                 .font(.subheadline.bold())
                 .foregroundColor(.white.opacity(0.9))
             Text("\(settingsStore.currencySymbol)\(currentTotal)")
@@ -221,7 +221,7 @@ struct BankrollView: View {
             resetEntryText = "\(settingsStore.bankroll)"
             showResetSheet = true
         } label: {
-            Label("Reset Bankroll", systemImage: "arrow.counterclockwise")
+            LocalizedLabel(title: "Reset Bankroll", systemImage: "arrow.counterclockwise")
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -233,12 +233,12 @@ struct BankrollView: View {
 
     private var graphCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Bankroll Over Time", systemImage: "chart.line.uptrend.xyaxis")
+            LocalizedLabel(title: "Bankroll Over Time", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if bankrollTimeline.count <= 1 {
-                Text("Complete sessions to see your bankroll trend.")
+                L10nText("Complete sessions to see your bankroll trend.")
                     .font(.caption)
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)
@@ -255,12 +255,12 @@ struct BankrollView: View {
 
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("History", systemImage: "list.bullet")
+            LocalizedLabel(title: "History", systemImage: "list.bullet")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if historyEntries.isEmpty {
-                Text("No bankroll history yet.")
+                L10nText("No bankroll history yet.")
                     .font(.caption)
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)
@@ -278,7 +278,7 @@ struct BankrollView: View {
                                     .font(.subheadline)
                                     .foregroundColor(.white)
                                 if entry.isReset {
-                                    Text("Settings bankroll updated to this value.")
+                                    L10nText("Settings bankroll updated to this value.")
                                         .font(.caption2)
                                         .foregroundColor(.gray)
                                 } else if let after = entry.bankrollAfter {
@@ -308,7 +308,7 @@ struct BankrollView: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 20) {
-                    Text("Enter new bankroll value. This updates the bankroll in Settings and starts tracking from this value.")
+                    L10nText("Enter new bankroll value. This updates the bankroll in Settings and starts tracking from this value.")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
@@ -323,7 +323,7 @@ struct BankrollView: View {
                 }
                 .padding(.top, 24)
             }
-            .navigationTitle("Reset Bankroll")
+            .localizedNavigationTitle("Reset Bankroll")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -360,7 +360,7 @@ struct BankrollGraphShareCard: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Bankroll Over Time")
+                    L10nText("Bankroll Over Time")
                         .font(.headline)
                         .foregroundColor(.white)
                     Text("Current: \(currencySymbol)\(currentTotal)")
@@ -373,7 +373,7 @@ struct BankrollGraphShareCard: View {
                 BankrollLineChart(points: points, gradient: gradient)
                     .frame(height: 180)
             } else {
-                Text("Add sessions to see your bankroll trend.")
+                L10nText("Add sessions to see your bankroll trend.")
                     .font(.caption)
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)

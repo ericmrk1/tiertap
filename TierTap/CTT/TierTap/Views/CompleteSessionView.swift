@@ -65,7 +65,7 @@ struct CompleteSessionView: View {
                             Text(session.game).foregroundColor(.gray)
                             HStack(spacing: 16) {
                                 Label(Session.durationString(session.duration), systemImage: "clock")
-                                Label("Buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)", systemImage: "dollarsign.circle")
+                                LocalizedLabel(title: "Buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)", systemImage: "dollarsign.circle")
                             }
                             .font(.caption).foregroundColor(.green)
                         }
@@ -95,7 +95,7 @@ struct CompleteSessionView: View {
 
                         if isValid {
                             VStack(alignment: .leading, spacing: 12) {
-                                Text("Session Summary").font(.headline).foregroundColor(.white)
+                                L10nText("Session Summary").font(.headline).foregroundColor(.white)
                                 Divider().background(Color.gray.opacity(0.3))
                                 if let wl = previewWL {
                                     SummaryRow(label: "Win/Loss",
@@ -132,7 +132,7 @@ struct CompleteSessionView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Private notes (not shared)")
+                            L10nText("Private notes (not shared)")
                                 .font(.caption.bold())
                                 .foregroundColor(.gray)
                             TextEditor(text: $privateNotes)
@@ -148,7 +148,7 @@ struct CompleteSessionView: View {
                             HStack {
                                 Image(systemName: "camera.viewfinder")
                                     .foregroundColor(.green)
-                                Text("Chip photo (optional)")
+                                L10nText("Chip photo (optional)")
                                     .font(.caption.bold())
                                     .foregroundColor(.gray)
                             }
@@ -203,7 +203,7 @@ struct CompleteSessionView: View {
                                     showLowAlert = true
                                 } else { save() }
                             } label: {
-                                Text("Save as Complete")
+                                L10nText("Save as Complete")
                                     .frame(maxWidth: .infinity).padding()
                                     .background(isValid ? Color.green : Color.gray)
                                     .foregroundColor(isValid ? .black : .white)
@@ -212,7 +212,7 @@ struct CompleteSessionView: View {
                             .disabled(!isValid)
 
                             Button { dismiss() } label: {
-                                Text("Cancel")
+                                L10nText("Cancel")
                                     .frame(maxWidth: .infinity).padding()
                                     .background(Color(.systemGray6).opacity(0.2))
                                     .foregroundColor(.white).cornerRadius(14)
@@ -222,7 +222,7 @@ struct CompleteSessionView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Complete Session")
+            .localizedNavigationTitle("Complete Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

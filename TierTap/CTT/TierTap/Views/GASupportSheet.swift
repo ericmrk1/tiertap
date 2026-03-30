@@ -15,7 +15,7 @@ struct GASupportSheet: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 28) {
-                    Text("We've noticed you've had a run of tough sessions. If you need support, please call:")
+                    L10nText("We've noticed you've had a run of tough sessions. If you need support, please call:")
                         .font(.body)
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
@@ -34,9 +34,9 @@ struct GASupportSheet: View {
                         HStack(spacing: 10) {
                             Image(systemName: "phone.fill")
                                 .font(.title2)
-                            Text("Call Gamblers Anonymous")
+                            L10nText("Call Gamblers Anonymous")
                                 .font(.headline)
-                            Text("(1-888-GA-HELPS)")
+                            L10nText("(1-888-GA-HELPS)")
                                 .font(.subheadline)
                                 .opacity(0.9)
                         }
@@ -48,7 +48,7 @@ struct GASupportSheet: View {
                     }
                     .padding(.horizontal, 24)
 
-                    Text("24/7 • Free and confidential")
+                    L10nText("24/7 • Free and confidential")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.8))
 
@@ -56,7 +56,7 @@ struct GASupportSheet: View {
                 }
                 .padding(.top, 32)
             }
-            .navigationTitle("Support")
+            .localizedNavigationTitle("Support")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

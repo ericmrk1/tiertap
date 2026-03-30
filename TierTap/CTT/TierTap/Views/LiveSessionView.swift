@@ -48,7 +48,7 @@ struct LiveSessionView: View {
                         HStack {
                             HStack(spacing: 5) {
                                 Circle().fill(Color.red).frame(width: 7, height: 7)
-                                Text("LIVE").font(.caption.bold()).foregroundColor(.red)
+                                L10nText("LIVE").font(.caption.bold()).foregroundColor(.red)
                             }
                             Spacer()
                             Text("Started \(s.startTime, style: .time)")
@@ -72,7 +72,7 @@ struct LiveSessionView: View {
                             }
                             .accessibilityLabel("Private notes")
                             Button { showStrategyOdds = true } label: {
-                                Text("Strategy/Odds")
+                                L10nText("Strategy/Odds")
                                     .font(.subheadline.weight(.medium))
                                     .foregroundColor(.green)
                                     .padding(.horizontal, 16)
@@ -92,7 +92,7 @@ struct LiveSessionView: View {
                             // Buy-In Panel
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
-                                    Text("Buy-Ins").font(.headline).foregroundColor(.white)
+                                    L10nText("Buy-Ins").font(.headline).foregroundColor(.white)
                                     Spacer()
                                     Text("Total: \(settingsStore.currencySymbol)\(s.totalBuyIn)")
                                         .font(.title3.bold()).foregroundColor(.white)
@@ -111,7 +111,7 @@ struct LiveSessionView: View {
                                     Button {
                                         showCompSheet = true
                                     } label: {
-                                        Label("Add Comp", systemImage: "gift.fill")
+                                        LocalizedLabel(title: "Add Comp", systemImage: "gift.fill")
                                             .font(.headline)
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 14)
@@ -123,7 +123,7 @@ struct LiveSessionView: View {
                                     Button {
                                         showBuyInSheet = true
                                     } label: {
-                                        Label("Add Buy-In", systemImage: "plus.circle")
+                                        LocalizedLabel(title: "Add Buy-In", systemImage: "plus.circle")
                                             .font(.headline)
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 14)
@@ -140,13 +140,13 @@ struct LiveSessionView: View {
 
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
-                                    Text("Comps").font(.headline).foregroundColor(.white)
+                                    L10nText("Comps").font(.headline).foregroundColor(.white)
                                     Spacer()
                                     Text("Total: \(settingsStore.currencySymbol)\(s.totalComp)")
                                         .font(.title3.bold()).foregroundColor(.white)
                                 }
                                 if s.compEvents.isEmpty {
-                                    Text("No comps logged yet.")
+                                    L10nText("No comps logged yet.")
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
                                 } else {
@@ -201,7 +201,7 @@ struct LiveSessionView: View {
                                     showCloseout = true
                                 }
                             } label: {
-                                Label("Stop & Close Out", systemImage: "stop.circle.fill")
+                                LocalizedLabel(title: "Stop & Close Out", systemImage: "stop.circle.fill")
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
                                     .padding(.horizontal, 16)
@@ -210,7 +210,7 @@ struct LiveSessionView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Private notes (not shared)")
+                                L10nText("Private notes (not shared)")
                                     .font(.caption.bold())
                                     .foregroundColor(.gray)
                                 TextEditor(text: Binding(
@@ -229,7 +229,7 @@ struct LiveSessionView: View {
                     }
                 }
             }
-            .navigationTitle("Live Session")
+            .localizedNavigationTitle("Live Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -299,7 +299,7 @@ struct PrivateNotesSheet: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Private notes (stored locally only, not shared)")
+                    L10nText("Private notes (stored locally only, not shared)")
                         .font(.caption)
                         .foregroundColor(.gray)
                     TextEditor(text: $notes)
@@ -313,7 +313,7 @@ struct PrivateNotesSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Private Notes")
+            .localizedNavigationTitle("Private Notes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

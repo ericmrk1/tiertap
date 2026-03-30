@@ -37,6 +37,8 @@ private let keyLastSlotGame = "ctt_last_slot_game"
 private let keyLastPokerDefaults = "ctt_last_poker_defaults"
 private let keyLastSlotDefaults = "ctt_last_slot_defaults"
 private let keyAnalyticsUseExpectedValue = "ctt_analytics_use_expected_value"
+private let keyAppLanguage = "ctt_app_language"
+private let appGroupSuiteName = "group.com.app.tiertap"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
 struct LastPokerSessionDefaults: Codable, Equatable {
@@ -479,6 +481,14 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue) }
     }
 
+    /// UI language (also synced to the app group for watch extensions).
+    @Published var appLanguage: AppLanguage {
+        didSet {
+            UserDefaults.standard.set(appLanguage.rawValue, forKey: keyAppLanguage)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(appLanguage.rawValue, forKey: keyAppLanguage)
+        }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -599,6 +609,15 @@ final class SettingsStore: ObservableObject {
             self.analyticsUseExpectedValue = false
         }
 
+        let storedLang =
+            UserDefaults.standard.string(forKey: keyAppLanguage)
+            ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyAppLanguage)
+        if let raw = storedLang, let lang = AppLanguage(rawValue: raw) {
+            self.appLanguage = lang
+        } else {
+            self.appLanguage = .english
+        }
+
         self.subscriptionOverrideCode = UserDefaults.standard.string(forKey: keySubscriptionOverrideCode) ?? ""
 
         // AI usage tracking (default to "today" with zero calls if nothing stored).
@@ -633,6 +652,8 @@ final class SettingsStore: ObservableObject {
             ]
             self.themePresets = defaults
         }
+
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.appLanguage.rawValue, forKey: keyAppLanguage)
     }
 
     // MARK: - AI usage helpers

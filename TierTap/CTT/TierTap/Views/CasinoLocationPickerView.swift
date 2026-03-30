@@ -47,7 +47,7 @@ struct CasinoLocationPickerView: View {
                     }
                 }
             }
-            .navigationTitle("Select Casino")
+            .localizedNavigationTitle("Select Casino")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -72,7 +72,7 @@ struct CasinoLocationPickerView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Manual search by ZIP or address
             VStack(alignment: .leading, spacing: 6) {
-                Text("Search by ZIP code or address")
+                L10nText("Search by ZIP code or address")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.9))
                 HStack(spacing: 8) {
@@ -107,7 +107,7 @@ struct CasinoLocationPickerView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .tint(.green)
-                    Text("Searching for nearby casinos…")
+                    L10nText("Searching for nearby casinos…")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -158,7 +158,7 @@ struct CasinoLocationPickerView: View {
         Group {
             if !settingsStore.favoriteCasinos.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Saved Locations")
+                    L10nText("Saved Locations")
                         .font(.headline)
                         .foregroundColor(.white)
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -184,17 +184,17 @@ struct CasinoLocationPickerView: View {
 
     private var nearbySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Casinos Near You")
+            L10nText("Casinos Near You")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if nearbyCasinos.isEmpty {
                 if !isSearching && hasSearchedOnce {
-                    Text("No nearby casinos found. Try again closer to a property or check saved locations.")
+                    L10nText("No nearby casinos found. Try again closer to a property or check saved locations.")
                         .font(.caption)
                         .foregroundColor(.gray)
                 } else if !isSearching {
-                    Text("Waiting for your location…")
+                    L10nText("Waiting for your location…")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }

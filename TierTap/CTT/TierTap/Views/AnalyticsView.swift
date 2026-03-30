@@ -225,7 +225,7 @@ struct AnalyticsView: View {
                     }
                 }
             }
-            .navigationTitle("Analytics")
+            .localizedNavigationTitle("Analytics")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -288,7 +288,7 @@ struct AnalyticsView: View {
                                         .lineLimit(1)
                                         .font(.caption)
                                 } else {
-                                    Text("Account")
+                                    L10nText("Account")
                                         .font(.caption)
                                 }
                             }
@@ -373,7 +373,7 @@ struct AnalyticsView: View {
                 }
             } label: {
                 HStack {
-                    Text("Filters")
+                    L10nText("Filters")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     Spacer()
@@ -399,7 +399,7 @@ struct AnalyticsView: View {
             if !availableCasinos.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Filter by location")
+                        L10nText("Filter by location")
                             .font(.subheadline.bold())
                             .foregroundColor(.white)
                         Spacer()
@@ -409,7 +409,7 @@ struct AnalyticsView: View {
                             Button {
                                 settingsStore.selectedLocationFilter = nil
                             } label: {
-                                Text("All")
+                                L10nText("All")
                                     .font(.caption)
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
@@ -440,14 +440,14 @@ struct AnalyticsView: View {
     private var dateFilterBar: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Date range")
+                L10nText("Date range")
                     .font(.subheadline.bold())
                     .foregroundColor(.white)
                 Spacer()
             }
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("From")
+                    L10nText("From")
                         .font(.caption)
                         .foregroundColor(.gray)
                     HStack(spacing: 8) {
@@ -465,7 +465,7 @@ struct AnalyticsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("To")
+                    L10nText("To")
                         .font(.caption)
                         .foregroundColor(.gray)
                     HStack(spacing: 8) {
@@ -493,10 +493,10 @@ struct AnalyticsView: View {
             Image(systemName: "chart.xyaxis.line")
                 .font(.system(size: 52))
                 .foregroundStyle(settingsStore.primaryGradient)
-            Text("No Analytics Yet")
+            L10nText("No Analytics Yet")
                 .font(.title3)
                 .foregroundColor(.gray)
-            Text("Play and complete a few sessions to unlock win/loss, tier point, and pace-of-play analytics.")
+            L10nText("Play and complete a few sessions to unlock win/loss, tier point, and pace-of-play analytics.")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.gray.opacity(0.7))
@@ -578,7 +578,7 @@ struct AnalyticsView: View {
                             .font(.caption2)
                             .foregroundColor(.gray)
                     } else {
-                        Text("All locations")
+                        L10nText("All locations")
                             .font(.caption2)
                             .foregroundColor(.gray)
                     }
@@ -603,7 +603,7 @@ struct AnalyticsView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "chart.bar.doc.horizontal")
-                        Text("Risk of Ruin")
+                        L10nText("Risk of Ruin")
                             .font(.caption.weight(.semibold))
                         Spacer(minLength: 8)
                         Text(riskOfRuinHeaderPercent)
@@ -630,14 +630,14 @@ struct AnalyticsView: View {
     private var graphTypePicker: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Graph style")
+                L10nText("Graph style")
                     .font(.subheadline.bold())
                     .foregroundColor(.white)
                 Spacer()
             }
             Picker("Graph style", selection: $selectedGraphKind) {
                 ForEach(GraphKind.allCases) { kind in
-                    Text(kind.displayName).tag(kind)
+                    Text(L10n.tr(kind.displayName, language: settingsStore.appLanguage)).tag(kind)
                 }
             }
             .pickerStyle(.segmented)
@@ -748,12 +748,12 @@ struct AnalyticsView: View {
 
     private var resultsBasisSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Results basis")
+            L10nText("Results basis")
                 .font(.subheadline.bold())
                 .foregroundColor(.white)
             Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
-                Text("Cash net").tag(false)
-                Text("EV (incl. comps)").tag(true)
+                L10nText("Cash net").tag(false)
+                L10nText("EV (incl. comps)").tag(true)
             }
             .pickerStyle(.segmented)
             Text(settingsStore.analyticsUseExpectedValue
@@ -816,6 +816,7 @@ private func aiAnalysisRelaxedFingerprint(
     category: SessionGameCategory,
     useEV: Bool,
     tone: String,
+    outputLanguage: String,
     bankroll: Int,
     unitSize: Int,
     total: Int,
@@ -843,6 +844,7 @@ private func aiAnalysisRelaxedFingerprint(
         category.rawValue,
         useEV ? "ev" : "cash",
         tone,
+        "lang:\(outputLanguage)",
         "br:\(bankrollBucket)",
         "u:\(unitBucket)",
         "t:\(total)",
@@ -1063,7 +1065,7 @@ struct AIAnalyticsSheet: View {
                 VStack(spacing: 20) {
                     VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("AI Analysis")
+                            L10nText("AI Analysis")
                                 .font(.title2.bold())
                                 .foregroundColor(.white)
                             GameCategoryWheelPicker(
@@ -1088,22 +1090,22 @@ struct AIAnalyticsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Results basis")
+                            L10nText("Results basis")
                                 .font(.caption.bold())
                                 .foregroundColor(.white.opacity(0.8))
                             Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
-                                Text("Cash net").tag(false)
-                                Text("EV (incl. comps)").tag(true)
+                                L10nText("Cash net").tag(false)
+                                L10nText("EV (incl. comps)").tag(true)
                             }
                             .pickerStyle(.segmented)
-                            Text("AI summaries and win/loss stats use this setting, matching the Analytics tab.")
+                            L10nText("AI summaries and win/loss stats use this setting, matching the Analytics tab.")
                                 .font(.caption2)
                                 .foregroundColor(.white.opacity(0.55))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Question")
+                            L10nText("Question")
                                 .font(.caption.bold())
                                 .foregroundColor(.white.opacity(0.8))
                             Menu {
@@ -1145,7 +1147,7 @@ struct AIAnalyticsSheet: View {
                         
                         if fullAnswer != nil {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Answer")
+                                L10nText("Answer")
                                     .font(.caption.bold())
                                     .foregroundColor(.white.opacity(0.8))
                                 ScrollView {
@@ -1167,13 +1169,13 @@ struct AIAnalyticsSheet: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                         } else if !hasProAccess {
-                            Text("AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.")
+                            L10nText("AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                         } else {
-                            Text("Ask TierTap as often as you like with your TierTap Pro subscription.")
+                            L10nText("Ask TierTap as often as you like with your TierTap Pro subscription.")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -1191,7 +1193,7 @@ struct AIAnalyticsSheet: View {
                                     .tint(.white)
                             } else {
                                 Image(systemName: "sparkles")
-                                Text("Ask TierTap")
+                                L10nText("Ask TierTap")
                                     .fontWeight(.semibold)
                             }
                         }
@@ -1207,7 +1209,7 @@ struct AIAnalyticsSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("AI Analysis")
+            .localizedNavigationTitle("AI Analysis")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1418,6 +1420,7 @@ struct AIAnalyticsSheet: View {
         \(statsBlock)
         Recent \(gameLabel) sessions (most recent first):
         \(recentLineCores.joined(separator: "\n"))
+        __tt_lang=\(settingsStore.appLanguage.rawValue)__
         """
         let promptHash = aiAnalysisPromptHash(promptForExactCache)
         let relaxedFingerprint = aiAnalysisRelaxedFingerprint(
@@ -1425,6 +1428,7 @@ struct AIAnalyticsSheet: View {
             category: selectedAnalyticsCategory,
             useEV: useEV,
             tone: toneInstruction,
+            outputLanguage: settingsStore.appLanguage.rawValue,
             bankroll: settingsStore.bankroll,
             unitSize: settingsStore.unitSize,
             total: total,
@@ -1440,7 +1444,8 @@ struct AIAnalyticsSheet: View {
             exactPromptHash: promptHash,
             relaxedFingerprint: relaxedFingerprint
         ) {
-            let moreDataNote = "\n\n—\nOver time, more logged sessions help TierTap give sharper analysis. This answer was reused because your data barely changed since the last run, so we skipped another AI call."
+            let noteEN = "Over time, more logged sessions help TierTap give sharper analysis. This answer was reused because your data barely changed since the last run, so we skipped another AI call."
+            let moreDataNote = "\n\n—\n" + L10n.tr(noteEN, language: settingsStore.appLanguage)
             let textToShow = cached.hit == .similar ? (cached.text + moreDataNote) : cached.text
             await MainActor.run {
                 errorMessage = nil
@@ -1466,6 +1471,12 @@ struct AIAnalyticsSheet: View {
             }
             let contents: [Content]
         }
+        let routerBody = GeminiProxyBody(
+            contents: [
+                GeminiRequest.Content(role: "user", parts: [.init(text: prompt)])
+            ],
+            language: settingsStore.appLanguage
+        )
         struct GeminiPart: Decodable {
             let text: String?
         }
@@ -1486,15 +1497,10 @@ struct AIAnalyticsSheet: View {
                     settingsStore.registerAICall()
                 }
             }
-            let body = GeminiRequest(
-                contents: [
-                    .init(role: "user", parts: [.init(text: prompt)])
-                ]
-            )
             let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
-                    options: FunctionInvokeOptions(body: body)
+                    options: FunctionInvokeOptions(body: routerBody)
                 )
             }
             let text = response.candidates?
@@ -1503,7 +1509,7 @@ struct AIAnalyticsSheet: View {
                 .parts?
                 .compactMap { $0.text }
                 .joined(separator: "\n")
-                ?? "No text response from Gemini."
+                ?? L10n.tr("No text response from Gemini.", language: settingsStore.appLanguage)
             await AIAnalysisGeminiCache.shared.store(
                 exactPromptHash: promptHash,
                 relaxedFingerprint: relaxedFingerprint,
@@ -1597,7 +1603,7 @@ struct BetCaptureDiffLineChartCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Bet Rating vs Actual", systemImage: "chart.line.uptrend.xyaxis")
+            LocalizedLabel(title: "Bet Rating vs Actual", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline)
                 .foregroundColor(.white)
             
@@ -1606,10 +1612,10 @@ struct BetCaptureDiffLineChartCard: View {
                     .frame(height: 180)
                 
                 HStack(spacing: 8) {
-                    Label("\(goodBadCounts.good) good", systemImage: "hand.thumbsup.fill")
+                    LocalizedLabel(title: "\(goodBadCounts.good) good", systemImage: "hand.thumbsup.fill")
                         .font(.caption)
                         .foregroundColor(.green)
-                    Label("\(goodBadCounts.bad) bad", systemImage: "hand.thumbsdown.fill")
+                    LocalizedLabel(title: "\(goodBadCounts.bad) bad", systemImage: "hand.thumbsdown.fill")
                         .font(.caption)
                         .foregroundColor(.red)
                     Spacer()
@@ -1618,12 +1624,12 @@ struct BetCaptureDiffLineChartCard: View {
                         .foregroundColor(.gray)
                 }
             } else {
-                Text("No sessions with both actual and rated average bet yet.")
+                L10nText("No sessions with both actual and rated average bet yet.")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
             
-            Text("Above 0 means your rated (captured) average bet is higher than your actual average bet, which is good. Below 0 means you’re effectively overbetting relative to what the casino tracks.")
+            L10nText("Above 0 means your rated (captured) average bet is higher than your actual average bet, which is good. Below 0 means you’re effectively overbetting relative to what the casino tracks.")
                 .font(.caption)
                 .foregroundColor(.gray)
             
@@ -1657,7 +1663,7 @@ struct VennDiagramCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Win vs. Tier Gain", systemImage: "circle.grid.2x1.fill")
+            LocalizedLabel(title: "Win vs. Tier Gain", systemImage: "circle.grid.2x1.fill")
                 .font(.headline)
                 .foregroundColor(.white)
 
@@ -1673,7 +1679,7 @@ struct VennDiagramCard: View {
             )
             .frame(height: 220)
 
-            Text("Shows how often you both have a positive session result (per your results basis) and gain tier points in the same session.")
+            L10nText("Shows how often you both have a positive session result (per your results basis) and gain tier points in the same session.")
                 .font(.caption)
                 .foregroundColor(.gray)
 
@@ -1689,7 +1695,7 @@ struct VennDiagramCard: View {
             }
 
             HStack {
-                Text("Intersection")
+                L10nText("Intersection")
                     .font(.caption)
                     .foregroundColor(.gray)
                 Spacer()
@@ -1741,7 +1747,7 @@ struct VennDiagramView: View {
                     Text("\(intersectionCount)")
                         .font(.title.bold())
                         .foregroundColor(.white)
-                    Text("Both")
+                    L10nText("Both")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.8))
                 }
@@ -1859,12 +1865,12 @@ struct TierProgressLineChartCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Tier Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
+            LocalizedLabel(title: "Tier Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if pointsByDate.isEmpty {
-                Text("No tier point data yet.")
+                L10nText("No tier point data yet.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -1872,7 +1878,7 @@ struct TierProgressLineChartCard: View {
                     .frame(height: 180)
             }
 
-            Text("Cumulative tier points earned across your recorded sessions.")
+            L10nText("Cumulative tier points earned across your recorded sessions.")
                 .font(.caption)
                 .foregroundColor(.gray)
 
@@ -1970,12 +1976,12 @@ struct SessionMoodBarChartCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Session moods", systemImage: "face.smiling.fill")
+            LocalizedLabel(title: "Session moods", systemImage: "face.smiling.fill")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if moodCounts.isEmpty {
-                Text("No session moods recorded yet. Enable \"Prompt for session mood\" in Settings → Sessions and end a session to record how each session felt.")
+                L10nText("No session moods recorded yet. Enable \"Prompt for session mood\" in Settings → Sessions and end a session to record how each session felt.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -2039,12 +2045,12 @@ struct GameBreakdownBars: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Sessions by Game", systemImage: "square.grid.2x2.fill")
+            LocalizedLabel(title: "Sessions by Game", systemImage: "square.grid.2x2.fill")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if totalsByGame.isEmpty {
-                Text("No game breakdown yet.")
+                L10nText("No game breakdown yet.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -2142,12 +2148,12 @@ struct TierPointsByLoyaltyProgramBars: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Tier Points by Loyalty Program", systemImage: "star.circle.fill")
+            LocalizedLabel(title: "Tier Points by Loyalty Program", systemImage: "star.circle.fill")
                 .font(.headline)
                 .foregroundColor(.white)
 
             if totalsByProgram.isEmpty {
-                Text("No tier point data yet.")
+                L10nText("No tier point data yet.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -2491,7 +2497,7 @@ struct AnalyticsShareSelectionSheet: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 List {
-                    Section(header: Text("Include in share").foregroundColor(.white)) {
+                    Section(header: L10nText("Include in share").foregroundColor(.white)) {
                         HStack {
                             Button {
                                 includeBetCaptureDiff = true
@@ -2505,7 +2511,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)
-                                    Text("Select All")
+                                    L10nText("Select All")
                                         .foregroundColor(.white)
                                 }
                             }
@@ -2525,7 +2531,7 @@ struct AnalyticsShareSelectionSheet: View {
                                 HStack {
                                     Image(systemName: "xmark.circle")
                                         .foregroundColor(.red)
-                                    Text("Deselect All")
+                                    L10nText("Deselect All")
                                         .foregroundColor(.white)
                                 }
                             }
@@ -2546,7 +2552,7 @@ struct AnalyticsShareSelectionSheet: View {
                     }
 
                     Section(
-                        footer: Text("We’ll generate images for the selected analytics and open the system share sheet so you can send them however you like.")
+                        footer: L10nText("We’ll generate images for the selected analytics and open the system share sheet so you can send them however you like.")
                             .font(.footnote)
                             .foregroundColor(.gray)
                     ) {
@@ -2555,7 +2561,7 @@ struct AnalyticsShareSelectionSheet: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Share Analytics")
+            .localizedNavigationTitle("Share Analytics")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

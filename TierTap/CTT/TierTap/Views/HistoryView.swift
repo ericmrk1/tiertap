@@ -94,10 +94,10 @@ struct HistoryView: View {
             Image(systemName: "clock.arrow.circlepath")
                 .font(.system(size: 52))
                 .foregroundColor(.gray)
-            Text("No Sessions Yet")
+            L10nText("No Sessions Yet")
                 .font(.title3)
                 .foregroundColor(.gray)
-            Text("Complete a session to see your history.")
+            L10nText("Complete a session to see your history.")
                 .font(.subheadline)
                 .foregroundColor(.gray.opacity(0.7))
         }
@@ -114,7 +114,7 @@ struct HistoryView: View {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                         .foregroundColor(.white)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Filters")
+                        L10nText("Filters")
                             .font(.subheadline.bold())
                             .foregroundColor(.white)
                         Text(historyFiltersActive ? "Showing filtered sessions" : "All sessions")
@@ -123,7 +123,7 @@ struct HistoryView: View {
                     }
                     Spacer()
                     if historyFiltersActive {
-                        Text("Active")
+                        L10nText("Active")
                             .font(.caption2.bold())
                             .foregroundColor(.green)
                             .padding(.horizontal, 8)
@@ -195,12 +195,12 @@ struct HistoryView: View {
                 withAnimation { isHistoryDateSectionExpanded.toggle() }
             } label: {
                 HStack {
-                    Label("Date & time range", systemImage: "calendar")
+                    LocalizedLabel(title: "Date & time range", systemImage: "calendar")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                     Spacer()
                     if useDateRangeFilter {
-                        Text("On")
+                        L10nText("On")
                             .font(.caption2)
                             .foregroundColor(.green)
                     }
@@ -214,7 +214,7 @@ struct HistoryView: View {
             if isHistoryDateSectionExpanded {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(isOn: $useDateRangeFilter) {
-                        Text("Limit to date range")
+                        L10nText("Limit to date range")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.9))
                     }
@@ -222,7 +222,7 @@ struct HistoryView: View {
 
                     if useDateRangeFilter {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("From")
+                            L10nText("From")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             DatePicker(
@@ -236,7 +236,7 @@ struct HistoryView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("To")
+                            L10nText("To")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             DatePicker(
@@ -260,7 +260,7 @@ struct HistoryView: View {
                 withAnimation { isHistoryGameSectionExpanded.toggle() }
             } label: {
                 HStack {
-                    Label("Games", systemImage: "suit.club.fill")
+                    LocalizedLabel(title: "Games", systemImage: "suit.club.fill")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                     Spacer()
@@ -310,7 +310,7 @@ struct HistoryView: View {
                 withAnimation { isHistoryLocationSectionExpanded.toggle() }
             } label: {
                 HStack {
-                    Label("Locations", systemImage: "mappin.and.ellipse")
+                    LocalizedLabel(title: "Locations", systemImage: "mappin.and.ellipse")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                     Spacer()
@@ -358,10 +358,10 @@ struct HistoryView: View {
     private var sessionListContent: some View {
         if filteredSessions.isEmpty {
             VStack(spacing: 8) {
-                Text("No sessions match your filters.")
+                L10nText("No sessions match your filters.")
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.8))
-                Text("Try adjusting filters or search.")
+                L10nText("Try adjusting filters or search.")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
             }
@@ -376,13 +376,13 @@ struct HistoryView: View {
                         .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                         .swipeActions(edge: .leading, allowsFullSwipe: false) {
                             Button { sessionToEdit = session } label: {
-                                Label("Edit", systemImage: "pencil")
+                                LocalizedLabel(title: "Edit", systemImage: "pencil")
                             }
                             .tint(.green)
                         }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) { sessionToDelete = session } label: {
-                                Label("Delete", systemImage: "trash")
+                                LocalizedLabel(title: "Delete", systemImage: "trash")
                             }
                             .tint(.red)
                         }
@@ -411,7 +411,7 @@ struct HistoryView: View {
                     historyContentView
                 }
             }
-            .navigationTitle("Session History")
+            .localizedNavigationTitle("Session History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -466,7 +466,7 @@ struct HistoryView: View {
                                         .lineLimit(1)
                                         .font(.caption)
                                 } else {
-                                    Text("Account")
+                                    L10nText("Account")
                                         .font(.caption)
                                 }
                             }
@@ -496,7 +496,7 @@ struct HistoryView: View {
                     }
                 }
             } message: {
-                Text("This session will be permanently removed. This cannot be undone.")
+                L10nText("This session will be permanently removed. This cannot be undone.")
             }
             .adaptiveSheet(isPresented: $isShareSelectorPresented) {
                 SessionShareSelectionView(
@@ -784,7 +784,7 @@ struct SessionRow: View {
             HStack {
                 Text(session.casino).font(.headline).foregroundColor(.white)
                 if session.requiresMoreInfo {
-                    Text("Incomplete")
+                    L10nText("Incomplete")
                         .font(.caption2.bold())
                         .foregroundColor(.orange)
                         .padding(.horizontal, 6)
@@ -855,7 +855,7 @@ struct SessionShareSelectionView: View {
                         Image(systemName: "square.and.arrow.up")
                             .font(.system(size: 40))
                             .foregroundColor(.gray)
-                        Text("No sessions available to share.")
+                        L10nText("No sessions available to share.")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }
@@ -869,7 +869,7 @@ struct SessionShareSelectionView: View {
                                     HStack {
                                         Image(systemName: "checkmark.circle.fill")
                                             .foregroundColor(.green)
-                                        Text("Select All Sessions")
+                                        L10nText("Select All Sessions")
                                             .foregroundColor(.white)
                                     }
                                 }
@@ -882,7 +882,7 @@ struct SessionShareSelectionView: View {
                                     HStack {
                                         Image(systemName: "xmark.circle")
                                             .foregroundColor(.red)
-                                        Text("Clear All")
+                                        L10nText("Clear All")
                                             .foregroundColor(.white)
                                     }
                                 }
@@ -891,16 +891,16 @@ struct SessionShareSelectionView: View {
                             .listRowBackground(Color(.systemGray6).opacity(0.2))
                         }
 
-                        Section(header: Text("Choose sessions to share").foregroundColor(.gray)) {
+                        Section(header: L10nText("Choose sessions to share").foregroundColor(.gray)) {
                             Toggle(isOn: $shareAsPhoto) {
-                                Text("Photo")
+                                L10nText("Photo")
                                     .foregroundColor(.white)
                             }
                             .toggleStyle(SwitchToggleStyle(tint: .green))
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
 
                             Toggle(isOn: $includeWinLosses) {
-                                Text("Include win/losses")
+                                L10nText("Include win/losses")
                                     .foregroundColor(.white)
                             }
                             .toggleStyle(SwitchToggleStyle(tint: .green))
@@ -921,7 +921,7 @@ struct SessionShareSelectionView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Share Sessions")
+            .localizedNavigationTitle("Share Sessions")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1033,13 +1033,13 @@ private struct SessionSharePhotoBasePickerSheet: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(.white.opacity(0.95))
                             .listRowBackground(Color(.systemGray6).opacity(0.12))
-                        Text("Metrics will be drawn on the image you choose.")
+                        L10nText("Metrics will be drawn on the image you choose.")
                             .font(.caption)
                             .foregroundColor(.gray)
                             .listRowBackground(Color(.systemGray6).opacity(0.12))
                     }
 
-                    Section(header: Text("Background image").foregroundColor(.gray)) {
+                    Section(header: L10nText("Background image").foregroundColor(.gray)) {
                         ForEach(Array(options.enumerated()), id: \.offset) { _, item in
                             Button {
                                 onPick(item.base)
@@ -1060,7 +1060,7 @@ private struct SessionSharePhotoBasePickerSheet: View {
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Choose photo")
+            .localizedNavigationTitle("Choose photo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1104,7 +1104,7 @@ private struct SessionSelectableRow: View {
                         Text(session.game)
                             .font(.caption)
                             .foregroundColor(.gray)
-                        Text("•")
+                        L10nText("•")
                             .font(.caption)
                             .foregroundColor(.gray)
                         Text(session.startTime, style: .date)

@@ -22,6 +22,39 @@ if (!GEMINI_API_KEY) {
 
 console.log("gemini-proxy function loaded");
 
+/** Strips `tierTapLanguagePreamble` and prepends it to the first user text part (Gemini multimodal safe). */
+function mergeTierTapLanguagePreamble(raw: string): string {
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return raw;
+  }
+  const pre = body["tierTapLanguagePreamble"];
+  delete body["tierTapLanguagePreamble"];
+  if (typeof pre !== "string" || pre.length === 0) {
+    return JSON.stringify(body);
+  }
+  const contents = body["contents"];
+  if (!Array.isArray(contents) || contents.length === 0) {
+    return JSON.stringify(body);
+  }
+  for (const item of contents) {
+    if (typeof item !== "object" || item === null) continue;
+    const parts = (item as Record<string, unknown>)["parts"];
+    if (!Array.isArray(parts)) continue;
+    for (const part of parts) {
+      if (typeof part !== "object" || part === null) continue;
+      const t = (part as Record<string, unknown>)["text"];
+      if (typeof t === "string" && t.length > 0) {
+        (part as Record<string, unknown>)["text"] = `${pre}\n\n---\n\n${t}`;
+        return JSON.stringify(body);
+      }
+    }
+  }
+  return JSON.stringify(body);
+}
+
 Deno.serve(async (req: Request) => {
   console.log("Incoming request:", {
     method: req.method,
@@ -67,7 +100,7 @@ Deno.serve(async (req: Request) => {
       console.log("Incoming request body (to forward to Gemini):", raw);
     }
 
-    bodyForGemini = raw;
+    bodyForGemini = mergeTierTapLanguagePreamble(raw);
   } catch (e) {
     console.error("Error reading incoming body for logging:", e);
     bodyForGemini = req.body;

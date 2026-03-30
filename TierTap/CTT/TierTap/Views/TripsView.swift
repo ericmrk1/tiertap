@@ -82,7 +82,7 @@ struct TripsView: View {
 
                 addTripFloatingButton
             }
-            .navigationTitle("Trips")
+            .localizedNavigationTitle("Trips")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -181,10 +181,10 @@ struct TripsView: View {
             Image(systemName: "suitcase.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(.white.opacity(0.9))
-            Text("No trips yet")
+            L10nText("No trips yet")
                 .font(.title2.bold())
                 .foregroundColor(.white)
-            Text("Track getaways, stays, flights, and the sessions that happened on each trip. Tap + to create one, or the sparkle wand to draft trips from your sessions with AI.")
+            L10nText("Track getaways, stays, flights, and the sessions that happened on each trip. Tap + to create one, or the sparkle wand to draft trips from your sessions with AI.")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.white.opacity(0.85))
@@ -341,7 +341,7 @@ struct TripsView: View {
             Button {
                 tripToEdit = trip
             } label: {
-                Label("Edit", systemImage: "pencil")
+                LocalizedLabel(title: "Edit", systemImage: "pencil")
             }
             .tint(.green)
         }
@@ -350,21 +350,21 @@ struct TripsView: View {
                 Button {
                     tripForAddSessions = trip
                 } label: {
-                    Label("Add sessions", systemImage: "plus.circle.fill")
+                    LocalizedLabel(title: "Add sessions", systemImage: "plus.circle.fill")
                 }
                 .tint(.green)
             }
             Button(role: .destructive) {
                 tripPendingDelete = trip
             } label: {
-                Label("Delete", systemImage: "trash")
+                LocalizedLabel(title: "Delete", systemImage: "trash")
             }
         }
         .contextMenu {
             Button {
                 shareTrip(trip)
             } label: {
-                Label("Share summary image", systemImage: "square.and.arrow.up")
+                LocalizedLabel(title: "Share summary image", systemImage: "square.and.arrow.up")
             }
         }
     }
@@ -386,7 +386,7 @@ struct TripsView: View {
                         .lineLimit(1)
                 }
                 HStack(spacing: 5) {
-                    Label("\(trip.sessionIDs.count) sessions", systemImage: "dice.fill")
+                    LocalizedLabel(title: "\(trip.sessionIDs.count) sessions", systemImage: "dice.fill")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.65))
                     if !trip.flights.legs.isEmpty {
@@ -472,7 +472,7 @@ struct TripsView: View {
                         .lineLimit(1)
                         .font(.caption)
                 } else {
-                    Text("Account")
+                    L10nText("Account")
                         .font(.caption)
                 }
             }

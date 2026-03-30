@@ -117,7 +117,7 @@ struct CloseoutView: View {
                                         Button {
                                             openUberAppOrWeb()
                                         } label: {
-                                            Text("🚕")
+                                            L10nText("🚕")
                                                 .font(.system(size: 36))
                                         }
                                         .accessibilityLabel("Open Uber")
@@ -125,7 +125,7 @@ struct CloseoutView: View {
                                         Button {
                                             openOpenTableAppOrWeb()
                                         } label: {
-                                            Text("🍽️")
+                                            L10nText("🍽️")
                                                 .font(.system(size: 36))
                                         }
                                         .accessibilityLabel("Open OpenTable")
@@ -135,17 +135,17 @@ struct CloseoutView: View {
 
                             HStack {
                                 if timerStopped {
-                                    Label("Timer stopped", systemImage: "stop.circle.fill")
+                                    LocalizedLabel(title: "Timer stopped", systemImage: "stop.circle.fill")
                                         .font(.caption).foregroundColor(.orange)
                                 } else {
-                                    Label("Timer running", systemImage: "play.circle.fill")
+                                    LocalizedLabel(title: "Timer running", systemImage: "play.circle.fill")
                                         .font(.caption).foregroundColor(.green)
                                 }
                                 Spacer()
                                 Text(s.casino).font(.subheadline.bold()).foregroundColor(.white)
-                                Text("·").foregroundColor(.gray)
+                                L10nText("·").foregroundColor(.gray)
                                 Text(Session.durationString(s.duration)).font(.caption.monospacedDigit()).foregroundColor(.green)
-                                Text("·").foregroundColor(.gray)
+                                L10nText("·").foregroundColor(.gray)
                                 Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.caption).foregroundColor(.gray)
                             }
                             .padding(.horizontal, 12).padding(.vertical, 8)
@@ -176,7 +176,7 @@ struct CloseoutView: View {
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(12)
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Adjust cash out")
+                                L10nText("Adjust cash out")
                                     .font(.caption.bold())
                                     .foregroundColor(.gray)
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -262,24 +262,24 @@ struct CloseoutView: View {
                             HStack(alignment: .top, spacing: 16) {
                                 VStack(alignment: .leading, spacing: 4) {
                                     if let wl = previewWL {
-                                        Text("W/L").font(.caption2).foregroundColor(.gray)
+                                        L10nText("W/L").font(.caption2).foregroundColor(.gray)
                                         Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
                                             .font(.subheadline.bold())
                                             .foregroundColor(wl >= 0 ? .green : .red)
                                     }
                                 }
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Buy-in").font(.caption2).foregroundColor(.gray)
+                                    L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
                                     Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
                                 }
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("Hrs").font(.caption2).foregroundColor(.gray)
+                                    L10nText("Hrs").font(.caption2).foregroundColor(.gray)
                                     Text(String(format: "%.2f", previewHours)).font(.subheadline).foregroundColor(.white)
                                 }
                                 if let hourly = previewHourlyWinLoss,
                                    let amount = Int(exactly: round(hourly)) {
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("Hourly W/L").font(.caption2).foregroundColor(.gray)
+                                        L10nText("Hourly W/L").font(.caption2).foregroundColor(.gray)
                                         Text("\(amount >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(amount))")
                                             .font(.subheadline)
                                             .foregroundColor(amount >= 0 ? .green : .red)
@@ -287,7 +287,7 @@ struct CloseoutView: View {
                                 }
                                 if let roi = previewROI {
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("ROI %").font(.caption2).foregroundColor(.gray)
+                                        L10nText("ROI %").font(.caption2).foregroundColor(.gray)
                                         Text(String(format: "%.1f%%", roi))
                                             .font(.subheadline)
                                             .foregroundColor(roi >= 0 ? .green : .red)
@@ -304,7 +304,7 @@ struct CloseoutView: View {
 
                         // Private notes (local only, not shared)
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Private notes (not shared)")
+                            L10nText("Private notes (not shared)")
                                 .font(.caption.bold())
                                 .foregroundColor(.gray)
                             TextEditor(text: $privateNotes)
@@ -318,7 +318,7 @@ struct CloseoutView: View {
 
                         // Session photo attachment
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Session photo")
+                            L10nText("Session photo")
                                 .font(.caption.bold())
                                 .foregroundColor(.gray)
 
@@ -339,7 +339,7 @@ struct CloseoutView: View {
                                         Image(systemName: "camera.viewfinder")
                                             .font(.system(size: 24))
                                             .foregroundColor(.gray)
-                                        Text("Add a photo from your session")
+                                        L10nText("Add a photo from your session")
                                             .font(.caption)
                                             .foregroundColor(.gray)
                                     }
@@ -352,7 +352,7 @@ struct CloseoutView: View {
                                 Button {
                                     sessionPhotoSource = .camera
                                 } label: {
-                                    Label("Camera", systemImage: "camera")
+                                    LocalizedLabel(title: "Camera", systemImage: "camera")
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
@@ -364,7 +364,7 @@ struct CloseoutView: View {
                                 Button {
                                     sessionPhotoSource = .photoLibrary
                                 } label: {
-                                    Label("Photo Library", systemImage: "photo")
+                                    LocalizedLabel(title: "Photo Library", systemImage: "photo")
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
@@ -397,7 +397,7 @@ struct CloseoutView: View {
                                     showLowAlert = true
                                 } else { save() }
                             } label: {
-                                Text("Save Session")
+                                L10nText("Save Session")
                                     .frame(maxWidth: .infinity).padding(.vertical, 24)
                                     .font(.headline)
                                     .foregroundColor(isValid ? .white : .white.opacity(0.85))
@@ -413,7 +413,7 @@ struct CloseoutView: View {
                             .disabled(!isValid)
 
                             Button { dismiss() } label: {
-                                Text("Cancel — Return to Session")
+                                L10nText("Cancel — Return to Session")
                                     .font(.subheadline)
                                     .frame(maxWidth: .infinity).padding(.vertical, 10)
                                     .foregroundColor(.white.opacity(0.9))
@@ -434,7 +434,7 @@ struct CloseoutView: View {
                                 showSubscriptionPaywall = true
                             }
                         } label: {
-                            Label("Chip Estimator", systemImage: "camera.viewfinder")
+                            LocalizedLabel(title: "Chip Estimator", systemImage: "camera.viewfinder")
                                 .font(.subheadline.bold())
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
@@ -449,7 +449,7 @@ struct CloseoutView: View {
                 }
                 .allowsHitTesting(true)
             }
-            .navigationTitle("End Session")
+            .localizedNavigationTitle("End Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -698,7 +698,7 @@ struct ChipEstimatorSheetView: View {
                             Text(game.isEmpty ? "Unknown table game" : game)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            Text("Chip Estimator")
+                            L10nText("Chip Estimator")
                                 .font(.caption.bold())
                                 .foregroundColor(.green)
                         }
@@ -725,7 +725,7 @@ struct ChipEstimatorSheetView: View {
                                         Image(systemName: "camera.viewfinder")
                                             .font(.system(size: 32))
                                             .foregroundColor(.gray)
-                                        Text("Add a photo of your chips")
+                                        L10nText("Add a photo of your chips")
                                             .font(.subheadline)
                                             .foregroundColor(.gray)
                                     }
@@ -738,7 +738,7 @@ struct ChipEstimatorSheetView: View {
                                 Button {
                                     chipPhotoSource = .camera
                                 } label: {
-                                    Label("Camera", systemImage: "camera")
+                                    LocalizedLabel(title: "Camera", systemImage: "camera")
                                         .font(.subheadline.bold())
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 10)
@@ -750,7 +750,7 @@ struct ChipEstimatorSheetView: View {
                                 Button {
                                     chipPhotoSource = .photoLibrary
                                 } label: {
-                                    Label("Photo Library", systemImage: "photo")
+                                    LocalizedLabel(title: "Photo Library", systemImage: "photo")
                                         .font(.subheadline.bold())
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 10)
@@ -783,7 +783,7 @@ struct ChipEstimatorSheetView: View {
 
                             if let estimatedAmount {
                                 VStack(spacing: 8) {
-                                    Text("Estimated value")
+                                    L10nText("Estimated value")
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                     Text("\(settingsStore.currencySymbol)\(estimatedAmount)")
@@ -795,7 +795,7 @@ struct ChipEstimatorSheetView: View {
                                         cashOut = String(estimatedAmount)
                                         dismiss()
                                     } label: {
-                                        Text("Use as cash-out amount")
+                                        L10nText("Use as cash-out amount")
                                             .font(.subheadline.bold())
                                             .padding(.horizontal, 16)
                                             .padding(.vertical, 10)
@@ -809,7 +809,7 @@ struct ChipEstimatorSheetView: View {
                                         recordChipEstimatorOutcome(accepted: false)
                                         dismiss()
                                     } label: {
-                                        Text("Not even close. Will enter manually.")
+                                        L10nText("Not even close. Will enter manually.")
                                             .font(.subheadline.bold())
                                             .multilineTextAlignment(.center)
                                             .padding(.horizontal, 16)
@@ -842,10 +842,10 @@ struct ChipEstimatorSheetView: View {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .green))
                                     .scaleEffect(1.3)
-                                Text("Estimating chip value…")
+                                L10nText("Estimating chip value…")
                                     .font(.headline)
                                     .foregroundColor(.white)
-                                Text("Analyzing your photo with TierTap AI.")
+                                L10nText("Analyzing your photo with TierTap AI.")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
@@ -855,7 +855,7 @@ struct ChipEstimatorSheetView: View {
                         }
                 }
             }
-            .navigationTitle("Chip Estimator")
+            .localizedNavigationTitle("Chip Estimator")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -1054,7 +1054,7 @@ struct ChipEstimatorSheetView: View {
         Do not explain your reasoning; just return either UNKNOWN or a single integer.
         """
 
-        let body = GeminiImageRequest(
+        let innerRequest = GeminiImageRequest(
             contents: [
                 .init(
                     role: "user",
@@ -1071,6 +1071,10 @@ struct ChipEstimatorSheetView: View {
                 )
             ]
         )
+        let routerBody = GeminiProxyBody(
+            contents: innerRequest.contents,
+            language: settingsStore.appLanguage
+        )
 
         do {
             if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
@@ -1082,7 +1086,7 @@ struct ChipEstimatorSheetView: View {
             let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
-                    options: FunctionInvokeOptions(body: body)
+                    options: FunctionInvokeOptions(body: routerBody)
                 )
             }
             let text = response.candidates?

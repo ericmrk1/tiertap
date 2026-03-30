@@ -54,7 +54,7 @@ struct TripLinkSessionsSheet: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 if trip == nil {
-                    Text("This trip is no longer available.")
+                    L10nText("This trip is no longer available.")
                         .foregroundColor(.white.opacity(0.9))
                         .padding()
                 } else if baseCandidates.isEmpty {
@@ -65,7 +65,7 @@ struct TripLinkSessionsSheet: View {
                     listContent
                 }
             }
-            .navigationTitle("Add sessions")
+            .localizedNavigationTitle("Add sessions")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -86,7 +86,7 @@ struct TripLinkSessionsSheet: View {
     }
 
     private var emptyAllLinked: some View {
-        Text("Every completed session is already on this trip, or you have no completed sessions yet.")
+        L10nText("Every completed session is already on this trip, or you have no completed sessions yet.")
             .font(.subheadline)
             .foregroundColor(.white.opacity(0.88))
             .multilineTextAlignment(.center)
@@ -94,7 +94,7 @@ struct TripLinkSessionsSheet: View {
     }
 
     private var emptySearch: some View {
-        Text("No sessions match your search.")
+        L10nText("No sessions match your search.")
             .font(.subheadline)
             .foregroundColor(.white.opacity(0.85))
     }
@@ -107,7 +107,7 @@ struct TripLinkSessionsSheet: View {
                         sessionPickRow(session)
                     }
                 } header: {
-                    Text("Within trip dates")
+                    L10nText("Within trip dates")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white.opacity(0.85))
                         .textCase(nil)
@@ -119,12 +119,12 @@ struct TripLinkSessionsSheet: View {
                         sessionPickRow(session)
                     }
                 } header: {
-                    Text("Other completed sessions")
+                    L10nText("Other completed sessions")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white.opacity(0.78))
                         .textCase(nil)
                 } footer: {
-                    Text("You can still link sessions that fall outside the trip’s start/end dates.")
+                    L10nText("You can still link sessions that fall outside the trip’s start/end dates.")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.55))
                 }

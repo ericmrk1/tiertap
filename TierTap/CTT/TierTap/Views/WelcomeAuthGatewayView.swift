@@ -66,12 +66,12 @@ struct WelcomeAuthGatewayView: View {
                 .frame(maxWidth: 160)
                 .shadow(radius: 12)
 
-            Text("Welcome to TierTap")
+            L10nText("Welcome to TierTap")
                 .font(.system(.largeTitle, design: .rounded).weight(.bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(.white)
 
-            Text("Track your casino sessions, understand your tier points, and let advanced AI help you make smarter decisions about your play.")
+            L10nText("Track your casino sessions, understand your tier points, and let advanced AI help you make smarter decisions about your play.")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.9))
                 .multilineTextAlignment(.center)
@@ -81,15 +81,15 @@ struct WelcomeAuthGatewayView: View {
 
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Why create a TierTap account?")
+            L10nText("Why create a TierTap account?")
                 .font(.headline)
                 .foregroundColor(.white)
 
             VStack(alignment: .leading, spacing: 8) {
-                Label("Unlock advanced AI summaries and suggestions for your sessions.", systemImage: "wand.and.stars")
-                Label("Sync your bankroll and session history safely across devices.", systemImage: "icloud")
-                Label("Join community sessions — see what others are playing and publish your own.", systemImage: "person.3.sequence.fill")
-                Label("Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
+                LocalizedLabel(title: "Unlock advanced AI summaries and suggestions for your sessions.", systemImage: "wand.and.stars")
+                LocalizedLabel(title: "Sync your bankroll and session history safely across devices.", systemImage: "icloud")
+                LocalizedLabel(title: "Join community sessions — see what others are playing and publish your own.", systemImage: "person.3.sequence.fill")
+                LocalizedLabel(title: "Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
             }
             .font(.footnote)
             .foregroundColor(.white.opacity(0.9))
@@ -102,7 +102,7 @@ struct WelcomeAuthGatewayView: View {
     private var authSection: some View {
         VStack(spacing: 14) {
             if !SupabaseConfig.isConfigured {
-                Text("To enable sign-in, add your Supabase keys. You can still use TierTap without an account.")
+                L10nText("To enable sign-in, add your Supabase keys. You can still use TierTap without an account.")
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
@@ -114,7 +114,7 @@ struct WelcomeAuthGatewayView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "apple.logo")
-                            Text("Sign in with Apple")
+                            L10nText("Sign in with Apple")
                                 .fontWeight(.semibold)
                         }
                         .font(.headline)
@@ -132,7 +132,7 @@ struct WelcomeAuthGatewayView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "globe")
-                            Text("Sign in with Google")
+                            L10nText("Sign in with Google")
                                 .fontWeight(.semibold)
                         }
                         .font(.headline)
@@ -146,7 +146,7 @@ struct WelcomeAuthGatewayView: View {
                     .disabled(authStore.isLoading || !SupabaseConfig.isConfigured)
 
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Email account")
+                        L10nText("Email account")
                             .font(.headline)
                             .foregroundColor(.white)
 
@@ -241,7 +241,7 @@ struct WelcomeAuthGatewayView: View {
                         .font(.system(size: 44))
                         .foregroundStyle(Color.green)
 
-                    Text("You're signed in to TierTap.")
+                    L10nText("You're signed in to TierTap.")
                         .font(.headline)
                         .foregroundColor(.white)
 
@@ -255,7 +255,7 @@ struct WelcomeAuthGatewayView: View {
                             .foregroundColor(.white.opacity(0.9))
                     }
 
-                    Text("You’re ready to unlock advanced AI features and community sessions.")
+                    L10nText("You’re ready to unlock advanced AI features and community sessions.")
                         .font(.footnote)
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -273,7 +273,7 @@ struct WelcomeAuthGatewayView: View {
             Button {
                 isPresented = false
             } label: {
-                Text("Continue without an account")
+                L10nText("Continue without an account")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
@@ -283,7 +283,7 @@ struct WelcomeAuthGatewayView: View {
             }
             .buttonStyle(.plain)
 
-            Text("You can keep using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
+            L10nText("You can keep using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
                 .font(.footnote)
                 .foregroundColor(.white.opacity(0.85))
                 .multilineTextAlignment(.center)

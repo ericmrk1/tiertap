@@ -79,7 +79,7 @@ struct MapPlacePickerView: View {
     private var mapSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center) {
-                Text("Search the map")
+                L10nText("Search the map")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.9))
                 Spacer(minLength: 8)
@@ -89,7 +89,7 @@ struct MapPlacePickerView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "location.fill")
-                            Text("Current location")
+                            L10nText("Current location")
                         }
                         .font(.caption.bold())
                         .foregroundColor(.black)
@@ -104,7 +104,7 @@ struct MapPlacePickerView: View {
             .padding(.horizontal)
 
             if allowsAirportCodeSearch {
-                Text("Enter a 3-letter IATA or 4-letter ICAO code, or search by airport name.")
+                L10nText("Enter a 3-letter IATA or 4-letter ICAO code, or search by airport name.")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.7))
                     .padding(.horizontal)
@@ -138,7 +138,7 @@ struct MapPlacePickerView: View {
             if isSearching {
                 HStack(spacing: 8) {
                     ProgressView().tint(.green)
-                    Text("Searching…")
+                    L10nText("Searching…")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -184,7 +184,7 @@ struct MapPlacePickerView: View {
 
     private var manualSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Or enter manually")
+            L10nText("Or enter manually")
                 .font(.headline)
                 .foregroundColor(.white)
             TextField("Name", text: $manualName)
@@ -207,7 +207,7 @@ struct MapPlacePickerView: View {
                 longitude = nil
                 dismiss()
             } label: {
-                Text("Use manual entry")
+                L10nText("Use manual entry")
                     .font(.subheadline.bold())
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -223,13 +223,13 @@ struct MapPlacePickerView: View {
 
     private var resultsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Results")
+            L10nText("Results")
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.horizontal)
 
             if searchResults.isEmpty && !isSearching {
-                Text("Search above, or pick a pin on the map.")
+                L10nText("Search above, or pick a pin on the map.")
                     .font(.caption)
                     .foregroundColor(.gray)
                     .padding(.horizontal)

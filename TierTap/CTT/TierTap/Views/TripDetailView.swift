@@ -56,12 +56,12 @@ struct TripDetailView: View {
                             Button {
                                 showEditor = true
                             } label: {
-                                Label("Edit trip", systemImage: "pencil")
+                                LocalizedLabel(title: "Edit trip", systemImage: "pencil")
                             }
                             Button(role: .destructive) {
                                 showDeleteConfirm = true
                             } label: {
-                                Label("Delete trip", systemImage: "trash")
+                                LocalizedLabel(title: "Delete trip", systemImage: "trash")
                             }
                         } label: {
                             Image(systemName: "ellipsis.circle")
@@ -121,10 +121,10 @@ struct TripDetailView: View {
     private var missingTripView: some View {
         ZStack {
             settingsStore.primaryGradient.ignoresSafeArea()
-            Text("This trip no longer exists.")
+            L10nText("This trip no longer exists.")
                 .foregroundColor(.white.opacity(0.9))
         }
-        .navigationTitle("Trip")
+        .localizedNavigationTitle("Trip")
         .onAppear { dismiss() }
     }
 
@@ -170,7 +170,7 @@ struct TripDetailView: View {
         let locLines = t.primaryLocationSubtitleLines
         let datesColumn = VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Start")
+                L10nText("Start")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.white.opacity(0.72))
                 Text(tripDateMedium(t.startDate))
@@ -178,7 +178,7 @@ struct TripDetailView: View {
                     .foregroundColor(.green.opacity(0.95))
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text("End")
+                L10nText("End")
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.white.opacity(0.72))
                 Text(tripDateMedium(t.endDate))
@@ -224,7 +224,7 @@ struct TripDetailView: View {
     private func photosSection(_ t: Trip) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Photos")
+                L10nText("Photos")
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
@@ -243,7 +243,7 @@ struct TripDetailView: View {
             }
 
             if t.photoFilenames.isEmpty {
-                Text("Add photos from your camera or library.")
+                L10nText("Add photos from your camera or library.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -288,7 +288,7 @@ struct TripDetailView: View {
 
     private func lodgingsBlock(_ t: Trip) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Where you stayed")
+            L10nText("Where you stayed")
                 .font(.headline)
                 .foregroundColor(.white)
             ForEach(t.lodgings) { place in
@@ -338,7 +338,7 @@ struct TripDetailView: View {
                     .foregroundColor(.gray)
             }
             if !leg.hasRoute {
-                Text("Add origin & destination on the map in Edit to see the route.")
+                L10nText("Add origin & destination on the map in Edit to see the route.")
                     .font(.caption2)
                     .foregroundColor(.orange.opacity(0.9))
             }
@@ -351,7 +351,7 @@ struct TripDetailView: View {
     private func flightsBlock(_ t: Trip) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Flights")
+                L10nText("Flights")
                     .font(.headline)
                     .foregroundColor(.white)
                 Text("(\(t.flights.pattern.label))")
@@ -392,7 +392,7 @@ struct TripDetailView: View {
                     Button {
                         showAddSessionsSheet = true
                     } label: {
-                        Label("Add", systemImage: "plus.circle.fill")
+                        LocalizedLabel(title: "Add", systemImage: "plus.circle.fill")
                             .font(.subheadline.weight(.semibold))
                             .foregroundColor(.green)
                     }
@@ -450,7 +450,7 @@ struct TripDetailView: View {
 
     private func notesBlock(_ t: Trip) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Notes")
+            L10nText("Notes")
                 .font(.headline)
                 .foregroundColor(.white)
             Text(t.notes)
@@ -477,11 +477,11 @@ struct TripDetailView: View {
                     .cornerRadius(16)
                     .padding()
                 } else {
-                    Text("Missing coordinates for this leg.")
+                    L10nText("Missing coordinates for this leg.")
                         .foregroundColor(.white)
                 }
             }
-            .navigationTitle("Flight route")
+            .localizedNavigationTitle("Flight route")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

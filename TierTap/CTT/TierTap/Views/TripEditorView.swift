@@ -100,7 +100,7 @@ struct TripEditorView: View {
 
                         HStack(alignment: .top, spacing: 12) {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Start")
+                                L10nText("Start")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.85))
                                 DatePicker("", selection: $draft.startDate, displayedComponents: [.date])
@@ -115,7 +115,7 @@ struct TripEditorView: View {
                                 .padding(.vertical, 4)
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("End")
+                                L10nText("End")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.85))
                                 DatePicker("", selection: $draft.endDate, displayedComponents: [.date])
@@ -139,21 +139,21 @@ struct TripEditorView: View {
                         accommodationsBubble
 
                         sectionTitle("Sessions on this trip")
-                        Text("Sessions that overlap your trip dates (inclusive) are selected automatically. Scroll to review the list and tap any row to add or remove it.")
+                        L10nText("Sessions that overlap your trip dates (inclusive) are selected automatically. Scroll to review the list and tap any row to add or remove it.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.75))
                         if completedSessions.isEmpty {
-                            Text("No completed sessions yet.")
+                            L10nText("No completed sessions yet.")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         } else {
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("Filter list by session dates")
+                                L10nText("Filter list by session dates")
                                     .font(.caption.weight(.semibold))
                                     .foregroundColor(.white.opacity(0.88))
                                 HStack(alignment: .top, spacing: 12) {
                                     VStack(alignment: .leading, spacing: 6) {
-                                        Text("From")
+                                        L10nText("From")
                                             .font(.caption)
                                             .foregroundColor(.white.opacity(0.85))
                                         DatePicker("", selection: $sessionListFilterStart, displayedComponents: [.date])
@@ -166,7 +166,7 @@ struct TripEditorView: View {
                                         .frame(width: 1)
                                         .padding(.vertical, 4)
                                     VStack(alignment: .leading, spacing: 6) {
-                                        Text("Through")
+                                        L10nText("Through")
                                             .font(.caption)
                                             .foregroundColor(.white.opacity(0.85))
                                         DatePicker("", selection: $sessionListFilterEnd, displayedComponents: [.date])
@@ -188,14 +188,14 @@ struct TripEditorView: View {
                                     sessionListFilterStart = a
                                     sessionListFilterEnd = b
                                 } label: {
-                                    Text("Use trip dates for filter")
+                                    L10nText("Use trip dates for filter")
                                         .font(.caption.bold())
                                 }
                                 .buttonStyle(.plain)
                                 .foregroundColor(.green)
 
                                 if completedSessionsInFilter.isEmpty {
-                                    Text("No sessions overlap this filter range. Adjust the dates above.")
+                                    L10nText("No sessions overlap this filter range. Adjust the dates above.")
                                         .font(.caption)
                                         .foregroundColor(.orange.opacity(0.9))
                                 } else {
@@ -223,7 +223,7 @@ struct TripEditorView: View {
                         }
                         .pickerStyle(.segmented)
 
-                        Text("Airline: start typing to match name, IATA, or ICAO. Origin and destination: type city, name, or code — picking from the list saves the IATA code; Map also saves IATA when the place matches the airport catalog.")
+                        L10nText("Airline: start typing to match name, IATA, or ICAO. Origin and destination: type city, name, or code — picking from the list saves the IATA code; Map also saves IATA when the place matches the airport catalog.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.72))
                             .fixedSize(horizontal: false, vertical: true)
@@ -256,7 +256,7 @@ struct TripEditorView: View {
                             t.flights.legs.append(TripFlightLeg())
                             draft = t
                         } label: {
-                            Label("Add flight leg", systemImage: "airplane")
+                            LocalizedLabel(title: "Add flight leg", systemImage: "airplane")
                                 .font(.subheadline.bold())
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity)
@@ -405,7 +405,7 @@ struct TripEditorView: View {
             Button {
                 showPrimaryPlacePicker = true
             } label: {
-                Label("Search map", systemImage: "map")
+                LocalizedLabel(title: "Search map", systemImage: "map")
                     .font(.subheadline.bold())
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -426,7 +426,7 @@ struct TripEditorView: View {
 
     private var accommodationsBubble: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Hotels, homes, and other stays. Each can have its own dates; new ones default to this trip’s dates.")
+            L10nText("Hotels, homes, and other stays. Each can have its own dates; new ones default to this trip’s dates.")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.8))
                 .fixedSize(horizontal: false, vertical: true)
@@ -446,7 +446,7 @@ struct TripEditorView: View {
                     draft.lodgings.append(new)
                     lodgingMapPick = LodgingMapPick(lodgingId: new.id)
                 } label: {
-                    Label("Add hotel", systemImage: "bed.double.fill")
+                    LocalizedLabel(title: "Add hotel", systemImage: "bed.double.fill")
                         .font(.caption.bold())
                 }
                 .foregroundColor(.green)
@@ -460,7 +460,7 @@ struct TripEditorView: View {
                     draft.lodgings.append(new)
                     lodgingMapPick = LodgingMapPick(lodgingId: new.id)
                 } label: {
-                    Label("Add home", systemImage: "house.fill")
+                    LocalizedLabel(title: "Add home", systemImage: "house.fill")
                         .font(.caption.bold())
                 }
                 .foregroundColor(.green)
@@ -481,7 +481,7 @@ struct TripEditorView: View {
         if draft.lodgings.contains(where: { $0.id == pick.lodgingId }) {
             lodgingMapPickerContent(lodgingId: pick.lodgingId)
         } else {
-            Text("This stay was removed.")
+            L10nText("This stay was removed.")
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black)
@@ -537,7 +537,7 @@ struct TripEditorView: View {
             Button {
                 lodgingMapPick = LodgingMapPick(lodgingId: place.id)
             } label: {
-                Label("Search map", systemImage: "mappin.and.ellipse")
+                LocalizedLabel(title: "Search map", systemImage: "mappin.and.ellipse")
                     .font(.caption.bold())
             }
             .buttonStyle(.plain)
@@ -551,7 +551,7 @@ struct TripEditorView: View {
     private func lodgingStayDatesBubble(lodgingId: UUID) -> some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Stay from")
+                L10nText("Stay from")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: lodgingStayStartBinding(lodgingId: lodgingId), displayedComponents: [.date])
@@ -566,7 +566,7 @@ struct TripEditorView: View {
                 .padding(.vertical, 4)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Stay through")
+                L10nText("Stay through")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: lodgingStayEndBinding(lodgingId: lodgingId), displayedComponents: [.date])
@@ -698,7 +698,7 @@ struct TripEditorView: View {
                 }
                 Spacer()
                 if inRange {
-                    Text("In range")
+                    L10nText("In range")
                         .font(.caption2.bold())
                         .foregroundColor(.black)
                         .padding(.horizontal, 8)
@@ -861,7 +861,7 @@ struct TripEditorView: View {
                 .foregroundColor(.white)
             HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Origin").font(.caption2).foregroundColor(.gray)
+                    L10nText("Origin").font(.caption2).foregroundColor(.gray)
                     VStack(alignment: .leading, spacing: 0) {
                         TextField("City, airport, or code", text: bindingLeg(idx, \.originName))
                             .padding(8)
@@ -881,7 +881,7 @@ struct TripEditorView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Destination").font(.caption2).foregroundColor(.gray)
+                    L10nText("Destination").font(.caption2).foregroundColor(.gray)
                     VStack(alignment: .leading, spacing: 0) {
                         TextField("City, airport, or code", text: bindingLeg(idx, \.destinationName))
                             .padding(8)
@@ -982,7 +982,7 @@ struct TripEditorView: View {
             )
         }
         return AnyView(
-            Text("This flight leg was removed.")
+            L10nText("This flight leg was removed.")
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black)

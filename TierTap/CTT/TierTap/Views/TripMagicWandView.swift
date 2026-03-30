@@ -182,7 +182,7 @@ struct TripMagicWandView: View {
                     }
                 }
             }
-            .navigationTitle("Suggest trips")
+            .localizedNavigationTitle("Suggest trips")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -265,12 +265,12 @@ struct TripMagicWandView: View {
             VStack(alignment: .leading, spacing: 22) {
                 wandSectionHeader("AI trip suggestions", systemImage: "wand.and.sparkles")
 
-                Text("TierTap groups completed sessions that are not already on a trip. TierTap proposes names, dates, location labels, and notes—the same upcoming, current, and historical buckets as the Trips tab.")
+                L10nText("TierTap groups completed sessions that are not already on a trip. TierTap proposes names, dates, location labels, and notes—the same upcoming, current, and historical buckets as the Trips tab.")
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.9))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Your library")
+                    L10nText("Your library")
                         .font(.caption.bold())
                         .foregroundColor(.white.opacity(0.75))
                     statRow(icon: "calendar.badge.clock", label: "Upcoming trips", value: upcomingTripCount)
@@ -314,13 +314,13 @@ struct TripMagicWandView: View {
                 .disabled(unassignedSessions.isEmpty || isWorking || !authStore.isSignedIn)
 
                 if unassignedSessions.isEmpty {
-                    Text("No unassigned completed sessions—every session is already linked to a trip, or you have no completed sessions yet.")
+                    L10nText("No unassigned completed sessions—every session is already linked to a trip, or you have no completed sessions yet.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
                 }
 
                 if !authStore.isSignedIn {
-                    Text("Sign in to use AI trip suggestions.")
+                    L10nText("Sign in to use AI trip suggestions.")
                         .font(.caption)
                         .foregroundColor(.orange)
                 }
@@ -361,7 +361,7 @@ struct TripMagicWandView: View {
 
     private var reviewContent: some View {
         VStack(spacing: 0) {
-            Text("Review each card: toggle, edit, or tap Search map for a proper place pin. Timelines match the Trips tab (upcoming, current, historical).")
+            L10nText("Review each card: toggle, edit, or tap Search map for a proper place pin. Timelines match the Trips tab (upcoming, current, historical).")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.82))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -459,7 +459,7 @@ struct TripMagicWandView: View {
     private func datePickerRow(start: Binding<Date>, end: Binding<Date>) -> some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Start")
+                L10nText("Start")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: start, displayedComponents: [.date])
@@ -474,7 +474,7 @@ struct TripMagicWandView: View {
                 .padding(.vertical, 4)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("End")
+                L10nText("End")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: end, displayedComponents: [.date])
@@ -525,7 +525,7 @@ struct TripMagicWandView: View {
             Button {
                 mapPickTargetId = draftId
             } label: {
-                Label("Search map", systemImage: "map")
+                LocalizedLabel(title: "Search map", systemImage: "map")
                     .font(.subheadline.bold())
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -552,7 +552,7 @@ struct TripMagicWandView: View {
                 .tint(.green.opacity(0.85))
 
             if sessions.isEmpty {
-                Text("Session list unavailable (IDs may be invalid).")
+                L10nText("Session list unavailable (IDs may be invalid).")
                     .font(.caption)
                     .foregroundColor(.orange.opacity(0.9))
             } else {
@@ -663,13 +663,16 @@ struct TripMagicWandView: View {
                 await MainActor.run { settingsStore.registerAICall() }
             }
 
-            let body = GeminiRequest(
-                contents: [.init(role: "user", parts: [.init(text: prompt)])]
+            let routerBody = GeminiProxyBody(
+                contents: [
+                    GeminiRequest.Content(role: "user", parts: [GeminiRequest.Part(text: prompt)])
+                ],
+                language: settingsStore.appLanguage
             )
             let response: GeminiRouterResponse = try await GeminiRouterThrottle.tripSuggestions.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
-                    options: FunctionInvokeOptions(body: body)
+                    options: FunctionInvokeOptions(body: routerBody)
                 )
             }
             let rawText = response.candidates?

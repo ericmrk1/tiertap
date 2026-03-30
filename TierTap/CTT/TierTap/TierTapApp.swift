@@ -30,6 +30,9 @@ struct TierTapApp: App {
                         .zIndex(2)
                 }
             }
+            .environment(\.locale, settingsStore.appLanguage.locale)
+            .environment(\.layoutDirection, settingsStore.appLanguage.layoutDirection)
+            .environment(\.appLanguage, settingsStore.appLanguage)
             .environmentObject(store)
             .environmentObject(tripStore)
             .environmentObject(settingsStore)
@@ -62,6 +65,7 @@ struct TierTapApp: App {
                 )
                 .environmentObject(authStore)
                 .environmentObject(settingsStore)
+                .environment(\.appLanguage, settingsStore.appLanguage)
             }
         }
     }

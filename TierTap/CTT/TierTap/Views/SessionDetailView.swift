@@ -21,7 +21,7 @@ struct SessionDetailView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "pencil.circle.fill")
-                                    Text("Complete session — add avg bet & ending tier")
+                                    L10nText("Complete session — add avg bet & ending tier")
                                         .font(.subheadline.bold())
                                 }
                                 .frame(maxWidth: .infinity).padding()
@@ -54,7 +54,7 @@ struct SessionDetailView: View {
                                        let url = ChipEstimatorPhotoStorage.url(for: fileName),
                                        let uiImage = UIImage(contentsOfFile: url.path) {
                                         VStack(alignment: .leading, spacing: 6) {
-                                            Text("Session")
+                                            L10nText("Session")
                                                 .font(.caption.bold())
                                                 .foregroundColor(.gray)
                                             Image(uiImage: uiImage)
@@ -274,7 +274,7 @@ struct SessionDetailView: View {
                     store.updateSession(s)
                 }
             }
-            .navigationTitle("Session Detail")
+            .localizedNavigationTitle("Session Detail")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

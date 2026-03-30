@@ -186,13 +186,13 @@ struct CheckInView: View {
                     VStack(spacing: 16) {
                     // Gaming Details section: vertically stacked Game then Location
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Gaming Details")
+                        L10nText("Gaming Details")
                             .font(.headline)
                             .foregroundColor(.white)
 
                         // Game — Table / Slots / Poker (wheel); Poker details below when selected
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Casino Game", systemImage: "suit.club.fill")
+                            LocalizedLabel(title: "Casino Game", systemImage: "suit.club.fill")
                                 .font(.headline)
                                 .foregroundColor(.white)
                             GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
@@ -231,27 +231,27 @@ struct CheckInView: View {
                                         }
                                         Spacer()
                                         Picker("Type of Game", selection: $pokerVariant) {
-                                            Text("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
-                                            Text("Pot Limit Omaha").tag("Pot Limit Omaha")
-                                            Text("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
-                                            Text("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
-                                            Text("Spread Limit Hold’em").tag("Spread Limit Hold’em")
-                                            Text("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
-                                            Text("Omaha Hi").tag("Omaha Hi")
-                                            Text("Omaha Hi-Lo").tag("Omaha Hi-Lo")
-                                            Text("5 Card Omaha").tag("5 Card Omaha")
-                                            Text("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
-                                            Text("7 Card Stud").tag("7 Card Stud")
-                                            Text("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
-                                            Text("Razz").tag("Razz")
-                                            Text("5 Card Draw").tag("5 Card Draw")
-                                            Text("2-7 Triple Draw").tag("2-7 Triple Draw")
-                                            Text("2-7 Single Draw").tag("2-7 Single Draw")
-                                            Text("Chinese Poker").tag("Chinese Poker")
-                                            Text("Open Face Chinese").tag("Open Face Chinese")
-                                            Text("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
-                                            Text("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
-                                            Text("Other Poker").tag("Other Poker")
+                                            L10nText("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
+                                            L10nText("Pot Limit Omaha").tag("Pot Limit Omaha")
+                                            L10nText("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
+                                            L10nText("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
+                                            L10nText("Spread Limit Hold’em").tag("Spread Limit Hold’em")
+                                            L10nText("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
+                                            L10nText("Omaha Hi").tag("Omaha Hi")
+                                            L10nText("Omaha Hi-Lo").tag("Omaha Hi-Lo")
+                                            L10nText("5 Card Omaha").tag("5 Card Omaha")
+                                            L10nText("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
+                                            L10nText("7 Card Stud").tag("7 Card Stud")
+                                            L10nText("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
+                                            L10nText("Razz").tag("Razz")
+                                            L10nText("5 Card Draw").tag("5 Card Draw")
+                                            L10nText("2-7 Triple Draw").tag("2-7 Triple Draw")
+                                            L10nText("2-7 Single Draw").tag("2-7 Single Draw")
+                                            L10nText("Chinese Poker").tag("Chinese Poker")
+                                            L10nText("Open Face Chinese").tag("Open Face Chinese")
+                                            L10nText("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
+                                            L10nText("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
+                                            L10nText("Other Poker").tag("Other Poker")
                                         }
                                         .pickerStyle(.menu)
                                         .tint(.white)
@@ -273,13 +273,13 @@ struct CheckInView: View {
                                     }
 
                                     VStack(alignment: .leading, spacing: 8) {
-                                        Text("Blinds & Structure")
+                                        L10nText("Blinds & Structure")
                                             .font(.caption.bold())
                                             .foregroundColor(.white)
 
                                         HStack(alignment: .center, spacing: 12) {
                                             VStack(spacing: 4) {
-                                                Text("SB")
+                                                L10nText("SB")
                                                     .font(.caption2)
                                                     .foregroundColor(.gray)
                                                 Picker("SB", selection: $pokerSmallBlind) {
@@ -292,7 +292,7 @@ struct CheckInView: View {
                                                 .frame(height: 80)
                                             }
                                             VStack(spacing: 4) {
-                                                Text("BB")
+                                                L10nText("BB")
                                                     .font(.caption2)
                                                     .foregroundColor(.gray)
                                                 Picker("BB", selection: $pokerBigBlind) {
@@ -305,7 +305,7 @@ struct CheckInView: View {
                                                 .frame(height: 80)
                                             }
                                             VStack(spacing: 4) {
-                                                Text("Ante")
+                                                L10nText("Ante")
                                                     .font(.caption2)
                                                     .foregroundColor(.gray)
                                                 Picker("Ante", selection: $pokerAnte) {
@@ -503,7 +503,7 @@ struct CheckInView: View {
                         // Casino — favorites chips + text field + location-based picker + public toggle
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
-                                Label("Casino Location", systemImage: "building.columns")
+                                LocalizedLabel(title: "Casino Location", systemImage: "building.columns")
                                     .font(.headline).foregroundColor(.white)
                                 Spacer()
                                 Toggle(isOn: $isCasinoPublic) {
@@ -533,7 +533,7 @@ struct CheckInView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "location.circle")
-                                    Text("Find casino near me")
+                                    L10nText("Find casino near me")
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                 }
@@ -551,13 +551,13 @@ struct CheckInView: View {
                     // Starting Tier — header with rewards selector, wheel, and value entry
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .center, spacing: 8) {
-                            Label("Starting Tier Points", systemImage: "star.circle")
+                            LocalizedLabel(title: "Starting Tier Points", systemImage: "star.circle")
                                 .font(.headline)
                                 .foregroundColor(.white)
                             Spacer()
                             if !availableRewardPrograms.isEmpty {
                                 Picker("", selection: $selectedRewardsProgram) {
-                                    Text("Select Rewards").tag("").font(.caption)
+                                    L10nText("Select Rewards").tag("").font(.caption)
                                     ForEach(availableRewardPrograms, id: \.self) { program in
                                         Text(program).tag(program)
                                     }
@@ -567,7 +567,7 @@ struct CheckInView: View {
                                 .tint(.white)
                             }
                         }
-                        Text("Check your casino loyalty app. Use wheel or type exact.")
+                        L10nText("Check your casino loyalty app. Use wheel or type exact.")
                             .font(.caption).foregroundColor(.gray)
                         HStack(spacing: 12) {
                             TierPointsWheel(selectedValue: $startingTier)
@@ -584,7 +584,7 @@ struct CheckInView: View {
 
                     // Buy-In — selector on left, value + rewards program on right
                     VStack(alignment: .leading, spacing: 10) {
-                        Label("Initial Buy-In", systemImage: "dollarsign.circle")
+                        LocalizedLabel(title: "Initial Buy-In", systemImage: "dollarsign.circle")
                             .font(.headline).foregroundColor(.white)
                         HStack(alignment: .top, spacing: 12) {
                             // Left: quick-select grid launcher for common cash amounts
@@ -630,7 +630,7 @@ struct CheckInView: View {
                         Button {
                             if store.liveSession != nil { showExistingAlert = true } else { go() }
                         } label: {
-                            Text("Let’s F@#$@ Go!")
+                            L10nText("Let’s F@#$@ Go!")
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
                                 .padding(.horizontal, 16)
@@ -653,7 +653,7 @@ struct CheckInView: View {
                 }
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("Check In")
+            .localizedNavigationTitle("Check In")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -692,7 +692,7 @@ struct CheckInView: View {
                 Button("Resume Existing", role: .cancel) { dismiss() }
                 Button("End & Start New", role: .destructive) { store.discardLiveSession(); go() }
             } message: {
-                Text("You have a live session. Resume it or end it to start a new one?")
+                L10nText("You have a live session. Resume it or end it to start a new one?")
             }
             .onAppear {
                 if casino.isEmpty, let recent = store.mostRecentCasino() {

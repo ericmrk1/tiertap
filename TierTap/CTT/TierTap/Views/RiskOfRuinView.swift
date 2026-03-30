@@ -32,7 +32,7 @@ struct RiskOfRuinView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Risk of Ruin")
+            .localizedNavigationTitle("Risk of Ruin")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -67,7 +67,7 @@ struct RiskOfRuinView: View {
                                     .lineLimit(1)
                                     .font(.caption)
                             } else {
-                                Text("Account")
+                                L10nText("Account")
                                     .font(.caption)
                             }
                         }
@@ -85,7 +85,7 @@ struct RiskOfRuinView: View {
     private var chanceOfBustingCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Label("Chance of busting out", systemImage: "exclamationmark.triangle.fill")
+                LocalizedLabel(title: "Chance of busting out", systemImage: "exclamationmark.triangle.fill")
                     .font(.headline).foregroundColor(.white)
                 Spacer()
             }
@@ -131,14 +131,14 @@ struct RiskOfRuinView: View {
 
     private var averageVsTargetCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Average vs target", systemImage: "chart.line.uptrend.xyaxis")
+            LocalizedLabel(title: "Average vs target", systemImage: "chart.line.uptrend.xyaxis")
                 .font(.headline).foregroundColor(.white)
             if result.sessionCount == 0 {
-                Text("Add closed sessions to see your average win/loss per session and compare to your target.")
+                L10nText("Add closed sessions to see your average win/loss per session and compare to your target.")
                     .font(.subheadline).foregroundColor(.gray)
             } else {
                 HStack {
-                    Text("Actual average")
+                    L10nText("Actual average")
                         .font(.subheadline).foregroundColor(.gray)
                     Spacer()
                     Text(formatDollars(result.actualAveragePerSession))
@@ -147,7 +147,7 @@ struct RiskOfRuinView: View {
                 }
                 if let target = result.targetAveragePerSession {
                     HStack {
-                        Text("Target average")
+                        L10nText("Target average")
                             .font(.subheadline).foregroundColor(.gray)
                         Spacer()
                         Text(formatDollars(target))
@@ -156,7 +156,7 @@ struct RiskOfRuinView: View {
                     if let actual = result.actualAveragePerSession {
                         let gap = actual - target
                         HStack {
-                            Text("Gap")
+                            L10nText("Gap")
                                 .font(.subheadline).foregroundColor(.gray)
                             Spacer()
                             Text((gap >= 0 ? "+" : "") + formatDollars(gap))
@@ -165,12 +165,12 @@ struct RiskOfRuinView: View {
                         }
                     }
                 } else {
-                    Text("Set a target in Settings to compare.")
+                    L10nText("Set a target in Settings to compare.")
                         .font(.caption).foregroundColor(.gray)
                 }
                 if let wr = result.winRate {
                     HStack {
-                        Text("Win rate (sessions)")
+                        L10nText("Win rate (sessions)")
                             .font(.subheadline).foregroundColor(.gray)
                         Spacer()
                         Text(String(format: "%.0f%%", wr * 100))
@@ -189,7 +189,7 @@ struct RiskOfRuinView: View {
             Image(systemName: "exclamationmark.octagon.fill")
                 .font(.title2).foregroundColor(.orange)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Bet exceeds target unit")
+                L10nText("Bet exceeds target unit")
                     .font(.headline).foregroundColor(.orange)
                 Text("Your current buy-in or average bet is above your set unit size (\(settingsStore.currencySymbol)\(result.recommendedUnitSize)). Consider lowering bet size to stay within bankroll management target.")
                     .font(.caption).foregroundColor(.gray)
@@ -215,7 +215,7 @@ struct RiskOfRuinView: View {
 
     private var mathNoteCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("How it's calculated")
+            L10nText("How it's calculated")
                 .font(.caption.bold()).foregroundColor(.gray)
             Text(settingsStore.analyticsUseExpectedValue
                  ? "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings. Match “Results basis” on Analytics."

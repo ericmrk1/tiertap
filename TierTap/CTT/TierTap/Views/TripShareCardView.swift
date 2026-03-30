@@ -175,7 +175,7 @@ struct TripShareCardView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("TierTap Trip")
+                        L10nText("TierTap Trip")
                             .font(.caption.weight(.semibold))
                             .foregroundColor(.white.opacity(0.75))
                         Text(trip.displayTitle)
@@ -231,7 +231,7 @@ struct TripShareCardView: View {
 
                 if !trip.lodgings.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Stay")
+                        L10nText("Stay")
                             .font(.headline)
                             .foregroundColor(.white)
                         ForEach(trip.lodgings) { place in
@@ -250,7 +250,7 @@ struct TripShareCardView: View {
                 if !trip.flights.legs.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
-                            Text("Flights")
+                            L10nText("Flights")
                                 .font(.headline)
                                 .foregroundColor(.white)
                             Text("(\(trip.flights.pattern.label))")
@@ -308,7 +308,7 @@ struct TripShareCardView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                     if sessions.isEmpty {
-                        Text("No sessions linked.")
+                        L10nText("No sessions linked.")
                             .font(.footnote)
                             .foregroundColor(.white.opacity(0.7))
                     } else {
@@ -328,7 +328,7 @@ struct TripShareCardView: View {
 
                 if let tripEV = tripExpectedValueSum {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Trip EV")
+                        L10nText("Trip EV")
                             .font(.headline)
                             .foregroundColor(.white)
                         Text("\(tripEV >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(tripEV).formatted(.number.grouping(.automatic)))")
@@ -339,7 +339,7 @@ struct TripShareCardView: View {
 
                 if tripCompTotal > 0 || !compRowsChronological.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("Comps (trip)", systemImage: "gift.fill")
+                        LocalizedLabel(title: "Comps (trip)", systemImage: "gift.fill")
                             .font(.headline)
                             .foregroundColor(.white)
                         if tripCompTotal > 0 {
@@ -358,7 +358,7 @@ struct TripShareCardView: View {
                             }
                         }
                         if !compRowsChronological.isEmpty {
-                            Text("Items")
+                            L10nText("Items")
                                 .font(.caption.weight(.semibold))
                                 .foregroundColor(.white.opacity(0.78))
                                 .padding(.top, tripCompTotal > 0 ? 4 : 0)
@@ -390,7 +390,7 @@ struct TripShareCardView: View {
 
                 if !tripMoodCounts.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("Session moods", systemImage: "face.smiling.fill")
+                        LocalizedLabel(title: "Session moods", systemImage: "face.smiling.fill")
                             .font(.headline)
                             .foregroundColor(.white)
                         if moodsChronological.count >= 2 {
@@ -441,7 +441,7 @@ struct TripShareCardView: View {
 
                 Spacer(minLength: 0)
 
-                Text("Shared from TierTap")
+                L10nText("Shared from TierTap")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.5))
             }

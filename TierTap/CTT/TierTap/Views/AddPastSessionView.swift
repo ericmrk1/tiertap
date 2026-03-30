@@ -168,7 +168,7 @@ struct AddPastSessionView: View {
                 }
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("Add Past Session")
+            .localizedNavigationTitle("Add Past Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -283,7 +283,7 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var gameSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("Casino Game", systemImage: "suit.club.fill")
+            LocalizedLabel(title: "Casino Game", systemImage: "suit.club.fill")
                 .font(.headline).foregroundColor(.white)
 
             GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
@@ -319,27 +319,27 @@ struct AddPastSessionView: View {
                         }
                         Spacer()
                         Picker("Type of Game", selection: $pokerVariant) {
-                            Text("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
-                            Text("Pot Limit Omaha").tag("Pot Limit Omaha")
-                            Text("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
-                            Text("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
-                            Text("Spread Limit Hold’em").tag("Spread Limit Hold’em")
-                            Text("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
-                            Text("Omaha Hi").tag("Omaha Hi")
-                            Text("Omaha Hi-Lo").tag("Omaha Hi-Lo")
-                            Text("5 Card Omaha").tag("5 Card Omaha")
-                            Text("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
-                            Text("7 Card Stud").tag("7 Card Stud")
-                            Text("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
-                            Text("Razz").tag("Razz")
-                            Text("5 Card Draw").tag("5 Card Draw")
-                            Text("2-7 Triple Draw").tag("2-7 Triple Draw")
-                            Text("2-7 Single Draw").tag("2-7 Single Draw")
-                            Text("Chinese Poker").tag("Chinese Poker")
-                            Text("Open Face Chinese").tag("Open Face Chinese")
-                            Text("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
-                            Text("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
-                            Text("Other Poker").tag("Other Poker")
+                            L10nText("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
+                            L10nText("Pot Limit Omaha").tag("Pot Limit Omaha")
+                            L10nText("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
+                            L10nText("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
+                            L10nText("Spread Limit Hold’em").tag("Spread Limit Hold’em")
+                            L10nText("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
+                            L10nText("Omaha Hi").tag("Omaha Hi")
+                            L10nText("Omaha Hi-Lo").tag("Omaha Hi-Lo")
+                            L10nText("5 Card Omaha").tag("5 Card Omaha")
+                            L10nText("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
+                            L10nText("7 Card Stud").tag("7 Card Stud")
+                            L10nText("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
+                            L10nText("Razz").tag("Razz")
+                            L10nText("5 Card Draw").tag("5 Card Draw")
+                            L10nText("2-7 Triple Draw").tag("2-7 Triple Draw")
+                            L10nText("2-7 Single Draw").tag("2-7 Single Draw")
+                            L10nText("Chinese Poker").tag("Chinese Poker")
+                            L10nText("Open Face Chinese").tag("Open Face Chinese")
+                            L10nText("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
+                            L10nText("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
+                            L10nText("Other Poker").tag("Other Poker")
                         }
                         .pickerStyle(.menu)
                         .tint(.white)
@@ -360,13 +360,13 @@ struct AddPastSessionView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Blinds & Structure")
+                        L10nText("Blinds & Structure")
                             .font(.caption.bold())
                             .foregroundColor(.white)
 
                         HStack(alignment: .center, spacing: 12) {
                             VStack(spacing: 4) {
-                                Text("SB")
+                                L10nText("SB")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                                 Picker("SB", selection: $pokerSmallBlind) {
@@ -379,7 +379,7 @@ struct AddPastSessionView: View {
                                 .frame(height: 80)
                             }
                             VStack(spacing: 4) {
-                                Text("BB")
+                                L10nText("BB")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                                 Picker("BB", selection: $pokerBigBlind) {
@@ -392,7 +392,7 @@ struct AddPastSessionView: View {
                                 .frame(height: 80)
                             }
                             VStack(spacing: 4) {
-                                Text("Ante")
+                                L10nText("Ante")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                                 Picker("Ante", selection: $pokerAnte) {
@@ -463,7 +463,7 @@ struct AddPastSessionView: View {
     @ViewBuilder private var casinoAndTimeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("Casino Location", systemImage: "building.columns")
+                LocalizedLabel(title: "Casino Location", systemImage: "building.columns")
                     .font(.headline).foregroundColor(.white)
                 Spacer()
                 Toggle(isOn: $isCasinoPublic) {
@@ -493,7 +493,7 @@ struct AddPastSessionView: View {
             } label: {
                 HStack {
                     Image(systemName: "location.circle")
-                    Text("Find casino near me")
+                    L10nText("Find casino near me")
                     Spacer()
                     Image(systemName: "chevron.right")
                 }
@@ -522,13 +522,13 @@ struct AddPastSessionView: View {
     @ViewBuilder private var startingTierSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center, spacing: 8) {
-                Label("Starting Tier Points", systemImage: "star.circle")
+                LocalizedLabel(title: "Starting Tier Points", systemImage: "star.circle")
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
                 if !availableRewardPrograms.isEmpty {
                     Picker("", selection: $selectedRewardsProgram) {
-                        Text("Select Rewards").tag("").font(.caption)
+                        L10nText("Select Rewards").tag("").font(.caption)
                         ForEach(availableRewardPrograms, id: \.self) { program in
                             Text(program).tag(program)
                         }
@@ -538,7 +538,7 @@ struct AddPastSessionView: View {
                     .tint(.white)
                 }
             }
-            Text("Check your casino loyalty app. Use wheel or type exact.")
+            L10nText("Check your casino loyalty app. Use wheel or type exact.")
                 .font(.caption).foregroundColor(.gray)
             HStack(spacing: 12) {
                 TierPointsWheel(selectedValue: $startingTier)
@@ -556,7 +556,7 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var totalBuyInSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label("Total Buy-In", systemImage: "dollarsign.circle")
+            LocalizedLabel(title: "Total Buy-In", systemImage: "dollarsign.circle")
                 .font(.headline).foregroundColor(.white)
             HStack(alignment: .top, spacing: 12) {
                 Button { showBuyInPicker = true } label: {
@@ -600,10 +600,10 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var endingTierSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Ending Tier Points", systemImage: "star.circle.fill")
+            LocalizedLabel(title: "Ending Tier Points", systemImage: "star.circle.fill")
                 .font(.headline)
                 .foregroundColor(.white)
-            Text("Use wheel or type exact.")
+            L10nText("Use wheel or type exact.")
                 .font(.caption).foregroundColor(.gray)
             HStack(spacing: 12) {
                 TierPointsWheel(selectedValue: $endingTier)
@@ -657,7 +657,7 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var moneyAndBetsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Cash Out & Avg Bets")
+            L10nText("Cash Out & Avg Bets")
                 .font(.headline)
                 .foregroundColor(.white)
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
@@ -670,7 +670,7 @@ struct AddPastSessionView: View {
                 }
             }
             VStack(alignment: .leading, spacing: 6) {
-                Text("Common amounts").font(.caption.bold()).foregroundColor(.gray)
+                L10nText("Common amounts").font(.caption.bold()).foregroundColor(.gray)
                 CommonAmountButtons(amounts: quickDenominations, selected: $avgBetActual)
                 CommonAmountButtons(amounts: quickDenominations, selected: $avgBetRated)
             }
@@ -684,7 +684,7 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var quickAddButtons: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Quick add amounts")
+            L10nText("Quick add amounts")
                 .font(.caption.bold())
                 .foregroundColor(.gray)
             ScrollView(.horizontal, showsIndicators: false) {
@@ -743,7 +743,7 @@ struct AddPastSessionView: View {
 
     @ViewBuilder private var saveButton: some View {
         Button { save() } label: {
-            Text("Save Session")
+            L10nText("Save Session")
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 32)

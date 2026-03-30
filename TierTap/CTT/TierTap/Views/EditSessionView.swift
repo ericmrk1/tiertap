@@ -80,7 +80,7 @@ struct EditSessionView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 10) {
-                            Label("Casino Game", systemImage: "suit.club.fill")
+                            LocalizedLabel(title: "Casino Game", systemImage: "suit.club.fill")
                                 .font(.headline).foregroundColor(.white)
 
                             GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
@@ -121,33 +121,33 @@ struct EditSessionView: View {
                                     }
 
                                     Picker("Poker Type", selection: $pokerVariant) {
-                                        Text("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
-                                        Text("Pot Limit Omaha").tag("Pot Limit Omaha")
-                                        Text("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
-                                        Text("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
-                                        Text("Spread Limit Hold’em").tag("Spread Limit Hold’em")
-                                        Text("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
-                                        Text("Omaha Hi").tag("Omaha Hi")
-                                        Text("Omaha Hi-Lo").tag("Omaha Hi-Lo")
-                                        Text("5 Card Omaha").tag("5 Card Omaha")
-                                        Text("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
-                                        Text("7 Card Stud").tag("7 Card Stud")
-                                        Text("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
-                                        Text("Razz").tag("Razz")
-                                        Text("5 Card Draw").tag("5 Card Draw")
-                                        Text("2-7 Triple Draw").tag("2-7 Triple Draw")
-                                        Text("2-7 Single Draw").tag("2-7 Single Draw")
-                                        Text("Chinese Poker").tag("Chinese Poker")
-                                        Text("Open Face Chinese").tag("Open Face Chinese")
-                                        Text("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
-                                        Text("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
-                                        Text("Other Poker").tag("Other Poker")
+                                        L10nText("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
+                                        L10nText("Pot Limit Omaha").tag("Pot Limit Omaha")
+                                        L10nText("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
+                                        L10nText("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
+                                        L10nText("Spread Limit Hold’em").tag("Spread Limit Hold’em")
+                                        L10nText("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
+                                        L10nText("Omaha Hi").tag("Omaha Hi")
+                                        L10nText("Omaha Hi-Lo").tag("Omaha Hi-Lo")
+                                        L10nText("5 Card Omaha").tag("5 Card Omaha")
+                                        L10nText("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
+                                        L10nText("7 Card Stud").tag("7 Card Stud")
+                                        L10nText("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
+                                        L10nText("Razz").tag("Razz")
+                                        L10nText("5 Card Draw").tag("5 Card Draw")
+                                        L10nText("2-7 Triple Draw").tag("2-7 Triple Draw")
+                                        L10nText("2-7 Single Draw").tag("2-7 Single Draw")
+                                        L10nText("Chinese Poker").tag("Chinese Poker")
+                                        L10nText("Open Face Chinese").tag("Open Face Chinese")
+                                        L10nText("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
+                                        L10nText("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
+                                        L10nText("Other Poker").tag("Other Poker")
                                     }
                                     .pickerStyle(.menu)
                                     .tint(.white)
 
                                     VStack(alignment: .leading, spacing: 6) {
-                                        Text("Blinds & Structure")
+                                        L10nText("Blinds & Structure")
                                             .font(.caption.bold())
                                             .foregroundColor(.white)
 
@@ -182,7 +182,7 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Casino").font(.subheadline.bold()).foregroundColor(.white)
+                            L10nText("Casino").font(.subheadline.bold()).foregroundColor(.white)
                             TextField("Casino name", text: $casino).textFieldStyle(DarkTextFieldStyle())
                             DatePicker("Date", selection: $date, displayedComponents: .date).colorScheme(.dark)
                             HStack(spacing: 12) {
@@ -208,17 +208,17 @@ struct EditSessionView: View {
 
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
-                                Text("Comps").font(.headline).foregroundColor(.white)
+                                L10nText("Comps").font(.headline).foregroundColor(.white)
                                 Spacer()
                                 Text("Total: \(settingsStore.currencySymbol)\(compTotal)")
                                     .font(.title3.bold()).foregroundColor(.white)
                             }
                             if compEvents.isEmpty {
-                                Text("No comps logged yet.")
+                                L10nText("No comps logged yet.")
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
                             } else {
-                                Text("Tap a row to edit, or use the menu to delete.")
+                                L10nText("Tap a row to edit, or use the menu to delete.")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                                 ForEach(compEvents) { ev in
@@ -275,7 +275,7 @@ struct EditSessionView: View {
                             Button {
                                 showCompSheet = true
                             } label: {
-                                Label("Add Comp", systemImage: "gift.fill")
+                                LocalizedLabel(title: "Add Comp", systemImage: "gift.fill")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 14)
@@ -290,12 +290,12 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         VStack(alignment: .leading, spacing: 12) {
-                            Label("Session Photos", systemImage: "photo.on.rectangle.angled")
+                            LocalizedLabel(title: "Session Photos", systemImage: "photo.on.rectangle.angled")
                                 .font(.headline)
                                 .foregroundColor(.white)
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Session")
+                                L10nText("Session")
                                     .font(.caption.bold())
                                     .foregroundColor(.gray)
                                 ZStack {
@@ -315,7 +315,7 @@ struct EditSessionView: View {
                                             Image(systemName: "camera.viewfinder")
                                                 .font(.system(size: 24))
                                                 .foregroundColor(.gray)
-                                            Text("Add a photo from this session")
+                                            L10nText("Add a photo from this session")
                                                 .font(.caption)
                                                 .foregroundColor(.gray)
                                         }
@@ -328,7 +328,7 @@ struct EditSessionView: View {
                                     Button {
                                         sessionPhotoSource = .camera
                                     } label: {
-                                        Label("Camera", systemImage: "camera")
+                                        LocalizedLabel(title: "Camera", systemImage: "camera")
                                             .font(.caption.bold())
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
@@ -340,7 +340,7 @@ struct EditSessionView: View {
                                     Button {
                                         sessionPhotoSource = .photoLibrary
                                     } label: {
-                                        Label("Photo Library", systemImage: "photo")
+                                        LocalizedLabel(title: "Photo Library", systemImage: "photo")
                                             .font(.caption.bold())
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
@@ -366,7 +366,7 @@ struct EditSessionView: View {
 
                             if compEvents.contains(where: { compHasReceiptPhoto($0.id) }) {
                                 VStack(alignment: .leading, spacing: 10) {
-                                    Text("Comp receipts")
+                                    L10nText("Comp receipts")
                                         .font(.caption.bold())
                                         .foregroundColor(.gray)
                                     ForEach(compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
@@ -391,7 +391,7 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Private notes (not shared)")
+                            L10nText("Private notes (not shared)")
                                 .font(.caption.bold())
                                 .foregroundColor(.gray)
                             TextEditor(text: $privateNotes)
@@ -407,7 +407,7 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         Button { save() } label: {
-                            Text("Save Changes")
+                            L10nText("Save Changes")
                                 .frame(maxWidth: .infinity).padding()
                                 .background(isValid ? Color.green : Color.gray)
                                 .foregroundColor(isValid ? .black : .white)
@@ -418,7 +418,7 @@ struct EditSessionView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Edit Session")
+            .localizedNavigationTitle("Edit Session")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -770,7 +770,7 @@ private struct EditCompEventSheet: View {
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Comp type")
+                            L10nText("Comp type")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
                             HStack(spacing: 8) {
@@ -795,7 +795,7 @@ private struct EditCompEventSheet: View {
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Details (optional)")
+                            L10nText("Details (optional)")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
                             TextField("Host name, promo…", text: $detailsText, axis: .vertical)
@@ -807,7 +807,7 @@ private struct EditCompEventSheet: View {
                             .colorScheme(.dark)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Receipt photo")
+                            L10nText("Receipt photo")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
                             ZStack {
@@ -835,7 +835,7 @@ private struct EditCompEventSheet: View {
                                 Button {
                                     compPhotoSource = .camera
                                 } label: {
-                                    Label("Camera", systemImage: "camera")
+                                    LocalizedLabel(title: "Camera", systemImage: "camera")
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
@@ -846,7 +846,7 @@ private struct EditCompEventSheet: View {
                                 Button {
                                     compPhotoSource = .photoLibrary
                                 } label: {
-                                    Label("Library", systemImage: "photo")
+                                    LocalizedLabel(title: "Library", systemImage: "photo")
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
@@ -859,7 +859,7 @@ private struct EditCompEventSheet: View {
                                         compPhoto = nil
                                         photoExplicitlyRemoved = true
                                     } label: {
-                                        Label("Remove", systemImage: "trash")
+                                        LocalizedLabel(title: "Remove", systemImage: "trash")
                                             .font(.caption.bold())
                                     }
                                 }
@@ -869,7 +869,7 @@ private struct EditCompEventSheet: View {
                         Button {
                             save()
                         } label: {
-                            Text("Save comp")
+                            L10nText("Save comp")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -882,7 +882,7 @@ private struct EditCompEventSheet: View {
                     .padding()
                 }
             }
-            .navigationTitle("Edit comp")
+            .localizedNavigationTitle("Edit comp")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

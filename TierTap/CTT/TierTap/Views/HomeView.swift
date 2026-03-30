@@ -72,20 +72,20 @@ struct HomeView: View {
                         if store.liveSession != nil {
                             HStack(spacing: 12) {
                                 Button { showAddPast = true } label: {
-                                    Label("Add Past Session", systemImage: "clock.arrow.circlepath")
+                                    LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
                                         .frame(maxWidth: .infinity).padding()
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                                 }
                                 Button { showHistory = true } label: {
-                                    Label("History", systemImage: "list.bullet.rectangle")
+                                    LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
                                         .frame(maxWidth: .infinity).padding()
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                                 }
                             }
                             Button { showBankroll = true } label: {
-                                Label("Bankroll", systemImage: "dollarsign.circle.fill")
+                                LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
                                     .background(Color(.systemGray6).opacity(0.25))
@@ -94,7 +94,7 @@ struct HomeView: View {
                                     .font(.title3.bold())
                             }
                             Button { showLive = true } label: {
-                                Label("Finish Live Session", systemImage: "play.circle.fill")
+                                LocalizedLabel(title: "Finish Live Session", systemImage: "play.circle.fill")
                                     .frame(maxWidth: .infinity).padding()
                                     .font(.headline)
                                     .foregroundColor(.white)
@@ -104,7 +104,7 @@ struct HomeView: View {
                                 Button {
                                     showCompSheet = true
                                 } label: {
-                                    Label("Add Comp", systemImage: "gift.fill")
+                                    LocalizedLabel(title: "Add Comp", systemImage: "gift.fill")
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 18)
                                         .padding(.horizontal)
@@ -115,7 +115,7 @@ struct HomeView: View {
                                 Button {
                                     showBuyInSheet = true
                                 } label: {
-                                    Label("Add Buy-In", systemImage: "plus.circle")
+                                    LocalizedLabel(title: "Add Buy-In", systemImage: "plus.circle")
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 18)
                                         .padding(.horizontal)
@@ -126,7 +126,7 @@ struct HomeView: View {
                             }
                         } else {
                             Button { showBankroll = true } label: {
-                                Label("Bankroll", systemImage: "dollarsign.circle.fill")
+                                LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
                                     .background(Color(.systemGray6).opacity(0.25))
@@ -138,13 +138,13 @@ struct HomeView: View {
                         if store.liveSession == nil {
                             HStack(spacing: 12) {
                                 Button { showAddPast = true } label: {
-                                    Label("Add Past Session", systemImage: "clock.arrow.circlepath")
+                                    LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
                                         .frame(maxWidth: .infinity).padding()
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                                 }
                                 Button { showHistory = true } label: {
-                                    Label("History", systemImage: "list.bullet.rectangle")
+                                    LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
                                         .frame(maxWidth: .infinity).padding()
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.white).cornerRadius(14).font(.subheadline)
@@ -153,7 +153,7 @@ struct HomeView: View {
                         }
                         if store.liveSession == nil {
                             Button { showCheckIn = true } label: {
-                                Label("Check In", systemImage: "plus.circle.fill")
+                                LocalizedLabel(title: "Check In", systemImage: "plus.circle.fill")
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
                                     .padding(.horizontal)
@@ -269,7 +269,7 @@ struct LiveNowCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Circle().fill(Color.red).frame(width: 8, height: 8)
-                    Text("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
+                    L10nText("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
                 }
                 Text(session.casino).font(.subheadline.weight(.semibold)).foregroundColor(.white)
                 Text(session.game).font(.caption).foregroundColor(.gray)
@@ -307,7 +307,7 @@ struct LiveNowCard: View {
                     }
                     .accessibilityLabel("Private notes")
                     Button { showStrategyOdds = true } label: {
-                        Text("Strategy/Odds")
+                        L10nText("Strategy/Odds")
                             .font(.caption.weight(.medium))
                             .foregroundColor(.green)
                             .padding(.horizontal, 12)
@@ -495,7 +495,7 @@ struct TapLevelLevelUpCelebrationView: View {
                 Button {
                     onDismiss()
                 } label: {
-                    Text("Awesome!")
+                    L10nText("Awesome!")
                         .font(.headline)
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
@@ -541,7 +541,7 @@ struct TapLevelShareCard: View {
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.8))
                 Spacer()
-                Text("TierTap")
+                L10nText("TierTap")
                     .font(.caption.weight(.medium))
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -563,12 +563,12 @@ struct TapLevelLevelsExplainerSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 List {
                     Section {
-                        Text("Your level (1–1,000) is based on sessions logged, tier point gains, and sessions where you enter both rated and actual avg bet. Each level needs 50 more raw score. Session milestones are on a scale of 10,000.")
+                        L10nText("Your level (1–1,000) is based on sessions logged, tier point gains, and sessions where you enter both rated and actual avg bet. Each level needs 50 more raw score. Session milestones are on a scale of 10,000.")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.9))
                             .listRowBackground(Color.white.opacity(0.08))
                     }
-                    Section(header: Text("Your progress").foregroundColor(.gray)) {
+                    Section(header: L10nText("Your progress").foregroundColor(.gray)) {
                         HStack(spacing: 8) {
                             Text(tapLevel.sessionMilestoneEmoji)
                                 .font(.title)
@@ -584,7 +584,7 @@ struct TapLevelLevelsExplainerSheet: View {
                         }
                         .listRowBackground(Color.white.opacity(0.08))
                     }
-                    Section(header: Text("Session milestones (scale of 10,000)").foregroundColor(.gray)) {
+                    Section(header: L10nText("Session milestones (scale of 10,000)").foregroundColor(.gray)) {
                         ForEach(Array(TapLevel.sessionMilestones.enumerated()), id: \.offset) { _, milestone in
                             let achieved = tapLevel.sessionCount >= milestone.sessions
                             HStack(alignment: .center, spacing: 12) {
@@ -609,7 +609,7 @@ struct TapLevelLevelsExplainerSheet: View {
                             .padding(.vertical, 6)
                         }
                     }
-                    Section(header: Text("Level bands (1–1,000)").foregroundColor(.gray)) {
+                    Section(header: L10nText("Level bands (1–1,000)").foregroundColor(.gray)) {
                         ForEach(Array(TapLevel.levelBandsForExplainer.enumerated()), id: \.offset) { _, band in
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack(alignment: .firstTextBaseline) {
@@ -631,7 +631,7 @@ struct TapLevelLevelsExplainerSheet: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Tap Levels")
+            .localizedNavigationTitle("Tap Levels")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

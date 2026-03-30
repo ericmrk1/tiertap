@@ -19,7 +19,7 @@ struct WatchLiveView: View {
                         .scaledToFit()
                         .frame(width: 24, height: 24)
                     Circle().fill(Color.red).frame(width: 6, height: 6)
-                    Text("LIVE").font(.caption2.bold()).foregroundColor(.red)
+                    L10nText("LIVE").font(.caption2.bold()).foregroundColor(.red)
                 }
 
                 Text(s.casino)
@@ -47,7 +47,7 @@ struct WatchLiveView: View {
                 Text("Total buy-in $\(s.totalBuyIn.formatted(.number.grouping(.automatic)))")
                     .font(.caption2)
 
-                Text("Rebuy").font(.caption2)
+                L10nText("Rebuy").font(.caption2)
                 HStack(spacing: 6) {
                     ForEach(rebuyAmounts, id: \.self) { amt in
                         Button("$\(amt)") {
@@ -61,7 +61,7 @@ struct WatchLiveView: View {
                 Button {
                     store.closeSessionCashOutOnly(cashOut: s.totalBuyIn)
                 } label: {
-                    Label("Stop session", systemImage: "stop.circle.fill")
+                    LocalizedLabel(title: "Stop session", systemImage: "stop.circle.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -69,7 +69,7 @@ struct WatchLiveView: View {
             }
             .padding()
         }
-        .navigationTitle("Remote")
+        .localizedNavigationTitle("Remote")
         .onReceive(ticker) { _ in
             elapsed = Date().timeIntervalSince(s.startTime)
         }

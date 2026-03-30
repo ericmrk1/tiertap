@@ -23,32 +23,32 @@ struct RootTabView: View {
         TabView(selection: $selectedTab) {
             AnalyticsView()
                 .tabItem {
-                    Label("Analytics", systemImage: "chart.pie.fill")
+                    LocalizedLabel(title: "Analytics", systemImage: "chart.pie.fill")
                 }
                 .tag(MainTab.analytics)
 
             TripsView()
                 .tabItem {
-                    Label("Trips", systemImage: "suitcase.fill")
+                    LocalizedLabel(title: "Trips", systemImage: "suitcase.fill")
                 }
                 .tag(MainTab.trips)
 
             HomeView()
                 .tabItem {
-                    Label("Sessions", systemImage: "play.circle.fill")
+                    LocalizedLabel(title: "Sessions", systemImage: "play.circle.fill")
                 }
                 .tag(MainTab.sessions)
 
             CommunitySessionsView()
                 .id(authStore.isSignedIn)
                 .tabItem {
-                    Label("Community", systemImage: "person.3.sequence.fill")
+                    LocalizedLabel(title: "Community", systemImage: "person.3.sequence.fill")
                 }
                 .tag(MainTab.community)
 
             SettingsView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
+                    LocalizedLabel(title: "Settings", systemImage: "gearshape.fill")
                 }
                 .tag(MainTab.settings)
         }
@@ -62,6 +62,7 @@ struct RootTabView: View {
                 showGASupportFromMoodDownswing = false
             })
             .environmentObject(settingsStore)
+            .environment(\.appLanguage, settingsStore.appLanguage)
         }
         #endif
     }
@@ -172,7 +173,7 @@ struct CommunitySessionsView: View {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.system(size: 36, weight: .bold))
                                     .foregroundColor(.yellow)
-                                Text("Connect Supabase to see the community feed.")
+                                L10nText("Connect Supabase to see the community feed.")
                                     .font(.subheadline)
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
@@ -184,12 +185,12 @@ struct CommunitySessionsView: View {
                                 Image(systemName: "person.crop.circle.badge.exclam")
                                     .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(.white)
-                                Text("Sign in to view the community feed.")
+                                L10nText("Sign in to view the community feed.")
                                     .font(.subheadline)
                                     .foregroundColor(.white.opacity(0.9))
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal)
-                                Text("Use the Account button in the top right to sign in.")
+                                L10nText("Use the Account button in the top right to sign in.")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.7))
                                     .multilineTextAlignment(.center)
@@ -205,12 +206,12 @@ struct CommunitySessionsView: View {
                                 Image(systemName: "person.3.sequence.fill")
                                     .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(.white.opacity(0.8))
-                                Text("No community sessions have been published yet.")
+                                L10nText("No community sessions have been published yet.")
                                     .font(.subheadline)
                                     .foregroundColor(.white.opacity(0.9))
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal)
-                                Text("Be the first to publish your sessions using the button at the bottom.")
+                                L10nText("Be the first to publish your sessions using the button at the bottom.")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.75))
                                     .multilineTextAlignment(.center)
@@ -237,7 +238,7 @@ struct CommunitySessionsView: View {
                                                     .tint(.white)
                                             } else {
                                                 Image(systemName: "arrow.down.circle.fill")
-                                                Text("Load more")
+                                                L10nText("Load more")
                                                     .fontWeight(.semibold)
                                             }
                                         }
@@ -264,7 +265,7 @@ struct CommunitySessionsView: View {
                         await reloadCommunityFeed()
                     }
                 }
-            .navigationTitle("Community")
+            .localizedNavigationTitle("Community")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -274,7 +275,7 @@ struct CommunitySessionsView: View {
                         Button {
                             presentCommunityMap(with: visibleFeedSessions)
                         } label: {
-                            Text("🌐")
+                            L10nText("🌐")
                                 .font(.title2)
                         }
                         .foregroundColor(.white)
@@ -311,7 +312,7 @@ struct CommunitySessionsView: View {
                                     .lineLimit(1)
                                     .font(.caption)
                             } else {
-                                Text("Account")
+                                L10nText("Account")
                                     .font(.caption)
                             }
                         }
@@ -357,7 +358,7 @@ struct CommunitySessionsView: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "paperplane.circle.fill")
-                                Text("Publish Sessions")
+                                L10nText("Publish Sessions")
                                     .fontWeight(.semibold)
                             }
                             .font(.headline)
@@ -447,7 +448,7 @@ struct CommunityAuthSheet: View {
                         .padding(20)
                 }
             }
-            .navigationTitle("Account")
+            .localizedNavigationTitle("Account")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -485,7 +486,7 @@ struct CommunityAuthSheet: View {
 
     private var profileSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Profile")
+            L10nText("Profile")
                 .font(.title2.bold())
                 .foregroundColor(.white)
 
@@ -517,7 +518,7 @@ struct CommunityAuthSheet: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "camera.fill")
-                                Text("Take photo")
+                                L10nText("Take photo")
                                     .font(.subheadline.bold())
                             }
                             .padding(.horizontal, 12)
@@ -533,7 +534,7 @@ struct CommunityAuthSheet: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "photo.on.rectangle")
-                                Text("Choose from library")
+                                L10nText("Choose from library")
                                     .font(.subheadline.bold())
                             }
                             .padding(.horizontal, 12)
@@ -546,7 +547,7 @@ struct CommunityAuthSheet: View {
                     }
                 }
 
-                Text("Display name")
+                L10nText("Display name")
                     .font(.subheadline.bold())
                     .foregroundColor(.white.opacity(0.9))
                 TextField("Your name", text: $profileDisplayName)
@@ -588,7 +589,7 @@ struct CommunityAuthSheet: View {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
-                    Text("Saved")
+                    L10nText("Saved")
                         .font(.subheadline)
                         .foregroundColor(.green)
                 }
@@ -627,11 +628,11 @@ struct CommunityAuthSheet: View {
                     .frame(maxWidth: 120)
                     .shadow(radius: 10)
 
-                Text("Your TierTap Account")
+                L10nText("Your TierTap Account")
                     .font(.title2.bold())
                     .foregroundColor(.white)
 
-                Text("Sign in to unlock advanced AI features, sync your data, and join Community sessions.")
+                L10nText("Sign in to unlock advanced AI features, sync your data, and join Community sessions.")
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
@@ -639,7 +640,7 @@ struct CommunityAuthSheet: View {
             .padding(.bottom, 4)
 
             if !SupabaseConfig.isConfigured {
-                Text("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.")
+                L10nText("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
@@ -656,7 +657,7 @@ struct CommunityAuthSheet: View {
                             .foregroundStyle(settingsStore.primaryGradient)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Signed in")
+                            L10nText("Signed in")
                                 .font(.headline)
                                 .foregroundColor(.white)
                             if let name = authStore.userDisplayName, !name.isEmpty {
@@ -692,15 +693,15 @@ struct CommunityAuthSheet: View {
                 .tint(.red)
             } else {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Why create an account?")
+                    L10nText("Why create an account?")
                         .font(.headline)
                         .foregroundColor(.white)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("Advanced AI summaries and guidance for your sessions.", systemImage: "wand.and.stars")
-                        Label("Sync your sessions and bankroll safely across devices.", systemImage: "icloud")
-                        Label("See and publish Community sessions with other players.", systemImage: "person.3.sequence.fill")
-                        Label("Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
+                        LocalizedLabel(title: "Advanced AI summaries and guidance for your sessions.", systemImage: "wand.and.stars")
+                        LocalizedLabel(title: "Sync your sessions and bankroll safely across devices.", systemImage: "icloud")
+                        LocalizedLabel(title: "See and publish Community sessions with other players.", systemImage: "person.3.sequence.fill")
+                        LocalizedLabel(title: "Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
                     }
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.9))
@@ -715,7 +716,7 @@ struct CommunityAuthSheet: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "apple.logo")
-                        Text("Sign in with Apple")
+                        L10nText("Sign in with Apple")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
@@ -732,7 +733,7 @@ struct CommunityAuthSheet: View {
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "globe")
-                        Text("Sign in with Google")
+                        L10nText("Sign in with Google")
                     }
                     .font(.headline)
                     .foregroundColor(.black)
@@ -745,11 +746,11 @@ struct CommunityAuthSheet: View {
                 .disabled(authStore.isLoading)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Email")
+                    L10nText("Email")
                         .font(.headline)
                         .foregroundColor(.white)
 
-                    Text("We'll email a one-time sign-in link — no password.")
+                    L10nText("We'll email a one-time sign-in link — no password.")
                         .font(.footnote)
                         .foregroundColor(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
@@ -798,7 +799,7 @@ struct CommunityAuthSheet: View {
                     )
 
                     if authStore.otpSent {
-                        Text("Open the link in the email on this device to finish signing in. You can leave this screen open or close it.")
+                        L10nText("Open the link in the email on this device to finish signing in. You can leave this screen open or close it.")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
@@ -808,7 +809,7 @@ struct CommunityAuthSheet: View {
                 Button {
                     onDismiss()
                 } label: {
-                    Text("Continue without an account")
+                    L10nText("Continue without an account")
                         .font(.subheadline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
@@ -817,7 +818,7 @@ struct CommunityAuthSheet: View {
                         .cornerRadius(12)
                 }
 
-                Text("You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
+                L10nText("You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
@@ -1372,7 +1373,7 @@ struct CommunityFeedRow: View {
                         )
                         .accessibilityLabel("Rating diff \(Int(diff)) percent")
                 } else if metrics?.avg_bet_actual != nil || metrics?.avg_bet_rated != nil {
-                    Text("Rating Diff N/A")
+                    L10nText("Rating Diff N/A")
                         .font(.caption.bold())
                         .foregroundColor(.white.opacity(0.85))
                         .padding(.horizontal, 10)
@@ -1395,7 +1396,7 @@ struct CommunityFeedRow: View {
                                 .fill(tierDeltaColor)
                         )
                 } else if metrics?.tiers_per_hour == nil {
-                    Text("PTS")
+                    L10nText("PTS")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
                         .padding(.horizontal, 8)
@@ -1541,7 +1542,7 @@ struct CommunityFeedFiltersView: View {
                 }
             } label: {
                 HStack(alignment: .center, spacing: 8) {
-                    Label("Filters", systemImage: "line.3.horizontal.decrease.circle")
+                    LocalizedLabel(title: "Filters", systemImage: "line.3.horizontal.decrease.circle")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                         .labelStyle(.titleAndIcon)
@@ -1574,13 +1575,13 @@ struct CommunityFeedFiltersView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Label("Date & time range", systemImage: "calendar")
+                        LocalizedLabel(title: "Date & time range", systemImage: "calendar")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.9))
 
                         VStack(alignment: .leading, spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("From")
+                                L10nText("From")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.8))
                                 DatePicker(
@@ -1594,7 +1595,7 @@ struct CommunityFeedFiltersView: View {
                             }
 
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("To")
+                                L10nText("To")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.8))
                                 DatePicker(
@@ -1612,7 +1613,7 @@ struct CommunityFeedFiltersView: View {
                     if !availableGames.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Label("Games", systemImage: "suit.club.fill")
+                                LocalizedLabel(title: "Games", systemImage: "suit.club.fill")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.9))
                                 Spacer()
@@ -1652,7 +1653,7 @@ struct CommunityFeedFiltersView: View {
                     if !availableLocations.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Label("Locations", systemImage: "mappin.and.ellipse")
+                                LocalizedLabel(title: "Locations", systemImage: "mappin.and.ellipse")
                                     .font(.caption)
                                     .foregroundColor(.white.opacity(0.9))
                                 Spacer()
@@ -1701,7 +1702,7 @@ struct CommunityFeedFiltersView: View {
                                     .tint(.white)
                             } else {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
-                                Text("Apply Filters")
+                                L10nText("Apply Filters")
                             }
                         }
                         .font(.subheadline.bold())
@@ -1793,20 +1794,20 @@ struct CommunityFeedMapSheet: View {
                             VStack(spacing: 16) {
                                 ProgressView()
                                     .tint(.white)
-                                Text("Loading casino locations…")
+                                L10nText("Loading casino locations…")
                                     .font(.subheadline)
                                     .foregroundColor(.white.opacity(0.9))
                                     .multilineTextAlignment(.center)
                             }
                             .padding()
                         } else if sessionCasinoNames.isEmpty {
-                            Text("No casino locations in these sessions.")
+                            L10nText("No casino locations in these sessions.")
                                 .font(.subheadline)
                                 .foregroundColor(.white.opacity(0.9))
                                 .multilineTextAlignment(.center)
                                 .padding()
                         } else {
-                            Text("No mapped casino locations for this feed yet.")
+                            L10nText("No mapped casino locations for this feed yet.")
                                 .font(.subheadline)
                                 .foregroundColor(.white.opacity(0.9))
                                 .multilineTextAlignment(.center)
@@ -1833,7 +1834,7 @@ struct CommunityFeedMapSheet: View {
                     .ignoresSafeArea()
                 }
             }
-            .navigationTitle("Session Map")
+            .localizedNavigationTitle("Session Map")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1924,14 +1925,14 @@ struct CommunitySessionPublishSelectionView: View {
                         Image(systemName: "person.3.sequence.fill")
                             .font(.system(size: 40))
                             .foregroundColor(.gray)
-                        Text("No completed sessions available to publish.")
+                        L10nText("No completed sessions available to publish.")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }
                 } else {
                     List {
                         Section(
-                            header: Text("Add a short comment (optional)").foregroundColor(.gray),
+                            header: L10nText("Add a short comment (optional)").foregroundColor(.gray),
                             footer: Text("One line in the feed. \(postComment.count)/\(ProfanityChecker.maxCommentLength) characters")
                                 .foregroundColor(.gray.opacity(0.8))
                         ) {
@@ -1948,12 +1949,12 @@ struct CommunitySessionPublishSelectionView: View {
                         }
 
                         Section(
-                            header: Text("Share details").foregroundColor(.secondary),
-                            footer: Text("Tier/hour, comps, and wins/losses are optional.")
+                            header: L10nText("Share details").foregroundColor(.secondary),
+                            footer: L10nText("Tier/hour, comps, and wins/losses are optional.")
                                 .foregroundColor(.gray.opacity(0.8))
                         ) {
                             Toggle(isOn: $publishTierPerHour) {
-                                Text("Tier / hour")
+                                L10nText("Tier / hour")
                                     .foregroundColor(.white)
                             }
                             .tint(.green)
@@ -1961,9 +1962,9 @@ struct CommunitySessionPublishSelectionView: View {
 
                             Toggle(isOn: $publishCompDetails) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Comp details")
+                                    L10nText("Comp details")
                                         .foregroundColor(.white)
-                                    Text("Count and total estimated value")
+                                    L10nText("Count and total estimated value")
                                         .font(.caption2)
                                         .foregroundColor(.gray)
                                 }
@@ -1972,14 +1973,14 @@ struct CommunitySessionPublishSelectionView: View {
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
 
                             Toggle(isOn: $publishWinLoss) {
-                                Text("Publish wins / losses")
+                                L10nText("Publish wins / losses")
                                     .foregroundColor(.white)
                             }
                             .tint(.green)
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
 
-                        Section(header: Text("Choose sessions to publish").foregroundColor(.primary)) {
+                        Section(header: L10nText("Choose sessions to publish").foregroundColor(.primary)) {
                             ScrollView {
                                 LazyVStack(spacing: 0) {
                                     ForEach(Array(sortedSessions.enumerated()), id: \.element.id) { index, session in
@@ -2006,7 +2007,7 @@ struct CommunitySessionPublishSelectionView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Publish Sessions")
+            .localizedNavigationTitle("Publish Sessions")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -2036,7 +2037,7 @@ struct CommunitySessionPublishSelectionView: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "checkmark.circle.fill")
-                                    Text("Select All Sessions")
+                                    L10nText("Select All Sessions")
                                         .lineLimit(2)
                                         .minimumScaleFactor(0.8)
                                         .multilineTextAlignment(.center)
@@ -2057,7 +2058,7 @@ struct CommunitySessionPublishSelectionView: View {
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "xmark.circle.fill")
-                                    Text("Clear All")
+                                    L10nText("Clear All")
                                 }
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.white)
@@ -2089,7 +2090,7 @@ struct CommunitySessionPublishSelectionView: View {
                                     ProgressView()
                                         .tint(.black)
                                 } else {
-                                    Text("Publish")
+                                    L10nText("Publish")
                                         .fontWeight(.semibold)
                                 }
                             }
@@ -2212,7 +2213,7 @@ private struct CommunitySessionSelectableRow: View {
                         Text(session.game)
                             .font(.caption)
                             .foregroundColor(.gray)
-                        Text("•")
+                        L10nText("•")
                             .font(.caption)
                             .foregroundColor(.gray)
                         Text(session.startTime, style: .date)

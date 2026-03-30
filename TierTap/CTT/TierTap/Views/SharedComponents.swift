@@ -162,7 +162,7 @@ struct SlotSessionNotesOnlySection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Notes (optional)")
+            L10nText("Notes (optional)")
                 .font(.caption2)
                 .foregroundColor(.gray)
             TextField("Denom, room, machine notes…", text: $slotNotes, axis: .vertical)
@@ -460,7 +460,7 @@ struct GamePickerView: View {
                                 )
                             )
                         } header: {
-                            Text("Not in list")
+                            L10nText("Not in list")
                                 .foregroundColor(.gray)
                         }
                     }
@@ -643,7 +643,7 @@ struct PokerPerformanceSummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Poker Performance")
+                L10nText("Poker Performance")
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
@@ -655,7 +655,7 @@ struct PokerPerformanceSummaryCard: View {
             }
 
             if useExpectedValue {
-                Text("Basis: EV (cash net + comps)")
+                L10nText("Basis: EV (cash net + comps)")
                     .font(.caption2)
                     .foregroundColor(.gray)
             }
@@ -726,18 +726,18 @@ struct PokerROITrendChartCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Poker ROI Over Time")
+                L10nText("Poker ROI Over Time")
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
             }
             if useExpectedValue {
-                Text("Per session: EV (cash + comps) ÷ initial buy-in")
+                L10nText("Per session: EV (cash + comps) ÷ initial buy-in")
                     .font(.caption2)
                     .foregroundColor(.gray)
             }
             if points.isEmpty {
-                Text("Add a few poker sessions to see ROI trends over time.")
+                L10nText("Add a few poker sessions to see ROI trends over time.")
                     .font(.caption)
                     .foregroundColor(.gray)
             } else {
@@ -888,7 +888,7 @@ struct BuyInGridSheet: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
             }
-            .navigationTitle("Initial Buy-In")
+            .localizedNavigationTitle("Initial Buy-In")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -942,10 +942,10 @@ struct BuyInQuickAddSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
-                        Text("Add Buy-In")
+                        L10nText("Add Buy-In")
                             .font(.title2.bold())
                             .foregroundColor(.white)
-                        Text("Tap a common denomination or enter a custom amount.")
+                        L10nText("Tap a common denomination or enter a custom amount.")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
@@ -977,7 +977,7 @@ struct BuyInQuickAddSheet: View {
                                 customAmount = ""
                             }
                         } label: {
-                            Text("Add Custom Amount to Total")
+                            L10nText("Add Custom Amount to Total")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(isCustomValid ? Color.green : Color.gray)
@@ -1023,7 +1023,7 @@ struct BuyInQuickAddSheet: View {
                 }
                 .padding()
             }
-            .navigationTitle("Buy-In")
+            .localizedNavigationTitle("Buy-In")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1109,7 +1109,7 @@ private struct CompEstimateReviewSheet: View {
                                 .foregroundColor(.white)
                                 .fixedSize(horizontal: false, vertical: true)
 
-                            Text("Why this amount")
+                            L10nText("Why this amount")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
                             Text(reason)
@@ -1117,7 +1117,7 @@ private struct CompEstimateReviewSheet: View {
                                 .foregroundColor(.white.opacity(0.95))
                                 .fixedSize(horizontal: false, vertical: true)
 
-                            Text("Accept fills Est. value. Details only adds a short note that TierTap AI performed the estimate—not the explanation above.")
+                            L10nText("Accept fills Est. value. Details only adds a short note that TierTap AI performed the estimate—not the explanation above.")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                                 .padding(.top, 4)
@@ -1129,7 +1129,7 @@ private struct CompEstimateReviewSheet: View {
 
                     HStack(spacing: 12) {
                         Button(action: onDecline) {
-                            Text("Decline")
+                            L10nText("Decline")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 20)
@@ -1144,7 +1144,7 @@ private struct CompEstimateReviewSheet: View {
                         .buttonStyle(.plain)
 
                         Button(action: onAccept) {
-                            Text("Accept")
+                            L10nText("Accept")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 20)
@@ -1160,7 +1160,7 @@ private struct CompEstimateReviewSheet: View {
                     .background(Color.black.opacity(0.12))
                 }
             }
-            .navigationTitle("Comp estimate")
+            .localizedNavigationTitle("Comp estimate")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(
                 LinearGradient(
@@ -1297,7 +1297,7 @@ struct CompQuickAddSheet: View {
                     VStack(spacing: 20) {
                         HStack(alignment: .center, spacing: 14) {
                             VStack(spacing: 10) {
-                                Text("Add Comp")
+                                L10nText("Add Comp")
                                     .font(.title2.bold())
                                     .foregroundColor(.white)
                                 Text("\(settingsStore.currencySymbol)\(parsedValueForSubmit.formatted(.number.grouping(.automatic)))")
@@ -1337,7 +1337,7 @@ struct CompQuickAddSheet: View {
                         .padding(.top, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Comp type")
+                            L10nText("Comp type")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
                             HStack(spacing: 12) {
@@ -1355,7 +1355,7 @@ struct CompQuickAddSheet: View {
                         if selectedKind == .foodBeverage {
                             HStack(alignment: .top, spacing: 12) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text("Details (optional)")
+                                    L10nText("Details (optional)")
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundColor(.gray)
                                     detailsOptionalEditorField()
@@ -1379,7 +1379,7 @@ struct CompQuickAddSheet: View {
                                     } label: {
                                         HStack(spacing: 4) {
                                             Image(systemName: "sparkles")
-                                            Text("Estimator")
+                                            L10nText("Estimator")
                                         }
                                         .font(.caption.weight(.semibold))
                                         .multilineTextAlignment(.center)
@@ -1399,7 +1399,7 @@ struct CompQuickAddSheet: View {
                             }
                         } else {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Details (optional)")
+                                L10nText("Details (optional)")
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundColor(.gray)
                                 detailsOptionalEditorField()
@@ -1466,7 +1466,7 @@ struct CompQuickAddSheet: View {
                 Button {
                     showCompPhotoOptions = true
                 } label: {
-                    Label("Add Photo", systemImage: "camera.viewfinder")
+                    LocalizedLabel(title: "Add Photo", systemImage: "camera.viewfinder")
                         .font(.subheadline.bold())
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
@@ -1493,10 +1493,10 @@ struct CompQuickAddSheet: View {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .green))
                                     .scaleEffect(1.3)
-                                Text("Estimating comp value…")
+                                L10nText("Estimating comp value…")
                                     .font(.headline)
                                     .foregroundColor(.white)
-                                Text("Getting an estimate with TierTap AI.")
+                                L10nText("Getting an estimate with TierTap AI.")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
@@ -1507,7 +1507,7 @@ struct CompQuickAddSheet: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("")
+            .localizedNavigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1759,37 +1759,41 @@ struct CompQuickAddSheet: View {
 
             let response: GeminiRouterResponse
             if let imgData = imageData {
+                let inner = GeminiImageRequest(
+                    contents: [
+                        .init(
+                            role: "user",
+                            parts: [
+                                .init(text: prompt, inline_data: nil),
+                                .init(
+                                    text: nil,
+                                    inline_data: GeminiInlineData(
+                                        mime_type: "image/jpeg",
+                                        data: imgData
+                                    )
+                                )
+                            ]
+                        )
+                    ]
+                )
+                let routerBody = GeminiProxyBody(contents: inner.contents, language: settingsStore.appLanguage)
                 response = try await GeminiRouterThrottle.shared.executeWithRetries {
                     try await client.functions.invoke(
                         "gemini-router",
-                        options: FunctionInvokeOptions(body: GeminiImageRequest(
-                            contents: [
-                                .init(
-                                    role: "user",
-                                    parts: [
-                                        .init(text: prompt, inline_data: nil),
-                                        .init(
-                                            text: nil,
-                                            inline_data: GeminiInlineData(
-                                                mime_type: "image/jpeg",
-                                                data: imgData
-                                            )
-                                        )
-                                    ]
-                                )
-                            ]
-                        ))
+                        options: FunctionInvokeOptions(body: routerBody)
                     )
                 }
             } else {
+                let inner = GeminiTextRequest(
+                    contents: [
+                        .init(role: "user", parts: [.init(text: prompt)])
+                    ]
+                )
+                let routerBody = GeminiProxyBody(contents: inner.contents, language: settingsStore.appLanguage)
                 response = try await GeminiRouterThrottle.shared.executeWithRetries {
                     try await client.functions.invoke(
                         "gemini-router",
-                        options: FunctionInvokeOptions(body: GeminiTextRequest(
-                            contents: [
-                                .init(role: "user", parts: [.init(text: prompt)])
-                            ]
-                        ))
+                        options: FunctionInvokeOptions(body: routerBody)
                     )
                 }
             }
@@ -1866,7 +1870,7 @@ struct CompQuickAddSheet: View {
                 HStack(spacing: 6) {
                     Image(systemName: "chevron.down")
                         .font(.caption2.weight(.semibold))
-                    Text("Scroll for more amounts")
+                    L10nText("Scroll for more amounts")
                         .font(.caption2.weight(.medium))
                 }
                 .foregroundColor(.gray)
@@ -1942,7 +1946,7 @@ struct CompQuickAddSheet: View {
 
     private var foodBeverageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Type")
+            L10nText("Type")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.gray)
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {

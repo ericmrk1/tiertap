@@ -14,7 +14,7 @@ struct SessionMoodPickerView: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: 0) {
-                    Text("🧠 How did the session feel?")
+                    L10nText("🧠 How did the session feel?")
                         .font(.title2.bold())
                         .foregroundColor(.white)
                         .padding(.vertical, 12)
@@ -49,7 +49,7 @@ struct SessionMoodPickerView: View {
                     .padding(.bottom, 8)
                 }
             }
-            .navigationTitle("Session mood")
+            .localizedNavigationTitle("Session mood")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

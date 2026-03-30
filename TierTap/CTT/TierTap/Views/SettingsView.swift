@@ -57,7 +57,7 @@ struct SettingsView: View {
                     .padding()
                 }
             }
-            .navigationTitle("Settings")
+            .localizedNavigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -102,7 +102,7 @@ struct SettingsView: View {
                 if let url = exportFileURL {
                     ShareSheet(items: [url])
                 } else {
-                    Text("Nothing to share.")
+                    L10nText("Nothing to share.")
                         .padding()
                 }
             }
@@ -147,20 +147,20 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.")
+                L10nText("You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.")
             }
         }
     }
 
     private var bankrollSection: some View {
         SettingsSection(
-            title: "Bankroll & Units",
+            title: "Bankroll & Localization",
             systemImage: "dollarsign.circle.fill",
             isExpanded: $isBankrollExpanded
         ) {
             VStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Currency")
+                    L10nText("Currency")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     Picker("", selection: $settingsStore.currencyCode) {
@@ -187,8 +187,24 @@ struct SettingsView: View {
                     .onChange(of: unitSizeText) { new in
                         if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
                     }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    L10nText("App language")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Picker("App language", selection: $settingsStore.appLanguage) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(lang.pickerLabel).tag(lang)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    L10nText("Controls the language for TierTap screens and for TierTap AI replies.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .padding(.top, 4)
             }
-            Text("Risk of Ruin for table games uses bankroll and unit size. Keep table-game bets at or below unit size to stay within target risk; poker sessions are not included.")
+            L10nText("Risk of Ruin for table games uses bankroll and unit size. Keep table-game bets at or below unit size to stay within target risk; poker sessions are not included.")
                 .font(.caption).foregroundColor(.gray)
         }
     }
@@ -208,7 +224,7 @@ struct SettingsView: View {
                         settingsStore.targetAveragePerSession = v
                     }
                 }
-            Text("Compare your actual average win/loss per table-game session to this target in the Risk of Ruin screen (poker is excluded).")
+            L10nText("Compare your actual average win/loss per table-game session to this target in the Risk of Ruin screen (poker is excluded).")
                 .font(.caption).foregroundColor(.gray)
         }
     }
@@ -220,9 +236,11 @@ struct SettingsView: View {
             isExpanded: $isSessionsExpanded
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                Toggle("Prompt for session mood after ending", isOn: $settingsStore.promptSessionMood)
+                Toggle(isOn: $settingsStore.promptSessionMood) {
+                    L10nText("Prompt for session mood after ending")
+                }
                     .tint(.green)
-                Text("When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.")
+                L10nText("When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -236,35 +254,35 @@ struct SettingsView: View {
             isExpanded: $isTierTapAIExpanded
         ) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Tone of voice")
+                L10nText("Tone of voice")
                     .font(.subheadline.bold())
                     .foregroundColor(.white)
                 Picker("Tone of voice", selection: $settingsStore.aiTone) {
                     ForEach(SettingsStore.AITone.allCases) { tone in
-                        Text(tone.displayName).tag(tone)
+                        Text(L10n.tr(tone.displayName, language: settingsStore.appLanguage)).tag(tone)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Text("Controls how the TierTap AI summarizes your sessions. Default is **Sarcastic**.")
+                L10nText("Controls how the TierTap AI summarizes your sessions. Default is **Sarcastic**.")
                     .font(.caption)
                     .foregroundColor(.gray)
 
-                Text("Typing speed")
+                L10nText("Typing speed")
                     .font(.subheadline.bold())
                     .foregroundColor(.white)
                     .padding(.top, 4)
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text("Slow")
+                        L10nText("Slow")
                             .font(.caption)
                             .foregroundColor(.gray)
                         Spacer()
-                        Text(settingsStore.aiTypingSpeed.displayName)
+                        Text(L10n.tr(settingsStore.aiTypingSpeed.displayName, language: settingsStore.appLanguage))
                             .font(.caption.bold())
                             .foregroundColor(.white)
                         Spacer()
-                        Text("Fast")
+                        L10nText("Fast")
                             .font(.caption)
                             .foregroundColor(.gray)
                     }
@@ -278,7 +296,7 @@ struct SettingsView: View {
                     )
                     .tint(.green)
                 }
-                Text("How quickly AI answers appear character by character in **Ask TierTap**. Slow matches the original pace.")
+                L10nText("How quickly AI answers appear character by character in **Ask TierTap**. Slow matches the original pace.")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -300,7 +318,7 @@ struct SettingsView: View {
                         .font(.subheadline.bold())
                     Spacer()
                     if hasProAccess {
-                        Text("Active")
+                        L10nText("Active")
                             .font(.caption2)
                             .fontWeight(.semibold)
                             .foregroundColor(.green)
@@ -321,12 +339,12 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Text("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
+            L10nText("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
                 .font(.caption)
                 .foregroundColor(.gray)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Developer subscription override")
+                L10nText("Developer subscription override")
                     .font(.caption.bold())
                     .foregroundColor(.gray)
                 TextField("Enter override code", text: $subscriptionOverrideText)
@@ -340,7 +358,7 @@ struct SettingsView: View {
                         settingsStore.subscriptionOverrideCode = digitsOnly
                     }
                 if settingsStore.isSubscriptionOverrideActive {
-                    Text("Override is active for this build; subscription checks are bypassed.")
+                    L10nText("Override is active for this build; subscription checks are bypassed.")
                         .font(.caption2)
                         .foregroundColor(.green)
                 }
@@ -356,12 +374,12 @@ struct SettingsView: View {
         ) {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Favorite casino games")
+                    L10nText("Favorite casino games")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     
                     if settingsStore.favoriteGames.isEmpty {
-                        Text("No favorite games yet. Tap **Add game from picker** to select from the game list.")
+                        L10nText("No favorite games yet. Tap **Add game from picker** to select from the game list.")
                             .font(.caption)
                             .foregroundColor(.gray)
                     } else {
@@ -395,7 +413,7 @@ struct SettingsView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                            Text("Add game from picker")
+                            L10nText("Add game from picker")
                                 .font(.subheadline.bold())
                         }
                         .padding(.horizontal, 10)
@@ -409,12 +427,12 @@ struct SettingsView: View {
                 Divider().background(Color.gray.opacity(0.3))
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Favorite slot games")
+                    L10nText("Favorite slot games")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
 
                     if settingsStore.favoriteSlotGames.isEmpty {
-                        Text("No favorite slots yet. Tap **Add slot from picker** to choose from the slot list.")
+                        L10nText("No favorite slots yet. Tap **Add slot from picker** to choose from the slot list.")
                             .font(.caption)
                             .foregroundColor(.gray)
                     } else {
@@ -448,7 +466,7 @@ struct SettingsView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                            Text("Add slot from picker")
+                            L10nText("Add slot from picker")
                                 .font(.subheadline.bold())
                         }
                         .padding(.horizontal, 10)
@@ -462,10 +480,10 @@ struct SettingsView: View {
                 Divider().background(Color.gray.opacity(0.3))
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Default game type")
+                    L10nText("Default game type")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
-                    Text("Controls whether new sessions and analytics default to table games, slots, or poker.")
+                    L10nText("Controls whether new sessions and analytics default to table games, slots, or poker.")
                         .font(.caption)
                         .foregroundColor(.gray)
                     GameCategoryWheelPicker(
@@ -482,12 +500,12 @@ struct SettingsView: View {
                 Divider().background(Color.gray.opacity(0.3))
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Common casino locations")
+                    L10nText("Common casino locations")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     
                     if settingsStore.favoriteCasinos.isEmpty {
-                        Text("No favorite locations yet. Tap **Add casino from picker** to select from the casino map/search.")
+                        L10nText("No favorite locations yet. Tap **Add casino from picker** to select from the casino map/search.")
                             .font(.caption)
                             .foregroundColor(.gray)
                     } else {
@@ -521,7 +539,7 @@ struct SettingsView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                            Text("Add casino from picker")
+                            L10nText("Add casino from picker")
                                 .font(.subheadline.bold())
                         }
                         .padding(.horizontal, 10)
@@ -535,10 +553,10 @@ struct SettingsView: View {
                 Divider().background(Color.gray.opacity(0.3))
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Quick amounts")
+                    L10nText("Quick amounts")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
-                    Text("Common denominations")
+                    L10nText("Common denominations")
                         .font(.caption)
                         .foregroundColor(.gray)
                     TextField("e.g. 20, 100, 500, 1000, 10000", text: $denominationsText)
@@ -563,16 +581,16 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Toggle("Casino chimes & haptics", isOn: $settingsStore.enableCasinoFeedback)
                         .tint(.green)
-                    Text("When on, major actions like check-in, buy-ins, closing out sessions, and sharing will play quick casino-style chimes and success haptics.")
+                    L10nText("When on, major actions like check-in, buy-ins, closing out sessions, and sharing will play quick casino-style chimes and success haptics.")
                         .font(.caption)
                         .foregroundColor(.gray)
                     Picker("Sound profile", selection: $settingsStore.soundProfile) {
                         ForEach(SettingsStore.SoundProfile.allCases) { profile in
-                            Text(profile.displayName).tag(profile)
+                            Text(L10n.tr(profile.displayName, language: settingsStore.appLanguage)).tag(profile)
                         }
                     }
                     .pickerStyle(.segmented)
-                    Text("Each profile uses its own set of external casino sound effects (e.g. classic chips, softer chimes, or arcade-style pings).")
+                    L10nText("Each profile uses its own set of external casino sound effects (e.g. classic chips, softer chimes, or arcade-style pings).")
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
@@ -589,7 +607,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 // Preset buttons
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Presets")
+                    L10nText("Presets")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -631,7 +649,7 @@ struct SettingsView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus.circle.fill")
-                            Text("Save current as preset")
+                            L10nText("Save current as preset")
                                 .font(.caption.bold())
                         }
                         .padding(.horizontal, 10)
@@ -646,12 +664,12 @@ struct SettingsView: View {
 
                 // Custom color pickers
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Custom colors")
+                    L10nText("Custom colors")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     HStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Primary")
+                            L10nText("Primary")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             ColorPicker("Primary color", selection: $primaryColorSelection, supportsOpacity: false)
@@ -661,7 +679,7 @@ struct SettingsView: View {
                                 }
                         }
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Secondary")
+                            L10nText("Secondary")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             ColorPicker("Secondary color", selection: $secondaryColorSelection, supportsOpacity: false)
@@ -678,11 +696,11 @@ struct SettingsView: View {
                     .frame(height: 44)
                     .overlay(
                         HStack {
-                            Text("Preview")
+                            L10nText("Preview")
                                 .font(.caption)
                                 .foregroundColor(.white.opacity(0.8))
                             Spacer()
-                            Text("Primary → Secondary")
+                            L10nText("Primary → Secondary")
                                 .font(.caption2)
                                 .foregroundColor(.white.opacity(0.8))
                         }
@@ -712,7 +730,7 @@ struct SettingsView: View {
         ) {
             VStack(alignment: .leading, spacing: 12) {
                 if !SupabaseConfig.isConfigured {
-                    Text("Add Supabase keys to enable sign-in and sync.")
+                    L10nText("Add Supabase keys to enable sign-in and sync.")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 } else if authStore.isSignedIn {
@@ -721,7 +739,7 @@ struct SettingsView: View {
                             .font(.title2)
                             .foregroundStyle(settingsStore.primaryGradient)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Signed in")
+                            L10nText("Signed in")
                                 .font(.subheadline.bold())
                                 .foregroundColor(.white)
                             if let name = authStore.userFullName, !name.isEmpty {
@@ -743,7 +761,7 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
                 } else {
-                    Text("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
+                    L10nText("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }
@@ -759,10 +777,10 @@ struct SettingsView: View {
         ) {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("CSV game type")
+                    L10nText("CSV game type")
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
-                    Text("Choose whether to export table, slots, or poker sessions. Older sessions without a game type are treated as table games.")
+                    L10nText("Choose whether to export table, slots, or poker sessions. Older sessions without a game type are treated as table games.")
                         .font(.caption)
                         .foregroundColor(.gray)
                     GameCategoryWheelPicker(
@@ -778,7 +796,7 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         Image(systemName: "square.and.arrow.up")
-                        Text("Export sessions as CSV")
+                        L10nText("Export sessions as CSV")
                             .font(.subheadline.bold())
                         Spacer()
                         if isExporting {
@@ -794,7 +812,7 @@ struct SettingsView: View {
                 }
                 .disabled(sessionStore.sessions.isEmpty || isExporting)
 
-                Text("Exports your recorded sessions to a .csv file so you can back up your data or analyze it elsewhere. Uses the iOS Share sheet to send to Files, email, or other apps.")
+                L10nText("Exports your recorded sessions to a .csv file so you can back up your data or analyze it elsewhere. Uses the iOS Share sheet to send to Files, email, or other apps.")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -812,7 +830,7 @@ struct SettingsView: View {
                     Link(destination: gaURL) {
                         HStack {
                             Image(systemName: "heart.circle.fill")
-                            Text("If you need help — Gamblers Anonymous")
+                            L10nText("If you need help — Gamblers Anonymous")
                                 .font(.subheadline.bold())
                             Spacer()
                             Image(systemName: "arrow.up.right.square")
@@ -824,7 +842,7 @@ struct SettingsView: View {
                 Link(destination: URL(string: "https://travelzork.com/privacy-policy/")!) {
                     HStack {
                         Image(systemName: "hand.raised.fill")
-                        Text("Privacy")
+                        L10nText("Privacy")
                             .font(.subheadline.bold())
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
@@ -835,7 +853,7 @@ struct SettingsView: View {
                 Link(destination: URL(string: "https://travelzork.com/")!) {
                     HStack {
                         Image(systemName: "heart.fill")
-                        Text("Sponsor")
+                        L10nText("Sponsor")
                             .font(.subheadline.bold())
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
@@ -846,7 +864,7 @@ struct SettingsView: View {
                 Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
                     HStack {
                         Image(systemName: "doc.text.fill")
-                        Text("EULA")
+                        L10nText("EULA")
                             .font(.subheadline.bold())
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
@@ -1045,6 +1063,7 @@ private struct SettingsSection<Content: View>: View {
     let systemImage: String
     @Binding var isExpanded: Bool
     @ViewBuilder let content: () -> Content
+    @Environment(\.appLanguage) private var appLanguage
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -1054,7 +1073,11 @@ private struct SettingsSection<Content: View>: View {
                 }
             } label: {
                 HStack {
-                    Label(title, systemImage: systemImage)
+                    Label {
+                        Text(L10n.tr(title, language: appLanguage))
+                    } icon: {
+                        Image(systemName: systemImage)
+                    }
                         .font(.headline)
                         .foregroundColor(.white)
                     Spacer()

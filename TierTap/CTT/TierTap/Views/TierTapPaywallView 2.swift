@@ -50,7 +50,7 @@ struct TierTapPaywallView: View {
                     .padding(.bottom, 28)
                 }
             }
-            .navigationTitle("TierTap Pro")
+            .localizedNavigationTitle("TierTap Pro")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -90,10 +90,10 @@ struct TierTapPaywallView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Unlock TierTap Pro")
+            L10nText("Unlock TierTap Pro")
                 .font(.title2.weight(.bold))
                 .foregroundColor(.white)
-            Text("Smarter play decisions, powered by AI.")
+            L10nText("Smarter play decisions, powered by AI.")
                 .font(.footnote)
                 .foregroundColor(.white.opacity(0.9))
         }
@@ -102,7 +102,7 @@ struct TierTapPaywallView: View {
 
     private var requirementsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Requirements", systemImage: "lock.circle.fill")
+            LocalizedLabel(title: "Requirements", systemImage: "lock.circle.fill")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
 
@@ -110,14 +110,14 @@ struct TierTapPaywallView: View {
                 HStack(spacing: 8) {
                     Image(systemName: hasProAccess ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(hasProAccess ? .green : .white.opacity(0.8))
-                    Text("Active TierTap Pro subscription.")
+                    L10nText("Active TierTap Pro subscription.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                 }
                 HStack(spacing: 8) {
                     Image(systemName: authStore.isSignedIn ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(authStore.isSignedIn ? .green : .white.opacity(0.8))
-                    Text("Signed in with a valid TierTap account (email, Apple, or Google).")
+                    L10nText("Signed in with a valid TierTap account (email, Apple, or Google).")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                 }
@@ -128,7 +128,7 @@ struct TierTapPaywallView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "person.crop.circle")
-                            Text("Go to Account to sign in")
+                            L10nText("Go to Account to sign in")
                                 .font(.caption.weight(.semibold))
                         }
                         .padding(.horizontal, 10)
@@ -149,7 +149,7 @@ struct TierTapPaywallView: View {
 
     private var benefitsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("What you get")
+            L10nText("What you get")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
 
@@ -191,13 +191,13 @@ struct TierTapPaywallView: View {
         Group {
             if let product = currentProduct {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("You're currently subscribed")
+                    L10nText("You're currently subscribed")
                         .font(.footnote.weight(.semibold))
                         .foregroundColor(.white)
                     Text("\(currentPlanLabel(for: product)) • \(product.displayPrice)")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
-                    Text("To change your subscription, choose a different plan below and tap \"Change plan\".")
+                    L10nText("To change your subscription, choose a different plan below and tap \"Change plan\".")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.85))
                         .fixedSize(horizontal: false, vertical: true)
@@ -290,7 +290,7 @@ struct TierTapPaywallView: View {
 
     private var legalSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage and cancel subscriptions in your device Settings under Apple ID → Subscriptions.")
+            L10nText("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage and cancel subscriptions in your device Settings under Apple ID → Subscriptions.")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
@@ -378,7 +378,7 @@ private struct PaywallProductRow: View {
                         .foregroundColor(.white.opacity(0.9))
 
                     if isCurrent {
-                        Text("Current plan")
+                        L10nText("Current plan")
                             .font(.caption2.weight(.semibold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
