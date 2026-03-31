@@ -1,0 +1,455 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E901 /* ForEveryDayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F901 /* ForEveryDayApp.swift */; };
+		E902 /* HabitModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F902 /* HabitModels.swift */; };
+		E903 /* HabitStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F903 /* HabitStore.swift */; };
+		E904 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F904 /* ReminderScheduler.swift */; };
+		E905 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F905 /* MainTabView.swift */; };
+		E906 /* DailyChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F906 /* DailyChecklistView.swift */; };
+		E907 /* DayTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F907 /* DayTimelineView.swift */; };
+		E908 /* CalendarMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F908 /* CalendarMonthView.swift */; };
+		E909 /* AnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F909 /* AnalysisView.swift */; };
+		E90A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90A /* SettingsView.swift */; };
+		E90B /* TimeOfDayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90B /* TimeOfDayPicker.swift */; };
+		E90D /* CollapsibleBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D /* CollapsibleBubble.swift */; };
+		E90E /* HapticAnimatedButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90E /* HapticAnimatedButtonStyle.swift */; };
+		E90F /* ConfettiBurstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90F /* ConfettiBurstView.swift */; };
+		E910 /* DailyScheduleShareExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F910 /* DailyScheduleShareExport.swift */; };
+		E911 /* CalendarMonthShareExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = F911 /* CalendarMonthShareExport.swift */; };
+		E912 /* TaskAttachmentViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F912 /* TaskAttachmentViews.swift */; };
+		E913 /* SFSymbolCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F913 /* SFSymbolCatalog.swift */; };
+		E914 /* TaskEditorLookViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F914 /* TaskEditorLookViews.swift */; };
+		E915 /* sf_symbol_names.txt in Resources */ = {isa = PBXBuildFile; fileRef = F915 /* sf_symbol_names.txt */; };
+		E90C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F90C /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F901 /* ForEveryDayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForEveryDayApp.swift; sourceTree = "<group>"; };
+		F902 /* HabitModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitModels.swift; sourceTree = "<group>"; };
+		F903 /* HabitStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitStore.swift; sourceTree = "<group>"; };
+		F904 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
+		F905 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		F906 /* DailyChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyChecklistView.swift; sourceTree = "<group>"; };
+		F907 /* DayTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayTimelineView.swift; sourceTree = "<group>"; };
+		F908 /* CalendarMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMonthView.swift; sourceTree = "<group>"; };
+		F909 /* AnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisView.swift; sourceTree = "<group>"; };
+		F90A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F90B /* TimeOfDayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeOfDayPicker.swift; sourceTree = "<group>"; };
+		F90D /* CollapsibleBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsibleBubble.swift; sourceTree = "<group>"; };
+		F90E /* HapticAnimatedButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticAnimatedButtonStyle.swift; sourceTree = "<group>"; };
+		F90F /* ConfettiBurstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiBurstView.swift; sourceTree = "<group>"; };
+		F910 /* DailyScheduleShareExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyScheduleShareExport.swift; sourceTree = "<group>"; };
+		F911 /* CalendarMonthShareExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMonthShareExport.swift; sourceTree = "<group>"; };
+		F912 /* TaskAttachmentViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAttachmentViews.swift; sourceTree = "<group>"; };
+		F913 /* SFSymbolCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbolCatalog.swift; sourceTree = "<group>"; };
+		F914 /* TaskEditorLookViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorLookViews.swift; sourceTree = "<group>"; };
+		F915 /* sf_symbol_names.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = sf_symbol_names.txt; sourceTree = "<group>"; };
+		F90C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		P900 /* ForEveryDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ForEveryDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FRWK1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G900 = {
+			isa = PBXGroup;
+			children = (
+				G901 /* ForEveryDay */,
+				G902 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		G901 /* ForEveryDay */ = {
+			isa = PBXGroup;
+			children = (
+				F901 /* ForEveryDayApp.swift */,
+				F90C /* Assets.xcassets */,
+				G907 /* Resources */,
+				G903 /* Models */,
+				G904 /* Services */,
+				G905 /* Views */,
+				G906 /* Components */,
+			);
+			path = ForEveryDay;
+			sourceTree = "<group>";
+		};
+		G902 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				P900 /* ForEveryDay.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		G903 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F902 /* HabitModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		G904 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F903 /* HabitStore.swift */,
+				F904 /* ReminderScheduler.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		G905 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F905 /* MainTabView.swift */,
+				F906 /* DailyChecklistView.swift */,
+				F907 /* DayTimelineView.swift */,
+				F908 /* CalendarMonthView.swift */,
+				F909 /* AnalysisView.swift */,
+				F90A /* SettingsView.swift */,
+				F910 /* DailyScheduleShareExport.swift */,
+				F911 /* CalendarMonthShareExport.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		G906 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				F90E /* HapticAnimatedButtonStyle.swift */,
+				F913 /* SFSymbolCatalog.swift */,
+				F912 /* TaskAttachmentViews.swift */,
+				F914 /* TaskEditorLookViews.swift */,
+				F90B /* TimeOfDayPicker.swift */,
+				F90D /* CollapsibleBubble.swift */,
+				F90F /* ConfettiBurstView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		G907 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F915 /* sf_symbol_names.txt */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		NT01 /* ForEveryDay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = XCNT01 /* Build configuration list for PBXNativeTarget "ForEveryDay" */;
+			buildPhases = (
+				SRC1 /* Sources */,
+				FRWK1 /* Frameworks */,
+				RES1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ForEveryDay;
+			productName = ForEveryDay;
+			productReference = P900 /* ForEveryDay.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		PR01 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					NT01 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = XCPR01 /* Build configuration list for PBXProject "ForEveryDay" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = G900;
+			productRefGroup = G902 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				NT01 /* ForEveryDay */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		RES1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E90C /* Assets.xcassets in Resources */,
+				E915 /* sf_symbol_names.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		SRC1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E901 /* ForEveryDayApp.swift in Sources */,
+				E902 /* HabitModels.swift in Sources */,
+				E903 /* HabitStore.swift in Sources */,
+				E904 /* ReminderScheduler.swift in Sources */,
+				E905 /* MainTabView.swift in Sources */,
+				E906 /* DailyChecklistView.swift in Sources */,
+				E907 /* DayTimelineView.swift in Sources */,
+				E908 /* CalendarMonthView.swift in Sources */,
+				E909 /* AnalysisView.swift in Sources */,
+				E90A /* SettingsView.swift in Sources */,
+				E90B /* TimeOfDayPicker.swift in Sources */,
+				E90D /* CollapsibleBubble.swift in Sources */,
+				E90E /* HapticAnimatedButtonStyle.swift in Sources */,
+				E90F /* ConfettiBurstView.swift in Sources */,
+				E912 /* TaskAttachmentViews.swift in Sources */,
+				E913 /* SFSymbolCatalog.swift in Sources */,
+				E914 /* TaskEditorLookViews.swift in Sources */,
+				E910 /* DailyScheduleShareExport.swift in Sources */,
+				E911 /* CalendarMonthShareExport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CFG01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LVWH8T63HA;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CFG02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LVWH8T63HA;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CFG03 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "For Every Day";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Every Day needs access to save schedule images you share to your photo library.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.foreveryday;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		CFG04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "For Every Day";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "For Every Day needs access to save schedule images you share to your photo library.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.foreveryday;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		XCNT01 /* Build configuration list for PBXNativeTarget "ForEveryDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFG03 /* Debug */,
+				CFG04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		XCPR01 /* Build configuration list for PBXProject "ForEveryDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFG01 /* Debug */,
+				CFG02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = PR01 /* Project object */;
+}
