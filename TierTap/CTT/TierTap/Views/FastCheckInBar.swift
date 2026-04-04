@@ -333,9 +333,13 @@ struct FastCheckInBar: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            L10nText("Fast Check-In")
-                .font(.subheadline.bold())
-                .foregroundColor(.white.opacity(0.95))
+            HStack
+            {
+                Label("", systemImage: "plus.circle.fill")
+                L10nText("Fast Check-In")
+                    .font(.headline.bold())
+                    .foregroundColor(.white.opacity(0.95))
+            }
             HStack(spacing: 0) {
                 fastZone(.poker, emoji: "♠️", title: "Poker")
                 divider
