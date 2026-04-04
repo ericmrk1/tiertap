@@ -181,6 +181,19 @@
     "fr": "(1-888-GA-HELPS)",
     "hi": "(1-888-जीए-सहायता)"
   },
+  "ui.5feceb66ffc86f38d952786c": {
+    "en": "0",
+    "zh-Hans": "0",
+    "ja": "0",
+    "ko": "0",
+    "vi": "0",
+    "es": "0",
+    "ar": "0",
+    "he": "0",
+    "de": "0",
+    "fr": "0",
+    "hi": "0"
+  },
   "ui.8b0dac233722ed9a629fd67b": {
     "en": "2-7 Single Draw",
     "zh-Hans": "2-7 单抽",
@@ -804,6 +817,19 @@
     "de": "Slot aus der Auswahl hinzufügen",
     "fr": "Ajouter un emplacement à partir du sélecteur",
     "hi": "पिकर से स्लॉट जोड़ें"
+  },
+  "ui.96e404b06e18610bbe8c25a9": {
+    "en": "Additional to total",
+    "zh-Hans": "Additional to total",
+    "ja": "Additional to total",
+    "ko": "Additional to total",
+    "vi": "Additional to total",
+    "es": "Additional to total",
+    "ar": "Additional to total",
+    "he": "Additional to total",
+    "de": "Additional to total",
+    "fr": "Additional to total",
+    "hi": "Additional to total"
   },
   "ui.07a7d4e0ebdc3a221a889f86": {
     "en": "Adjust cash out",
@@ -1975,6 +2001,19 @@
     "fr": "Forfait actuel",
     "hi": "वर्तमान योजना"
   },
+  "ui.5ff2b5b3d9517a8e6d5693d5": {
+    "en": "Custom amount",
+    "zh-Hans": "Custom amount",
+    "ja": "Custom amount",
+    "ko": "Custom amount",
+    "vi": "Custom amount",
+    "es": "Custom amount",
+    "ar": "Custom amount",
+    "he": "Custom amount",
+    "de": "Custom amount",
+    "fr": "Custom amount",
+    "hi": "Custom amount"
+  },
   "ui.2f7518c7ae0ed46791d169de": {
     "en": "Custom colors",
     "zh-Hans": "定制颜色",
@@ -2495,6 +2534,32 @@
     "fr": "Rapide",
     "hi": "तेज़"
   },
+  "ui.2666a05a17adef844a514278": {
+    "en": "Fast Check-In",
+    "zh-Hans": "Fast Check-In",
+    "ja": "Fast Check-In",
+    "ko": "Fast Check-In",
+    "vi": "Fast Check-In",
+    "es": "Fast Check-In",
+    "ar": "Fast Check-In",
+    "he": "Fast Check-In",
+    "de": "Fast Check-In",
+    "fr": "Fast Check-In",
+    "hi": "Fast Check-In"
+  },
+  "ui.16bec7b66cc8ee70bff56946": {
+    "en": "Fast Close Out",
+    "zh-Hans": "快速结束",
+    "ja": "クイック終了",
+    "ko": "빠른 종료",
+    "vi": "Đóng nhanh",
+    "es": "Cierre rápido",
+    "ar": "إغلاق سريع",
+    "he": "סגירה מהירה",
+    "de": "Schnell abschließen",
+    "fr": "Clôture rapide",
+    "hi": "त्वरित बंद करें"
+  },
   "ui.ededb3b068217caff63b8673": {
     "en": "Favorite casino games",
     "zh-Hans": "最喜欢的赌场游戏",
@@ -3001,6 +3066,19 @@
     "de": "Level-Bänder (1–1.000)",
     "fr": "Bandes de niveau (1 à 1 000)",
     "hi": "लेवल बैंड (1-1,000)"
+  },
+  "ui.033c379d9f22b860031aa31f": {
+    "en": "Level mins",
+    "zh-Hans": "Level mins",
+    "ja": "Level mins",
+    "ko": "Level mins",
+    "vi": "Level mins",
+    "es": "Level mins",
+    "ar": "Level mins",
+    "he": "Level mins",
+    "de": "Level mins",
+    "fr": "Level mins",
+    "hi": "Level mins"
   },
   "ui.dc20b3d5d2cddf82fad33282": {
     "en": "Library",
@@ -5199,6 +5277,19 @@
     "fr": "Points de niveau de départ",
     "hi": "आरंभिक स्तर बिंदु"
   },
+  "ui.07614992be0deddf84c1497c": {
+    "en": "Starting stack",
+    "zh-Hans": "Starting stack",
+    "ja": "Starting stack",
+    "ko": "Starting stack",
+    "vi": "Starting stack",
+    "es": "Starting stack",
+    "ar": "Starting stack",
+    "he": "Starting stack",
+    "de": "Starting stack",
+    "fr": "Starting stack",
+    "hi": "Starting stack"
+  },
   "ui.08fd1de4b04df4a2fe763ac6": {
     "en": "Stay",
     "zh-Hans": "停留",
@@ -5237,19 +5328,6 @@
     "de": "Bleiben Sie durch",
     "fr": "Reste à travers",
     "hi": "के माध्यम से रहो"
-  },
-  "ui.16bec7b66cc8ee70bff56946": {
-    "en": "Fast Close Out",
-    "zh-Hans": "快速结束",
-    "ja": "クイック終了",
-    "ko": "빠른 종료",
-    "vi": "Đóng nhanh",
-    "es": "Cierre rápido",
-    "ar": "إغلاق سريع",
-    "he": "סגירה מהירה",
-    "de": "Schnell abschließen",
-    "fr": "Clôture rapide",
-    "hi": "त्वरित बंद करें"
   },
   "ui.ee31d2280fa9429b16973997": {
     "en": "Stop & Close Out",

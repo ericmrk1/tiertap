@@ -275,12 +275,24 @@ struct InputRow: View {
     let label: String
     let placeholder: String
     @Binding var value: String
+    /// English title on the numeric dial pad; `nil` = text field only (no keypad button).
+    var dialPadNavigationTitle: String? = nil
+    @EnvironmentObject private var settingsStore: SettingsStore
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label).font(.subheadline.bold()).foregroundColor(.white)
-            TextField(placeholder, text: $value)
-                .textFieldStyle(DarkTextFieldStyle())
-                .keyboardType(.numberPad)
+            if let dialTitle = dialPadNavigationTitle {
+                NumericEntryWithDialPad(
+                    placeholder: placeholder,
+                    text: $value,
+                    dialPadNavigationTitle: dialTitle
+                )
+            } else {
+                TextField(placeholder, text: $value)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.numberPad)
+            }
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -808,9 +820,10 @@ private enum StartingTierAuxSheet: String, Identifiable {
     var id: String { rawValue }
 }
 
-/// Numeric pad for tier point entry (digits only). Presented at ~60% screen height with keys near the bottom.
-private struct TierPointsDialPadSheet: View {
+/// Numeric pad (digits only). ~60% screen height; keys aligned toward the bottom. `navigationTitle` is the English source for localization.
+struct NumericDialPadSheet: View {
     @Binding var value: String
+    let navigationTitle: String
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var digits: String = ""
@@ -910,7 +923,7 @@ private struct TierPointsDialPadSheet: View {
                 }
                 .padding()
             }
-            .localizedNavigationTitle("Tier points")
+            .localizedNavigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -935,6 +948,56 @@ private struct TierPointsDialPadSheet: View {
         navigationContent
             .presentationDetents([.fraction(0.6)])
             .presentationDragIndicator(.visible)
+    }
+}
+
+/// Square-grid button that opens the numeric dial pad (shared styling).
+struct DialPadLaunchButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "circle.grid.3x3.fill")
+                .font(.system(size: 22, weight: .medium))
+                .foregroundColor(.white)
+                .frame(width: 44, height: 44)
+                .background(Color(.systemGray6).opacity(0.35))
+                .cornerRadius(10)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Number pad")
+    }
+}
+
+/// Single-line numeric `TextField` with keyboard + adjacent dial pad sheet.
+struct NumericEntryWithDialPad: View {
+    let placeholder: String
+    @Binding var text: String
+    /// English string for `NumericDialPadSheet` navigation title / localization.
+    let dialPadNavigationTitle: String
+    var textFieldMinWidth: CGFloat?
+    var textFieldMaxWidth: CGFloat?
+
+    @EnvironmentObject private var settingsStore: SettingsStore
+    @State private var showDialPad = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            TextField(placeholder, text: $text)
+                .textFieldStyle(DarkTextFieldStyle())
+                .keyboardType(.numberPad)
+                .frame(
+                    minWidth: textFieldMinWidth ?? 0,
+                    maxWidth: textFieldMaxWidth ?? .infinity,
+                    alignment: .leading
+                )
+
+            DialPadLaunchButton { showDialPad = true }
+        }
+        .sheet(isPresented: $showDialPad) {
+            NumericDialPadSheet(value: $text, navigationTitle: dialPadNavigationTitle)
+                .environmentObject(settingsStore)
+        }
     }
 }
 
@@ -980,17 +1043,7 @@ struct StartingTierPointsQuickPickRow: View {
                     .keyboardType(.numberPad)
                     .frame(minWidth: 80, maxWidth: 118)
 
-                Button {
-                    auxSheet = .dialPad
-                } label: {
-                    Image(systemName: "circle.grid.3x3.fill")
-                        .font(.system(size: 22, weight: .medium))
-                        .foregroundColor(.white)
-                        .frame(width: 44, height: 44)
-                        .background(Color(.systemGray6).opacity(0.35))
-                        .cornerRadius(10)
-                }
-                .accessibilityLabel("Number pad")
+                DialPadLaunchButton { auxSheet = .dialPad }
             }
         }
         .sheet(item: $auxSheet) { kind in
@@ -999,7 +1052,7 @@ struct StartingTierPointsQuickPickRow: View {
                 TierPointsQuickPickSheet(selectedValue: $tierPointsText)
                     .environmentObject(settingsStore)
             case .dialPad:
-                TierPointsDialPadSheet(value: $tierPointsText)
+                NumericDialPadSheet(value: $tierPointsText, navigationTitle: "Tier points")
                     .environmentObject(settingsStore)
             }
         }
@@ -1030,17 +1083,7 @@ private struct TierPointsQuickPickSheet: View {
                                 .textFieldStyle(DarkTextFieldStyle())
                                 .keyboardType(.numberPad)
 
-                            Button {
-                                showDialPad = true
-                            } label: {
-                                Image(systemName: "circle.grid.3x3.fill")
-                                    .font(.system(size: 22, weight: .medium))
-                                    .foregroundColor(.white)
-                                    .frame(width: 44, height: 44)
-                                    .background(Color(.systemGray6).opacity(0.35))
-                                    .cornerRadius(10)
-                            }
-                            .accessibilityLabel("Number pad")
+                            DialPadLaunchButton { showDialPad = true }
                         }
 
                         LazyVGrid(
@@ -1095,7 +1138,7 @@ private struct TierPointsQuickPickSheet: View {
             }
         }
         .sheet(isPresented: $showDialPad) {
-            TierPointsDialPadSheet(value: $selectedValue)
+            NumericDialPadSheet(value: $selectedValue, navigationTitle: "Tier points")
                 .environmentObject(settingsStore)
         }
     }
@@ -1269,21 +1312,32 @@ struct BuyInQuickAddSheet: View {
                     }
 
                     VStack(spacing: 12) {
-                        TextField("Custom amount", text: $customAmount)
-                            .textFieldStyle(DarkTextFieldStyle())
-                            .keyboardType(.numberPad)
+                        NumericEntryWithDialPad(
+                            placeholder: "Custom amount",
+                            text: $customAmount,
+                            dialPadNavigationTitle: "Buy-In"
+                        )
                         Button {
                             if let a = Int(customAmount), a > 0 {
                                 pendingTotal += a
                                 customAmount = ""
                             }
                         } label: {
-                            L10nText("Add Custom Amount to Total")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(isCustomValid ? Color.green : Color.gray)
-                                .foregroundColor(isCustomValid ? .black : .white)
-                                .cornerRadius(14)
+                            Group {
+                                if let a = Int(customAmount.trimmingCharacters(in: .whitespacesAndNewlines)), a > 0 {
+                                    Text(
+                                        "Add \(settingsStore.currencySymbol)\(a.formatted(.number.grouping(.automatic))) to total"
+                                    )
+                                } else {
+                                    L10nText("Add Custom Amount to Total")
+                                }
+                            }
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(isCustomValid ? Color.green : Color.gray)
+                            .foregroundColor(isCustomValid ? .black : .white)
+                            .cornerRadius(14)
                         }
                         .disabled(!isCustomValid)
 
@@ -1667,10 +1721,11 @@ struct CompQuickAddSheet: View {
                                     Text("Est. value (\(settingsStore.currencySymbol))")
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundColor(.gray)
-                                    TextField("0", text: $foodValueText)
-                                        .keyboardType(.numberPad)
-                                        .textFieldStyle(DarkTextFieldStyle())
-                                        .multilineTextAlignment(.trailing)
+                                    NumericEntryWithDialPad(
+                                        placeholder: "0",
+                                        text: $foodValueText,
+                                        dialPadNavigationTitle: "Amount"
+                                    )
                                     Button {
                                         if hasProEstimatorAccess && authStore.isSignedIn {
                                             Task { await runCompValueEstimator() }
@@ -1696,7 +1751,7 @@ struct CompQuickAddSheet: View {
                                     .buttonStyle(.plain)
                                     .disabled(isEstimatingCompValue)
                                 }
-                                .frame(width: 120)
+                                .frame(minWidth: 132, maxWidth: 180, alignment: .leading)
                             }
                         } else {
                             VStack(alignment: .leading, spacing: 8) {
@@ -1707,7 +1762,7 @@ struct CompQuickAddSheet: View {
                             }
                         }
 
-                        VStack(spacing: 8) {
+                        VStack(spacing: 4) {
                             if existingSessionCompTotal > 0 {
                                 Text("All comps: \(settingsStore.currencySymbol)\(existingSessionCompTotal.formatted(.number.grouping(.automatic)))")
                                     .font(.subheadline)
@@ -2177,6 +2232,18 @@ struct CompQuickAddSheet: View {
                 .foregroundColor(.gray)
                 .frame(maxWidth: .infinity)
             }
+
+            VStack(alignment: .leading, spacing: 6) {
+                L10nText("Additional to total")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.gray)
+                NumericEntryWithDialPad(
+                    placeholder: "0",
+                    text: $dollarAdditionalText,
+                    dialPadNavigationTitle: "Amount"
+                )
+            }
+            .padding(.top, 4)
         }
     }
 

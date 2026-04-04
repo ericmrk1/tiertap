@@ -243,7 +243,7 @@ struct CloseoutView: View {
                                     .cornerRadius(8)
                                 }
                             }
-                            InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier)
+                            InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier, dialPadNavigationTitle: "Tier points")
                             VStack(alignment: .leading, spacing: 8) {
                                 L10nText("Tier points")
                                     .font(.caption.bold())

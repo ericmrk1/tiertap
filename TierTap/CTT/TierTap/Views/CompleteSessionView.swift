@@ -77,7 +77,7 @@ struct CompleteSessionView: View {
                             InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount left with", value: $cashOut)
                             InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
                             InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
-                            InputRow(label: "Ending Tier Points", placeholder: "From loyalty app", value: $endingTier)
+                            InputRow(label: "Ending Tier Points", placeholder: "From loyalty app", value: $endingTier, dialPadNavigationTitle: "Tier points")
                             if settingsStore.unitSize > 0,
                                (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || session.totalBuyIn > settingsStore.unitSize {
                                 HStack(spacing: 8) {

@@ -153,25 +153,35 @@ struct EditSessionView: View {
                                             .foregroundColor(.white)
 
                                         HStack(spacing: 8) {
-                                            TextField("SB", text: $pokerSmallBlindText)
-                                                .textFieldStyle(DarkTextFieldStyle())
-                                                .keyboardType(.numberPad)
-                                            TextField("BB", text: $pokerBigBlindText)
-                                                .textFieldStyle(DarkTextFieldStyle())
-                                                .keyboardType(.numberPad)
-                                            TextField("Ante", text: $pokerAnteText)
-                                                .textFieldStyle(DarkTextFieldStyle())
-                                                .keyboardType(.numberPad)
+                                            NumericEntryWithDialPad(
+                                                placeholder: "SB",
+                                                text: $pokerSmallBlindText,
+                                                dialPadNavigationTitle: "Small blind"
+                                            )
+                                            NumericEntryWithDialPad(
+                                                placeholder: "BB",
+                                                text: $pokerBigBlindText,
+                                                dialPadNavigationTitle: "Big blind"
+                                            )
+                                            NumericEntryWithDialPad(
+                                                placeholder: "Ante",
+                                                text: $pokerAnteText,
+                                                dialPadNavigationTitle: "Ante"
+                                            )
                                         }
 
                                         if pokerGameKind == .tournament {
                                             HStack(spacing: 8) {
-                                                TextField("Level mins", text: $pokerLevelMinutesText)
-                                                    .textFieldStyle(DarkTextFieldStyle())
-                                                    .keyboardType(.numberPad)
-                                                TextField("Starting stack", text: $pokerStartingStackText)
-                                                    .textFieldStyle(DarkTextFieldStyle())
-                                                    .keyboardType(.numberPad)
+                                                NumericEntryWithDialPad(
+                                                    placeholder: "Level mins",
+                                                    text: $pokerLevelMinutesText,
+                                                    dialPadNavigationTitle: "Level minutes"
+                                                )
+                                                NumericEntryWithDialPad(
+                                                    placeholder: "Starting stack",
+                                                    text: $pokerStartingStackText,
+                                                    dialPadNavigationTitle: "Starting stack"
+                                                )
                                             }
                                         }
                                     }
@@ -196,10 +206,10 @@ struct EditSessionView: View {
                         .cornerRadius(16)
 
                         VStack(spacing: 12) {
-                            InputRow(label: "Total Buy-In (\(settingsStore.currencySymbol))", placeholder: "Total bought in", value: $totalBuyIn)
-                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", value: $cashOut)
-                            InputRow(label: "Starting Tier Points", placeholder: "At session start", value: $startingTier)
-                            InputRow(label: "Ending Tier Points", placeholder: "At session end", value: $endingTier)
+                            InputRow(label: "Total Buy-In (\(settingsStore.currencySymbol))", placeholder: "Total bought in", value: $totalBuyIn, dialPadNavigationTitle: "Buy-In")
+                            InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", value: $cashOut, dialPadNavigationTitle: "Cash Out")
+                            InputRow(label: "Starting Tier Points", placeholder: "At session start", value: $startingTier, dialPadNavigationTitle: "Tier points")
+                            InputRow(label: "Ending Tier Points", placeholder: "At session end", value: $endingTier, dialPadNavigationTitle: "Tier points")
                             VStack(alignment: .leading, spacing: 6) {
                                 L10nText("Tier points")
                                     .font(.caption.bold())
@@ -210,8 +220,8 @@ struct EditSessionView: View {
                                 }
                                 .pickerStyle(.segmented)
                             }
-                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
-                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
+                            InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual, dialPadNavigationTitle: "Avg bet actual")
+                            InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated, dialPadNavigationTitle: "Avg bet rated")
                         }
                         .padding()
                         .background(Color(.systemGray6).opacity(0.15))
@@ -777,9 +787,11 @@ private struct EditCompEventSheet: View {
                             Text("Amount (\(settingsStore.currencySymbol))")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundColor(.gray)
-                            TextField("0", text: $amountText)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(DarkTextFieldStyle())
+                            NumericEntryWithDialPad(
+                                placeholder: "0",
+                                text: $amountText,
+                                dialPadNavigationTitle: "Amount"
+                            )
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
