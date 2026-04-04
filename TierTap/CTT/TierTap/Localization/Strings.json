@@ -1429,18 +1429,18 @@
     "fr": "Enregistrement",
     "hi": "चेक इन"
   },
-  "ui.a863c715e0747326f1b5226b": {
-    "en": "Check your casino loyalty app. Use wheel or type exact.",
-    "zh-Hans": "检查您的赌场忠诚度应用程序。使用滚轮或精确键入。",
-    "ja": "カジノロイヤルティアプリを確認してください。ホイールを使用するか、正確に入力してください。",
-    "ko": "카지노 로열티 앱을 확인하세요. 휠을 사용하거나 정확하게 입력하세요.",
-    "vi": "Kiểm tra ứng dụng khách hàng thân thiết trong sòng bạc của bạn. Sử dụng bánh xe hoặc gõ chính xác.",
-    "es": "Consulta la aplicación de fidelización de tu casino. Utilice rueda o tipo exacto.",
-    "ar": "تحقق من تطبيق ولاء الكازينو الخاص بك. استخدم العجلة أو اكتب بالضبط.",
-    "he": "בדוק את אפליקציית נאמנות הקזינו שלך. השתמש בגלגל או הקלד מדויק.",
-    "de": "Überprüfen Sie Ihre Casino-Treue-App. Verwenden Sie das Rad oder geben Sie exakt ein.",
-    "fr": "Vérifiez votre application de fidélité de casino. Utilisez la roue ou tapez exactement.",
-    "hi": "अपने कैसीनो लॉयल्टी ऐप की जाँच करें। व्हील का प्रयोग करें या सटीक टाइप करें।"
+  "ui.e517cfa713e0c5dc2a7f32d1": {
+    "en": "Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).",
+    "zh-Hans": "请查看赌场会员应用。可快捷点选 1,000–50,000，或直接输入精确积分（不可为 0）。",
+    "ja": "カジノのロイヤルティアプリを確認してください。1,000～50,000 をクイック選択するか、正確な数値を入力（0 は不可）。",
+    "ko": "카지노 로열티 앱을 확인하세요. 1,000–50,000 빠른 선택 또는 정확한 값 입력(0 불가).",
+    "vi": "Mở ứng dụng khách hàng thân thiết của sòng bạc. Chọn nhanh 1.000–50.000 hoặc nhập chính xác (không được là 0).",
+    "es": "Consulta la app de fidelidad del casino. Elige rápido entre 1.000 y 50.000 o escribe la cifra exacta (no puede ser 0).",
+    "ar": "تحقق من تطبيق ولاء الكازينو. اختر بسرعة بين 1,000 و 50,000 أو اكتب الرقم بدقة (لا يمكن أن يكون 0).",
+    "he": "בדוק את אפליקציית הנאמנות של הקזינו. בחירה מהירה 1,000–50,000 או הקלד סכום מדויק (לא אפס).",
+    "de": "Prüfen Sie die Casino-Treue-App. Schnellauswahl 1.000–50.000 oder genauen Wert eingeben (nicht null).",
+    "fr": "Consultez l’appli de fidélité du casino. Sélection rapide 1 000–50 000 ou saisissez le montant exact (pas zéro).",
+    "hi": "अपने कैसीनो लॉयल्टी ऐप में देखें। 1,000–50,000 त्वरित चुनें या सटीक अंक दर्ज करें (शून्य नहीं)।"
   },
   "ui.e0c9c0d1d13de202eb4fca74": {
     "en": "Chinese Poker",
@@ -4107,6 +4107,19 @@
     "fr": "Montants rapides",
     "hi": "त्वरित मात्रा"
   },
+  "ui.54328b738352e3aa80129cde": {
+    "en": "Quick pick (1k–50k)",
+    "zh-Hans": "快速选取（1千–5万）",
+    "ja": "クイック選択（1千～5万）",
+    "ko": "빠른 선택(1천–5만)",
+    "vi": "Chọn nhanh (1k–50k)",
+    "es": "Selección rápida (1k–50k)",
+    "ar": "اختيار سريع (1k–50k)",
+    "he": "בחירה מהירה (1k–50k)",
+    "de": "Schnellauswahl (1k–50k)",
+    "fr": "Choix rapide (1k–50k)",
+    "hi": "त्वरित चयन (1k–50k)"
+  },
   "ui.3b0d4e783db83b2c7e1fef89": {
     "en": "ROI %",
     "zh-Hans": "投资回报率%",
@@ -5225,6 +5238,19 @@
     "fr": "Reste à travers",
     "hi": "के माध्यम से रहो"
   },
+  "ui.16bec7b66cc8ee70bff56946": {
+    "en": "Fast Close Out",
+    "zh-Hans": "快速结束",
+    "ja": "クイック終了",
+    "ko": "빠른 종료",
+    "vi": "Đóng nhanh",
+    "es": "Cierre rápido",
+    "ar": "إغلاق سريع",
+    "he": "סגירה מהירה",
+    "de": "Schnell abschließen",
+    "fr": "Clôture rapide",
+    "hi": "त्वरित बंद करें"
+  },
   "ui.ee31d2280fa9429b16973997": {
     "en": "Stop & Close Out",
     "zh-Hans": "止损平仓",
@@ -5549,6 +5575,19 @@
     "de": "Stufenfortschritt im Laufe der Zeit",
     "fr": "Progression des niveaux au fil du temps",
     "hi": "समय के साथ स्तरीय प्रगति"
+  },
+  "ui.b830e68ae5ae0ef361ed19e3": {
+    "en": "Tier points",
+    "zh-Hans": "Tier points",
+    "ja": "Tier points",
+    "ko": "Tier points",
+    "vi": "Tier points",
+    "es": "Tier points",
+    "ar": "Tier points",
+    "he": "Tier points",
+    "de": "Tier points",
+    "fr": "Tier points",
+    "hi": "Tier points"
   },
   "ui.a3902b24c2dd557ed46efb14": {
     "en": "Tier/hour, comps, and wins/losses are optional.",
@@ -5888,6 +5927,19 @@
     "fr": "Débloquez des résumés et des suggestions avancés d'IA pour vos sessions.",
     "hi": "अपने सत्रों के लिए उन्नत AI सारांश और सुझाव अनलॉक करें।"
   },
+  "ui.33c8e8de41c3a35124251370": {
+    "en": "Unverified",
+    "zh-Hans": "Unverified",
+    "ja": "Unverified",
+    "ko": "Unverified",
+    "vi": "Unverified",
+    "es": "Unverified",
+    "ar": "Unverified",
+    "he": "Unverified",
+    "de": "Unverified",
+    "fr": "Unverified",
+    "hi": "Unverified"
+  },
   "ui.5f1a2542e4e4ca5ed784e15f": {
     "en": "Upcoming",
     "zh-Hans": "即将推出",
@@ -5965,6 +6017,32 @@
     "de": "Verwenden Sie das Rad oder geben Sie exakt ein.",
     "fr": "Utilisez la roue ou tapez exactement.",
     "hi": "व्हील का प्रयोग करें या सटीक टाइप करें।"
+  },
+  "ui.7140f4f19dec525960aabacb": {
+    "en": "Verification",
+    "zh-Hans": "Verification",
+    "ja": "Verification",
+    "ko": "Verification",
+    "vi": "Verification",
+    "es": "Verification",
+    "ar": "Verification",
+    "he": "Verification",
+    "de": "Verification",
+    "fr": "Verification",
+    "hi": "Verification"
+  },
+  "ui.4f7838402f37674e8ebedb6c": {
+    "en": "Verified",
+    "zh-Hans": "Verified",
+    "ja": "Verified",
+    "ko": "Verified",
+    "vi": "Verified",
+    "es": "Verified",
+    "ar": "Verified",
+    "he": "Verified",
+    "de": "Verified",
+    "fr": "Verified",
+    "hi": "Verified"
   },
   "ui.ee1bcdc62141fd28f77fe217": {
     "en": "W/L",

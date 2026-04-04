@@ -161,6 +161,25 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    /// End the live session immediately using the same defaults as the close-out sheet pre-fill:
+    /// cash out = total buy-in, ending tier = starting tier (or recent history for this casino, else 0).
+    /// Marks tier point figures as **unverified** so W/L and tier gains stay provisional.
+    func fastCloseSessionWithDefaultsUnverified() {
+        guard var s = liveSession else { return }
+        let cashOut = s.totalBuyIn
+        let endingTier: Int
+        if s.startingTierPoints > 0 {
+            endingTier = s.startingTierPoints
+        } else if let hist = defaultEndingTierPoints(for: s.casino) {
+            endingTier = hist
+        } else {
+            endingTier = 0
+        }
+        s.tierPointsVerification = .unverified
+        liveSession = s
+        closeSession(cashOut: cashOut, endingTier: endingTier, privateNotes: nil)
+    }
+
     func closeSession(cashOut: Int, endingTier: Int, privateNotes: String? = nil) {
         guard var s = liveSession else { return }
         s.cashOut = cashOut
@@ -294,6 +313,19 @@ class SessionStore: ObservableObject {
     func updateLiveSessionNotes(_ text: String?) {
         guard var s = liveSession else { return }
         s.privateNotes = text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true ? nil : text
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
+    /// Whether tier point figures for the live session are verified (confirmed) or still provisional.
+    func updateLiveSessionTierPointsVerification(_ value: SessionTierPointsVerification) {
+        guard var s = liveSession else { return }
+        if s.tierPointsVerification == nil, value == .verified { return }
+        guard s.tierPointsVerification != value else { return }
+        s.tierPointsVerification = value
         liveSession = s
         saveLive()
         #if os(iOS)
@@ -436,5 +468,20 @@ class SessionStore: ObservableObject {
         let sorted = sessions
             .sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
         return sorted.first.flatMap { $0.casino.isEmpty ? nil : $0.casino }
+    }
+
+    /// Most recent saved session for a game type (table = non-poker, non-slots, including legacy `nil` category).
+    func mostRecentSession(forGameCategory category: SessionGameCategory) -> Session? {
+        let sorted = sessions.sorted { ($0.endTime ?? $0.startTime) > ($1.endTime ?? $1.startTime) }
+        return sorted.first { s in
+            switch category {
+            case .table:
+                return s.gameCategory != .poker && s.gameCategory != .slots
+            case .slots:
+                return s.gameCategory == .slots
+            case .poker:
+                return s.gameCategory == .poker
+            }
+        }
     }
 }

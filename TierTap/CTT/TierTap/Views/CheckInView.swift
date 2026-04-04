@@ -172,7 +172,7 @@ struct CheckInView: View {
     var isValid: Bool {
         let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
         return hasGame && !casino.isEmpty &&
-        (Int(startingTier) != nil) && (Int(initialBuyIn) ?? 0) > 0
+        (Int(startingTier) ?? 0) > 0 && (Int(initialBuyIn) ?? 0) > 0
     }
 
     /// Discrete blind values used for SB / BB / Ante wheels and presets.
@@ -548,7 +548,7 @@ struct CheckInView: View {
                         .cornerRadius(16)
                     }
 
-                    // Starting Tier — header with rewards selector, wheel, and value entry
+                    // Starting Tier — header with rewards selector, quick-pick grid, and value entry
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .center, spacing: 8) {
                             LocalizedLabel(title: "Starting Tier Points", systemImage: "star.circle")
@@ -567,16 +567,10 @@ struct CheckInView: View {
                                 .tint(.white)
                             }
                         }
-                        L10nText("Check your casino loyalty app. Use wheel or type exact.")
+                        L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                             .font(.caption).foregroundColor(.gray)
-                        HStack(spacing: 12) {
-                            TierPointsWheel(selectedValue: $startingTier)
-                                .frame(maxWidth: .infinity)
-                            TextField("Exact value", text: $startingTier)
-                                .textFieldStyle(DarkTextFieldStyle())
-                                .keyboardType(.numberPad)
-                                .frame(width: 110)
-                        }
+                        StartingTierPointsQuickPickRow(tierPointsText: $startingTier)
+                            .environmentObject(settingsStore)
                     }
                     .padding()
                     .background(Color(.systemGray6).opacity(0.15))
@@ -761,27 +755,17 @@ struct CheckInView: View {
     }
 
     func go() {
-        // For Poker, build a descriptive game name from the selected options.
         if gameCategory == .poker {
-            var parts: [String] = []
-            let kindLabel = (pokerGameKind == .cash) ? "Cash" : "Tournament"
-            parts.append("Poker \(kindLabel)")
-            if !pokerVariant.isEmpty {
-                parts.append(pokerVariant)
-            }
-            if pokerGameKind == .tournament {
-                var opts: [String] = []
-                if pokerAllowsRebuy { opts.append("Re-buy") }
-                if pokerAllowsAddOn { opts.append("Add-On") }
-                if pokerHasFreezeOut { opts.append("Freeze-Out") }
-                if !opts.isEmpty {
-                    parts.append(opts.joined(separator: ", "))
-                }
-            }
-            selectedGame = parts.joined(separator: " - ")
+            selectedGame = FastCheckInHelper.composedPokerGameName(
+                pokerGameKind: pokerGameKind,
+                pokerVariant: pokerVariant,
+                pokerAllowsRebuy: pokerAllowsRebuy,
+                pokerAllowsAddOn: pokerAllowsAddOn,
+                pokerHasFreezeOut: pokerHasFreezeOut
+            )
         }
 
-        guard let tier = Int(startingTier), let buy = Int(initialBuyIn) else { return }
+        guard let tier = Int(startingTier), tier > 0, let buy = Int(initialBuyIn) else { return }
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
         store.startSession(
             game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy,

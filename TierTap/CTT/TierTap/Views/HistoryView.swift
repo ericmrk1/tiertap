@@ -31,6 +31,8 @@ struct HistoryView: View {
     @State private var isShareSheetPresented: Bool = false
     @State private var shareItems: [Any] = []
     @State private var pendingShareItems: [Any]?
+    /// Single choice below Filters; legacy sessions without stored verification count as verified.
+    @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
 
     private var showDeleteAlert: Binding<Bool> {
         Binding(
@@ -63,6 +65,8 @@ struct HistoryView: View {
                 session.game.localizedCaseInsensitiveContains(trimmedSearch)
             }
         }
+
+        sessions = sessions.filter { $0.effectiveTierPointsVerification == historyTierPointsFilter }
 
         return sessions
     }
@@ -187,6 +191,22 @@ struct HistoryView: View {
         )
         .padding(.horizontal)
         .padding(.top, 8)
+    }
+
+    private var historyTierPointsVerificationSegment: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            L10nText("Tier points")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.85))
+            Picker("", selection: $historyTierPointsFilter) {
+                Text("Verified").tag(SessionTierPointsVerification.verified)
+                Text("Unverified").tag(SessionTierPointsVerification.unverified)
+            }
+            .pickerStyle(.segmented)
+            .tint(.green)
+        }
+        .padding(.horizontal)
+        .padding(.top, 10)
     }
 
     private var historyDateRangeSection: some View {
@@ -396,6 +416,7 @@ struct HistoryView: View {
     private var historyContentView: some View {
         VStack(spacing: 0) {
             historyStickyFilterBubble
+            historyTierPointsVerificationSegment
             sessionListContent
                 .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
@@ -790,6 +811,15 @@ struct SessionRow: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(Color.orange.opacity(0.25))
+                        .cornerRadius(4)
+                }
+                if session.effectiveTierPointsVerification == .unverified {
+                    Text("Unverified")
+                        .font(.caption2.bold())
+                        .foregroundColor(.yellow.opacity(0.95))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.yellow.opacity(0.18))
                         .cornerRadius(4)
                 }
                 Spacer()

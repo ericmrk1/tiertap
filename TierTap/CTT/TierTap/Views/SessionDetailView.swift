@@ -8,6 +8,7 @@ struct SessionDetailView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showCompleteSession = false
     @State private var privateNotes: String = ""
+    @State private var tierPointsVerification: SessionTierPointsVerification = .verified
 
     var body: some View {
         NavigationStack {
@@ -166,6 +167,17 @@ struct SessionDetailView: View {
                         }
 
                         DetailSection(title: "Tier Points", icon: "star.circle") {
+                            VStack(alignment: .leading, spacing: 8) {
+                                L10nText("Verification")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                Picker("", selection: $tierPointsVerification) {
+                                    Text("Verified").tag(SessionTierPointsVerification.verified)
+                                    Text("Unverified").tag(SessionTierPointsVerification.unverified)
+                                }
+                                .pickerStyle(.segmented)
+                                .tint(.green)
+                            }
                             DetailRow(label: "Starting", value: "\(session.startingTierPoints)")
                             if let et = session.endingTierPoints {
                                 DetailRow(label: "Ending", value: "\(et)")
@@ -263,7 +275,18 @@ struct SessionDetailView: View {
                     .padding()
                 }
             }
-            .onAppear { privateNotes = session.privateNotes ?? "" }
+            .onAppear {
+                privateNotes = session.privateNotes ?? ""
+                tierPointsVerification = session.effectiveTierPointsVerification
+            }
+            .onChange(of: tierPointsVerification) { newValue in
+                guard let idx = store.sessions.firstIndex(where: { $0.id == session.id }) else { return }
+                var s = store.sessions[idx]
+                if s.tierPointsVerification == nil, newValue == .verified { return }
+                guard s.tierPointsVerification != newValue else { return }
+                s.tierPointsVerification = newValue
+                store.updateSession(s)
+            }
             .onDisappear {
                 let trimmed = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard let idx = store.sessions.firstIndex(where: { $0.id == session.id }) else { return }

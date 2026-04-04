@@ -19,6 +19,7 @@ struct EditSessionView: View {
     @State private var cashOut: String = ""
     @State private var startingTier: String = ""
     @State private var endingTier: String = ""
+    @State private var tierPointsVerification: SessionTierPointsVerification = .unverified
     @State private var avgBetActual: String = ""
     @State private var avgBetRated: String = ""
     @State private var privateNotes: String = ""
@@ -199,6 +200,16 @@ struct EditSessionView: View {
                             InputRow(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", value: $cashOut)
                             InputRow(label: "Starting Tier Points", placeholder: "At session start", value: $startingTier)
                             InputRow(label: "Ending Tier Points", placeholder: "At session end", value: $endingTier)
+                            VStack(alignment: .leading, spacing: 6) {
+                                L10nText("Tier points")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                Picker("", selection: $tierPointsVerification) {
+                                    Text("Verified").tag(SessionTierPointsVerification.verified)
+                                    Text("Unverified").tag(SessionTierPointsVerification.unverified)
+                                }
+                                .pickerStyle(.segmented)
+                            }
                             InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
                             InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
                         }
@@ -504,6 +515,7 @@ struct EditSessionView: View {
         cashOut = session.cashOut.map { "\($0)" } ?? ""
         startingTier = "\(session.startingTierPoints)"
         endingTier = session.endingTierPoints.map { "\($0)" } ?? ""
+        tierPointsVerification = session.effectiveTierPointsVerification
         avgBetActual = session.avgBetActual.map { "\($0)" } ?? ""
         avgBetRated = session.avgBetRated.map { "\($0)" } ?? ""
         privateNotes = session.privateNotes ?? ""
@@ -596,6 +608,7 @@ struct EditSessionView: View {
             sessionMood: session.sessionMood,
             privateNotes: privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes,
             rewardsProgramName: session.rewardsProgramName,
+            tierPointsVerification: tierPointsVerification,
             chipEstimatorImageFilename: chipPhotoFilename,
             gameCategory: gameCategory,
             pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,

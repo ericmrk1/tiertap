@@ -138,7 +138,7 @@ struct AddPastSessionView: View {
         return hasGame && !casino.isEmpty &&
             endTime > startTime &&
             buyOK && Int(cashOut) != nil &&
-            Int(startingTier) != nil && Int(endingTier) != nil &&
+            (Int(startingTier) ?? 0) > 0 && Int(endingTier) != nil &&
             Int(avgBetActual) != nil && Int(avgBetRated) != nil
     }
 
@@ -538,16 +538,10 @@ struct AddPastSessionView: View {
                     .tint(.white)
                 }
             }
-            L10nText("Check your casino loyalty app. Use wheel or type exact.")
+            L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                 .font(.caption).foregroundColor(.gray)
-            HStack(spacing: 12) {
-                TierPointsWheel(selectedValue: $startingTier)
-                    .frame(maxWidth: .infinity)
-                TextField("Exact value", text: $startingTier)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .keyboardType(.numberPad)
-                    .frame(width: 110)
-            }
+            StartingTierPointsQuickPickRow(tierPointsText: $startingTier)
+                .environmentObject(settingsStore)
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -793,7 +787,7 @@ struct AddPastSessionView: View {
         }
 
         guard let bi = Int(totalBuyIn), let co = Int(cashOut),
-              let st = Int(startingTier), let et = Int(endingTier),
+              let st = Int(startingTier), st > 0, let et = Int(endingTier),
               let aba = Int(avgBetActual), let abr = Int(avgBetRated) else { return }
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
         let cal = Calendar.current

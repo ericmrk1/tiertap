@@ -5,6 +5,13 @@ enum SessionStatus: String, Codable, CaseIterable {
     case requiringMoreInfo
 }
 
+/// Whether tier point figures for the session are treated as confirmed (`verified`) or still provisional (`unverified`).
+/// `nil` on decoded sessions means data from before this feature existed; use `effectiveTierPointsVerification` (treat as verified).
+enum SessionTierPointsVerification: String, Codable, CaseIterable {
+    case verified
+    case unverified
+}
+
 /// Emotional state after a session (stored in session metadata).
 enum SessionMood: String, Codable, CaseIterable {
     case epic      // amazing
@@ -244,6 +251,8 @@ struct Session: Identifiable, Codable, Equatable {
     var privateNotes: String?
     /// Loyalty program name chosen at check-in (e.g. MGM Rewards), if any.
     var rewardsProgramName: String?
+    /// Confirmed vs provisional tier point totals. New sessions default to `.unverified`; `nil` is only for older persisted data.
+    var tierPointsVerification: SessionTierPointsVerification?
     /// Optional filename for a locally stored chip estimator photo associated with this session.
     var chipEstimatorImageFilename: String?
 
@@ -276,9 +285,14 @@ struct Session: Identifiable, Codable, Equatable {
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
 
+    /// For filtering and display: legacy sessions without `tierPointsVerification` count as verified.
+    var effectiveTierPointsVerification: SessionTierPointsVerification {
+        tierPointsVerification ?? .verified
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName
+        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, tierPointsVerification
         case chipEstimatorImageFilename
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
@@ -306,6 +320,7 @@ struct Session: Identifiable, Codable, Equatable {
         sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
         privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
         rewardsProgramName = try c.decodeIfPresent(String.self, forKey: .rewardsProgramName)
+        tierPointsVerification = try c.decodeIfPresent(SessionTierPointsVerification.self, forKey: .tierPointsVerification)
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
         gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
         pokerGameKind = try c.decodeIfPresent(SessionPokerGameKind.self, forKey: .pokerGameKind)
@@ -332,6 +347,7 @@ struct Session: Identifiable, Codable, Equatable {
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
          status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
          rewardsProgramName: String? = nil,
+         tierPointsVerification: SessionTierPointsVerification? = .unverified,
          chipEstimatorImageFilename: String? = nil,
          gameCategory: SessionGameCategory? = nil,
          pokerGameKind: SessionPokerGameKind? = nil,
@@ -368,6 +384,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.sessionMood = sessionMood
         self.privateNotes = privateNotes
         self.rewardsProgramName = rewardsProgramName
+        self.tierPointsVerification = tierPointsVerification
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
         self.gameCategory = gameCategory
         self.pokerGameKind = pokerGameKind
@@ -408,6 +425,7 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
         try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
         try c.encodeIfPresent(rewardsProgramName, forKey: .rewardsProgramName)
+        try c.encodeIfPresent(tierPointsVerification, forKey: .tierPointsVerification)
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
         try c.encodeIfPresent(gameCategory, forKey: .gameCategory)
         try c.encodeIfPresent(pokerGameKind, forKey: .pokerGameKind)

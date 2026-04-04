@@ -800,6 +800,307 @@ struct TierPointsWheel: View {
     }
 }
 
+// MARK: - Starting tier points quick pick (1k–50k grid sheet + exact field)
+
+private enum StartingTierAuxSheet: String, Identifiable {
+    case quickPickGrid
+    case dialPad
+    var id: String { rawValue }
+}
+
+/// Numeric pad for tier point entry (digits only). Presented at ~60% screen height with keys near the bottom.
+private struct TierPointsDialPadSheet: View {
+    @Binding var value: String
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+    @State private var digits: String = ""
+
+    private let maxDigits = 12
+
+    private var previewText: String {
+        digits.isEmpty ? "0" : digits
+    }
+
+    private func appendDigit(_ d: String) {
+        guard d.count == 1, d.first?.isNumber == true else { return }
+        guard digits.count < maxDigits else { return }
+        digits.append(d)
+    }
+
+    private func deleteLast() {
+        if !digits.isEmpty { digits.removeLast() }
+    }
+
+    private func clearAll() {
+        digits = ""
+    }
+
+    private func applyValueAndDismiss() {
+        if digits.isEmpty {
+            value = ""
+        } else if let n = Int(digits) {
+            value = "\(n)"
+        }
+        dismiss()
+    }
+
+    private func dialButton(_ title: String) -> some View {
+        Button {
+            appendDigit(title)
+        } label: {
+            Text(title)
+                .font(.title.bold())
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 56)
+                .background(Color(.systemGray6).opacity(0.4))
+                .foregroundColor(.white)
+                .cornerRadius(12)
+        }
+    }
+
+    private var keypadRows: some View {
+        VStack(spacing: 12) {
+            ForEach([[1, 2, 3], [4, 5, 6], [7, 8, 9]], id: \.self) { row in
+                HStack(spacing: 12) {
+                    ForEach(row, id: \.self) { n in
+                        dialButton("\(n)")
+                    }
+                }
+            }
+            HStack(spacing: 12) {
+                Button(action: deleteLast) {
+                    Image(systemName: "delete.left")
+                        .font(.title2)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 56)
+                        .background(Color(.systemGray6).opacity(0.4))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                dialButton("0")
+                Button(action: clearAll) {
+                    L10nText("Clear")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 56)
+                        .background(Color(.systemGray6).opacity(0.4))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var navigationContent: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    Spacer(minLength: 0)
+                    Text(previewText)
+                        .font(.system(size: 40, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white)
+                        .minimumScaleFactor(0.35)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 8)
+
+                    keypadRows
+                }
+                .padding()
+            }
+            .localizedNavigationTitle("Tier points")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.foregroundColor(.green)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(action: applyValueAndDismiss) {
+                        L10nText("Done")
+                    }
+                    .foregroundColor(.green)
+                }
+            }
+            .onAppear {
+                digits = value.filter { $0.isNumber }
+            }
+        }
+    }
+
+    var body: some View {
+        navigationContent
+            .presentationDetents([.fraction(0.6)])
+            .presentationDragIndicator(.visible)
+    }
+}
+
+/// Quick-pick grid plus typed value for **starting** tier points only; values may be any positive
+/// integer — the grid is 1,000…50,000 in steps of 1,000.
+struct StartingTierPointsQuickPickRow: View {
+    @Binding var tierPointsText: String
+    @State private var auxSheet: StartingTierAuxSheet?
+    @EnvironmentObject var settingsStore: SettingsStore
+
+    private var displayPoints: Int? {
+        let v = Int(tierPointsText) ?? 0
+        return v > 0 ? v : nil
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Button {
+                auxSheet = .quickPickGrid
+            } label: {
+                HStack {
+                    Image(systemName: "square.grid.2x2.fill")
+                    Group {
+                        if let pts = displayPoints {
+                            Text("\(pts.formatted(.number.grouping(.automatic))) pts")
+                        } else {
+                            L10nText("Quick pick (1k–50k)")
+                        }
+                    }
+                    .lineLimit(1)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray6).opacity(0.25))
+                .foregroundColor(.white)
+                .cornerRadius(12)
+            }
+            .frame(maxWidth: .infinity)
+
+            HStack(spacing: 8) {
+                TextField("Exact value", text: $tierPointsText)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.numberPad)
+                    .frame(minWidth: 80, maxWidth: 118)
+
+                Button {
+                    auxSheet = .dialPad
+                } label: {
+                    Image(systemName: "circle.grid.3x3.fill")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .background(Color(.systemGray6).opacity(0.35))
+                        .cornerRadius(10)
+                }
+                .accessibilityLabel("Number pad")
+            }
+        }
+        .sheet(item: $auxSheet) { kind in
+            switch kind {
+            case .quickPickGrid:
+                TierPointsQuickPickSheet(selectedValue: $tierPointsText)
+                    .environmentObject(settingsStore)
+            case .dialPad:
+                TierPointsDialPadSheet(value: $tierPointsText)
+                    .environmentObject(settingsStore)
+            }
+        }
+    }
+}
+
+private struct TierPointsQuickPickSheet: View {
+    @Binding var selectedValue: String
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+    @State private var showDialPad = false
+
+    private static let gridValues: [Int] = Array(stride(from: 1_000, through: 50_000, by: 1_000))
+
+    private var isPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+
+    @ViewBuilder
+    private var navigationContent: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack(spacing: 8) {
+                            TextField("Exact value", text: $selectedValue)
+                                .textFieldStyle(DarkTextFieldStyle())
+                                .keyboardType(.numberPad)
+
+                            Button {
+                                showDialPad = true
+                            } label: {
+                                Image(systemName: "circle.grid.3x3.fill")
+                                    .font(.system(size: 22, weight: .medium))
+                                    .foregroundColor(.white)
+                                    .frame(width: 44, height: 44)
+                                    .background(Color(.systemGray6).opacity(0.35))
+                                    .cornerRadius(10)
+                            }
+                            .accessibilityLabel("Number pad")
+                        }
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                            ],
+                            spacing: 12
+                        ) {
+                            ForEach(Self.gridValues, id: \.self) { pts in
+                                Button {
+                                    selectedValue = "\(pts)"
+                                    dismiss()
+                                } label: {
+                                    Text(pts.formatted(.number.grouping(.automatic)))
+                                        .font(.headline)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(minHeight: 56)
+                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(12)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .localizedNavigationTitle("Tier points")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.foregroundColor(.green)
+                }
+            }
+        }
+    }
+
+    var body: some View {
+        Group {
+            if isPad {
+                GeometryReader { geo in
+                    navigationContent
+                        .frame(height: geo.size.height * 0.7)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                }
+            } else {
+                navigationContent
+            }
+        }
+        .sheet(isPresented: $showDialPad) {
+            TierPointsDialPadSheet(value: $selectedValue)
+                .environmentObject(settingsStore)
+        }
+    }
+}
+
 // MARK: - Initial buy-in grid (popup with big squares)
 struct BuyInGridSheet: View {
     let amounts: [Int]

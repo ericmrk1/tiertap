@@ -27,6 +27,7 @@
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */; };
+		FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */; };
 		5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282155DBCB51F96C8840E98B /* SessionDetailView.swift */; };
 		667E48382A9F58F593FD6471 /* CasinoTimerWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */; };
@@ -175,6 +176,7 @@
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
+		FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastCheckInBar.swift; sourceTree = "<group>"; };
 		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportCatalog.swift; sourceTree = "<group>"; };
 		ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirlineCatalog.swift; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
 				7E68A7C0EAF309AC9F041237 /* HomeView.swift */,
 				9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */,
+				FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */,
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
 				STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */,
@@ -691,6 +694,7 @@
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,
 				4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */,
+				FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */,
 				8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */,
 				8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */,
 				BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */,

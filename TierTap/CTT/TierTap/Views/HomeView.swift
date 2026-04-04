@@ -161,6 +161,9 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                     .background(GameCategoryBubbleBackground(cornerRadius: 16))
                             }
+                            FastCheckInBar()
+                                .environmentObject(store)
+                                .environmentObject(settingsStore)
                         }
                     }
                     .padding(.horizontal).padding(.bottom, 44)

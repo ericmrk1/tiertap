@@ -244,6 +244,21 @@ struct CloseoutView: View {
                                 }
                             }
                             InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier)
+                            VStack(alignment: .leading, spacing: 8) {
+                                L10nText("Tier points")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                Picker("", selection: Binding(
+                                    get: { store.liveSession?.effectiveTierPointsVerification ?? .unverified },
+                                    set: { store.updateLiveSessionTierPointsVerification($0) }
+                                )) {
+                                    Text("Verified").tag(SessionTierPointsVerification.verified)
+                                    Text("Unverified").tag(SessionTierPointsVerification.unverified)
+                                }
+                                .pickerStyle(.segmented)
+                                .tint(.green)
+                            }
+                            .padding(.vertical, 4)
                             if settingsStore.unitSize > 0,
                                s.totalBuyIn > settingsStore.unitSize {
                                 HStack(spacing: 6) {

@@ -191,6 +191,42 @@ struct LiveSessionView: View {
                                 StatMini(title: "Start Pts", value: "\(s.startingTierPoints)")
                             }
 
+                            VStack(alignment: .leading, spacing: 8) {
+                                L10nText("Tier points")
+                                    .font(.caption.bold())
+                                    .foregroundColor(.gray)
+                                Picker("", selection: Binding(
+                                    get: { store.liveSession?.effectiveTierPointsVerification ?? .unverified },
+                                    set: { store.updateLiveSessionTierPointsVerification($0) }
+                                )) {
+                                    Text("Verified").tag(SessionTierPointsVerification.verified)
+                                    Text("Unverified").tag(SessionTierPointsVerification.unverified)
+                                }
+                                .pickerStyle(.segmented)
+                                .tint(.green)
+                            }
+                            .padding()
+                            .background(Color(.systemGray6).opacity(0.15))
+                            .cornerRadius(16)
+
+                            Button {
+                                if hasMissingInfo {
+                                    showMissingInfoAlert = true
+                                } else {
+                                    if let live = store.liveSession {
+                                        settingsStore.recordLastPlayedGameChoices(from: live)
+                                    }
+                                    store.fastCloseSessionWithDefaultsUnverified()
+                                }
+                            } label: {
+                                LocalizedLabel(title: "Fast Close Out", systemImage: "bolt.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 16)
+                                    .background(Color.orange.opacity(0.9))
+                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
+                            }
+
                             Button {
                                 if hasMissingInfo {
                                     showMissingInfoAlert = true
