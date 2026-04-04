@@ -426,15 +426,21 @@ struct AddPastSessionView: View {
 
                         if pokerGameKind == .tournament {
                             HStack(spacing: 8) {
-                                TextField("Level mins", text: $pokerLevelMinutesText)
-                                    .textFieldStyle(DarkTextFieldStyle())
-                                    .keyboardType(.numberPad)
-                                TextField("Starting stack", text: $pokerStartingStackText)
-                                    .textFieldStyle(DarkTextFieldStyle())
-                                    .keyboardType(.numberPad)
-                                TextField("Cost", text: $pokerTournamentCostText)
-                                    .textFieldStyle(DarkTextFieldStyle())
-                                    .keyboardType(.numberPad)
+                                NumericEntryWithDialPad(
+                                    placeholder: "Level mins",
+                                    text: $pokerLevelMinutesText,
+                                    dialPadNavigationTitle: "Level minutes"
+                                )
+                                NumericEntryWithDialPad(
+                                    placeholder: "Starting stack",
+                                    text: $pokerStartingStackText,
+                                    dialPadNavigationTitle: "Starting stack"
+                                )
+                                NumericEntryWithDialPad(
+                                    placeholder: "Cost",
+                                    text: $pokerTournamentCostText,
+                                    dialPadNavigationTitle: "Tournament cost"
+                                )
                             }
                         }
                     }
@@ -540,7 +546,7 @@ struct AddPastSessionView: View {
             }
             L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                 .font(.caption).foregroundColor(.gray)
-            StartingTierPointsQuickPickRow(tierPointsText: $startingTier)
+            TierPointsQuickPickRow(tierPointsText: $startingTier)
                 .environmentObject(settingsStore)
         }
         .padding()
@@ -568,9 +574,11 @@ struct AddPastSessionView: View {
                 .frame(maxWidth: .infinity)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    TextField("Exact amount", text: $totalBuyIn)
-                        .textFieldStyle(DarkTextFieldStyle())
-                        .keyboardType(.numberPad)
+                    NumericEntryWithDialPad(
+                        placeholder: "Exact amount",
+                        text: $totalBuyIn,
+                        dialPadNavigationTitle: "Buy-In"
+                    )
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -597,16 +605,10 @@ struct AddPastSessionView: View {
             LocalizedLabel(title: "Ending Tier Points", systemImage: "star.circle.fill")
                 .font(.headline)
                 .foregroundColor(.white)
-            L10nText("Use wheel or type exact.")
+            L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                 .font(.caption).foregroundColor(.gray)
-            HStack(spacing: 12) {
-                TierPointsWheel(selectedValue: $endingTier)
-                    .frame(maxWidth: .infinity)
-                TextField("Exact value", text: $endingTier)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .keyboardType(.numberPad)
-                    .frame(width: 110)
-            }
+            TierPointsQuickPickRow(tierPointsText: $endingTier)
+                .environmentObject(settingsStore)
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -656,11 +658,26 @@ struct AddPastSessionView: View {
                 .foregroundColor(.white)
             Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
                 GridRow {
-                    compactNumberField(label: "Cash Out (\(settingsStore.currencySymbol))", placeholder: "Amount cashed out", text: $cashOut)
+                    compactNumberField(
+                        label: "Cash Out (\(settingsStore.currencySymbol))",
+                        placeholder: "Amount cashed out",
+                        text: $cashOut,
+                        dialPadTitle: "Cash Out"
+                    )
                 }
                 GridRow {
-                    compactNumberField(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", text: $avgBetActual)
-                    compactNumberField(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", text: $avgBetRated)
+                    compactNumberField(
+                        label: "Avg Bet Actual (\(settingsStore.currencySymbol))",
+                        placeholder: "Actual avg bet",
+                        text: $avgBetActual,
+                        dialPadTitle: "Avg bet actual"
+                    )
+                    compactNumberField(
+                        label: "Avg Bet Rated (\(settingsStore.currencySymbol))",
+                        placeholder: "Rated avg bet",
+                        text: $avgBetRated,
+                        dialPadTitle: "Avg bet rated"
+                    )
                 }
             }
             VStack(alignment: .leading, spacing: 6) {
@@ -755,14 +772,16 @@ struct AddPastSessionView: View {
         .disabled(!isValid)
     }
 
-    private func compactNumberField(label: String, placeholder: String, text: Binding<String>) -> some View {
+    private func compactNumberField(label: String, placeholder: String, text: Binding<String>, dialPadTitle: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.caption)
                 .foregroundColor(.white)
-            TextField(placeholder, text: text)
-                .textFieldStyle(DarkTextFieldStyle())
-                .keyboardType(.numberPad)
+            NumericEntryWithDialPad(
+                placeholder: placeholder,
+                text: text,
+                dialPadNavigationTitle: dialPadTitle
+            )
         }
     }
 

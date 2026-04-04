@@ -569,7 +569,7 @@ struct CheckInView: View {
                         }
                         L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                             .font(.caption).foregroundColor(.gray)
-                        StartingTierPointsQuickPickRow(tierPointsText: $startingTier)
+                        TierPointsQuickPickRow(tierPointsText: $startingTier)
                             .environmentObject(settingsStore)
                     }
                     .padding()

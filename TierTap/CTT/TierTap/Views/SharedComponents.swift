@@ -1001,9 +1001,8 @@ struct NumericEntryWithDialPad: View {
     }
 }
 
-/// Quick-pick grid plus typed value for **starting** tier points only; values may be any positive
-/// integer — the grid is 1,000…50,000 in steps of 1,000.
-struct StartingTierPointsQuickPickRow: View {
+/// Quick-pick grid (1k–50k) plus exact field and dial pad for tier points (starting or ending).
+struct TierPointsQuickPickRow: View {
     @Binding var tierPointsText: String
     @State private var auxSheet: StartingTierAuxSheet?
     @EnvironmentObject var settingsStore: SettingsStore
