@@ -44,14 +44,7 @@ struct EditSessionView: View {
     @State private var showCompSheet = false
     @State private var compToEdit: CompEvent?
 
-    private static let quickCompAmounts: [Int] = [
-        5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000
-    ]
-
     private var compTotal: Int { compEvents.reduce(0) { $0 + $1.amount } }
-    private var compDollarsCreditsTotal: Int {
-        compEvents.filter { $0.kind == .dollarsCredits }.reduce(0) { $0 + $1.amount }
-    }
 
     // Session photo attachment
     @State private var sessionPhoto: UIImage?
@@ -457,8 +450,6 @@ struct EditSessionView: View {
             .adaptiveSheet(isPresented: $showCompSheet) {
                 CompQuickAddSheet(
                     existingSessionCompTotal: compTotal,
-                    existingDollarsCreditsCompTotal: compDollarsCreditsTotal,
-                    quickAmounts: Self.quickCompAmounts,
                     sessionGame: selectedGame,
                     sessionCasino: casino,
                     sessionCasinoLatitude: session.casinoLatitude,

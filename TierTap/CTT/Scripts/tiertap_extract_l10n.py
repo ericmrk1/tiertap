@@ -55,6 +55,10 @@ def extract_literals(roots: list[Path]) -> list[str]:
         re.compile(r'L10nText\(\s*"((?:\\.|[^"\\])*)"\s*\)'),
         re.compile(r'LocalizedLabel\(\s*title:\s*"((?:\\.|[^"\\])*)"\s*,'),
         re.compile(r'\.localizedNavigationTitle\(\s*"((?:\\.|[^"\\])*)"\s*\)'),
+        # User guide + any explicit L10n.tr("English key", language: …)
+        re.compile(r'L10n\.tr\(\s*"((?:\\.|[^"\\])*)"\s*,'),
+        # UserGuideContent.loc("English key", language)
+        re.compile(r'\bloc\(\s*"((?:\\.|[^"\\])*)"\s*,'),
     ]
     found: set[str] = set()
     for root in roots:

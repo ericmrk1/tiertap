@@ -24,6 +24,9 @@
 		2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */; };
 		2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
+		UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */; };
+		UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */; };
+		UGPDFBUILD01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */; };
@@ -180,6 +183,9 @@
 		APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockGateView.swift; sourceTree = "<group>"; };
 		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideContent.swift; sourceTree = "<group>"; };
+		UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideView.swift; sourceTree = "<group>"; };
+		UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuidePDFExporter.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
 		FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastCheckInBar.swift; sourceTree = "<group>"; };
@@ -299,6 +305,9 @@
 				PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */,
 				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
 				7E68A7C0EAF309AC9F041237 /* HomeView.swift */,
+				UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */,
+				UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */,
+				UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */,
 				9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */,
 				FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */,
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
@@ -703,6 +712,9 @@
 				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,
+				UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */,
+				UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */,
+				UGPDFBUILD01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift in Sources */,
 				4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */,
 				FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */,
 				8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */,

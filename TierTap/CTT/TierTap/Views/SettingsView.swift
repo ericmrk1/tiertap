@@ -43,6 +43,7 @@ struct SettingsView: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
+                        aboutSection
                         accountSection
                         bankrollSection
                         riskOfRuinSection
@@ -51,7 +52,6 @@ struct SettingsView: View {
                         themeSection
                         tierTapAISection
                         dataExportSection
-                        aboutSection
                     }
                     .padding()
                 }
@@ -840,6 +840,27 @@ struct SettingsView: View {
             isExpanded: $isAboutExpanded
         ) {
             VStack(spacing: 10) {
+                NavigationLink {
+                    UserGuideView()
+                        .environmentObject(settingsStore)
+                } label: {
+                    HStack {
+                        Image(systemName: "book.pages.fill")
+                        L10nText("User Guide")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+
                 if let gaURL = URL(string: "https://www.gamblersanonymous.org/") {
                     Link(destination: gaURL) {
                         HStack {

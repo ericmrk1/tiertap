@@ -841,6 +841,35 @@ final class SettingsStore: ObservableObject {
         return useEighteenXMultipliers ? base.map { $0 * 18 } : base
     }
 
+    /// Same chip grid as check-in / past-session buy-in: settings denominations plus common squares, up to 100k.
+    var buyInGridAmounts: [Int] {
+        let base = effectiveDenominations
+        let denoms = base.isEmpty ? [100, 200, 300, 500, 1000, 2000, 5000, 10_000] : base
+        var set: Set<Int> = Set(denoms)
+
+        for d in denoms {
+            set.insert(d)
+            set.insert(d * 2)
+            set.insert(d * 3)
+            if d >= 100 { set.insert(d / 2) }
+        }
+
+        set.insert(25); set.insert(50); set.insert(75); set.insert(150); set.insert(250); set.insert(750)
+
+        let maxTarget = 100_000
+        let step = 1_000
+        let currentMax = set.max() ?? 0
+        if currentMax < maxTarget {
+            var next = max(step, ((currentMax + step - 1) / step) * step)
+            while next <= maxTarget {
+                set.insert(next)
+                next += step
+            }
+        }
+
+        return set.sorted()
+    }
+
     var primaryColor: Color {
         if let hex = primaryColorHex, let c = color(fromHex: hex) {
             return c

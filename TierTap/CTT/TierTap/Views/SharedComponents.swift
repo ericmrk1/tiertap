@@ -56,6 +56,51 @@ struct FilterPanelPillButton: View {
     }
 }
 
+// MARK: - Date + time split for compact filter pickers
+
+extension Binding where Value == Date {
+    /// Calendar day for a `.date` picker; preserves hour/minute/second of the full `Date` when the day changes.
+    func datePortion(calendar: Calendar = .current) -> Binding<Date> {
+        Binding(
+            get: { calendar.startOfDay(for: self.wrappedValue) },
+            set: { newDay in
+                let time = calendar.dateComponents([.hour, .minute, .second], from: self.wrappedValue)
+                var components = calendar.dateComponents([.year, .month, .day], from: newDay)
+                components.hour = time.hour
+                components.minute = time.minute
+                components.second = time.second
+                if let merged = calendar.date(from: components) {
+                    self.wrappedValue = merged
+                }
+            }
+        )
+    }
+
+    /// Time-of-day for an `.hourAndMinute` picker; merges into the calendar day of the full `Date`.
+    func timePortion(calendar: Calendar = .current) -> Binding<Date> {
+        Binding(
+            get: {
+                let comps = calendar.dateComponents([.hour, .minute], from: self.wrappedValue)
+                return calendar.date(from: DateComponents(calendar: calendar, year: 2000, month: 1, day: 1, hour: comps.hour, minute: comps.minute))
+                    ?? self.wrappedValue
+            },
+            set: { newTime in
+                let day = calendar.dateComponents([.year, .month, .day], from: self.wrappedValue)
+                let time = calendar.dateComponents([.hour, .minute], from: newTime)
+                var merged = DateComponents()
+                merged.year = day.year
+                merged.month = day.month
+                merged.day = day.day
+                merged.hour = time.hour
+                merged.minute = time.minute
+                if let d = calendar.date(from: merged) {
+                    self.wrappedValue = d
+                }
+            }
+        )
+    }
+}
+
 struct GameButton: View {
     let title: String
     let isSelected: Bool
@@ -1144,15 +1189,58 @@ private struct TierPointsQuickPickSheet: View {
 }
 
 // MARK: - Initial buy-in grid (popup with big squares)
+
+/// Shared multi-select chip grid for buy-in and dollars/credits comp entry.
+enum BuyInGridSheetMode: Equatable {
+    case initialBuyIn
+    case compAmount
+}
+
 struct BuyInGridSheet: View {
     let amounts: [Int]
     @Binding var selected: String
+    var mode: BuyInGridSheetMode = .initialBuyIn
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var selectedAmounts: Set<Int> = []
 
     private var totalSelected: Int {
         selectedAmounts.reduce(0, +)
+    }
+
+    private var navigationTitle: String {
+        switch mode {
+        case .initialBuyIn: return "Initial Buy-In"
+        case .compAmount: return "Comp amount"
+        }
+    }
+
+    private var totalSummaryText: String {
+        let sym = settingsStore.currencySymbol
+        switch mode {
+        case .initialBuyIn:
+            return totalSelected > 0
+                ? "Total buy-in: \(sym)\(totalSelected)"
+                : "Select one or more amounts."
+        case .compAmount:
+            return totalSelected > 0
+                ? "Comp amount: \(sym)\(totalSelected)"
+                : "Select one or more amounts."
+        }
+    }
+
+    private var confirmButtonTitle: String {
+        let sym = settingsStore.currencySymbol
+        switch mode {
+        case .initialBuyIn:
+            return totalSelected > 0
+                ? "Good Luck - Buying in for \(sym)\(totalSelected)"
+                : "Good Luck"
+        case .compAmount:
+            return totalSelected > 0
+                ? "Use \(sym)\(totalSelected)"
+                : "Set amount"
+        }
     }
 
     private var isPad: Bool {
@@ -1200,11 +1288,7 @@ struct BuyInGridSheet: View {
                     }
 
                     VStack(spacing: 8) {
-                        Text(
-                            totalSelected > 0
-                            ? "Total buy-in: \(settingsStore.currencySymbol)\(totalSelected)"
-                            : "Select one or more amounts."
-                        )
+                        Text(totalSummaryText)
                         .font(.subheadline)
                         .foregroundColor(.gray)
 
@@ -1213,11 +1297,7 @@ struct BuyInGridSheet: View {
                             selected = "\(totalSelected)"
                             dismiss()
                         } label: {
-                            Text(
-                                totalSelected > 0
-                                ? "Good Luck - Buying in for \(settingsStore.currencySymbol)\(totalSelected)"
-                                : "Good Luck"
-                            )
+                            Text(confirmButtonTitle)
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -1231,7 +1311,7 @@ struct BuyInGridSheet: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
             }
-            .localizedNavigationTitle("Initial Buy-In")
+            .localizedNavigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -1534,9 +1614,6 @@ private struct CompEstimateReviewSheet: View {
 struct CompQuickAddSheet: View {
     /// Sum of comp amounts already recorded for this session (running total before this entry).
     let existingSessionCompTotal: Int
-    /// Sum of dollars / credits comps already logged this session.
-    let existingDollarsCreditsCompTotal: Int
-    let quickAmounts: [Int]
     /// Live session table game (for AI comp value estimation).
     var sessionGame: String = ""
     /// Live session casino / location name (for AI comp value estimation).
@@ -1550,9 +1627,9 @@ struct CompQuickAddSheet: View {
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
     @State private var selectedKind: CompKind = .foodBeverage
-    /// Count per quick denomination; total dollars = sum(amt * count) plus optional additional field.
-    @State private var dollarDenominationCounts: [Int: Int] = [:]
-    @State private var dollarAdditionalText = ""
+    /// Dollars / credits comp value (same grid + exact field pattern as buy-in).
+    @State private var dollarsCreditsText = ""
+    @State private var showDollarsCreditsGrid = false
     @State private var foodValueText = ""
     @State private var foodBeverageKind: FoodBeverageKind = .meal
     @State private var detailsText = ""
@@ -1584,14 +1661,6 @@ struct CompQuickAddSheet: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
-    /// Scrollable denomination list: fixed viewport height (row + spacing); hint when more rows exist below.
-    private static let denominationRowSpacing: CGFloat = 8
-    private static let denominationRowHeight: CGFloat = 50
-    private static let denominationVisibleRows: CGFloat = 3
-    private static var denominationListMaxHeight: CGFloat {
-        denominationVisibleRows * denominationRowHeight + (denominationVisibleRows - 1) * denominationRowSpacing
-    }
-
     /// Matches Est. value `TextField` + spacing + Estimator button on the food row (below the column labels).
     private static let compDetailsEditorHeight: CGFloat = 100
     /// Minimum height so an empty details field shows ~3 caption lines.
@@ -1600,15 +1669,8 @@ struct CompQuickAddSheet: View {
         return line * 3 + 8
     }
 
-    private var parsedDollarAdditional: Int {
-        Int(dollarAdditionalText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0
-    }
-
     private var dollarsCreditsValue: Int {
-        let fromDenoms = quickAmounts.reduce(0) { sum, amt in
-            sum + amt * (dollarDenominationCounts[amt] ?? 0)
-        }
-        return fromDenoms + parsedDollarAdditional
+        max(0, Int(dollarsCreditsText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
     }
 
     private var parsedFoodValue: Int {
@@ -1641,6 +1703,51 @@ struct CompQuickAddSheet: View {
                 .frame(maxWidth: .infinity, minHeight: Self.compDetailsTextFieldMinHeight, alignment: .topLeading)
         }
         .frame(height: Self.compDetailsEditorHeight)
+    }
+
+    private var sessionCompTotalsFooter: some View {
+        VStack(spacing: 4) {
+            if existingSessionCompTotal > 0 {
+                Text("All comps: \(settingsStore.currencySymbol)\(existingSessionCompTotal.formatted(.number.grouping(.automatic)))")
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+            }
+            Text(parsedValueForSubmit > 0
+                 ? "After this entry, session comps total: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))"
+                 : "Set a value to see the new session comps total.")
+                .font(.subheadline)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var addCompSubmitButton: some View {
+        Button {
+            guard parsedValueForSubmit > 0 else { return }
+            let kind = selectedKind
+            let note = detailsText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let fb: FoodBeverageKind? = (kind == .foodBeverage) ? foodBeverageKind : nil
+            let otherTrim = foodBeverageOtherText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let otherDesc: String? = (kind == .foodBeverage && fb == .other && !otherTrim.isEmpty) ? otherTrim : nil
+            if kind == .foodBeverage {
+                settingsStore.lastFoodBeverageCompKind = foodBeverageKind
+            }
+            onAdd(kind, parsedValueForSubmit, note.isEmpty ? nil : note, fb, otherDesc, compPhoto?.jpegData(compressionQuality: 0.9))
+            if settingsStore.enableCasinoFeedback {
+                CelebrationPlayer.shared.playQuickChime()
+            }
+            dismiss()
+        } label: {
+            Text(canSubmit ? "Add \(settingsStore.currencySymbol)\(parsedValueForSubmit)" : "Add comp")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(canSubmit ? Color.green : Color.gray)
+                .foregroundColor(canSubmit ? .black : .white)
+                .cornerRadius(14)
+        }
+        .disabled(!canSubmit)
     }
 
     var body: some View {
@@ -1701,12 +1808,21 @@ struct CompQuickAddSheet: View {
                         }
 
                         if selectedKind == .dollarsCredits {
-                            dollarsCreditsSection
+                            dollarsCreditsBuyInStyleSection
+                            VStack(alignment: .leading, spacing: 0) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    L10nText("Details (optional)")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(.gray)
+                                    detailsOptionalEditorField()
+                                }
+                                addCompSubmitButton
+                                    .padding(.top, 6)
+                                sessionCompTotalsFooter
+                                    .padding(.top, 6)
+                            }
                         } else if selectedKind == .foodBeverage {
                             foodBeverageSection
-                        }
-
-                        if selectedKind == .foodBeverage {
                             HStack(alignment: .top, spacing: 12) {
                                 VStack(alignment: .leading, spacing: 8) {
                                     L10nText("Details (optional)")
@@ -1752,59 +1868,12 @@ struct CompQuickAddSheet: View {
                                 }
                                 .frame(minWidth: 132, maxWidth: 180, alignment: .leading)
                             }
-                        } else {
-                            VStack(alignment: .leading, spacing: 8) {
-                                L10nText("Details (optional)")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundColor(.gray)
-                                detailsOptionalEditorField()
-                            }
+                            sessionCompTotalsFooter
+                            addCompSubmitButton
                         }
-
-                        VStack(spacing: 4) {
-                            if existingSessionCompTotal > 0 {
-                                Text("All comps: \(settingsStore.currencySymbol)\(existingSessionCompTotal.formatted(.number.grouping(.automatic)))")
-                                    .font(.subheadline)
-                                    .foregroundColor(.primary)
-                            }
-                            Text(parsedValueForSubmit > 0
-                                 ? "After this entry, session comps total: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))"
-                                 : "Set a value to see the new session comps total.")
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-
-                        Button {
-                            guard parsedValueForSubmit > 0 else { return }
-                            let kind = selectedKind
-                            let note = detailsText.trimmingCharacters(in: .whitespacesAndNewlines)
-                            let fb: FoodBeverageKind? = (kind == .foodBeverage) ? foodBeverageKind : nil
-                            let otherTrim = foodBeverageOtherText.trimmingCharacters(in: .whitespacesAndNewlines)
-                            let otherDesc: String? = (kind == .foodBeverage && fb == .other && !otherTrim.isEmpty) ? otherTrim : nil
-                            if kind == .foodBeverage {
-                                settingsStore.lastFoodBeverageCompKind = foodBeverageKind
-                            }
-                            onAdd(kind, parsedValueForSubmit, note.isEmpty ? nil : note, fb, otherDesc, compPhoto?.jpegData(compressionQuality: 0.9))
-                            if settingsStore.enableCasinoFeedback {
-                                CelebrationPlayer.shared.playQuickChime()
-                            }
-                            dismiss()
-                        } label: {
-                            Text(canSubmit ? "Add \(settingsStore.currencySymbol)\(parsedValueForSubmit)" : "Add comp")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(canSubmit ? Color.green : Color.gray)
-                                .foregroundColor(canSubmit ? .black : .white)
-                                .cornerRadius(14)
-                        }
-                        .disabled(!canSubmit)
 
                         Button("Clear") {
-                            dollarDenominationCounts = [:]
-                            dollarAdditionalText = ""
+                            dollarsCreditsText = ""
                             foodValueText = ""
                             foodBeverageOtherText = ""
                             foodBeverageKind = settingsStore.lastFoodBeverageCompKind
@@ -1896,6 +1965,14 @@ struct CompQuickAddSheet: View {
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
+            }
+            .adaptiveSheet(isPresented: $showDollarsCreditsGrid) {
+                BuyInGridSheet(
+                    amounts: settingsStore.buyInGridAmounts,
+                    selected: $dollarsCreditsText,
+                    mode: .compAmount
+                )
+                .environmentObject(settingsStore)
             }
             .sheet(item: $pendingCompEstimate) { estimate in
                 CompEstimateReviewSheet(
@@ -2196,119 +2273,37 @@ struct CompQuickAddSheet: View {
         return String(trimmed[start ... end])
     }
 
-    private var dollarsCreditsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    LazyVStack(spacing: Self.denominationRowSpacing) {
-                        ForEach(quickAmounts, id: \.self) { amt in
-                            dollarDenominationRow(amt)
-                        }
-                    }
-                    .padding(.bottom, dollarsCreditsScrollHintVisible ? 4 : 0)
-                }
-                .frame(maxHeight: Self.denominationListMaxHeight)
-                .clipped()
-
-                if dollarsCreditsScrollHintVisible {
-                    LinearGradient(
-                        colors: [.clear, Color.black.opacity(0.4)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 28)
-                    .allowsHitTesting(false)
-                }
-            }
-
-            if dollarsCreditsScrollHintVisible {
-                HStack(spacing: 6) {
-                    Image(systemName: "chevron.down")
-                        .font(.caption2.weight(.semibold))
-                    L10nText("Scroll for more amounts")
-                        .font(.caption2.weight(.medium))
-                }
-                .foregroundColor(.gray)
-                .frame(maxWidth: .infinity)
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                L10nText("Additional to total")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.gray)
-                NumericEntryWithDialPad(
-                    placeholder: "0",
-                    text: $dollarAdditionalText,
-                    dialPadNavigationTitle: "Amount"
-                )
-            }
-            .padding(.top, 4)
-        }
-    }
-
-    /// True when the quick-amount list is taller than the fixed viewport (user must scroll).
-    private var dollarsCreditsScrollHintVisible: Bool {
-        quickAmounts.count > Int(Self.denominationVisibleRows)
-    }
-
-    private func dollarCount(for amt: Int) -> Int {
-        dollarDenominationCounts[amt] ?? 0
-    }
-
-    private func incrementDollarDenom(_ amt: Int) {
-        var next = dollarDenominationCounts
-        next[amt, default: 0] += 1
-        dollarDenominationCounts = next
-    }
-
-    private func decrementDollarDenom(_ amt: Int) {
-        var next = dollarDenominationCounts
-        guard let v = next[amt], v > 0 else { return }
-        if v == 1 {
-            next.removeValue(forKey: amt)
-        } else {
-            next[amt] = v - 1
-        }
-        dollarDenominationCounts = next
-    }
-
-    private func dollarDenominationRow(_ amt: Int) -> some View {
-        let count = dollarCount(for: amt)
-        let active = count > 0
-        return HStack(spacing: 12) {
-            Button {
-                decrementDollarDenom(amt)
-            } label: {
-                Image(systemName: "minus.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(active ? .orange : .gray.opacity(0.35))
-            }
-            .buttonStyle(.plain)
-            .disabled(!active)
-            Text("\(settingsStore.currencySymbol)\(amt.formatted(.number.grouping(.automatic)))")
+    /// Same pattern as check-in / past-session buy-in: chip grid sheet + exact amount + dial pad.
+    private var dollarsCreditsBuyInStyleSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            LocalizedLabel(title: "Comp amount", systemImage: "dollarsign.circle")
                 .font(.headline)
-                .monospacedDigit()
                 .foregroundColor(.white)
+            HStack(alignment: .top, spacing: 12) {
+                Button { showDollarsCreditsGrid = true } label: {
+                    HStack {
+                        Image(systemName: "square.grid.2x2.fill")
+                        Text(dollarsCreditsText.isEmpty ? "Choose cash" : "\(settingsStore.currencySymbol)\(dollarsCreditsText)")
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
                 .frame(maxWidth: .infinity)
-            Button {
-                incrementDollarDenom(amt)
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(.green)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    NumericEntryWithDialPad(
+                        placeholder: "Exact amount",
+                        text: $dollarsCreditsText,
+                        dialPadNavigationTitle: "Buy-In"
+                    )
+                }
+                .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(active ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(active ? Color.green.opacity(0.6) : Color.gray.opacity(0.3), lineWidth: active ? 1.5 : 1)
-        )
-        .cornerRadius(14)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Dollar amount \(amt), count \(count)")
     }
 
     private var foodBeverageSection: some View {

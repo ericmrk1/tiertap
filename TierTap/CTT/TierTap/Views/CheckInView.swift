@@ -98,39 +98,6 @@ struct CheckInView: View {
         return selectedGame.isEmpty || list.contains(selectedGame)
     }
 
-    /// Build a large set of common buy-in amounts from settings denominations + common squares,
-    /// and extend in regular increments up to 100k so the grid can keep scrolling upward.
-    private var buyInGridAmounts: [Int] {
-        let base = settingsStore.effectiveDenominations
-        let denoms = base.isEmpty ? [100, 200, 300, 500, 1000, 2000, 5000, 10_000] : base
-        var set: Set<Int> = Set(denoms)
-
-        // Core multiples/halves around the configured denominations.
-        for d in denoms {
-            set.insert(d)
-            set.insert(d * 2)
-            set.insert(d * 3)
-            if d >= 100 { set.insert(d / 2) }
-        }
-
-        // Extra "nice" chips.
-        set.insert(25); set.insert(50); set.insert(75); set.insert(150); set.insert(250); set.insert(750)
-
-        // Ensure amounts continue in clean increments up to 100k so the grid keeps scrolling.
-        let maxTarget = 100_000
-        let step = 1_000
-        let currentMax = set.max() ?? 0
-        if currentMax < maxTarget {
-            var next = max(step, ((currentMax + step - 1) / step) * step)
-            while next <= maxTarget {
-                set.insert(next)
-                next += step
-            }
-        }
-
-        return set.sorted()
-    }
-
     /// Known casino loyalty / rewards programs. For now this is hard-coded and
     /// matched loosely against the selected casino name.
     private let defaultRewardPrograms: [String] = [
@@ -679,7 +646,7 @@ struct CheckInView: View {
                 }
             }
             .adaptiveSheet(isPresented: $showBuyInPicker) {
-                BuyInGridSheet(amounts: buyInGridAmounts, selected: $initialBuyIn)
+                BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $initialBuyIn)
                     .environmentObject(settingsStore)
                     .presentationDetents([.fraction(0.7), .large])
                     .presentationDragIndicator(.visible)

@@ -241,32 +241,61 @@ struct HistoryView: View {
                     .tint(.green)
 
                     if useDateRangeFilter {
-                        VStack(alignment: .leading, spacing: 4) {
-                            L10nText("From")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                            DatePicker(
-                                "",
-                                selection: $filterStartDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
-                            .tint(.white)
-                        }
+                        HStack(alignment: .top, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                L10nText("From")
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.8))
+                                DatePicker(
+                                    "",
+                                    selection: $filterStartDate.datePortion(),
+                                    displayedComponents: .date
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
+                                DatePicker(
+                                    "",
+                                    selection: $filterStartDate.timePortion(),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            L10nText("To")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                            DatePicker(
-                                "",
-                                selection: $filterEndDate,
-                                displayedComponents: [.date, .hourAndMinute]
-                            )
-                            .datePickerStyle(.compact)
-                            .labelsHidden()
-                            .tint(.white)
+                            Rectangle()
+                                .fill(Color.white.opacity(0.22))
+                                .frame(width: 1)
+                                .padding(.vertical, 4)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                L10nText("To")
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.8))
+                                DatePicker(
+                                    "",
+                                    selection: $filterEndDate.datePortion(),
+                                    displayedComponents: .date
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
+                                DatePicker(
+                                    "",
+                                    selection: $filterEndDate.timePortion(),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }

@@ -32,6 +32,7 @@ struct CommunityPublisher {
     /// When `publishTierPerHour` is true, `tiers_per_hour` is included in metrics; otherwise it is omitted.
     /// When `publishWinLoss` is true, buy-in, cash-out, net win/loss, total comps, and EV (expected value = net + comps) are included in metrics.
     /// When `publishCompDetails` is true, `comp_count` and `comp_value_total` (sum of logged comp amounts) are included for sessions that have comps.
+    /// When `attachScreenName` is false, `session_details.screen_name` is omitted so the post appears as Anonymous in the feed (still tied to your account on the server).
     static func publishSessions(
         _ sessions: [Session],
         authStore: AuthStore,
@@ -40,7 +41,8 @@ struct CommunityPublisher {
         comment: String? = nil,
         publishTierPerHour: Bool = true,
         publishWinLoss: Bool = false,
-        publishCompDetails: Bool = false
+        publishCompDetails: Bool = false,
+        attachScreenName: Bool = true
     ) async throws -> Int {
         guard SupabaseConfig.isConfigured else {
             throw CommunityPublisherError.supabaseNotConfigured
@@ -62,9 +64,15 @@ struct CommunityPublisher {
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
         let userId = session.user.id
-        let registeredScreenName = try await UserScreenNamesAPI.fetchRegisteredScreenName(userId: userId)
-        guard let screenNameForPost = registeredScreenName, !screenNameForPost.isEmpty else {
-            throw CommunityPublisherError.screenNameNotRegistered
+        let screenNameForPost: String?
+        if attachScreenName {
+            let registered = try await UserScreenNamesAPI.fetchRegisteredScreenName(userId: userId)
+            guard let name = registered, !name.isEmpty else {
+                throw CommunityPublisherError.screenNameNotRegistered
+            }
+            screenNameForPost = name
+        } else {
+            screenNameForPost = nil
         }
 
         let payloads: [TableGamePostPayload] = completed.map { s in

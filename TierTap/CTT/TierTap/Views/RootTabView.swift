@@ -100,6 +100,10 @@ struct CommunitySessionsView: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
+    private var anonymousFeedLabel: String {
+        L10n.tr("Anonymous", language: settingsStore.appLanguage)
+    }
+
     private var visibleFeedSessions: [TableGamePostRow] {
         feedSessions.filter { item in
             let gameName = (item.game ?? item.session_details?.game ?? "")
@@ -131,7 +135,7 @@ struct CommunitySessionsView: View {
             } else if let screenName = item.feedScreenName {
                 matchesScreenNameBubbles = selectedScreenNames.contains(screenName)
             } else {
-                matchesScreenNameBubbles = false
+                matchesScreenNameBubbles = selectedScreenNames.contains(anonymousFeedLabel)
             }
 
             let screenNameQuery = screenNameSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -141,7 +145,7 @@ struct CommunitySessionsView: View {
             } else if let screenName = item.feedScreenName {
                 matchesScreenNameSearch = screenName.localizedStandardContains(screenNameQuery)
             } else {
-                matchesScreenNameSearch = false
+                matchesScreenNameSearch = anonymousFeedLabel.localizedStandardContains(screenNameQuery)
             }
 
             return matchesGame && matchesLocation && matchesScreenNameBubbles && matchesScreenNameSearch
@@ -386,7 +390,7 @@ struct CommunitySessionsView: View {
                         } label: {
                             HStack(spacing: 8) {
                                 Image(systemName: "paperplane.circle.fill")
-                                L10nText("Publish Sessions")
+                                L10nText("Pick Sessions To Publish")
                                     .fontWeight(.semibold)
                             }
                             .font(.headline)
@@ -1049,6 +1053,9 @@ extension CommunitySessionsView {
                 .execute()
                 .value
 
+            let appLanguage = await MainActor.run { settingsStore.appLanguage }
+            let anonymousLabel = L10n.tr("Anonymous", language: appLanguage)
+
             let gamesSet = Set(
                 items.compactMap { row in
                     (row.game ?? row.session_details?.game)?
@@ -1066,8 +1073,11 @@ extension CommunitySessionsView {
             )
 
             let screenNamesSet = Set(
-                items.compactMap { row in
-                    row.feedScreenName
+                items.flatMap { row -> [String] in
+                    if let name = row.feedScreenName {
+                        return [name]
+                    }
+                    return [anonymousLabel]
                 }
             )
 
@@ -1159,6 +1169,9 @@ extension CommunitySessionsView {
 
             let allItems = existingItems + moreItems
 
+            let appLanguage = await MainActor.run { settingsStore.appLanguage }
+            let anonymousLabel = L10n.tr("Anonymous", language: appLanguage)
+
             let gamesSet = Set(
                 allItems.compactMap { row in
                     (row.game ?? row.session_details?.game)?
@@ -1176,8 +1189,11 @@ extension CommunitySessionsView {
             )
 
             let screenNamesSet = Set(
-                allItems.compactMap { row in
-                    row.feedScreenName
+                allItems.flatMap { row -> [String] in
+                    if let name = row.feedScreenName {
+                        return [name]
+                    }
+                    return [anonymousLabel]
                 }
             )
 
@@ -1420,6 +1436,15 @@ struct CommunityFeedRow: View {
                         }
                         .foregroundColor(.white.opacity(0.8))
                         .accessibilityLabel("Screen Name \(screenName)")
+                    } else {
+                        HStack(spacing: 4) {
+                            Image(systemName: "eye.slash")
+                                .font(.caption2)
+                            L10nText("Anonymous")
+                                .font(.caption.weight(.medium))
+                        }
+                        .foregroundColor(.white.opacity(0.8))
+                        .accessibilityLabel(L10n.tr("Anonymous", language: settingsStore.appLanguage))
                     }
 
                     if let comment = item.session_details?.comment, !comment.isEmpty {
@@ -1735,34 +1760,61 @@ struct CommunityFeedFiltersView: View {
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.9))
 
-                        VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .top, spacing: 8) {
                             VStack(alignment: .leading, spacing: 4) {
                                 L10nText("From")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.white.opacity(0.8))
                                 DatePicker(
                                     "",
-                                    selection: $filterStartDate,
-                                    displayedComponents: [.date, .hourAndMinute]
+                                    selection: $filterStartDate.datePortion(),
+                                    displayedComponents: .date
                                 )
                                 .datePickerStyle(.compact)
                                 .labelsHidden()
                                 .tint(.white)
+                                .font(.caption2)
+                                DatePicker(
+                                    "",
+                                    selection: $filterStartDate.timePortion(),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Rectangle()
+                                .fill(Color.white.opacity(0.22))
+                                .frame(width: 1)
+                                .padding(.vertical, 4)
 
                             VStack(alignment: .leading, spacing: 4) {
                                 L10nText("To")
-                                    .font(.caption)
+                                    .font(.caption2)
                                     .foregroundColor(.white.opacity(0.8))
                                 DatePicker(
                                     "",
-                                    selection: $filterEndDate,
-                                    displayedComponents: [.date, .hourAndMinute]
+                                    selection: $filterEndDate.datePortion(),
+                                    displayedComponents: .date
                                 )
                                 .datePickerStyle(.compact)
                                 .labelsHidden()
                                 .tint(.white)
+                                .font(.caption2)
+                                DatePicker(
+                                    "",
+                                    selection: $filterEndDate.timePortion(),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                                .tint(.white)
+                                .font(.caption2)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
 
@@ -1911,18 +1963,19 @@ struct CommunityFeedFiltersView: View {
                         HStack {
                             if isLoading {
                                 ProgressView()
-                                    .tint(.white)
+                                    .tint(.green)
                             } else {
                                 Image(systemName: "line.3.horizontal.decrease.circle")
                                 L10nText("Apply Filters")
                             }
                         }
-                        .font(.subheadline.bold())
-                        .foregroundColor(.white)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.green)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.15))
-                        .cornerRadius(10)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.green.opacity(0.28))
+                        .clipShape(Capsule())
                     }
                     .disabled(isLoading)
                 }
@@ -2119,6 +2172,8 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var publishWinLoss = false
     /// When on, comp count and total estimated comp value (from logged comps) are stored and shown on the feed.
     @State private var publishCompDetails = false
+    /// When on, your Community screen name is stored on each post; when off, posts show as Anonymous.
+    @State private var attachScreenName = true
 
     private var sortedSessions: [Session] {
         sessions.sorted { $0.startTime > $1.startTime }
@@ -2158,6 +2213,19 @@ struct CommunitySessionPublishSelectionView: View {
                                     }
                                 }
                                 .listRowBackground(Color(.systemGray6).opacity(0.15))
+                        }
+
+                        Section(
+                            header: L10nText("Privacy").foregroundColor(.secondary),
+                            footer: L10nText("When off, posts appear as Anonymous in the feed.")
+                                .foregroundColor(.gray.opacity(0.8))
+                        ) {
+                            Toggle(isOn: $attachScreenName) {
+                                L10nText("Show my screen name")
+                                    .foregroundColor(.white)
+                            }
+                            .tint(.green)
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
                         }
 
                         Section(
@@ -2219,7 +2287,7 @@ struct CommunitySessionPublishSelectionView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .localizedNavigationTitle("Publish Sessions")
+            .localizedNavigationTitle("Pick Sessions To Publish")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -2374,7 +2442,8 @@ struct CommunitySessionPublishSelectionView: View {
                 comment: commentToPublish,
                 publishTierPerHour: publishTierPerHour,
                 publishWinLoss: publishWinLoss,
-                publishCompDetails: publishCompDetails
+                publishCompDetails: publishCompDetails,
+                attachScreenName: attachScreenName
             )
             await MainActor.run {
                 isPublishing = false

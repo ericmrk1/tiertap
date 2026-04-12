@@ -32,10 +32,6 @@ struct HomeView: View {
         [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
     }
 
-    private var quickCompAmounts: [Int] {
-        [5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000]
-    }
-
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
@@ -176,8 +172,18 @@ struct HomeView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarHidden(!hasProAccess)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        UserGuideView()
+                            .environmentObject(settingsStore)
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.body.weight(.medium))
+                            .foregroundColor(.white)
+                    }
+                    .accessibilityLabel("User guide")
+                }
                 if hasProAccess {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -252,8 +258,6 @@ struct HomeView: View {
         .adaptiveSheet(isPresented: $showCompSheet) {
             CompQuickAddSheet(
                 existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
-                existingDollarsCreditsCompTotal: store.liveSession?.totalCompDollarsCredits ?? 0,
-                quickAmounts: quickCompAmounts,
                 sessionGame: store.liveSession?.game ?? "",
                 sessionCasino: store.liveSession?.casino ?? "",
                 sessionCasinoLatitude: store.liveSession?.casinoLatitude,

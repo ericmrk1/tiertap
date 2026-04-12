@@ -28,7 +28,7 @@
   "ui.e8518454255006cf9ab4e4ac": {
     "en": "$1/$3/$5",
     "zh-Hans": "$1/$3/$5",
-    "ja": "$1/$3/$5",
+    "ja": "1ドル/3ドル/5ドル",
     "ko": "$1/$3/$5",
     "vi": "$1/$3/$5",
     "es": "$1/$3/$5",
@@ -298,6 +298,19 @@
     "fr": "Stud à 7 cartes Hi-Lo",
     "hi": "7 कार्ड स्टड हाय-लो"
   },
+  "ui.7c6d8efed872a8939f893998": {
+    "en": "A TierTap Pro subscription plus a signed-in account unlocks AI-powered analysis, chip estimation at close-out, and the Community feed. Core session logging works on your device either way.",
+    "zh-Hans": "TierTap Pro 订阅加上登录帐户可解锁人工智能驱动的分析、平仓时的筹码估算以及社区源。无论哪种方式，核心会话日志记录都可以在您的设备上运行。",
+    "ja": "TierTap Pro サブスクリプションとサインインしたアカウントにより、AI を活用した分析、取引終了時のチップ推定、およびコミュニティ フィードが利用可能になります。コア セッションのログはデバイス上でどちらの方法でも機能します。",
+    "ko": "TierTap Pro 구독과 로그인된 계정을 함께 사용하면 AI 기반 분석, 종료 시 칩 추정 및 커뮤니티 피드를 사용할 수 있습니다. 핵심 세션 로깅은 장치에서 어느 방식으로든 작동합니다.",
+    "vi": "Đăng ký TierTap Pro cộng với tài khoản đã đăng nhập sẽ mở khóa phân tích do AI cung cấp, ước tính chip khi kết thúc và nguồn cấp dữ liệu Cộng đồng. Ghi nhật ký phiên cốt lõi vẫn hoạt động trên thiết bị của bạn.",
+    "es": "Una suscripción a TierTap Pro más una cuenta iniciada desbloquea análisis impulsados ​​por IA, estimación de chips en el momento del cierre y el feed de la comunidad. El registro de sesiones principales funciona en su dispositivo de cualquier manera.",
+    "ar": "يؤدي اشتراك TierTap Pro بالإضافة إلى حساب مسجل الدخول إلى فتح التحليل المدعوم بالذكاء الاصطناعي وتقدير الرقائق عند الإغلاق وموجز المجتمع. يعمل تسجيل الجلسة الأساسية على جهازك في كلتا الحالتين.",
+    "he": "מנוי TierTap Pro בתוספת חשבון מחובר פותח ניתוח מופעל בינה מלאכותית, הערכת שבבים בסגירה ואת עדכון הקהילה. רישום הפעלת הליבה עובד במכשיר שלך בכל מקרה.",
+    "de": "Ein TierTap Pro-Abonnement und ein angemeldetes Konto schalten die KI-gestützte Analyse, die Chip-Schätzung beim Abschluss und den Community-Feed frei. Die Kernsitzungsprotokollierung funktioniert auf Ihrem Gerät in beiden Fällen.",
+    "fr": "Un abonnement TierTap Pro et un compte connecté débloquent une analyse basée sur l'IA, une estimation des puces à la clôture et le flux de la communauté. La journalisation des sessions principales fonctionne dans les deux cas sur votre appareil.",
+    "hi": "टियरटैप प्रो सदस्यता और एक साइन-इन खाता एआई-संचालित विश्लेषण, क्लोज-आउट पर चिप अनुमान और सामुदायिक फ़ीड को अनलॉक करता है। कोर सत्र लॉगिंग आपके डिवाइस पर किसी भी तरह से काम करती है।"
+  },
   "ui.c8438a13b9dd6620a5bde18a": {
     "en": "AI Analysis",
     "zh-Hans": "人工智能分析",
@@ -414,6 +427,19 @@
     "de": "Konto",
     "fr": "Compte",
     "hi": "खाता"
+  },
+  "ui.5092c5f361340492d89058c6": {
+    "en": "Account and subscription",
+    "zh-Hans": "帐户和订阅",
+    "ja": "アカウントとサブスクリプション",
+    "ko": "계정 및 구독",
+    "vi": "Tài khoản và đăng ký",
+    "es": "Cuenta y suscripción",
+    "ar": "الحساب والاشتراك",
+    "he": "חשבון ומנוי",
+    "de": "Konto und Abonnement",
+    "fr": "Compte et abonnement",
+    "hi": "खाता और सदस्यता"
   },
   "ui.806002b61abc3e1ee63362cd": {
     "en": "Account page",
@@ -766,6 +792,19 @@
     "fr": "Ajoutez l'origine et la destination sur la carte dans Modifier pour voir l'itinéraire.",
     "hi": "मार्ग देखने के लिए संपादन में मानचित्र पर मूल और गंतव्य जोड़ें।"
   },
+  "ui.cd7ce8cdd9aa029b06d820b7": {
+    "en": "Add past session",
+    "zh-Hans": "添加过去的会话",
+    "ja": "過去のセッションを追加",
+    "ko": "지난 세션 추가",
+    "vi": "Thêm phiên trước đây",
+    "es": "Agregar sesión pasada",
+    "ar": "إضافة الجلسة الماضية",
+    "he": "הוסף הפעלה קודמת",
+    "de": "Vergangene Sitzung hinzufügen",
+    "fr": "Ajouter une session passée",
+    "hi": "पिछला सत्र जोड़ें"
+  },
   "ui.cdb9e3a5474fad968f59c464": {
     "en": "Add photos from your camera or library.",
     "zh-Hans": "添加相机或图库中的照片。",
@@ -817,19 +856,6 @@
     "de": "Slot aus der Auswahl hinzufügen",
     "fr": "Ajouter un emplacement à partir du sélecteur",
     "hi": "पिकर से स्लॉट जोड़ें"
-  },
-  "ui.96e404b06e18610bbe8c25a9": {
-    "en": "Additional to total",
-    "zh-Hans": "Additional to total",
-    "ja": "Additional to total",
-    "ko": "Additional to total",
-    "vi": "Additional to total",
-    "es": "Additional to total",
-    "ar": "Additional to total",
-    "he": "Additional to total",
-    "de": "Additional to total",
-    "fr": "Additional to total",
-    "hi": "Additional to total"
   },
   "ui.07a7d4e0ebdc3a221a889f86": {
     "en": "Adjust cash out",
@@ -935,6 +961,32 @@
     "fr": "Analytique",
     "hi": "एनालिटिक्स"
   },
+  "ui.a8b824065ec9584c96e53f34": {
+    "en": "Analytics looks sparse",
+    "zh-Hans": "分析看起来稀疏",
+    "ja": "分析がまばらに見える",
+    "ko": "분석이 빈약해 보입니다.",
+    "vi": "Phân tích có vẻ thưa thớt",
+    "es": "Los análisis parecen escasos",
+    "ar": "التحليلات تبدو متفرقة",
+    "he": "אנליטיקס נראה דליל",
+    "de": "Analytics sieht spärlich aus",
+    "fr": "Les analyses semblent rares",
+    "hi": "एनालिटिक्स विरल दिखता है"
+  },
+  "ui.20f5a03ea213a813426147a8": {
+    "en": "Analytics uses closed sessions with complete outcomes. Add or finish sessions, and check that the selected game category matches how sessions were saved.",
+    "zh-Hans": "分析使用具有完整结果的封闭式会话。添加或完成会话，并检查所选游戏类别是否与保存会话的方式匹配。",
+    "ja": "分析では、完全な結果を得るために閉じられたセッションが使用されます。セッションを追加または終了し、選択したゲーム カテゴリがセッションの保存方法と一致していることを確認します。",
+    "ko": "Analytics에서는 완전한 결과가 포함된 종료된 세션을 사용합니다. 세션을 추가하거나 종료하고 선택한 게임 카테고리가 세션이 저장된 방식과 일치하는지 확인하세요.",
+    "vi": "Analytics sử dụng các phiên đóng với kết quả hoàn chỉnh. Thêm hoặc kết thúc phiên và kiểm tra xem danh mục trò chơi đã chọn có khớp với cách lưu phiên hay không.",
+    "es": "Analytics utiliza sesiones cerradas con resultados completos. Agregue o finalice sesiones y verifique que la categoría de juego seleccionada coincida con cómo se guardaron las sesiones.",
+    "ar": "يستخدم التحليلات جلسات مغلقة ذات نتائج كاملة. قم بإضافة الجلسات أو إنهائها، وتأكد من تطابق فئة اللعبة المحددة مع كيفية حفظ الجلسات.",
+    "he": "Analytics משתמש במפגשים סגורים עם תוצאות מלאות. הוסף או סיים הפעלות, ובדוק שקטגוריית המשחק שנבחרה תואמת את האופן שבו הפעלות נשמרו.",
+    "de": "Analytics verwendet geschlossene Sitzungen mit vollständigen Ergebnissen. Fügen Sie Sitzungen hinzu oder beenden Sie sie und überprüfen Sie, ob die ausgewählte Spielkategorie mit der Art und Weise übereinstimmt, wie Sitzungen gespeichert wurden.",
+    "fr": "Analytics utilise des sessions fermées avec des résultats complets. Ajoutez ou terminez des sessions et vérifiez que la catégorie de jeu sélectionnée correspond à la manière dont les sessions ont été enregistrées.",
+    "hi": "एनालिटिक्स पूर्ण परिणामों के साथ बंद सत्रों का उपयोग करता है। सत्र जोड़ें या समाप्त करें, और जांचें कि चयनित खेल श्रेणी सत्र सहेजे जाने के तरीके से मेल खाती है।"
+  },
   "ui.3dd88ab9a96e62fa2709127c": {
     "en": "Analyzing your photo with TierTap AI.",
     "zh-Hans": "使用 TierTap AI 分析您的照片。",
@@ -947,6 +999,19 @@
     "de": "Analysieren Sie Ihr Foto mit TierTap AI.",
     "fr": "Analyser votre photo avec TierTap AI.",
     "hi": "टियरटैप एआई के साथ आपकी फोटो का विश्लेषण किया जा रहा है।"
+  },
+  "ui.e7a8aa2df7e5d0b233da615a": {
+    "en": "Anonymous",
+    "zh-Hans": "匿名的",
+    "ja": "匿名",
+    "ko": "익명의",
+    "vi": "Vô danh",
+    "es": "Anónimo",
+    "ar": "مجهول",
+    "he": "אֲנוֹנִימִי",
+    "de": "Anonym",
+    "fr": "Anonyme",
+    "hi": "गुमनाम"
   },
   "ui.b2a3aa602762a782e47a4f8e": {
     "en": "Answer",
@@ -974,6 +1039,19 @@
     "fr": "Antenne",
     "hi": "पूर्व"
   },
+  "ui.a7f2e52891ae11ed46b23a8a": {
+    "en": "App asks to unlock every time",
+    "zh-Hans": "应用程序每次都要求解锁",
+    "ja": "アプリは毎回ロック解除を要求します",
+    "ko": "앱에서 매번 잠금 해제를 요청함",
+    "vi": "Ứng dụng luôn yêu cầu mở khóa",
+    "es": "La aplicación pide desbloquearse cada vez",
+    "ar": "يطلب التطبيق فتح القفل في كل مرة",
+    "he": "האפליקציה מבקשת לבטל את הנעילה בכל פעם",
+    "de": "Die App fordert jedes Mal zum Entsperren auf",
+    "fr": "L'application demande à se déverrouiller à chaque fois",
+    "hi": "ऐप हर बार अनलॉक करने के लिए कहता है"
+  },
   "ui.b8352b44a588721c19f49139": {
     "en": "App language",
     "zh-Hans": "应用语言",
@@ -986,6 +1064,45 @@
     "de": "App-Sprache",
     "fr": "Langue de l'application",
     "hi": "ऐप भाषा"
+  },
+  "ui.d2dbb826de122eb207bda506": {
+    "en": "App lock is enabled. Turn it off in your TierTap account settings if you prefer not to authenticate each return to the app.",
+    "zh-Hans": "应用程序锁定已启用。如果您不想对每次返回应用程序进行身份验证，请在 TierTap 帐户设置中将其关闭。",
+    "ja": "アプリロックが有効になっています。アプリに戻るたびに認証を行わない場合は、TierTap アカウント設定でこれをオフにします。",
+    "ko": "앱 잠금이 활성화되었습니다. 앱으로 돌아올 때마다 인증하지 않으려면 TierTap 계정 설정에서 이 기능을 끄세요.",
+    "vi": "Khóa ứng dụng được kích hoạt. Tắt nó trong cài đặt tài khoản TierTap của bạn nếu bạn không muốn xác thực mỗi lần quay lại ứng dụng.",
+    "es": "El bloqueo de aplicaciones está habilitado. Desactívelo en la configuración de su cuenta TierTap si prefiere no autenticar cada devolución a la aplicación.",
+    "ar": "تم تمكين قفل التطبيق. قم بإيقاف تشغيله في إعدادات حساب TierTap الخاص بك إذا كنت تفضل عدم مصادقة كل عودة إلى التطبيق.",
+    "he": "נעילת האפליקציה מופעלת. כבה אותו בהגדרות חשבון TierTap שלך אם אתה מעדיף לא לאמת כל חזרה לאפליקציה.",
+    "de": "Die App-Sperre ist aktiviert. Deaktivieren Sie es in den Einstellungen Ihres TierTap-Kontos, wenn Sie nicht jede Rückkehr zur App authentifizieren möchten.",
+    "fr": "Le verrouillage des applications est activé. Désactivez-le dans les paramètres de votre compte TierTap si vous préférez ne pas authentifier chaque retour à l'application.",
+    "hi": "ऐप लॉक सक्षम है. यदि आप ऐप पर प्रत्येक रिटर्न को प्रमाणित नहीं करना चाहते हैं तो इसे अपनी टियरटैप खाता सेटिंग में बंद कर दें।"
+  },
+  "ui.e600335cac24033fa229af83": {
+    "en": "App overview",
+    "zh-Hans": "应用概述",
+    "ja": "アプリ概要",
+    "ko": "앱 개요",
+    "vi": "Tổng quan về ứng dụng",
+    "es": "Descripción general de la aplicación",
+    "ar": "نظرة عامة على التطبيق",
+    "he": "סקירה כללית של האפליקציה",
+    "de": "App-Übersicht",
+    "fr": "Présentation de l'application",
+    "hi": "ऐप सिंहावलोकन"
+  },
+  "ui.9371bab2ce8d97650539ac46": {
+    "en": "Apple Watch",
+    "zh-Hans": "苹果手表",
+    "ja": "アップルウォッチ",
+    "ko": "애플워치",
+    "vi": "Đồng hồ Apple",
+    "es": "reloj de manzana",
+    "ar": "ساعة أبل",
+    "he": "Apple Watch",
+    "de": "Apple Watch",
+    "fr": "Apple Watch",
+    "hi": "एप्पल घड़ी"
   },
   "ui.09b2e220c665ead696dbd4aa": {
     "en": "Apply Filters",
@@ -1286,6 +1403,19 @@
     "fr": "Adhésion",
     "hi": "खरीदना"
   },
+  "ui.4c00c55620e657df30e92316": {
+    "en": "CSV export fails or is empty",
+    "zh-Hans": "CSV 导出失败或为空",
+    "ja": "CSV エクスポートが失敗するか空です",
+    "ko": "CSV 내보내기가 실패했거나 비어 있습니다.",
+    "vi": "Xuất CSV không thành công hoặc trống",
+    "es": "La exportación CSV falla o está vacía",
+    "ar": "فشل تصدير ملف CSV أو أنه فارغ",
+    "he": "ייצוא CSV נכשל או ריק",
+    "de": "Der CSV-Export schlägt fehl oder ist leer",
+    "fr": "L'exportation CSV échoue ou est vide",
+    "hi": "CSV निर्यात विफल या खाली है"
+  },
   "ui.04de72c2c25b89b96b87a3ae": {
     "en": "CSV game type",
     "zh-Hans": "CSV 游戏类型",
@@ -1324,6 +1454,19 @@
     "de": "Kamera",
     "fr": "Caméra",
     "hi": "कैमरा"
+  },
+  "ui.45db6e974f3964183d74fe02": {
+    "en": "Can I change language or currency?",
+    "zh-Hans": "我可以更改语言或货币吗？",
+    "ja": "言語や通貨を変更できますか?",
+    "ko": "언어나 통화를 변경할 수 있나요?",
+    "vi": "Tôi có thể thay đổi ngôn ngữ hoặc đơn vị tiền tệ không?",
+    "es": "¿Puedo cambiar de idioma o moneda?",
+    "ar": "هل يمكنني تغيير اللغة أو العملة؟",
+    "he": "האם אוכל לשנות שפה או מטבע?",
+    "de": "Kann ich die Sprache oder Währung ändern?",
+    "fr": "Puis-je changer de langue ou de devise ?",
+    "hi": "क्या मैं भाषा या मुद्रा बदल सकता हूँ?"
   },
   "ui.19766ed6ccb2f4a32778eed8": {
     "en": "Cancel",
@@ -1469,10 +1612,17 @@
     "hi": "अपने कैसीनो लॉयल्टी ऐप में देखें। 1,000–50,000 त्वरित चुनें या सटीक अंक दर्ज करें (शून्य नहीं)।"
   },
   "ui.728ee21478bf45e0fe7d584d": {
-    "en": "Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track."
-  },
-  "ui.020c0766989356b7d803347b": {
-    "en": "Starting sessions without a Tier rating will make it difficult to track Tier levels and points."
+    "en": "Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track.",
+    "zh-Hans": "检查您的赌场忠诚度应用程序。快速选择 1,000–50,000 或输入任何准确的金额。从零开始是允许的，但更难跟踪。",
+    "ja": "カジノロイヤルティアプリを確認してください。 1,000 ～ 50,000 をクイック選択するか、正確な金額を入力します。ゼロから開始することは許可されていますが、追跡するのは困難です。",
+    "ko": "카지노 로열티 앱을 확인하세요. 1,000~50,000을 빠르게 선택하거나 정확한 금액을 입력하세요. 0에서 시작하는 것은 허용되지만 추적하기가 더 어렵습니다.",
+    "vi": "Kiểm tra ứng dụng khách hàng thân thiết trong sòng bạc của bạn. Chọn nhanh 1.000–50.000 hoặc nhập bất kỳ số tiền chính xác nào. Được phép bắt đầu từ số 0 nhưng khó theo dõi hơn.",
+    "es": "Consulta la aplicación de fidelización de tu casino. Elija rápidamente entre 1000 y 50 000 o escriba cualquier cantidad exacta. Se permite comenzar desde cero, pero es más difícil de rastrear.",
+    "ar": "تحقق من تطبيق ولاء الكازينو الخاص بك. اختر سريعًا ما بين 1000 إلى 50000 أو اكتب أي مبلغ محدد. البدء من الصفر مسموح به ولكن من الصعب تتبعه.",
+    "he": "בדוק את אפליקציית נאמנות הקזינו שלך. בחירה מהירה 1,000–50,000 או הקלד כל סכום מדויק. מותר להתחיל מאפס אבל קשה יותר לעקוב.",
+    "de": "Überprüfen Sie Ihre Casino-Treue-App. Wählen Sie schnell 1.000–50.000 aus oder geben Sie einen beliebigen genauen Betrag ein. Bei Null anzufangen ist erlaubt, aber schwieriger zu verfolgen.",
+    "fr": "Vérifiez votre application de fidélité de casino. Choisissez rapidement entre 1 000 et 50 000 ou saisissez n’importe quel montant exact. Commencer à zéro est autorisé mais plus difficile à suivre.",
+    "hi": "अपने कैसीनो लॉयल्टी ऐप की जाँच करें। तुरंत 1,000-50,000 चुनें या कोई सटीक राशि टाइप करें। शून्य से शुरू करने की अनुमति है लेकिन ट्रैक करना कठिन है।"
   },
   "ui.e0c9c0d1d13de202eb4fca74": {
     "en": "Chinese Poker",
@@ -1578,6 +1728,19 @@
     "fr": "Choisissez les sessions à partager",
     "hi": "साझा करने के लिए सत्र चुनें"
   },
+  "ui.776f1843a96397eb63259424": {
+    "en": "Choose the game category and optional date or location filters.",
+    "zh-Hans": "选择游戏类别和可选的日期或地点过滤器。",
+    "ja": "ゲームのカテゴリと、オプションの日付または場所のフィルターを選択します。",
+    "ko": "게임 카테고리와 선택적인 날짜 또는 위치 필터를 선택하세요.",
+    "vi": "Chọn danh mục trò chơi và các bộ lọc ngày hoặc địa điểm tùy chọn.",
+    "es": "Elija la categoría del juego y los filtros opcionales de fecha o ubicación.",
+    "ar": "اختر فئة اللعبة ومرشحات التاريخ أو الموقع الاختيارية.",
+    "he": "בחר את קטגוריית המשחק ומסנני תאריך או מיקום אופציונליים.",
+    "de": "Wählen Sie die Spielkategorie und optionale Datums- oder Ortsfilter.",
+    "fr": "Choisissez la catégorie de jeu et les filtres de date ou de lieu facultatifs.",
+    "hi": "खेल श्रेणी और वैकल्पिक दिनांक या स्थान फ़िल्टर चुनें।"
+  },
   "ui.1014e14335d16f390b5a9dfd": {
     "en": "Choose whether to export table, slots, or poker sessions. Older sessions without a game type are treated as table games.",
     "zh-Hans": "选择是否导出牌桌、老虎机或扑克会话。没有游戏类型的旧会话被视为桌面游戏。",
@@ -1643,6 +1806,19 @@
     "fr": "Fermer",
     "hi": "बंद करना"
   },
+  "ui.477729cae16a8222f6b15d2b": {
+    "en": "Close-out and session mood",
+    "zh-Hans": "结束和会议气氛",
+    "ja": "終了とセッションの雰囲気",
+    "ko": "종료 및 세션 분위기",
+    "vi": "Tâm trạng kết thúc và phiên",
+    "es": "Estado de ánimo de cierre y sesión",
+    "ar": "الإغلاق ومزاج الجلسة",
+    "he": "מצב רוח מקרוב ומפגש",
+    "de": "Abschluss- und Session-Stimmung",
+    "fr": "Clôture et ambiance de la séance",
+    "hi": "क्लोज-आउट और सत्र मूड"
+  },
   "ui.1a09cdd45728f783f52cb5ea": {
     "en": "Common amounts",
     "zh-Hans": "常用金额",
@@ -1694,6 +1870,19 @@
     "de": "Gemeinschaft",
     "fr": "Communauté",
     "hi": "समुदाय"
+  },
+  "ui.8b9162917aee2feea610209f": {
+    "en": "Community feed errors or empty feed",
+    "zh-Hans": "社区提要错误或空提要",
+    "ja": "コミュニティ フィードのエラーまたは空のフィード",
+    "ko": "커뮤니티 피드 오류 또는 빈 피드",
+    "vi": "Lỗi nguồn cấp dữ liệu cộng đồng hoặc nguồn cấp dữ liệu trống",
+    "es": "Errores en el feed de la comunidad o feed vacío",
+    "ar": "أخطاء في خلاصة المجتمع أو خلاصة فارغة",
+    "he": "שגיאות עדכון בקהילה או עדכון ריק",
+    "de": "Community-Feed-Fehler oder leerer Feed",
+    "fr": "Erreurs de flux de communauté ou flux vide",
+    "hi": "सामुदायिक फ़ीड त्रुटियाँ या खाली फ़ीड"
   },
   "ui.713e92dbc92e052a3902c2ef": {
     "en": "Comp details",
@@ -1851,6 +2040,19 @@
     "fr": "Comps (voyage)",
     "hi": "कंप्स (यात्रा)"
   },
+  "ui.039d1b185a46aa35fae8d621": {
+    "en": "Confirm you’re signed in, have Pro access, and try adjusting or clearing filters. Poor network connectivity can also delay loading.",
+    "zh-Hans": "确认您已登录，具有专业版访问权限，然后尝试调整或清除过滤器。网络连接不良也会延迟加载。",
+    "ja": "サインインしていること、Pro アクセス権があることを確認して、フィルターの調整またはクリアを試してください。ネットワーク接続が不十分な場合も、読み込みが遅れる可能性があります。",
+    "ko": "로그인했는지 확인하고 Pro 액세스 권한이 있는지 확인하고 필터를 조정하거나 삭제해 보세요. 네트워크 연결이 좋지 않으면 로딩이 지연될 수도 있습니다.",
+    "vi": "Xác nhận bạn đã đăng nhập, có quyền truy cập Pro và thử điều chỉnh hoặc xóa bộ lọc. Kết nối mạng kém cũng có thể làm chậm quá trình tải.",
+    "es": "Confirma que has iniciado sesión, que tienes acceso Pro e intenta ajustar o borrar los filtros. Una mala conectividad de red también puede retrasar la carga.",
+    "ar": "تأكد من تسجيل الدخول، واحصل على وصول احترافي، وحاول تعديل المرشحات أو مسحها. يمكن أن يؤدي ضعف الاتصال بالشبكة أيضًا إلى تأخير التحميل.",
+    "he": "אשר שאתה מחובר, יש לך גישת Pro ונסה להתאים או לנקות מסננים. קישוריות רשת לקויה יכולה גם לעכב את הטעינה.",
+    "de": "Bestätigen Sie, dass Sie angemeldet sind, über Pro-Zugriff verfügen und versuchen Sie, Filter anzupassen oder zu löschen. Auch eine schlechte Netzwerkverbindung kann den Ladevorgang verzögern.",
+    "fr": "Confirmez que vous êtes connecté, que vous disposez d'un accès Pro et essayez d'ajuster ou de supprimer les filtres. Une mauvaise connectivité réseau peut également retarder le chargement.",
+    "hi": "पुष्टि करें कि आप साइन इन हैं, आपके पास प्रो एक्सेस है, और फ़िल्टर समायोजित करने या साफ़ करने का प्रयास करें। ख़राब नेटवर्क कनेक्टिविटी के कारण भी लोडिंग में देरी हो सकती है."
+  },
   "ui.448013d61ff27b7c955dba3e": {
     "en": "Connect Supabase to see the community feed.",
     "zh-Hans": "连接 Supabase 以查看社区源。",
@@ -1916,6 +2118,32 @@
     "fr": "Contrôle si les nouvelles sessions et analyses sont par défaut axées sur les jeux de table, les machines à sous ou le poker.",
     "hi": "नियंत्रित करता है कि नए सत्र और विश्लेषण टेबल गेम, स्लॉट या पोकर के लिए डिफ़ॉल्ट हैं या नहीं।"
   },
+  "ui.204a5eb2cd28bcfdf3be9f8c": {
+    "en": "Cost",
+    "zh-Hans": "成本",
+    "ja": "料金",
+    "ko": "비용",
+    "vi": "Trị giá",
+    "es": "Costo",
+    "ar": "يكلف",
+    "he": "עֲלוּת",
+    "de": "Kosten",
+    "fr": "Coût",
+    "hi": "लागत"
+  },
+  "ui.b2981c1d20865bab261750cd": {
+    "en": "Couldn’t create PDF",
+    "zh-Hans": "无法创建 PDF",
+    "ja": "PDFを作成できませんでした",
+    "ko": "PDF를 만들 수 없습니다.",
+    "vi": "Không thể tạo PDF",
+    "es": "No se pudo crear PDF",
+    "ar": "لا يمكن إنشاء PDF",
+    "he": "לא ניתן ליצור PDF",
+    "de": "PDF konnte nicht erstellt werden",
+    "fr": "Impossible de créer un PDF",
+    "hi": "पीडीएफ नहीं बनाया जा सका"
+  },
   "ui.664faf8968096ddadea0a803": {
     "en": "Count and total estimated value",
     "zh-Hans": "计数和总估计值",
@@ -1928,6 +2156,19 @@
     "de": "Anzahl und geschätzter Gesamtwert",
     "fr": "Nombre et valeur totale estimée",
     "hi": "गणना और कुल अनुमानित मूल्य"
+  },
+  "ui.43766b3561a631b3e57cb0f8": {
+    "en": "Create or edit trips with dates and details; open a trip to see its timeline and linked sessions.",
+    "zh-Hans": "创建或编辑包含日期和详细信息的行程；打开旅程以查看其时间线和链接的会话。",
+    "ja": "日付と詳細を含む旅行を作成または編集します。旅行を開いてタイムラインとリンクされたセッションを確認します。",
+    "ko": "날짜와 세부정보가 포함된 여행을 생성하거나 편집하세요. 여행을 열어 타임라인과 연결된 세션을 확인하세요.",
+    "vi": "Tạo hoặc chỉnh sửa các chuyến đi có ngày tháng và thông tin chi tiết; mở một chuyến đi để xem dòng thời gian và các phiên được liên kết của nó.",
+    "es": "Cree o edite viajes con fechas y detalles; abra un viaje para ver su cronograma y sesiones vinculadas.",
+    "ar": "إنشاء أو تحرير الرحلات بالتواريخ والتفاصيل؛ افتح رحلة لرؤية مخططها الزمني وجلساتها المرتبطة.",
+    "he": "צור או ערוך טיולים עם תאריכים ופרטים; פתח טיול כדי לראות את ציר הזמן וההפעלות המקושרות שלו.",
+    "de": "Erstellen oder bearbeiten Sie Reisen mit Daten und Details; Öffnen Sie eine Reise, um deren Zeitleiste und verknüpfte Sitzungen anzuzeigen.",
+    "fr": "Créez ou modifiez des voyages avec des dates et des détails ; ouvrez un voyage pour voir sa chronologie et ses sessions liées.",
+    "hi": "तिथियों और विवरणों के साथ यात्राएँ बनाएँ या संपादित करें; किसी यात्रा की टाइमलाइन और उससे जुड़े सत्र देखने के लिए उसे खोलें।"
   },
   "ui.f1fedc692d1172d8a47c256f": {
     "en": "Cumulative tier points earned across your recorded sessions.",
@@ -2009,16 +2250,16 @@
   },
   "ui.5ff2b5b3d9517a8e6d5693d5": {
     "en": "Custom amount",
-    "zh-Hans": "Custom amount",
-    "ja": "Custom amount",
-    "ko": "Custom amount",
-    "vi": "Custom amount",
-    "es": "Custom amount",
-    "ar": "Custom amount",
-    "he": "Custom amount",
-    "de": "Custom amount",
-    "fr": "Custom amount",
-    "hi": "Custom amount"
+    "zh-Hans": "定制金额",
+    "ja": "カスタム金額",
+    "ko": "맞춤 금액",
+    "vi": "Số tiền tùy chỉnh",
+    "es": "Cantidad personalizada",
+    "ar": "مبلغ مخصص",
+    "he": "סכום מותאם אישית",
+    "de": "Benutzerdefinierter Betrag",
+    "fr": "Montant personnalisé",
+    "hi": "कस्टम राशि"
   },
   "ui.2f7518c7ae0ed46791d169de": {
     "en": "Custom colors",
@@ -2189,57 +2430,31 @@
     "fr": "Remplacement de l'abonnement du développeur",
     "hi": "डेवलपर सदस्यता ओवरराइड"
   },
-  "ui.2b7f6a84de917e387539dbe4": {
-    "en": "Display name",
-    "zh-Hans": "显示名称",
-    "ja": "表示名",
-    "ko": "표시 이름",
-    "vi": "Tên hiển thị",
-    "es": "Nombre para mostrar",
-    "ar": "اسم العرض",
-    "he": "שם תצוגה",
-    "de": "Anzeigename",
-    "fr": "Nom d'affichage",
-    "hi": "प्रदर्शित होने वाला नाम"
+  "ui.f58ef6c1b99a7f681df829aa": {
+    "en": "Device passcode",
+    "zh-Hans": "设备密码",
+    "ja": "デバイスのパスコード",
+    "ko": "장치 비밀번호",
+    "vi": "Mật mã thiết bị",
+    "es": "Código de acceso del dispositivo",
+    "ar": "رمز مرور الجهاز",
+    "he": "קוד גישה למכשיר",
+    "de": "Gerätepasscode",
+    "fr": "Code d'accès de l'appareil",
+    "hi": "डिवाइस पासकोड"
   },
-  "ui.8f6bb7910da2477f6df5adce": {
-    "en": "Screen Name",
-    "zh-Hans": "屏幕名称",
-    "ja": "スクリーン名",
-    "ko": "화면 이름",
-    "vi": "Tên hiển thị",
-    "es": "Nombre de pantalla",
-    "ar": "اسم الشاشة",
-    "he": "שם מסך",
-    "de": "Bildschirmname",
-    "fr": "Nom d'écran",
-    "hi": "स्क्रीन नाम"
-  },
-  "ui.16140b7c2f9226ffa2b04c90": {
-    "en": "Shown on Community when you publish",
-    "zh-Hans": "发布到社区时显示",
-    "ja": "コミュニティに投稿すると表示されます",
-    "ko": "커뮤니티에 게시할 때 표시",
-    "vi": "Hiển thị khi bạn đăng lên Cộng đồng",
-    "es": "Se muestra en la comunidad al publicar",
-    "ar": "يظهر في المجتمع عند النشر",
-    "he": "מוצג בקהילה כשאתה מפרסם",
-    "de": "Wird in der Community angezeigt, wenn du veröffentlichst",
-    "fr": "Affiché dans la communauté lorsque vous publiez",
-    "hi": "प्रकाशित करने पर समुदाय में दिखता है"
-  },
-  "ui.0a02372195987a90679a2b93": {
-    "en": "Screen names",
-    "zh-Hans": "屏幕名称",
-    "ja": "スクリーン名",
-    "ko": "화면 이름",
-    "vi": "Tên hiển thị",
-    "es": "Nombres de pantalla",
-    "ar": "أسماء الشاشة",
-    "he": "שמות מסך",
-    "de": "Bildschirmnamen",
-    "fr": "Noms d'écran",
-    "hi": "स्क्रीन नाम"
+  "ui.6528ee726d217ce408eda8a3": {
+    "en": "Dollars / credits",
+    "zh-Hans": "Dollars / credits",
+    "ja": "Dollars / credits",
+    "ko": "Dollars / credits",
+    "vi": "Dollars / credits",
+    "es": "Dollars / credits",
+    "ar": "Dollars / credits",
+    "he": "Dollars / credits",
+    "de": "Dollars / credits",
+    "fr": "Dollars / credits",
+    "hi": "Dollars / credits"
   },
   "ui.11a6767d5674c7e45f7e00dc": {
     "en": "Done",
@@ -2449,18 +2664,31 @@
     "fr": "Saisissez un code IATA à 3 lettres ou OACI à 4 lettres, ou effectuez une recherche par nom d'aéroport.",
     "hi": "3-अक्षर वाला IATA या 4-अक्षर वाला ICAO कोड दर्ज करें, या हवाई अड्डे के नाम से खोजें।"
   },
-  "ui.30a0acf9bb1bca00f72142f8": {
-    "en": "Enter new bankroll value. This updates the bankroll in Settings and starts tracking from this value.",
-    "zh-Hans": "输入新的资金值。这会更新“设置”中的资金并从此值开始跟踪。",
-    "ja": "新しいバンクロール値を入力します。これにより、設定のバンクロールが更新され、この値から追跡が開始されます。",
-    "ko": "새로운 자금 가치를 입력하세요. 이렇게 하면 설정에서 자금이 업데이트되고 이 값에서 추적이 시작됩니다.",
-    "vi": "Nhập giá trị ngân hàng mới. Thao tác này sẽ cập nhật danh sách ngân hàng trong Cài đặt và bắt đầu theo dõi từ giá trị này.",
-    "es": "Ingrese el nuevo valor de sus fondos. Esto actualiza los fondos en Configuración y comienza a realizar el seguimiento a partir de este valor.",
-    "ar": "أدخل قيمة التمويل الجديدة. يؤدي هذا إلى تحديث التمويل في الإعدادات ويبدأ التتبع من هذه القيمة.",
-    "he": "הזן ערך חשבון חדש. זה מעדכן את הכסף בהגדרות ומתחיל לעקוב מהערך הזה.",
-    "de": "Geben Sie den neuen Guthabenwert ein. Dadurch wird das Guthaben in den Einstellungen aktualisiert und die Verfolgung beginnt ab diesem Wert.",
-    "fr": "Entrez la nouvelle valeur de votre bankroll. Cela met à jour la bankroll dans les paramètres et commence le suivi à partir de cette valeur.",
-    "hi": "नया बैंकरोल मान दर्ज करें. यह सेटिंग्स में बैंकरोल को अपडेट करता है और इस मान से ट्रैकिंग शुरू करता है।"
+  "ui.d79ee91f1a40c63bfba59e9d": {
+    "en": "Enter cash-out and ending tier points (and other fields the app asks for, such as average bet where applicable).",
+    "zh-Hans": "输入兑现和结束等级积分（以及应用程序要求的其他字段，例如适用的平均赌注）。",
+    "ja": "キャッシュアウトと終了段階ポイント (および、該当する場合は平均ベットなど、アプリが要求するその他のフィールド) を入力します。",
+    "ko": "캐시아웃 및 종료 등급 포인트(및 해당되는 경우 평균 베팅과 같이 앱에서 요구하는 기타 필드)를 입력하세요.",
+    "vi": "Nhập điểm rút tiền và điểm kết thúc (và các trường khác mà ứng dụng yêu cầu, chẳng hạn như đặt cược trung bình nếu có).",
+    "es": "Ingrese los puntos de retiro y de nivel final (y otros campos que solicite la aplicación, como la apuesta promedio, cuando corresponda).",
+    "ar": "أدخل نقاط السحب النقدي ونقاط الطبقة النهائية (والحقول الأخرى التي يطلبها التطبيق، مثل متوسط ​​الرهان حيثما ينطبق ذلك).",
+    "he": "הזן נקודות מזומן ונקודות סיום (ושדות אחרים שהאפליקציה מבקשת, כגון הימור ממוצע במידת הצורך).",
+    "de": "Geben Sie Auszahlungs- und Endpunktpunkte ein (und andere Felder, nach denen die App fragt, wie z. B. den durchschnittlichen Einsatz, falls zutreffend).",
+    "fr": "Saisissez les points de retrait et de niveau final (ainsi que d'autres champs demandés par l'application, tels que la mise moyenne, le cas échéant).",
+    "hi": "कैश-आउट और अंतिम स्तर के बिंदु (और अन्य फ़ील्ड जो ऐप मांगता है, जैसे औसत दांव जहां लागू हो) दर्ज करें।"
+  },
+  "ui.85e16744f4986b2f50a85253": {
+    "en": "Enter override code",
+    "zh-Hans": "输入覆盖代码",
+    "ja": "オーバーライドコードを入力してください",
+    "ko": "재정의 코드를 입력하세요",
+    "vi": "Nhập mã ghi đè",
+    "es": "Ingrese el código de anulación",
+    "ar": "أدخل رمز التجاوز",
+    "he": "הזן קוד ביטול",
+    "de": "Geben Sie den Override-Code ein",
+    "fr": "Entrez le code de remplacement",
+    "hi": "ओवरराइड कोड दर्ज करें"
   },
   "ui.c5cfb642ded824ecc33fa5f1": {
     "en": "Estimated value",
@@ -2527,6 +2755,19 @@
     "fr": "Chaque session terminée est déjà sur ce voyage, ou vous n'avez pas encore de session terminée.",
     "hi": "इस यात्रा पर प्रत्येक पूर्ण सत्र पहले से ही है, या आपके पास अभी तक कोई पूर्ण सत्र नहीं है।"
   },
+  "ui.f071e995c2766069aac25ce4": {
+    "en": "Exact amount",
+    "zh-Hans": "确切数量",
+    "ja": "正確な金額",
+    "ko": "정확한 금액",
+    "vi": "Số tiền chính xác",
+    "es": "Cantidad exacta",
+    "ar": "المبلغ الدقيق",
+    "he": "כמות מדויקת",
+    "de": "Genauer Betrag",
+    "fr": "Montant exact",
+    "hi": "सटीक मात्रा"
+  },
   "ui.9a5e4d9513126f648a112642": {
     "en": "Export Failed",
     "zh-Hans": "导出失败",
@@ -2566,6 +2807,45 @@
     "fr": "Exporte vos sessions enregistrées vers un fichier .csv afin que vous puissiez sauvegarder vos données ou les analyser ailleurs. Utilise la feuille de partage iOS pour envoyer vers des fichiers, des e-mails ou d'autres applications.",
     "hi": "आपके रिकॉर्ड किए गए सत्रों को एक .csv फ़ाइल में निर्यात करता है ताकि आप अपने डेटा का बैकअप ले सकें या उसका कहीं और विश्लेषण कर सकें। फ़ाइलें, ईमेल या अन्य ऐप्स पर भेजने के लिए iOS शेयर शीट का उपयोग करता है।"
   },
+  "ui.dbc468a14b601d5d9240aeb7": {
+    "en": "FAQ",
+    "zh-Hans": "常问问题",
+    "ja": "よくある質問",
+    "ko": "FAQ",
+    "vi": "Câu hỏi thường gặp",
+    "es": "Preguntas frecuentes",
+    "ar": "التعليمات",
+    "he": "שאלות נפוצות",
+    "de": "FAQ",
+    "fr": "FAQ",
+    "hi": "अक्सर पूछे जाने वाले प्रश्न"
+  },
+  "ui.90e62640e2343a9e23d4eacb": {
+    "en": "Face ID / Touch ID",
+    "zh-Hans": "面容 ID / 触摸 ID",
+    "ja": "顔認証 / タッチ ID",
+    "ko": "페이스ID / 터치ID",
+    "vi": "ID khuôn mặt / ID cảm ứng",
+    "es": "Identificación facial/identificación táctil",
+    "ar": "معرف الوجه / معرف اللمس",
+    "he": "מזהה פנים / מגע מזהה",
+    "de": "Gesichts-ID / Touch-ID",
+    "fr": "Identification faciale/identification tactile",
+    "hi": "फेस आईडी/टच आईडी"
+  },
+  "ui.95dd7739a964bfb45b6b2fa1": {
+    "en": "Face ID or Touch ID when available, with passcode as backup.",
+    "zh-Hans": "Face ID 或 Touch ID（如果可用），并带有密码作为备份。",
+    "ja": "Face ID または Touch ID が利用可能な場合は、パスコードをバックアップとして使用します。",
+    "ko": "Face ID 또는 Touch ID(사용 가능한 경우)(비밀번호를 백업으로 사용)",
+    "vi": "Face ID hoặc Touch ID khi khả dụng, với mật mã dự phòng.",
+    "es": "Face ID o Touch ID cuando esté disponible, con código de acceso como respaldo.",
+    "ar": "Face ID أو Touch ID عند توفرهما، مع رمز المرور كنسخة احتياطية.",
+    "he": "Face ID או Touch ID כאשר זמין, עם קוד סיסמה כגיבוי.",
+    "de": "Face ID oder Touch ID, sofern verfügbar, mit Passcode als Backup.",
+    "fr": "Face ID ou Touch ID lorsqu'ils sont disponibles, avec mot de passe comme sauvegarde.",
+    "hi": "उपलब्ध होने पर फेस आईडी या टच आईडी, बैकअप के रूप में पासकोड के साथ।"
+  },
   "ui.6c582b62e0e5aa05647388bd": {
     "en": "Fast",
     "zh-Hans": "快速地",
@@ -2581,16 +2861,16 @@
   },
   "ui.2666a05a17adef844a514278": {
     "en": "Fast Check-In",
-    "zh-Hans": "Fast Check-In",
-    "ja": "Fast Check-In",
-    "ko": "Fast Check-In",
-    "vi": "Fast Check-In",
-    "es": "Fast Check-In",
-    "ar": "Fast Check-In",
-    "he": "Fast Check-In",
-    "de": "Fast Check-In",
-    "fr": "Fast Check-In",
-    "hi": "Fast Check-In"
+    "zh-Hans": "快速入住",
+    "ja": "ファストチェックイン",
+    "ko": "빠른 체크인",
+    "vi": "Nhận phòng nhanh",
+    "es": "Registro rápido",
+    "ar": "تسجيل وصول سريع",
+    "he": "צ'ק אין מהיר",
+    "de": "Schneller Check-in",
+    "fr": "Enregistrement rapide",
+    "hi": "तेजी से चेक-इन"
   },
   "ui.16bec7b66cc8ee70bff56946": {
     "en": "Fast Close Out",
@@ -2643,6 +2923,19 @@
     "de": "Favoriten",
     "fr": "Favoris",
     "hi": "पसंदीदा"
+  },
+  "ui.559bcf56c3c2aacdbdd24a85": {
+    "en": "Filter by date range, game, location, tier verification state, or free-text search.",
+    "zh-Hans": "按日期范围、游戏、位置、等级验证状态或自由文本搜索进行过滤。",
+    "ja": "日付範囲、ゲーム、場所、レベル検証状態、またはフリーテキスト検索でフィルタリングします。",
+    "ko": "기간, 게임, 위치, 등급 확인 상태 또는 자유 텍스트 검색을 기준으로 필터링하세요.",
+    "vi": "Lọc theo phạm vi ngày, trò chơi, vị trí, trạng thái xác minh cấp độ hoặc tìm kiếm văn bản miễn phí.",
+    "es": "Filtre por rango de fechas, juego, ubicación, estado de verificación de nivel o búsqueda de texto libre.",
+    "ar": "قم بالتصفية حسب النطاق الزمني أو اللعبة أو الموقع أو حالة التحقق من المستوى أو البحث عن نص حر.",
+    "he": "סנן לפי טווח תאריכים, משחק, מיקום, מצב אימות שכבה או חיפוש בטקסט חופשי.",
+    "de": "Filtern Sie nach Datumsbereich, Spiel, Standort, Status der Stufenüberprüfung oder Freitextsuche.",
+    "fr": "Filtrez par plage de dates, jeu, lieu, état de vérification de niveau ou recherche en texte libre.",
+    "hi": "दिनांक सीमा, खेल, स्थान, स्तरीय सत्यापन स्थिति, या मुक्त-पाठ खोज के आधार पर फ़िल्टर करें।"
   },
   "ui.428a2c79b765c5541adf993b": {
     "en": "Filter by location",
@@ -2709,6 +3002,32 @@
     "fr": "Terminer la session en direct",
     "hi": "लाइव सत्र समाप्त करें"
   },
+  "ui.d9caf7014a9beaf3693d29d6": {
+    "en": "Finished sessions appear in History. Check filters and search if you don’t see them immediately.",
+    "zh-Hans": "已完成的会话会显示在历史记录中。检查过滤器并搜索（如果您没有立即看到它们）。",
+    "ja": "終了したセッションは履歴に表示されます。フィルターを確認し、すぐに表示されない場合は検索してください。",
+    "ko": "완료된 세션이 기록에 표시됩니다. 필터를 확인하고 즉시 표시되지 않으면 검색해 보세요.",
+    "vi": "Các phiên kết thúc sẽ xuất hiện trong Lịch sử. Kiểm tra bộ lọc và tìm kiếm nếu bạn không nhìn thấy chúng ngay lập tức.",
+    "es": "Las sesiones terminadas aparecen en el Historial. Verifique los filtros y busque si no los ve de inmediato.",
+    "ar": "تظهر الجلسات المنتهية في السجل. تحقق من عوامل التصفية وابحث إذا لم تراها على الفور.",
+    "he": "הפעלות שהסתיימו מופיעות בהיסטוריה. בדוק מסננים וחפש אם אינך רואה אותם מיד.",
+    "de": "Abgeschlossene Sitzungen werden im Verlauf angezeigt. Überprüfen Sie die Filter und suchen Sie, wenn Sie sie nicht sofort sehen.",
+    "fr": "Les sessions terminées apparaissent dans l'historique. Vérifiez les filtres et effectuez une recherche si vous ne les voyez pas immédiatement.",
+    "hi": "समाप्त सत्र इतिहास में दिखाई देते हैं। यदि आप उन्हें तुरंत नहीं देखते हैं तो फ़िल्टर जांचें और खोजें।"
+  },
+  "ui.d1232d0257e66f04b89fa496": {
+    "en": "First launch",
+    "zh-Hans": "首次推出",
+    "ja": "最初の打ち上げ",
+    "ko": "첫 출시",
+    "vi": "Lần ra mắt đầu tiên",
+    "es": "Primer lanzamiento",
+    "ar": "الإطلاق الأول",
+    "he": "השקה ראשונה",
+    "de": "Erster Start",
+    "fr": "Premier lancement",
+    "hi": "पहला लॉन्च"
+  },
   "ui.60fb22451095c91917545900": {
     "en": "Fixed Limit Hold’em",
     "zh-Hans": "固定限注德州扑克",
@@ -2774,6 +3093,19 @@
     "fr": "Depuis l'application de fidélité",
     "hi": "लॉयल्टी ऐप से"
   },
+  "ui.ac9d9c1fb450219e7d9ff0aa": {
+    "en": "From the home screen you can add extra buy-ins or comps, open bankroll tools, review history, add a past session manually, or finish the live session.",
+    "zh-Hans": "在主屏幕上，您可以添加额外的买入或补偿、打开资金工具、查看历史记录、手动添加过去的会话或完成实时会话。",
+    "ja": "ホーム画面から、追加のバイインやコンプを追加したり、バンクロール ツールを開いたり、履歴を確認したり、過去のセッションを手動で追加したり、ライブ セッションを終了したりできます。",
+    "ko": "홈 화면에서 추가 바이인 또는 구성 요소를 추가하고, 자금 도구를 열고, 기록을 검토하고, 이전 세션을 수동으로 추가하거나, 라이브 세션을 완료할 수 있습니다.",
+    "vi": "Từ màn hình chính, bạn có thể thêm các khoản mua hoặc mua bổ sung, mở công cụ tài khoản ngân hàng, xem lại lịch sử, thêm phiên trước đây theo cách thủ công hoặc kết thúc phiên trực tiếp.",
+    "es": "Desde la pantalla de inicio puede agregar entradas o composiciones adicionales, abrir herramientas de fondos, revisar el historial, agregar una sesión pasada manualmente o finalizar la sesión en vivo.",
+    "ar": "من الشاشة الرئيسية، يمكنك إضافة عمليات اشتراك أو شركات إضافية، أو فتح أدوات التمويل، أو مراجعة السجل، أو إضافة جلسة سابقة يدويًا، أو إنهاء الجلسة المباشرة.",
+    "he": "ממסך הבית אתה יכול להוסיף רכישות או החזרות נוספות, לפתוח כלי בנק, לסקור היסטוריה, להוסיף הפעלה קודמת באופן ידני או לסיים את ההפעלה החיה.",
+    "de": "Auf dem Startbildschirm können Sie zusätzliche Buy-Ins oder Comps hinzufügen, Bankroll-Tools öffnen, den Verlauf überprüfen, eine vergangene Sitzung manuell hinzufügen oder die Live-Sitzung beenden.",
+    "fr": "Depuis l'écran d'accueil, vous pouvez ajouter des buy-ins ou des comps supplémentaires, ouvrir des outils de bankroll, consulter l'historique, ajouter manuellement une session passée ou terminer la session en direct.",
+    "hi": "होम स्क्रीन से आप अतिरिक्त बाय-इन्स या कंप्स जोड़ सकते हैं, बैंकरोल टूल खोल सकते हैं, इतिहास की समीक्षा कर सकते हैं, पिछले सत्र को मैन्युअल रूप से जोड़ सकते हैं, या लाइव सत्र समाप्त कर सकते हैं।"
+  },
   "ui.d9dae78103ad099379d5d31c": {
     "en": "Games",
     "zh-Hans": "游戏",
@@ -2825,6 +3157,19 @@
     "de": "Erhalten Sie einen Kostenvoranschlag mit TierTap AI.",
     "fr": "Obtenir une estimation avec TierTap AI.",
     "hi": "टियरटैप एआई के साथ अनुमान प्राप्त करना।"
+  },
+  "ui.831d0f72d242b7d12d4ef151": {
+    "en": "Getting started",
+    "zh-Hans": "入门",
+    "ja": "はじめる",
+    "ko": "시작하기",
+    "vi": "Bắt đầu",
+    "es": "Empezando",
+    "ar": "ابدء",
+    "he": "מתחילים",
+    "de": "Erste Schritte",
+    "fr": "Commencer",
+    "hi": "शुरू करना"
   },
   "ui.f84186b91668dc1da4100dae": {
     "en": "Go to Account to sign in",
@@ -2904,6 +3249,19 @@
     "fr": "P/L horaire",
     "hi": "प्रति घंटा डब्ल्यू/एल"
   },
+  "ui.9e7f70d492aa45efdcf4070f": {
+    "en": "How do I back up my data?",
+    "zh-Hans": "我如何备份我的数据？",
+    "ja": "データをバックアップするにはどうすればよいですか?",
+    "ko": "데이터를 어떻게 백업하나요?",
+    "vi": "Làm cách nào để sao lưu dữ liệu của tôi?",
+    "es": "¿Cómo hago una copia de seguridad de mis datos?",
+    "ar": "كيف يمكنني عمل نسخة احتياطية لبياناتي؟",
+    "he": "איך אני מגבה את הנתונים שלי?",
+    "de": "Wie sichere ich meine Daten?",
+    "fr": "Comment sauvegarder mes données ?",
+    "hi": "मैं अपने डेटा का बैकअप कैसे ले सकता हूँ?"
+  },
   "ui.886fb2cd9e4e4e81a9313f2e": {
     "en": "How it's calculated",
     "zh-Hans": "计算方法",
@@ -2930,6 +3288,97 @@
     "fr": "La rapidité avec laquelle les réponses de l'IA apparaissent caractère par caractère dans **Ask TierTap**. Lent correspond au rythme d’origine.",
     "hi": "**आस्क टियरटैप** में एआई उत्तर कितनी जल्दी चरित्र दर चरित्र दिखाई देते हैं। धीमी गति मूल गति से मेल खाती है।"
   },
+  "ui.468ef0065ba2455fcf68a869": {
+    "en": "How to use it:",
+    "zh-Hans": "使用方法：",
+    "ja": "使用方法:",
+    "ko": "그것을 사용하는 방법:",
+    "vi": "Làm thế nào để sử dụng nó:",
+    "es": "Cómo usarlo:",
+    "ar": "كيفية استخدامه:",
+    "he": "כיצד להשתמש בו:",
+    "de": "So verwenden Sie es:",
+    "fr": "Comment l'utiliser :",
+    "hi": "इसका उपयोग कैसे करना है:"
+  },
+  "ui.4b3f5941ee87b804c819f795": {
+    "en": "How to use it: Apply date and filter chips, search by display name, reload the feed, and publish your own eligible sessions when the app offers it.",
+    "zh-Hans": "如何使用它：应用日期和过滤芯片，按显示名称搜索，重新加载提要，并在应用程序提供时发布您自己的合格会话。",
+    "ja": "使用方法: 日付とフィルターチップを適用し、表示名で検索し、フィードをリロードし、アプリが提供するときに独自の対象となるセッションを公開します。",
+    "ko": "사용 방법: 날짜 및 필터 칩을 적용하고, 표시 이름으로 검색하고, 피드를 다시 로드하고, 앱이 제공할 때 적합한 세션을 게시하세요.",
+    "vi": "Cách sử dụng: Áp dụng chip ngày và bộ lọc, tìm kiếm theo tên hiển thị, tải lại nguồn cấp dữ liệu và xuất bản các phiên đủ điều kiện của riêng bạn khi ứng dụng cung cấp.",
+    "es": "Cómo usarlo: aplique fechas y filtros, busque por nombre para mostrar, vuelva a cargar el feed y publique sus propias sesiones elegibles cuando la aplicación lo ofrezca.",
+    "ar": "كيفية استخدامه: قم بتطبيق شرائح التاريخ والتصفية، وابحث حسب اسم العرض، وأعد تحميل الخلاصة، وانشر جلساتك المؤهلة عندما يقدمها التطبيق.",
+    "he": "כיצד להשתמש בו: החל תאריך וסנן שבבי, חפש לפי שם תצוגה, טען מחדש את הפיד ופרסם הפעלות כשירות משלך כאשר האפליקציה מציעה זאת.",
+    "de": "So verwenden Sie es: Wenden Sie Datums- und Filterchips an, suchen Sie nach Anzeigenamen, laden Sie den Feed neu und veröffentlichen Sie Ihre eigenen berechtigten Sitzungen, wenn die App sie anbietet.",
+    "fr": "Comment l'utiliser : appliquez des puces de date et de filtrage, recherchez par nom d'affichage, rechargez le flux et publiez vos propres sessions éligibles lorsque l'application le propose.",
+    "hi": "इसका उपयोग कैसे करें: दिनांक और फ़िल्टर चिप्स लागू करें, प्रदर्शन नाम से खोजें, फ़ीड पुनः लोड करें, और ऐप द्वारा ऑफ़र किए जाने पर अपने स्वयं के योग्य सत्र प्रकाशित करें।"
+  },
+  "ui.80eaa58454331bff93e5132e": {
+    "en": "How to use it: Enter the same kind of information as a live check-in and close-out, with times and amounts you remember.",
+    "zh-Hans": "如何使用：输入与实时签入和结账相同的信息，以及您记住的时间和金额。",
+    "ja": "使用方法: ライブチェックインとクローズアウトと同じ種類の情報を、覚えている時間と金額で入力します。",
+    "ko": "이용방법 : 라이브 체크인 및 체크아웃과 동일한 정보를 기억하고 있는 시간과 금액과 함께 입력하세요.",
+    "vi": "Cách sử dụng: Nhập cùng loại thông tin như nhận phòng và kết thúc trực tiếp, với thời gian và số lượng bạn nhớ.",
+    "es": "Cómo usarlo: Ingrese el mismo tipo de información que un registro de entrada y cierre en vivo, con horarios y montos que recuerde.",
+    "ar": "كيفية استخدامها: أدخل نفس النوع من المعلومات مثل تسجيل الوصول والإغلاق المباشر، مع الأوقات والمبالغ التي تتذكرها.",
+    "he": "איך להשתמש בו: הזן את אותו סוג של מידע כמו צ'ק-אין וסגירה חי, עם זמנים וסכומים שאתה זוכר.",
+    "de": "So verwenden Sie es: Geben Sie die gleichen Informationen wie bei einem Live-Check-in und -Close-out ein, mit Zeiten und Beträgen, die Sie sich merken.",
+    "fr": "Comment l'utiliser : saisissez le même type d'informations qu'un enregistrement et une clôture en direct, avec les heures et les montants dont vous vous souvenez.",
+    "hi": "इसका उपयोग कैसे करें: लाइव चेक-इन और क्लोज़-आउट जैसी ही जानकारी दर्ज करें, आपके द्वारा याद किए जाने वाले समय और मात्रा के साथ।"
+  },
+  "ui.8dbd6284e89555205a25b3fb": {
+    "en": "How to use it: Expand each section. Export sessions as CSV from Data & Export. Manage favorites to power quick check-in and buy-in grids.",
+    "zh-Hans": "如何使用它：展开每个部分。从数据和导出中将会话导出为 CSV。管理收藏夹以支持快速签到和买入网格。",
+    "ja": "使用方法: 各セクションを展開します。データとエクスポートからセッションを CSV としてエクスポートします。お気に入りを管理して、迅速なチェックインと購入グリッドを強化します。",
+    "ko": "사용 방법: 각 섹션을 확장합니다. 데이터 및 내보내기에서 세션을 CSV로 내보냅니다. 즐겨찾기를 관리하여 빠른 체크인 및 바이인 그리드를 강화하세요.",
+    "vi": "Cách sử dụng: Mở rộng từng phần. Xuất phiên dưới dạng CSV từ Dữ liệu & Xuất. Quản lý các mục yêu thích để cung cấp năng lượng cho lưới đăng ký và mua hàng nhanh chóng.",
+    "es": "Cómo usarlo: expande cada sección. Exporte sesiones como CSV desde Datos y Exportación. Administre favoritos para impulsar cuadrículas de check-in y buy-in rápidos.",
+    "ar": "كيفية استخدامه: قم بتوسيع كل قسم. تصدير الجلسات كملف CSV من البيانات والتصدير. قم بإدارة المفضلة لتشغيل شبكات تسجيل الوصول والاشتراك السريعة.",
+    "he": "כיצד להשתמש בו: הרחב כל חלק. ייצוא הפעלות כ-CSV מ-Data & Export. נהל מועדפים כדי להפעיל רשתות צ'ק-אין ורכישה מהירה.",
+    "de": "So verwenden Sie es: Erweitern Sie jeden Abschnitt. Exportieren Sie Sitzungen als CSV aus Data & Export. Verwalten Sie Favoriten, um schnelle Check-in- und Buy-in-Raster zu ermöglichen.",
+    "fr": "Comment l'utiliser : développez chaque section. Exportez les sessions au format CSV depuis Data & Export. Gérez les favoris pour alimenter des grilles d'enregistrement et d'adhésion rapides.",
+    "hi": "इसका उपयोग कैसे करें: प्रत्येक अनुभाग का विस्तार करें। डेटा और निर्यात से सीएसवी के रूप में निर्यात सत्र। त्वरित चेक-इन और बाय-इन ग्रिड को सशक्त बनाने के लिए पसंदीदा प्रबंधित करें।"
+  },
+  "ui.ba6cd3ad23927c16a512ec69": {
+    "en": "How to use it: Open TierTap on Apple Watch and follow the start and live flows; finish missing details on the phone if prompted.",
+    "zh-Hans": "使用方法：在Apple Watch上打开TierTap并按照开始和直播流程进行操作；如果出现提示，请在电话上完成缺失的详细信息。",
+    "ja": "使用方法: Apple Watch で TierTap を開き、開始フローとライブフローに従います。プロンプトが表示されたら、電話で不足している詳細を完了します。",
+    "ko": "사용 방법: Apple Watch에서 TierTap을 열고 시작 및 라이브 흐름을 따르세요. 메시지가 표시되면 전화로 누락된 세부정보를 완료하세요.",
+    "vi": "Cách sử dụng: Mở TierTap trên Apple Watch và theo dõi các luồng bắt đầu và trực tiếp; hoàn tất các chi tiết còn thiếu trên điện thoại nếu được nhắc.",
+    "es": "Cómo usarlo: abre TierTap en Apple Watch y sigue el inicio y los flujos en vivo; termine de faltar detalles en el teléfono si se le solicita.",
+    "ar": "كيفية استخدامه: افتح TierTap على Apple Watch واتبع البداية والتدفقات المباشرة؛ قم بإنهاء التفاصيل المفقودة على الهاتف إذا طُلب منك ذلك.",
+    "he": "כיצד להשתמש בו: פתחו את TierTap ב-Apple Watch ועקבו אחר זרימות ההתחלה והחיים; לסיים פרטים חסרים בטלפון אם תתבקש.",
+    "de": "So verwenden Sie es: Öffnen Sie TierTap auf der Apple Watch und folgen Sie den Start- und Live-Abläufen. Vervollständigen Sie fehlende Details am Telefon, wenn Sie dazu aufgefordert werden.",
+    "fr": "Comment l'utiliser : ouvrez TierTap sur Apple Watch et suivez les flux de démarrage et en direct ; terminez les détails manquants au téléphone si vous y êtes invité.",
+    "hi": "इसका उपयोग कैसे करें: ऐप्पल वॉच पर टियरटैप खोलें और प्रारंभ और लाइव प्रवाह का पालन करें; यदि संकेत दिया जाए तो फ़ोन पर गुम विवरण समाप्त करें।"
+  },
+  "ui.72b153e6aab365e455afcac6": {
+    "en": "How to use it: Open from the Sessions tab when you want a focused bankroll screen during or between trips.",
+    "zh-Hans": "如何使用它：当您想要在旅行期间或之间进行集中的资金屏幕时，请从“会话”选项卡打开。",
+    "ja": "使用方法: 旅行中または旅行の合間に集中的なバンクロール画面が必要な場合は、[セッション] タブから開きます。",
+    "ko": "사용 방법: 여행 중 또는 여행 사이에 집중된 자금 화면을 원할 때 세션 탭에서 엽니다.",
+    "vi": "Cách sử dụng: Mở từ tab Phiên khi bạn muốn có màn hình tài khoản ngân hàng tập trung trong hoặc giữa các chuyến đi.",
+    "es": "Cómo usarlo: ábrelo desde la pestaña Sesiones cuando quieras una pantalla de fondos enfocada durante o entre viajes.",
+    "ar": "كيفية استخدامه: افتحه من علامة التبويب \"الجلسات\" عندما تريد شاشة تمويل مركزة أثناء الرحلات أو بينها.",
+    "he": "איך להשתמש בו: פתחו מהכרטיסייה הפעלות כאשר אתם רוצים מסך חשבונות ממוקד במהלך או בין נסיעות.",
+    "de": "So verwenden Sie es: Öffnen Sie es über die Registerkarte „Sitzungen“, wenn Sie während oder zwischen Reisen einen fokussierten Bankroll-Bildschirm wünschen.",
+    "fr": "Comment l'utiliser : ouvrez-le à partir de l'onglet Sessions lorsque vous souhaitez un écran de bankroll ciblé pendant ou entre les voyages.",
+    "hi": "इसका उपयोग कैसे करें: जब आप यात्राओं के दौरान या बीच में एक केंद्रित बैंकरोल स्क्रीन चाहते हैं तो सत्र टैब से खोलें।"
+  },
+  "ui.414305430b8e6b5afda0ec27": {
+    "en": "How to use it: Reach TierTap Account from Settings; manage subscription from the Account section or paywall screens.",
+    "zh-Hans": "如何使用：从“设置”进入“TierTap帐户”；从帐户部分或付费专区屏幕管理订阅。",
+    "ja": "使用方法: [設定] から TierTap アカウントにアクセスします。アカウントセクションまたはペイウォール画面からサブスクリプションを管理します。",
+    "ko": "사용 방법: 설정에서 TierTap 계정에 연결하세요. 계정 섹션이나 페이월 화면에서 구독을 관리하세요.",
+    "vi": "Cách sử dụng: Tiếp cận Tài khoản TierTap từ Cài đặt; quản lý đăng ký từ phần Tài khoản hoặc màn hình tường phí.",
+    "es": "Cómo usarlo: acceda a la cuenta TierTap desde Configuración; administre la suscripción desde la sección Cuenta o las pantallas del muro de pago.",
+    "ar": "كيفية استخدامه: الوصول إلى حساب TierTap من الإعدادات؛ إدارة الاشتراك من قسم الحساب أو شاشات نظام حظر الاشتراك غير المدفوع.",
+    "he": "כיצד להשתמש בו: הגש לחשבון TierTap מהגדרות; נהל את המנוי מקטע חשבון או מסכי חומת תשלום.",
+    "de": "So verwenden Sie es: Rufen Sie das TierTap-Konto über die Einstellungen auf. Verwalten Sie das Abonnement über den Kontobereich oder die Paywall-Bildschirme.",
+    "fr": "Comment l'utiliser : accédez au compte TierTap à partir des paramètres ; gérer l'abonnement à partir de la section Compte ou des écrans de paywall.",
+    "hi": "इसका उपयोग कैसे करें: सेटिंग्स से टियरटैप खाते तक पहुंचें; खाता अनुभाग या पेवॉल स्क्रीन से सदस्यता प्रबंधित करें।"
+  },
   "ui.8d55f4943ea681a33dfe9a1c": {
     "en": "Hrs",
     "zh-Hans": "小时",
@@ -2942,6 +3391,32 @@
     "de": "Std",
     "fr": "Heures",
     "hi": "घंटे"
+  },
+  "ui.b22cf1820a026f24359bd839": {
+    "en": "If account sign-in is offered, you can sign in now or later from Settings.",
+    "zh-Hans": "如果提供帐户登录，您可以立即或稍后从“设置”登录。",
+    "ja": "アカウントのサインインが提供されている場合は、今すぐまたは後で [設定] からサインインできます。",
+    "ko": "계정 로그인이 제공되면 지금 또는 나중에 설정에서 로그인할 수 있습니다.",
+    "vi": "Nếu đăng nhập tài khoản được cung cấp, bạn có thể đăng nhập ngay bây giờ hoặc đăng nhập sau từ Cài đặt.",
+    "es": "Si se ofrece el inicio de sesión en la cuenta, puede iniciar sesión ahora o más tarde desde Configuración.",
+    "ar": "إذا تم عرض تسجيل الدخول إلى الحساب، فيمكنك تسجيل الدخول الآن أو لاحقًا من الإعدادات.",
+    "he": "אם מוצעת כניסה לחשבון, תוכל להיכנס כעת או מאוחר יותר מההגדרות.",
+    "de": "Wenn die Kontoanmeldung angeboten wird, können Sie sich jetzt oder später über die Einstellungen anmelden.",
+    "fr": "Si la connexion au compte est proposée, vous pouvez vous connecter maintenant ou plus tard à partir des paramètres.",
+    "hi": "यदि खाता साइन-इन की पेशकश की जाती है, तो आप सेटिंग्स से अभी या बाद में साइन इन कर सकते हैं।"
+  },
+  "ui.76bd3ef3993cae5c6eaa720e": {
+    "en": "If enabled in Settings, you’ll pick a session mood (how the session felt) after saving.",
+    "zh-Hans": "如果在“设置”中启用，您将在保存后选择会话氛围（会话的感受）。",
+    "ja": "設定で有効にすると、保存後にセッションのムード (セッションがどのように感じられたか) を選択できます。",
+    "ko": "설정에서 활성화하면 저장 후 세션 분위기(세션의 느낌)를 선택하게 됩니다.",
+    "vi": "Nếu được bật trong Cài đặt, bạn sẽ chọn trạng thái phiên (cảm giác của phiên) sau khi lưu.",
+    "es": "Si está habilitado en Configuración, elegirás el estado de ánimo de la sesión (cómo se sintió la sesión) después de guardarla.",
+    "ar": "إذا تم تمكينه في الإعدادات، فستختار مزاج الجلسة (كيف شعرت بالجلسة) بعد الحفظ.",
+    "he": "אם מופעל בהגדרות, תבחר מצב רוח של הפעלה (איך הרגשה ההפעלה) לאחר השמירה.",
+    "de": "Wenn die Option in den Einstellungen aktiviert ist, können Sie nach dem Speichern eine Sitzungsstimmung (wie sich die Sitzung anfühlte) auswählen.",
+    "fr": "Si cette option est activée dans Paramètres, vous choisirez une ambiance de session (le ressenti de la session) après l'enregistrement.",
+    "hi": "यदि सेटिंग्स में सक्षम किया गया है, तो आप सहेजने के बाद एक सत्र मूड (सत्र कैसा लगा) चुनेंगे।"
   },
   "ui.4fafadc75382fd8bb5769403": {
     "en": "If you need help — Gamblers Anonymous",
@@ -2956,6 +3431,19 @@
     "fr": "Si vous avez besoin d'aide — Gamblers Anonymes",
     "hi": "यदि आपको सहायता की आवश्यकता है - जुआरी अज्ञात"
   },
+  "ui.82b079790449bf1b2b18edff": {
+    "en": "If you use TierTap Pro, you can use chip estimation from a table photo when supported.",
+    "zh-Hans": "如果您使用 TierTap Pro，则可以在支持的情况下使用桌面照片中的筹码估算。",
+    "ja": "TierTap Pro を使用している場合、サポートされている場合はテーブル写真からのチップ推定を使用できます。",
+    "ko": "TierTap Pro를 사용하는 경우 지원되는 경우 테이블 사진에서 칩 추정을 사용할 수 있습니다.",
+    "vi": "Nếu sử dụng TierTap Pro, bạn có thể sử dụng ước tính chip từ ảnh bảng khi được hỗ trợ.",
+    "es": "Si usa TierTap Pro, puede usar la estimación de chips a partir de una foto de mesa cuando sea compatible.",
+    "ar": "إذا كنت تستخدم TierTap Pro، فيمكنك استخدام تقدير الشريحة من صورة جدول عندما تكون مدعومة.",
+    "he": "אם אתה משתמש ב-TierTap Pro, תוכל להשתמש בהערכת שבב מתמונת טבלה כאשר היא נתמכת.",
+    "de": "Wenn Sie TierTap Pro verwenden, können Sie die Spanschätzung anhand eines Tischfotos verwenden, sofern dies unterstützt wird.",
+    "fr": "Si vous utilisez TierTap Pro, vous pouvez utiliser l'estimation des puces à partir d'une photo de tableau lorsqu'elle est prise en charge.",
+    "hi": "यदि आप टियरटैप प्रो का उपयोग करते हैं, तो समर्थित होने पर आप टेबल फोटो से चिप अनुमान का उपयोग कर सकते हैं।"
+  },
   "ui.c6dc18b02d97c59ac136a7e6": {
     "en": "In range",
     "zh-Hans": "在范围内",
@@ -2968,6 +3456,19 @@
     "de": "In Reichweite",
     "fr": "À portée",
     "hi": "सीमा में"
+  },
+  "ui.ded91ee3d2d4b697d2e574fa": {
+    "en": "In your TierTap account area you can require Face ID, Touch ID, or your device passcode before the app opens after you leave it or return from the background.",
+    "zh-Hans": "在您的 TierTap 帐户区域中，您可以在离开应用程序或从后台返回后打开应用程序之前要求面容 ID、触摸 ID 或设备密码。",
+    "ja": "TierTap アカウント領域では、アプリから離れるかバックグラウンドから戻った後にアプリが開く前に、Face ID、Touch ID、またはデバイスのパスコードを要求できます。",
+    "ko": "TierTap 계정 영역에서 앱을 종료하거나 백그라운드에서 돌아온 후 앱이 열리기 전에 Face ID, Touch ID 또는 장치 암호를 요구할 수 있습니다.",
+    "vi": "Trong khu vực tài khoản TierTap, bạn có thể yêu cầu Face ID, Touch ID hoặc mật mã thiết bị của mình trước khi ứng dụng mở ra sau khi bạn thoát khỏi ứng dụng hoặc quay lại từ nền.",
+    "es": "En el área de su cuenta TierTap, puede solicitar Face ID, Touch ID o el código de acceso de su dispositivo antes de que se abra la aplicación después de salir o regresar del fondo.",
+    "ar": "في منطقة حساب TierTap، يمكنك طلب Face ID أو Touch ID أو رمز المرور الخاص بجهازك قبل فتح التطبيق بعد مغادرته أو العودة من الخلفية.",
+    "he": "באזור חשבון TierTap שלך תוכל לדרוש Face ID, Touch ID או קוד סיסמה של המכשיר שלך לפני שהאפליקציה תיפתח לאחר שתעזוב אותה או תחזור מהרקע.",
+    "de": "In Ihrem TierTap-Kontobereich können Sie Face ID, Touch ID oder Ihren Gerätepasscode anfordern, bevor die App geöffnet wird, nachdem Sie sie verlassen oder aus dem Hintergrund zurückkehren.",
+    "fr": "Dans la zone de votre compte TierTap, vous pouvez exiger Face ID, Touch ID ou le code d'accès de votre appareil avant que l'application ne s'ouvre après l'avoir quittée ou être revenue de l'arrière-plan.",
+    "hi": "आपके टियरटैप खाता क्षेत्र में ऐप छोड़ने या बैकग्राउंड से लौटने के बाद खुलने से पहले आपको फेस आईडी, टच आईडी या अपने डिवाइस पासकोड की आवश्यकता हो सकती है।"
   },
   "ui.78dc04e35279009c342d98b4": {
     "en": "Include in share",
@@ -3060,6 +3561,19 @@
     "fr": "Rejoignez les sessions communautaires : voyez à quoi jouent les autres et publiez les vôtres.",
     "hi": "सामुदायिक सत्रों में शामिल हों - देखें कि अन्य लोग क्या खेल रहे हैं और अपना स्वयं का सत्र प्रकाशित करें।"
   },
+  "ui.02852ea0db075f961d808252": {
+    "en": "Keep private notes that stay with the session.",
+    "zh-Hans": "保留与会话相关的私人笔记。",
+    "ja": "セッションに残るプライベートなメモを保持します。",
+    "ko": "세션과 함께 유지되는 개인 메모를 보관하세요.",
+    "vi": "Giữ các ghi chú riêng tư ở lại với phiên.",
+    "es": "Mantenga notas privadas que permanezcan con la sesión.",
+    "ar": "احتفظ بالملاحظات الخاصة التي تبقى مع الجلسة.",
+    "he": "שמור הערות פרטיות שנשארות עם הפגישה.",
+    "de": "Bewahren Sie private Notizen auf, die während der Sitzung erhalten bleiben.",
+    "fr": "Conservez des notes privées qui restent avec la session.",
+    "hi": "निजी नोट्स रखें जो सत्र के साथ बने रहें।"
+  },
   "ui.35e0d0360a0af6d115f9df30": {
     "en": "LIVE",
     "zh-Hans": "居住",
@@ -3114,16 +3628,16 @@
   },
   "ui.033c379d9f22b860031aa31f": {
     "en": "Level mins",
-    "zh-Hans": "Level mins",
-    "ja": "Level mins",
-    "ko": "Level mins",
-    "vi": "Level mins",
-    "es": "Level mins",
-    "ar": "Level mins",
-    "he": "Level mins",
-    "de": "Level mins",
-    "fr": "Level mins",
-    "hi": "Level mins"
+    "zh-Hans": "级别分钟数",
+    "ja": "レベル分",
+    "ko": "레벨 분",
+    "vi": "Số phút cấp độ",
+    "es": "Minutos de nivel",
+    "ar": "دقائق المستوى",
+    "he": "רמה דקות",
+    "de": "Level Min",
+    "fr": "Minutes de niveau",
+    "hi": "स्तर मिनट"
   },
   "ui.dc20b3d5d2cddf82fad33282": {
     "en": "Library",
@@ -3153,6 +3667,19 @@
   },
   "ui.7692acbbf361ef1c5e1c4d20": {
     "en": "Live Session",
+    "zh-Hans": "现场会议",
+    "ja": "ライブセッション",
+    "ko": "라이브 세션",
+    "vi": "Phiên trực tiếp",
+    "es": "Sesión en vivo",
+    "ar": "جلسة حية",
+    "he": "סשן חי",
+    "de": "Live-Sitzung",
+    "fr": "Séance en direct",
+    "hi": "लाइव सत्र"
+  },
+  "ui.94f506b7d34d68a252edf5ae": {
+    "en": "Live session",
     "zh-Hans": "现场会议",
     "ja": "ライブセッション",
     "ko": "라이브 세션",
@@ -3203,6 +3730,32 @@
     "fr": "Emplacements",
     "hi": "स्थानों"
   },
+  "ui.db44b8db4f05d720ef1a57ab": {
+    "en": "Lock",
+    "zh-Hans": "锁",
+    "ja": "ロック",
+    "ko": "잠그다",
+    "vi": "Khóa",
+    "es": "Cerrar",
+    "ar": "قفل",
+    "he": "לִנְעוֹל",
+    "de": "Sperren",
+    "fr": "Verrouillage",
+    "hi": "ताला"
+  },
+  "ui.9b928cd7b1c37fca06946c52": {
+    "en": "Lock Down TierTap",
+    "zh-Hans": "锁定 TierTap",
+    "ja": "TierTapをロックダウンする",
+    "ko": "Lock Down TierTap",
+    "vi": "Khóa cấp độTap",
+    "es": "Bloquear nivelToque",
+    "ar": "قفل TierTap",
+    "he": "נעל את TierTap",
+    "de": "TierTap sperren",
+    "fr": "Verrouiller le niveauTap",
+    "hi": "टियरटैप को लॉक करें"
+  },
   "ui.49616145514e9abf1fc47d63": {
     "en": "Log out",
     "zh-Hans": "退出",
@@ -3241,6 +3794,19 @@
     "de": "Jetzt Treue-App",
     "fr": "Application de fidélité maintenant",
     "hi": "अब वफादारी ऐप"
+  },
+  "ui.6d2085569a2323785dc43261": {
+    "en": "Main features",
+    "zh-Hans": "主要特点",
+    "ja": "主な特長",
+    "ko": "주요 기능",
+    "vi": "Các tính năng chính",
+    "es": "Características principales",
+    "ar": "الميزات الرئيسية",
+    "he": "תכונות עיקריות",
+    "de": "Hauptmerkmale",
+    "fr": "Principales caractéristiques",
+    "hi": "मुख्य विशेषताएं"
   },
   "ui.be176b0015c424b78e9f343f": {
     "en": "Map",
@@ -3632,6 +4198,19 @@
     "fr": "Aucune session avec pari moyen réel et noté pour le moment.",
     "hi": "वास्तविक और रेटेड औसत दांव दोनों के साथ अभी तक कोई सत्र नहीं।"
   },
+  "ui.545fff37a44a0d04dea9dd3a": {
+    "en": "No text response from Gemini.",
+    "zh-Hans": "双子座没有短信回复。",
+    "ja": "ジェミニからのテキスト応答はありません。",
+    "ko": "Gemini로부터 문자 응답이 없습니다.",
+    "vi": "Không có phản hồi bằng tin nhắn từ Song Tử.",
+    "es": "No hay respuesta de texto de Gemini.",
+    "ar": "لا توجد استجابة نصية من الجوزاء.",
+    "he": "אין תגובת טקסט מג'מיני.",
+    "de": "Keine Textantwort von Gemini.",
+    "fr": "Aucune réponse textuelle de Gemini.",
+    "hi": "जेमिनी की ओर से कोई पाठ प्रतिक्रिया नहीं।"
+  },
   "ui.f2a10936eb7f95f65a7e5bf2": {
     "en": "No tier point data yet.",
     "zh-Hans": "尚无等级点数据。",
@@ -3670,6 +4249,19 @@
     "de": "Keine nicht zugewiesenen abgeschlossenen Sitzungen – jede Sitzung ist bereits mit einer Reise verknüpft, oder Sie haben noch keine abgeschlossenen Sitzungen.",
     "fr": "Aucune session terminée non attribuée : chaque session est déjà liée à un voyage ou vous n'avez pas encore de session terminée.",
     "hi": "कोई भी बिना असाइन किया गया पूर्ण सत्र नहीं है—प्रत्येक सत्र पहले से ही एक यात्रा से जुड़ा हुआ है, या आपके पास अभी तक कोई पूर्ण सत्र नहीं है।"
+  },
+  "ui.e1050f8ddb89b00d72b1ea98": {
+    "en": "None (free tier)",
+    "zh-Hans": "无（免费套餐）",
+    "ja": "なし (無料利用枠)",
+    "ko": "없음(무료 등급)",
+    "vi": "Không có (cấp miễn phí)",
+    "es": "Ninguno (nivel gratuito)",
+    "ar": "لا شيء (الطبقة المجانية)",
+    "he": "אין (רמה חינם)",
+    "de": "Keine (kostenloses Kontingent)",
+    "fr": "Aucun (niveau gratuit)",
+    "hi": "कोई नहीं (फ्री टियर)"
   },
   "ui.131ada176048f835e5300648": {
     "en": "Not even close. Will enter manually.",
@@ -3801,6 +4393,45 @@
     "fr": "Chinois à visage ouvert",
     "hi": "खुला चेहरा चीनी"
   },
+  "ui.5140c01b7612e52a1baff5ef": {
+    "en": "Open Risk of Ruin to compare play to your bankroll and target averages (table-focused; poker is handled separately in copy inside the app).",
+    "zh-Hans": "打开“破产风险”，将游戏与您的资金和目标平均值进行比较（以牌桌为中心；扑克在应用程序内的副本中单独处理）。",
+    "ja": "Risk of Ruin を開いて、プレイをバンクロールおよびターゲット平均と比較します (テーブルに焦点を当てています。ポーカーはアプリ内のコピーで個別に処理されます)。",
+    "ko": "Risk of Ruin을 열어 플레이를 자금 및 목표 평균과 비교하세요(테이블 중심, 포커는 앱 내부 사본에서 별도로 처리됩니다).",
+    "vi": "Mở Rủi ro hủy hoại để so sánh cách chơi với số tiền trung bình và mục tiêu của bạn (tập trung vào bàn; poker được xử lý riêng trong bản sao bên trong ứng dụng).",
+    "es": "Abra Risk of Ruin para comparar el juego con sus fondos y promedios objetivo (centrado en la mesa; el póquer se maneja por separado en una copia dentro de la aplicación).",
+    "ar": "افتح Risk of Ruin لمقارنة اللعب برصيدك المالي والمتوسطات المستهدفة (تركز على الجدول؛ ويتم التعامل مع البوكر بشكل منفصل في نسخة داخل التطبيق).",
+    "he": "פתח את Risk of Ruin כדי להשוות את המשחק לממוצעי הכסף והיעד שלך (ממוקד שולחן; הפוקר מטופל בנפרד בעותק בתוך האפליקציה).",
+    "de": "Öffnen Sie „Risk of Ruin“, um das Spiel mit Ihrem Guthaben und Ihren Zieldurchschnitten zu vergleichen (tabellenorientiert; Poker wird separat in Kopie in der App behandelt).",
+    "fr": "Ouvrez Risk of Ruin pour comparer le jeu à votre bankroll et à vos moyennes cibles (axé sur les tables ; le poker est traité séparément en copie dans l'application).",
+    "hi": "अपने बैंकरोल और लक्ष्य औसत (टेबल-केंद्रित; पोकर को ऐप के अंदर कॉपी में अलग से संभाला जाता है) के साथ खेल की तुलना करने के लिए बर्बाद होने का जोखिम खोलें।"
+  },
+  "ui.d9bcc09193ddf6ba1d9731fd": {
+    "en": "Open a session for details, editing, sharing, or deletion.",
+    "zh-Hans": "打开会话以进行详细信息、编辑、共享或删除。",
+    "ja": "詳細、編集、共有、削除を行うには、セッションを開いてください。",
+    "ko": "세부정보, 편집, 공유 또는 삭제를 위해 세션을 엽니다.",
+    "vi": "Mở một phiên để biết chi tiết, chỉnh sửa, chia sẻ hoặc xóa.",
+    "es": "Abra una sesión para obtener detalles, editar, compartir o eliminar.",
+    "ar": "افتح جلسة للحصول على التفاصيل أو التحرير أو المشاركة أو الحذف.",
+    "he": "פתח הפעלה לפרטים, עריכה, שיתוף או מחיקה.",
+    "de": "Öffnen Sie eine Sitzung für Details, Bearbeitung, Freigabe oder Löschung.",
+    "fr": "Ouvrez une session pour plus de détails, de modification, de partage ou de suppression.",
+    "hi": "विवरण, संपादन, साझाकरण या हटाने के लिए एक सत्र खोलें।"
+  },
+  "ui.f2837bdb481233461fccfb12": {
+    "en": "Open the Sessions tab. Tap Check In to begin a new live session, or use the quick shortcuts when you have favorites configured. When you’re done playing, finish the live session and complete close-out.",
+    "zh-Hans": "打开“会话”选项卡。点击签入开始新的实时会话，或者在配置了收藏夹后使用快速快捷方式。当您完成演奏后，结束现场会话并完成收尾。",
+    "ja": "「セッション」タブを開きます。 「チェックイン」をタップして新しいライブセッションを開始するか、お気に入りを設定している場合はクイックショートカットを使用します。演奏が終わったら、ライブセッションを終了し、クローズアウトを完了します。",
+    "ko": "세션 탭을 엽니다. 체크인을 눌러 새 라이브 세션을 시작하거나 즐겨찾기를 구성한 경우 빠른 바로가기를 사용하세요. 플레이가 끝나면 라이브 세션을 종료하고 종료를 완료하세요.",
+    "vi": "Mở tab Phiên. Nhấn Đăng ký để bắt đầu phiên trực tiếp mới hoặc sử dụng phím tắt nhanh khi bạn đã định cấu hình mục yêu thích. Khi bạn chơi xong, hãy kết thúc phiên trực tiếp và hoàn tất quá trình kết thúc.",
+    "es": "Abra la pestaña Sesiones. Toque Registrarse para comenzar una nueva sesión en vivo o use los atajos rápidos cuando tenga favoritos configurados. Cuando termines de jugar, finaliza la sesión en vivo y completa el cierre.",
+    "ar": "افتح علامة التبويب \"الجلسات\". اضغط على Check In لبدء جلسة مباشرة جديدة، أو استخدم الاختصارات السريعة عندما تكون لديك مفضلات تم تكوينها. عندما تنتهي من اللعب، قم بإنهاء الجلسة المباشرة وأكمل الإغلاق.",
+    "he": "פתח את הכרטיסייה הפעלות. הקש על צ'ק אין כדי להתחיל הפעלה חדשה בשידור חי, או השתמש בקיצורי הדרך המהירים כאשר הגדרת מועדפים. כשתסיים לשחק, סיים את הסשן החי והשלם את הסגירה.",
+    "de": "Öffnen Sie die Registerkarte Sitzungen. Tippen Sie auf „Einchecken“, um eine neue Live-Sitzung zu beginnen, oder verwenden Sie die Schnellzugriffe, wenn Sie Favoriten konfiguriert haben. Wenn Sie mit dem Spielen fertig sind, beenden Sie die Live-Sitzung und schließen Sie den Abschluss ab.",
+    "fr": "Ouvrez l'onglet Sessions. Appuyez sur S'enregistrer pour commencer une nouvelle session en direct ou utilisez les raccourcis rapides lorsque vos favoris sont configurés. Lorsque vous avez fini de jouer, terminez la session en direct et terminez la clôture.",
+    "hi": "सत्र टैब खोलें. नया लाइव सत्र शुरू करने के लिए चेक इन पर टैप करें, या जब आपने पसंदीदा कॉन्फ़िगर कर लिया हो तो त्वरित शॉर्टकट का उपयोग करें। जब आप खेलना समाप्त कर लें, तो लाइव सत्र समाप्त करें और क्लोज-आउट पूरा करें।"
+  },
   "ui.28ff1d2bb480195a6e75771c": {
     "en": "Open the link in the email on this device to finish signing in. You can leave this screen open or close it.",
     "zh-Hans": "在此设备上打开电子邮件中的链接以完成登录。您可以将此屏幕保持打开或关闭。",
@@ -3813,6 +4444,19 @@
     "de": "Öffnen Sie den Link in der E-Mail auf diesem Gerät, um die Anmeldung abzuschließen. Sie können diesen Bildschirm geöffnet lassen oder schließen.",
     "fr": "Ouvrez le lien dans l'e-mail sur cet appareil pour terminer la connexion. Vous pouvez laisser cet écran ouvert ou le fermer.",
     "hi": "साइन इन करना समाप्त करने के लिए इस डिवाइस पर ईमेल में दिए गए लिंक को खोलें। आप इस स्क्रीन को खुला छोड़ सकते हैं या बंद कर सकते हैं।"
+  },
+  "ui.587407a0c50d3299bcdd533f": {
+    "en": "Optional app lock",
+    "zh-Hans": "可选应用锁",
+    "ja": "オプションのアプリロック",
+    "ko": "선택적 앱 잠금",
+    "vi": "Khóa ứng dụng tùy chọn",
+    "es": "Bloqueo de aplicaciones opcional",
+    "ar": "قفل التطبيق الاختياري",
+    "he": "נעילת אפליקציה אופציונלית",
+    "de": "Optionale App-Sperre",
+    "fr": "Verrouillage d'application en option",
+    "hi": "वैकल्पिक ऐप लॉक"
   },
   "ui.63e056c5ee6a0ec2b361df8c": {
     "en": "Optional — e.g. 100",
@@ -3892,6 +4536,32 @@
     "fr": "Le remplacement est actif pour cette version ; les contrôles d'abonnement sont contournés.",
     "hi": "इस निर्माण के लिए ओवरराइड सक्रिय है; सदस्यता जांच को दरकिनार कर दिया जाता है।"
   },
+  "ui.b5a4e80b8a50628d31a8ea4b": {
+    "en": "PDF generation failed.",
+    "zh-Hans": "PDF 生成失败。",
+    "ja": "PDF の生成に失敗しました。",
+    "ko": "PDF 생성에 실패했습니다.",
+    "vi": "Tạo PDF không thành công.",
+    "es": "Error al generar el PDF.",
+    "ar": "فشل إنشاء PDF.",
+    "he": "הפקת PDF נכשלה.",
+    "de": "Die PDF-Generierung ist fehlgeschlagen.",
+    "fr": "La génération du PDF a échoué.",
+    "hi": "पीडीएफ जनरेशन विफल."
+  },
+  "ui.7821a03e83d54c4519defe99": {
+    "en": "PRO",
+    "zh-Hans": "专业版",
+    "ja": "プロ",
+    "ko": "찬성",
+    "vi": "CHUYÊN NGHIỆP",
+    "es": "PRO",
+    "ar": "للمحترفين",
+    "he": "מִקצוֹעָן",
+    "de": "PRO",
+    "fr": "PRO",
+    "hi": "प्रो"
+  },
   "ui.e41cddd3a4cbd9679e6c7116": {
     "en": "PTS",
     "zh-Hans": "PTS",
@@ -3957,6 +4627,32 @@
     "fr": "Photos",
     "hi": "तस्वीरें"
   },
+  "ui.66bace4d56ddc5bccc4e05a6": {
+    "en": "Pick Sessions To Publish",
+    "zh-Hans": "选择要发布的会话",
+    "ja": "公開するセッションを選択",
+    "ko": "게시할 세션 선택",
+    "vi": "Chọn phiên để xuất bản",
+    "es": "Elegir sesiones para publicar",
+    "ar": "اختر الجلسات للنشر",
+    "he": "בחר הפעלות לפרסום",
+    "de": "Sitzungen zum Veröffentlichen auswählen",
+    "fr": "Choisir les sessions à publier",
+    "hi": "प्रकाशित करने के लिए सत्र चुनें"
+  },
+  "ui.5bef34d5b977d0c86cb26fba": {
+    "en": "Pick a game type that matches the sessions you’ve saved; older entries may default to table games.",
+    "zh-Hans": "选择与您保存的会话相匹配的游戏类型；较旧的条目可能默认为桌面游戏。",
+    "ja": "保存したセッションに一致するゲーム タイプを選択します。古いエントリではデフォルトでテーブル ゲームが設定される場合があります。",
+    "ko": "저장한 세션과 일치하는 게임 유형을 선택하세요. 이전 항목은 기본적으로 테이블 게임으로 설정될 수 있습니다.",
+    "vi": "Chọn loại trò chơi phù hợp với các phiên bạn đã lưu; các mục cũ hơn có thể mặc định là trò chơi trên bàn.",
+    "es": "Elige un tipo de juego que coincida con las sesiones que has guardado; Las entradas más antiguas pueden tener por defecto juegos de mesa.",
+    "ar": "اختر نوع اللعبة الذي يتوافق مع الجلسات التي قمت بحفظها؛ قد تكون الإدخالات الأقدم افتراضية لألعاب الطاولة.",
+    "he": "בחר סוג משחק שמתאים להפעלות ששמרת; ערכים ישנים יותר עשויים לשמש כברירת מחדל למשחקי שולחן.",
+    "de": "Wählen Sie einen Spieltyp, der zu den von Ihnen gespeicherten Sitzungen passt. Bei älteren Einträgen werden möglicherweise standardmäßig Tischspiele verwendet.",
+    "fr": "Choisissez un type de jeu qui correspond aux sessions que vous avez enregistrées ; les entrées plus anciennes peuvent être par défaut des jeux de table.",
+    "hi": "ऐसा गेम प्रकार चुनें जो आपके द्वारा सहेजे गए सत्रों से मेल खाता हो; पुरानी प्रविष्टियाँ टेबल गेम के लिए डिफ़ॉल्ट हो सकती हैं।"
+  },
   "ui.762e041f0712df990aa21898": {
     "en": "Play and complete a few sessions to unlock win/loss, tier point, and pace-of-play analytics.",
     "zh-Hans": "玩并完成一些会话来解锁输赢、等级点和游戏节奏分析。",
@@ -4014,7 +4710,7 @@
     "zh-Hans": "底池限注奥马哈高低",
     "ja": "ポット リミット オマハ ハイロー",
     "ko": "팟 리미트 오마하 Hi-Lo",
-    "vi": "Pot Limit Omaha Hi-Lo",
+    "vi": "Giới hạn nồi Omaha Hi-Lo",
     "es": "Omaha con límite de bote Hi-Lo",
     "ar": "حد الرهان أوماها هاي لو",
     "he": "Pot Limit Omaha Hi-Lo",
@@ -4164,19 +4860,6 @@
     "de": "Veröffentlichen",
     "fr": "Publier",
     "hi": "प्रकाशित करना"
-  },
-  "ui.866dfaab1d859d5dde56ef96": {
-    "en": "Publish Sessions",
-    "zh-Hans": "发布会话",
-    "ja": "セッションの公開",
-    "ko": "세션 게시",
-    "vi": "Phiên xuất bản",
-    "es": "Publicar sesiones",
-    "ar": "نشر الجلسات",
-    "he": "פרסם הפעלות",
-    "de": "Sitzungen veröffentlichen",
-    "fr": "Publier des sessions",
-    "hi": "सत्र प्रकाशित करें"
   },
   "ui.5079bac859ff7860abfba15f": {
     "en": "Publish wins / losses",
@@ -4347,6 +5030,32 @@
     "fr": "Retirer",
     "hi": "निकालना"
   },
+  "ui.17e51e0b25270e18948a49c3": {
+    "en": "Require Face ID, Touch ID, or your device passcode to reopen TierTap after you leave the app.",
+    "zh-Hans": "离开应用程序后，需要使用 Face ID、Touch ID 或设备密码才能重新打开 TierTap。",
+    "ja": "アプリを終了した後に TierTap を再度開くには、Face ID、Touch ID、またはデバイスのパスコードが必要です。",
+    "ko": "앱을 종료한 후 TierTap을 다시 열려면 Face ID, Touch ID 또는 장치 암호가 필요합니다.",
+    "vi": "Yêu cầu Face ID, Touch ID hoặc mật mã thiết bị của bạn để mở lại TierTap sau khi bạn rời khỏi ứng dụng.",
+    "es": "Solicite Face ID, Touch ID o la contraseña de su dispositivo para volver a abrir TierTap después de salir de la aplicación.",
+    "ar": "اطلب Face ID أو Touch ID أو رمز مرور جهازك لإعادة فتح TierTap بعد مغادرة التطبيق.",
+    "he": "דרוש Face ID, Touch ID או קוד סיסמה של המכשיר שלך כדי לפתוח מחדש את TierTap לאחר עזיבת האפליקציה.",
+    "de": "Erfordern Sie Face ID, Touch ID oder Ihren Gerätepasscode, um TierTap erneut zu öffnen, nachdem Sie die App verlassen haben.",
+    "fr": "Exigez Face ID, Touch ID ou le code d'accès de votre appareil pour rouvrir TierTap après avoir quitté l'application.",
+    "hi": "ऐप छोड़ने के बाद टियरटैप को फिर से खोलने के लिए फेस आईडी, टच आईडी या अपने डिवाइस पासकोड की आवश्यकता है।"
+  },
+  "ui.1ef110773890098c8a977cf0": {
+    "en": "Require unlock to open TierTap",
+    "zh-Hans": "需要解锁才能打开 TierTap",
+    "ja": "TierTap を開くにはロック解除が必要です",
+    "ko": "TierTap을 열려면 잠금 해제가 필요합니다.",
+    "vi": "Yêu cầu mở khóa để mở TierTap",
+    "es": "Requerir desbloqueo para abrir TierTap",
+    "ar": "يتطلب فتح لفتح TierTap",
+    "he": "דרוש ביטול נעילה כדי לפתוח את TierTap",
+    "de": "Zum Öffnen von TierTap ist eine Entsperrung erforderlich",
+    "fr": "Exiger le déverrouillage pour ouvrir TierTap",
+    "hi": "टियरटैप खोलने के लिए अनलॉक की आवश्यकता है"
+  },
   "ui.e0cdd07f6a270b8269217510": {
     "en": "Requirements",
     "zh-Hans": "要求",
@@ -4359,19 +5068,6 @@
     "de": "Anforderungen",
     "fr": "Exigences",
     "hi": "आवश्यकताएं"
-  },
-  "ui.daee7606b339f3c339076fe2": {
-    "en": "Reset",
-    "zh-Hans": "重置",
-    "ja": "リセット",
-    "ko": "다시 놓기",
-    "vi": "Cài lại",
-    "es": "Reiniciar",
-    "ar": "إعادة ضبط",
-    "he": "אִתחוּל",
-    "de": "Zurücksetzen",
-    "fr": "Réinitialiser",
-    "hi": "रीसेट करें"
   },
   "ui.10160fd2ad3a33ee2763d368": {
     "en": "Reset Bankroll",
@@ -4437,6 +5133,19 @@
     "de": "Vorhandenes fortsetzen",
     "fr": "Reprendre existant",
     "hi": "मौजूदा फिर से शुरू करें"
+  },
+  "ui.38211ee4973a68b6c1cea544": {
+    "en": "Review buy-ins and comps, add more at any time, and open strategy or odds reference for your game.",
+    "zh-Hans": "查看买入费和赔率，随时添加更多资金，并为您的游戏打开策略或赔率参考。",
+    "ja": "バイインとコンプを確認し、いつでも追加して、ゲームの戦略やオッズのリファレンスを開きます。",
+    "ko": "바이인과 조합을 검토하고, 언제든지 추가하고, 게임에 대한 전략이나 배당률 참조를 공개하세요.",
+    "vi": "Xem lại các khoản mua và bù, thêm nhiều hơn bất kỳ lúc nào và mở tài liệu tham khảo về chiến lược hoặc tỷ lệ cược cho trò chơi của bạn.",
+    "es": "Revise los buy-ins y las composiciones, agregue más en cualquier momento y abra la estrategia o la referencia de probabilidades para su juego.",
+    "ar": "قم بمراجعة عمليات الاشتراك والاشتراكات، وأضف المزيد في أي وقت، وافتح مرجع الإستراتيجية أو الاحتمالات للعبتك.",
+    "he": "בדוק רכישות והחזרות, הוסף עוד בכל עת ופתח אסטרטגיה או התייחסות לסיכויים עבור המשחק שלך.",
+    "de": "Überprüfen Sie Buy-Ins und Comps, fügen Sie jederzeit weitere hinzu und öffnen Sie Strategie- oder Quotenreferenzen für Ihr Spiel.",
+    "fr": "Passez en revue les buy-ins et les compositions, ajoutez-en d'autres à tout moment et ouvrez la référence en matière de stratégie ou de cotes pour votre jeu.",
+    "hi": "बाय-इन्स और कंप्स की समीक्षा करें, किसी भी समय और जोड़ें, और अपने गेम के लिए रणनीति या ऑड्स संदर्भ खोलें।"
   },
   "ui.0f770c16293447c416d82064": {
     "en": "Review each card: toggle, edit, or tap Search map for a proper place pin. Timelines match the Trips tab (upcoming, current, historical).",
@@ -4607,18 +5316,31 @@
     "fr": "Emplacements enregistrés",
     "hi": "सहेजे गए स्थान"
   },
-  "ui.f4f9eac90e0a701d5f20c145": {
-    "en": "Scroll for more amounts",
-    "zh-Hans": "滚动查看更多金额",
-    "ja": "スクロールしてさらに金額を表示します",
-    "ko": "더 많은 금액을 보려면 스크롤하세요.",
-    "vi": "Cuộn để biết thêm số tiền",
-    "es": "Desplázate para ver más cantidades",
-    "ar": "قم بالتمرير لمزيد من المبالغ",
-    "he": "גלול לסכומים נוספים",
-    "de": "Scrollen Sie für weitere Beträge",
-    "fr": "Faites défiler pour plus de montants",
-    "hi": "अधिक रकम के लिए स्क्रॉल करें"
+  "ui.8f6bb7910da2477f6df5adce": {
+    "en": "Screen Name",
+    "zh-Hans": "屏幕名称",
+    "ja": "スクリーン名",
+    "ko": "화면 이름",
+    "vi": "Tên hiển thị",
+    "es": "Nombre de pantalla",
+    "ar": "اسم الشاشة",
+    "he": "שם מסך",
+    "de": "Bildschirmname",
+    "fr": "Nom d'écran",
+    "hi": "स्क्रीन नाम"
+  },
+  "ui.0a02372195987a90679a2b93": {
+    "en": "Screen names",
+    "zh-Hans": "屏幕名称",
+    "ja": "スクリーン名",
+    "ko": "화면 이름",
+    "vi": "Tên hiển thị",
+    "es": "Nombres de pantalla",
+    "ar": "أسماء الشاشة",
+    "he": "שמות מסך",
+    "de": "Bildschirmnamen",
+    "fr": "Noms d'écran",
+    "hi": "स्क्रीन नाम"
   },
   "ui.25063aa8a217c23565491b0d": {
     "en": "Search above, or pick a pin on the map.",
@@ -4645,6 +5367,19 @@
     "de": "Suche nach Postleitzahl oder Adresse",
     "fr": "Rechercher par code postal ou adresse",
     "hi": "ज़िप कोड या पते के आधार पर खोजें"
+  },
+  "ui.74f30a15663942a3f6c945f2": {
+    "en": "Search by screen name",
+    "zh-Hans": "按屏幕名称搜索",
+    "ja": "スクリーン名で検索",
+    "ko": "화면 이름으로 검색",
+    "vi": "Tìm theo tên hiển thị",
+    "es": "Buscar por nombre de pantalla",
+    "ar": "البحث حسب اسم الشاشة",
+    "he": "חיפוש לפי שם מסך",
+    "de": "Nach Bildschirmnamen suchen",
+    "fr": "Rechercher par nom d'écran",
+    "hi": "स्क्रीन नाम से खोजें"
   },
   "ui.c802781b2d6c7de29607fefe": {
     "en": "Search map",
@@ -4932,6 +5667,19 @@
     "fr": "Séances",
     "hi": "सत्र"
   },
+  "ui.0453f786e8bf8616ef2405b9": {
+    "en": "Sessions (home)",
+    "zh-Hans": "会议（主场）",
+    "ja": "セッション（ホーム）",
+    "ko": "세션(홈)",
+    "vi": "Phiên (nhà)",
+    "es": "Sesiones (en casa)",
+    "ar": "الجلسات (المنزل)",
+    "he": "הפעלות (בית)",
+    "de": "Sitzungen (zu Hause)",
+    "fr": "Séances (à domicile)",
+    "hi": "सत्र (घर)"
+  },
   "ui.7ea6d52e613e951df66be17f": {
     "en": "Sessions by Game",
     "zh-Hans": "按游戏划分的会话",
@@ -5062,6 +5810,19 @@
     "fr": "Partager l’image récapitulative",
     "hi": "सारांश छवि साझा करें"
   },
+  "ui.acd22929ad1cea27439b9323": {
+    "en": "Share user guide as PDF",
+    "zh-Hans": "以 PDF 形式共享用户指南",
+    "ja": "ユーザーガイドをPDFとして共有",
+    "ko": "사용자 가이드를 PDF로 공유",
+    "vi": "Chia sẻ hướng dẫn sử dụng dưới dạng PDF",
+    "es": "Compartir la guía del usuario como PDF",
+    "ar": "مشاركة دليل المستخدم بصيغة PDF",
+    "he": "שתף מדריך למשתמש כ-PDF",
+    "de": "Teilen Sie das Benutzerhandbuch als PDF",
+    "fr": "Partager le guide de l'utilisateur au format PDF",
+    "hi": "उपयोगकर्ता गाइड को पीडीएफ के रूप में साझा करें"
+  },
   "ui.c8d8f070791397cda29e02c2": {
     "en": "Shared from TierTap",
     "zh-Hans": "分享自 TierTap",
@@ -5087,6 +5848,32 @@
     "de": "Short Deck Hold’em (6+)",
     "fr": "Hold'em à deck court (6+)",
     "hi": "शॉर्ट डेक होल्डम (6+)"
+  },
+  "ui.c4f0c8abb6a5ff4e664a3b40": {
+    "en": "Show my screen name",
+    "zh-Hans": "显示我的屏幕名称",
+    "ja": "スクリーンネームを表示",
+    "ko": "내 화면 이름 표시",
+    "vi": "Hiển thị tên màn hình của tôi",
+    "es": "Mostrar mi nombre de pantalla",
+    "ar": "إظهار اسم الشاشة الخاص بي",
+    "he": "הצג את שם המסך שלי",
+    "de": "Zeige meinen Benutzernamen",
+    "fr": "Afficher mon pseudo",
+    "hi": "मेरा स्क्रीन नाम दिखाओ"
+  },
+  "ui.16140b7c2f9226ffa2b04c90": {
+    "en": "Shown on Community when you publish",
+    "zh-Hans": "当您发布时显示在社区上",
+    "ja": "公開するとコミュニティに表示されます",
+    "ko": "게시하면 커뮤니티에 표시됩니다.",
+    "vi": "Hiển thị trên Cộng đồng khi bạn xuất bản",
+    "es": "Se muestra en la comunidad cuando publicas",
+    "ar": "يظهر في المجتمع عند النشر",
+    "he": "מוצג בקהילה כשאתה מפרסם",
+    "de": "Wird bei der Veröffentlichung in der Community angezeigt",
+    "fr": "Affiché sur la communauté lorsque vous publiez",
+    "hi": "जब आप प्रकाशित करते हैं तो समुदाय पर दिखाया जाता है"
   },
   "ui.218d708aa13ee1f5d5b745ef": {
     "en": "Shows how often you both have a positive session result (per your results basis) and gain tier points in the same session.",
@@ -5178,6 +5965,19 @@
     "de": "Abmelden",
     "fr": "se déconnecter",
     "hi": "साइन आउट"
+  },
+  "ui.7a6af01960e61717606f8158": {
+    "en": "Sign-in sheet keeps appearing",
+    "zh-Hans": "登录表不断出现",
+    "ja": "サインインシートが表示され続ける",
+    "ko": "로그인 시트가 계속 나타납니다.",
+    "vi": "Bảng đăng nhập liên tục xuất hiện",
+    "es": "La hoja de registro sigue apareciendo",
+    "ar": "تستمر ورقة تسجيل الدخول في الظهور",
+    "he": "גיליון כניסה ממשיך להופיע",
+    "de": "Das Anmeldeformular wird weiterhin angezeigt",
+    "fr": "La feuille de connexion continue d'apparaître",
+    "hi": "साइन-इन शीट प्रदर्शित होती रहती है"
   },
   "ui.ca566c8968e7e881d55617e7": {
     "en": "Signed in",
@@ -5296,6 +6096,32 @@
     "fr": "Démarrez une session sur votre iPhone pour le contrôler à partir d'ici",
     "hi": "इसे यहां से नियंत्रित करने के लिए अपने iPhone पर एक सत्र प्रारंभ करें"
   },
+  "ui.a330c27864963cfe31172501": {
+    "en": "Start anyway",
+    "zh-Hans": "无论如何都要开始",
+    "ja": "とにかく始める",
+    "ko": "어쨌든 시작하세요",
+    "vi": "Vẫn bắt đầu",
+    "es": "Empezar de todos modos",
+    "ar": "ابدأ على أي حال",
+    "he": "תתחיל בכל זאת",
+    "de": "Fangen Sie trotzdem an",
+    "fr": "Commencez quand même",
+    "hi": "फिर भी शुरू करो"
+  },
+  "ui.f41fec8fb78adef3e1ee217c": {
+    "en": "Start logging",
+    "zh-Hans": "开始记录",
+    "ja": "ロギングを開始する",
+    "ko": "로깅 시작",
+    "vi": "Bắt đầu đăng nhập",
+    "es": "Iniciar sesión",
+    "ar": "ابدأ التسجيل",
+    "he": "התחל לרשום",
+    "de": "Beginnen Sie mit der Protokollierung",
+    "fr": "Commencer la journalisation",
+    "hi": "लॉगिंग प्रारंभ करें"
+  },
   "ui.5eed7e9fc8f3cd68976a1119": {
     "en": "Start over",
     "zh-Hans": "重新开始",
@@ -5322,18 +6148,31 @@
     "fr": "Points de niveau de départ",
     "hi": "आरंभिक स्तर बिंदु"
   },
+  "ui.020c0766989356b7d803347b": {
+    "en": "Starting sessions without a Tier rating will make it difficult to track Tier levels and points.",
+    "zh-Hans": "在没有等级评级的情况下开始会话将导致很难跟踪等级级别和积分。",
+    "ja": "Tier 評価なしでセッションを開始すると、Tier レベルとポイントを追跡することが困難になります。",
+    "ko": "등급 등급 없이 세션을 시작하면 등급 수준과 포인트를 추적하기가 어렵습니다.",
+    "vi": "Việc bắt đầu các phiên mà không có xếp hạng Cấp độ sẽ gây khó khăn cho việc theo dõi cấp độ và điểm Cấp độ.",
+    "es": "Iniciar sesiones sin una calificación de nivel dificultará el seguimiento de los niveles y puntos de nivel.",
+    "ar": "إن بدء الجلسات بدون تصنيف المستوى سيجعل من الصعب تتبع مستويات ونقاط المستوى.",
+    "he": "התחלת הפעלות ללא דירוג שכבה יקשה על מעקב אחר רמות ונקודות של שכבות.",
+    "de": "Das Starten von Sitzungen ohne Stufenbewertung macht es schwierig, Stufen und Punkte zu verfolgen.",
+    "fr": "Démarrer des sessions sans évaluation de niveau rendra difficile le suivi des niveaux et des points de niveau.",
+    "hi": "टियर रेटिंग के बिना सत्र शुरू करने से टियर स्तर और अंकों को ट्रैक करना मुश्किल हो जाएगा।"
+  },
   "ui.07614992be0deddf84c1497c": {
     "en": "Starting stack",
-    "zh-Hans": "Starting stack",
-    "ja": "Starting stack",
-    "ko": "Starting stack",
-    "vi": "Starting stack",
-    "es": "Starting stack",
-    "ar": "Starting stack",
-    "he": "Starting stack",
-    "de": "Starting stack",
-    "fr": "Starting stack",
-    "hi": "Starting stack"
+    "zh-Hans": "起始堆栈",
+    "ja": "開始スタック",
+    "ko": "스택 시작",
+    "vi": "ngăn xếp bắt đầu",
+    "es": "Pila inicial",
+    "ar": "كومة البداية",
+    "he": "מחסנית מתחילה",
+    "de": "Startstapel",
+    "fr": "Pile de départ",
+    "hi": "आरंभिक ढेर"
   },
   "ui.08fd1de4b04df4a2fe763ac6": {
     "en": "Stay",
@@ -5412,6 +6251,19 @@
     "de": "Strategie/Quoten",
     "fr": "Stratégie/Cotes",
     "hi": "रणनीति/संभावनाएँ"
+  },
+  "ui.ea320b358837afdf45eb9a05": {
+    "en": "Subscription:",
+    "zh-Hans": "订阅：",
+    "ja": "サブスクリプション：",
+    "ko": "신청:",
+    "vi": "Đăng ký:",
+    "es": "Suscripción:",
+    "ar": "الاشتراك:",
+    "he": "מִנוּי:",
+    "de": "Abonnement:",
+    "fr": "Abonnement:",
+    "hi": "सदस्यता:"
   },
   "ui.a151f2e912fe8d5b31e07dae": {
     "en": "Subscriptions",
@@ -5504,6 +6356,32 @@
     "fr": "Prendre une photo",
     "hi": "फोटो लो"
   },
+  "ui.91b8e58e792c3a2e5172565e": {
+    "en": "Tap Check In to pick game type (table games, slots, or poker), location, starting tier points, buy-in, and loyalty program details.",
+    "zh-Hans": "点击签到可选择游戏类型（桌面游戏、老虎机或扑克）、地点、起始等级积分、买入和忠诚度计划详细信息。",
+    "ja": "[チェックイン] をタップして、ゲームの種類 (テーブル ゲーム、スロット、またはポーカー)、場所、開始段階ポイント、バイイン、ロイヤルティ プログラムの詳細を選択します。",
+    "ko": "체크인을 눌러 게임 유형(테이블 게임, 슬롯 또는 포커), 위치, 시작 등급 포인트, 바이인 및 로열티 프로그램 세부 정보를 선택하세요.",
+    "vi": "Nhấn Đăng ký để chọn loại trò chơi (trò chơi trên bàn, máy đánh bạc hoặc bài poker), vị trí, điểm cấp độ bắt đầu, lượt mua và chi tiết chương trình khách hàng thân thiết.",
+    "es": "Toque Registrarse para elegir el tipo de juego (juegos de mesa, tragamonedas o póquer), ubicación, puntos de nivel inicial, entrada y detalles del programa de lealtad.",
+    "ar": "اضغط على \"تسجيل الدخول\" لاختيار نوع اللعبة (ألعاب الطاولة، أو ماكينات القمار، أو البوكر)، والموقع، ونقاط مستوى البداية، والاشتراك، وتفاصيل برنامج الولاء.",
+    "he": "הקש על צ'ק אין כדי לבחור סוג משחק (משחקי שולחן, משבצות או פוקר), מיקום, נקודות רמה התחלתיות, רכישה ופרטי תוכנית נאמנות.",
+    "de": "Tippen Sie auf „Einchecken“, um den Spieltyp (Tischspiele, Spielautomaten oder Poker), den Standort, die Startpunkte, das Buy-in und Details zum Treueprogramm auszuwählen.",
+    "fr": "Appuyez sur S'enregistrer pour sélectionner le type de jeu (jeux de table, machines à sous ou poker), l'emplacement, les points de niveau de départ, le buy-in et les détails du programme de fidélité.",
+    "hi": "गेम का प्रकार (टेबल गेम, स्लॉट या पोकर), स्थान, शुरुआती स्तर के बिंदु, बाय-इन और लॉयल्टी प्रोग्राम विवरण चुनने के लिए चेक इन पर टैप करें।"
+  },
+  "ui.34c454d17aaacf20b45529f8": {
+    "en": "Tap Level shows progress based on your logged play; open the info control on the card to read how levels and milestones work, or share your level as an image.",
+    "zh-Hans": "点击级别根据您记录的游戏显示进度；打开卡片上的信息控件以了解级别和里程碑的工作原理，或以图像形式共享您的级别。",
+    "ja": "「レベルをタップ」には、記録されたプレイに基づいて進行状況が表示されます。カードの情報コントロールを開いて、レベルとマイルストーンがどのように機能するかを確認したり、レベルを画像として共有したりできます。",
+    "ko": "Tap Level은 기록된 플레이를 기반으로 진행 상황을 표시합니다. 카드의 정보 컨트롤을 열어 레벨과 마일스톤 작동 방식을 읽거나 레벨을 이미지로 공유하세요.",
+    "vi": "Cấp độ nhấn hiển thị tiến trình dựa trên lượt chơi đã ghi của bạn; mở phần kiểm soát thông tin trên thẻ để đọc cách hoạt động của các cấp độ và cột mốc hoặc chia sẻ cấp độ của bạn dưới dạng hình ảnh.",
+    "es": "Tap Level muestra el progreso según tu juego registrado; abra el control de información en la tarjeta para leer cómo funcionan los niveles y los hitos, o comparta su nivel como una imagen.",
+    "ar": "يعرض الضغط على المستوى التقدم بناءً على اللعب الذي قمت بتسجيله؛ افتح عنصر التحكم في المعلومات الموجود على البطاقة لقراءة كيفية عمل المستويات والمعالم الرئيسية، أو قم بمشاركة مستواك كصورة.",
+    "he": "הקשה על רמה מציגה התקדמות בהתבסס על ההצגה הרשומה שלך; פתח את בקרת המידע בכרטיס כדי לקרוא כיצד רמות ואבני דרך פועלות, או שתף את הרמה שלך כתמונה.",
+    "de": "Tap Level zeigt den Fortschritt basierend auf Ihrem protokollierten Spiel an; Öffnen Sie das Info-Steuerelement auf der Karte, um zu lesen, wie Levels und Meilensteine ​​funktionieren, oder teilen Sie Ihr Level als Bild.",
+    "fr": "Tap Level affiche la progression en fonction de votre jeu enregistré ; ouvrez le contrôle d'informations sur la carte pour lire comment fonctionnent les niveaux et les jalons, ou partagez votre niveau sous forme d'image.",
+    "hi": "टैप लेवल आपके लॉग किए गए प्ले के आधार पर प्रगति दिखाता है; स्तर और मील के पत्थर कैसे काम करते हैं यह पढ़ने के लिए कार्ड पर सूचना नियंत्रण खोलें, या एक छवि के रूप में अपना स्तर साझा करें।"
+  },
   "ui.12b0ca8f747460e5381f4fb6": {
     "en": "Tap Levels",
     "zh-Hans": "抽头级别",
@@ -5555,6 +6433,19 @@
     "de": "Zieldurchschnitt",
     "fr": "Moyenne cible",
     "hi": "लक्ष्य औसत"
+  },
+  "ui.069c9c49f64cddd45e628b59": {
+    "en": "The app needs a game, a location, and at least one buy-in recorded for that session.",
+    "zh-Hans": "该应用程序需要一场比赛、一个地点以及至少一次为该会话记录的买入。",
+    "ja": "アプリには、ゲーム、場所、およびそのセッションに対して記録された少なくとも 1 つのバイインが必要です。",
+    "ko": "앱에는 해당 세션에 대해 기록된 게임, 위치 및 최소 한 번의 바이인이 필요합니다.",
+    "vi": "Ứng dụng cần có trò chơi, địa điểm và ít nhất một lượt mua được ghi lại cho phiên đó.",
+    "es": "La aplicación necesita un juego, una ubicación y al menos una entrada registrada para esa sesión.",
+    "ar": "يحتاج التطبيق إلى لعبة وموقع وتسجيل اشتراك واحد على الأقل لتلك الجلسة.",
+    "he": "האפליקציה זקוקה למשחק, מיקום ולפחות רכישה אחת שתועד עבור אותה הפעלה.",
+    "de": "Die App benötigt ein Spiel, einen Ort und mindestens ein für diese Sitzung aufgezeichnetes Buy-in.",
+    "fr": "L'application a besoin d'un jeu, d'un emplacement et d'au moins un buy-in enregistré pour cette session.",
+    "hi": "ऐप को उस सत्र के लिए एक गेम, एक स्थान और कम से कम एक बाय-इन रिकॉर्ड की आवश्यकता होती है।"
   },
   "ui.38e68237670c4e31972a5a64": {
     "en": "Theme & colors",
@@ -5634,6 +6525,19 @@
     "fr": "Ce voyage n'existe plus.",
     "hi": "यह यात्रा अब मौजूद नहीं है."
   },
+  "ui.f149de0b333372272ead83a4": {
+    "en": "Those features require an active TierTap Pro subscription and a signed-in TierTap account.",
+    "zh-Hans": "这些功能需要有效的 TierTap Pro 订阅和登录的 TierTap 帐户。",
+    "ja": "これらの機能には、有効な TierTap Pro サブスクリプションとサインインした TierTap アカウントが必要です。",
+    "ko": "이러한 기능을 사용하려면 활성 TierTap Pro 구독과 로그인된 TierTap 계정이 필요합니다.",
+    "vi": "Những tính năng này yêu cầu đăng ký TierTap Pro đang hoạt động và tài khoản TierTap đã đăng nhập.",
+    "es": "Esas funciones requieren una suscripción activa a TierTap Pro y una cuenta TierTap iniciada.",
+    "ar": "تتطلب هذه الميزات اشتراك TierTap Pro نشطًا وحساب TierTap مسجل الدخول.",
+    "he": "תכונות אלה דורשות מנוי TierTap Pro פעיל וחשבון TierTap מחובר.",
+    "de": "Für diese Funktionen sind ein aktives TierTap Pro-Abonnement und ein angemeldetes TierTap-Konto erforderlich.",
+    "fr": "Ces fonctionnalités nécessitent un abonnement TierTap Pro actif et un compte TierTap connecté.",
+    "hi": "उन सुविधाओं के लिए एक सक्रिय टियरटैप प्रो सदस्यता और एक साइन-इन टियरटैप खाते की आवश्यकता होती है।"
+  },
   "ui.afc6abac44c4184ca1c07787": {
     "en": "Through",
     "zh-Hans": "通过",
@@ -5701,16 +6605,16 @@
   },
   "ui.b830e68ae5ae0ef361ed19e3": {
     "en": "Tier points",
-    "zh-Hans": "Tier points",
-    "ja": "Tier points",
-    "ko": "Tier points",
-    "vi": "Tier points",
-    "es": "Tier points",
-    "ar": "Tier points",
-    "he": "Tier points",
-    "de": "Tier points",
-    "fr": "Tier points",
-    "hi": "Tier points"
+    "zh-Hans": "等级积分",
+    "ja": "ティアポイント",
+    "ko": "등급 포인트",
+    "vi": "Điểm cấp",
+    "es": "Puntos de nivel",
+    "ar": "نقاط الطبقة",
+    "he": "נקודות שכבה",
+    "de": "Stufenpunkte",
+    "fr": "Points de niveau",
+    "hi": "स्तरीय अंक"
   },
   "ui.a3902b24c2dd557ed46efb14": {
     "en": "Tier/hour, comps, and wins/losses are optional.",
@@ -5751,6 +6655,19 @@
     "fr": "IA TierTap",
     "hi": "टियरटैप एआई"
   },
+  "ui.eb46fe82562e434bf9d10eaa": {
+    "en": "TierTap Account",
+    "zh-Hans": "TierTap 帐户",
+    "ja": "ティアタップアカウント",
+    "ko": "TierTap 계정",
+    "vi": "Tài khoản TierTap",
+    "es": "Cuenta TierTap",
+    "ar": "حساب تاير تاب",
+    "he": "חשבון TierTap",
+    "de": "TierTap-Konto",
+    "fr": "Compte TierTap",
+    "hi": "टियरटैप खाता"
+  },
   "ui.f4e39265a39acf5031d1de72": {
     "en": "TierTap Pro",
     "zh-Hans": "TierTap 专业版",
@@ -5763,6 +6680,58 @@
     "de": "TierTap Pro",
     "fr": "TierTap Pro",
     "hi": "टियरटैप प्रो"
+  },
+  "ui.5b8b3b980261655aa097a234": {
+    "en": "TierTap Pro (developer override)",
+    "zh-Hans": "TierTap Pro（开发人员覆盖）",
+    "ja": "TierTap Pro (開発者オーバーライド)",
+    "ko": "TierTap Pro(개발자 재정의)",
+    "vi": "TierTap Pro (ghi đè của nhà phát triển)",
+    "es": "TierTap Pro (anulación del desarrollador)",
+    "ar": "TierTap Pro (تجاوز المطور)",
+    "he": "TierTap Pro (עקיפה של מפתחים)",
+    "de": "TierTap Pro (Entwicklerüberschreibung)",
+    "fr": "TierTap Pro (remplacement du développeur)",
+    "hi": "टियरटैप प्रो (डेवलपर ओवरराइड)"
+  },
+  "ui.705f7a3dedf5d778e9220750": {
+    "en": "TierTap Pro — Monthly",
+    "zh-Hans": "TierTap Pro — 每月",
+    "ja": "TierTap Pro — 毎月",
+    "ko": "TierTap Pro — 월간",
+    "vi": "TierTap Pro — Hàng tháng",
+    "es": "TierTap Pro: mensual",
+    "ar": "TierTap Pro – شهريًا",
+    "he": "TierTap Pro - חודשי",
+    "de": "TierTap Pro – Monatlich",
+    "fr": "TierTap Pro – Mensuel",
+    "hi": "टियरटैप प्रो - मासिक"
+  },
+  "ui.6d1d3d36e23ee9001012777c": {
+    "en": "TierTap Pro — Quarterly",
+    "zh-Hans": "TierTap Pro — 季刊",
+    "ja": "TierTap Pro — 四半期ごと",
+    "ko": "TierTap Pro — 분기별",
+    "vi": "TierTap Pro — Hàng quý",
+    "es": "TierTap Pro: trimestral",
+    "ar": "TierTap Pro – ربع سنوي",
+    "he": "TierTap Pro - מדי רבעון",
+    "de": "TierTap Pro – Vierteljährlich",
+    "fr": "TierTap Pro — Trimestriel",
+    "hi": "टियरटैप प्रो - त्रैमासिक"
+  },
+  "ui.81564ad6ccd67c98a231fa88": {
+    "en": "TierTap Pro — Yearly",
+    "zh-Hans": "TierTap Pro — 每年",
+    "ja": "TierTap Pro — 毎年",
+    "ko": "TierTap Pro — 매년",
+    "vi": "TierTap Pro — Hàng năm",
+    "es": "TierTap Pro: Anual",
+    "ar": "TierTap Pro – سنويًا",
+    "he": "TierTap Pro - שנתי",
+    "de": "TierTap Pro – Jährlich",
+    "fr": "TierTap Pro — Annuel",
+    "hi": "टियरटैप प्रो - वार्षिक"
   },
   "ui.c404372a55f4016cb372e205": {
     "en": "TierTap Trip",
@@ -5777,6 +6746,32 @@
     "fr": "Voyage TierTap",
     "hi": "टियरटैप ट्रिप"
   },
+  "ui.0df2066d974803f2ea757891": {
+    "en": "TierTap User Guide",
+    "zh-Hans": "TierTap 用户指南",
+    "ja": "TierTap ユーザーガイド",
+    "ko": "TierTap 사용자 가이드",
+    "vi": "Hướng dẫn sử dụng TierTap",
+    "es": "Guía del usuario de TierTap",
+    "ar": "دليل مستخدم TierTap",
+    "he": "מדריך למשתמש של TierTap",
+    "de": "TierTap-Benutzerhandbuch",
+    "fr": "Guide de l'utilisateur TierTap",
+    "hi": "टियरटैप उपयोगकर्ता गाइड"
+  },
+  "ui.d305cd65706f29eacbea87d8": {
+    "en": "TierTap account",
+    "zh-Hans": "TierTap 帐户",
+    "ja": "TierTap アカウント",
+    "ko": "TierTap 계정",
+    "vi": "Tài khoản TierTap",
+    "es": "Cuenta TierTap",
+    "ar": "حساب تاير تاب",
+    "he": "חשבון TierTap",
+    "de": "TierTap-Konto",
+    "fr": "Compte TierTap",
+    "hi": "टियरटैप खाता"
+  },
   "ui.5e6ab5006545175ba312fbef": {
     "en": "TierTap groups completed sessions that are not already on a trip. TierTap proposes names, dates, location labels, and notes—the same upcoming, current, and historical buckets as the Trips tab.",
     "zh-Hans": "TierTap 对旅行中尚未完成的会话进行分组。 TierTap 会建议名称、日期、位置标签和注释 - 与“行程”选项卡相同的即将到来的、当前的和历史的存储桶。",
@@ -5789,6 +6784,32 @@
     "de": "TierTap gruppiert abgeschlossene Sitzungen, die noch nicht auf einer Reise sind. TierTap schlägt Namen, Daten, Ortsbezeichnungen und Notizen vor – dieselben bevorstehenden, aktuellen und historischen Zeiträume wie die Registerkarte „Reisen“.",
     "fr": "Les groupes TierTap ont terminé des sessions qui ne sont pas déjà en voyage. TierTap propose des noms, des dates, des étiquettes de lieu et des notes – les mêmes catégories à venir, actuelles et historiques que l'onglet Voyages.",
     "hi": "टियरटैप समूहों ने ऐसे सत्र पूरे कर लिए जो पहले से यात्रा पर नहीं हैं। टियरटैप नाम, तिथियां, स्थान लेबल और नोट्स प्रस्तावित करता है - ट्रिप्स टैब के समान आगामी, वर्तमान और ऐतिहासिक बकेट।"
+  },
+  "ui.32e236d077bf50a8dd0453e2": {
+    "en": "TierTap helps you log casino play sessions—buy-ins, comps, tier points, and outcomes—then review history, analytics, trips, and optional community sharing. The app is organized around five main tabs: Analytics, Trips, Sessions (home), Community, and Settings.",
+    "zh-Hans": "TierTap 可帮助您记录赌场游戏会话（买入、赠送、等级积分和结果），然后查看历史记录、分析、旅行和可选的社区共享。该应用程序围绕五个主要选项卡进行组织：分析、行程、会话（家庭）、社区和设置。",
+    "ja": "TierTap は、カジノ プレイ セッション (バイイン、コンプ、ティア ポイント、結果) を記録し、履歴、分析、旅行、およびオプションのコミュニティ共有を確認するのに役立ちます。このアプリは、「分析」、「旅行」、「セッション (ホーム)」、「コミュニティ」、「設定」の 5 つのメイン タブで構成されています。",
+    "ko": "TierTap을 사용하면 바이인, 보상, 등급 포인트, 결과 등 카지노 플레이 세션을 기록한 다음 내역, 분석, 여행 및 선택적 커뮤니티 공유를 검토할 수 있습니다. 앱은 분석, 여행, 세션(홈), 커뮤니티, 설정 등 5개의 기본 탭으로 구성되어 있습니다.",
+    "vi": "TierTap giúp bạn ghi lại các phiên chơi sòng bạc—số lượt mua, phần thưởng, điểm cấp và kết quả—sau đó xem lại lịch sử, phân tích, chuyến đi và chia sẻ cộng đồng tùy chọn. Ứng dụng được tổ chức xung quanh năm tab chính: Phân tích, Chuyến đi, Phiên (trang chủ), Cộng đồng và Cài đặt.",
+    "es": "TierTap lo ayuda a registrar sesiones de juego de casino (compras, compensaciones, puntos de nivel y resultados) y luego revisar el historial, análisis, viajes y compartir con la comunidad opcional. La aplicación está organizada en torno a cinco pestañas principales: Análisis, Viajes, Sesiones (inicio), Comunidad y Configuración.",
+    "ar": "يساعدك TierTap على تسجيل جلسات اللعب في الكازينو — عمليات الاشتراك والاشتراكات ونقاط الطبقة والنتائج — ثم مراجعة السجل والتحليلات والرحلات والمشاركة المجتمعية الاختيارية. يتم تنظيم التطبيق حول خمس علامات تبويب رئيسية: التحليلات، والرحلات، والجلسات (الصفحة الرئيسية)، والمجتمع، والإعدادات.",
+    "he": "TierTap עוזרת לך לרשום מפגשי משחק בקזינו - רכישות, החזרות, נקודות שכבה ותוצאות - ולאחר מכן סקור את ההיסטוריה, הניתוחים, הנסיעות ושיתוף קהילה אופציונלי. האפליקציה מאורגנת סביב חמש כרטיסיות עיקריות: אנליטיקס, טיולים, הפעלות (בית), קהילה והגדרות.",
+    "de": "TierTap hilft Ihnen, Casino-Spielsitzungen zu protokollieren – Buy-Ins, Comps, Rangpunkte und Ergebnisse – und anschließend den Verlauf, Analysen, Reisen und optionale Community-Freigaben zu überprüfen. Die App ist in fünf Hauptregisterkarten unterteilt: Analysen, Reisen, Sitzungen (Home), Community und Einstellungen.",
+    "fr": "TierTap vous aide à enregistrer les sessions de jeu de casino (buy-ins, récompenses, points de niveau et résultats), puis à consulter l'historique, les analyses, les voyages et le partage communautaire facultatif. L'application est organisée autour de cinq onglets principaux : Analyses, Voyages, Sessions (accueil), Communauté et Paramètres.",
+    "hi": "टियरटैप आपको कैसीनो खेलने के सत्रों-बाय-इन्स, कंप्स, टियर पॉइंट्स और परिणामों को लॉग करने में मदद करता है-फिर इतिहास, विश्लेषण, यात्राएं और वैकल्पिक समुदाय साझाकरण की समीक्षा करता है। ऐप को पांच मुख्य टैब के आसपास व्यवस्थित किया गया है: एनालिटिक्स, ट्रिप्स, सेशंस (होम), कम्युनिटी और सेटिंग्स।"
+  },
+  "ui.362e406df68479ac82976a11": {
+    "en": "TierTap is locked",
+    "zh-Hans": "TierTap 已锁定",
+    "ja": "TierTapはロックされています",
+    "ko": "TierTap이 잠겨 있습니다.",
+    "vi": "TierTap đã bị khóa",
+    "es": "TierTap está bloqueado",
+    "ar": "تم تأمين TierTap",
+    "he": "TierTap נעול",
+    "de": "TierTap ist gesperrt",
+    "fr": "TierTap est verrouillé",
+    "hi": "टियरटैप लॉक है"
   },
   "ui.3c40bcafcbd3dab070409f6a": {
     "en": "Timer running",
@@ -5815,6 +6836,162 @@
     "de": "Timer gestoppt",
     "fr": "Minuterie arrêtée",
     "hi": "टाइमर बंद हो गया"
+  },
+  "ui.6436460607dd327b3d375558": {
+    "en": "Tips: Approximate values are fine; you can edit the session later from History.",
+    "zh-Hans": "提示：近似值即可；您可以稍后从历史记录中编辑会话。",
+    "ja": "ヒント: おおよその値で問題ありません。セッションは後で履歴から編集できます。",
+    "ko": "팁: 대략적인 값이 좋습니다. 나중에 기록에서 세션을 편집할 수 있습니다.",
+    "vi": "Lời khuyên: Giá trị gần đúng là ổn; bạn có thể chỉnh sửa phiên sau từ Lịch sử.",
+    "es": "Consejos: Los valores aproximados están bien; Puedes editar la sesión más tarde desde Historial.",
+    "ar": "نصائح: القيم التقريبية جيدة؛ يمكنك تحرير الجلسة لاحقًا من السجل.",
+    "he": "טיפים: ערכים משוערים בסדר; תוכל לערוך את ההפעלה מאוחר יותר מההיסטוריה.",
+    "de": "Tipps: Näherungswerte sind in Ordnung; Sie können die Sitzung später im Verlauf bearbeiten.",
+    "fr": "Conseils : Les valeurs approximatives conviennent ; vous pouvez modifier la session plus tard à partir de l'historique.",
+    "hi": "युक्तियाँ: अनुमानित मान ठीक हैं; आप बाद में सत्र को इतिहास से संपादित कर सकते हैं।"
+  },
+  "ui.361f2cf1cde42e26880dd6d1": {
+    "en": "Tips: Clear filters when your list looks empty but you know you have sessions.",
+    "zh-Hans": "提示：当您的列表看起来为空但您知道自己有会话时，请清除过滤器。",
+    "ja": "ヒント: リストが空に見えてもセッションがあることがわかっている場合は、フィルターをクリアします。",
+    "ko": "팁: 목록이 비어 있는 것처럼 보이지만 세션이 있다는 것을 알고 있으면 필터를 지우세요.",
+    "vi": "Mẹo: Xóa bộ lọc khi danh sách của bạn trông trống nhưng bạn biết mình có phiên.",
+    "es": "Consejos: borre los filtros cuando su lista parezca vacía pero sepa que tiene sesiones.",
+    "ar": "نصائح: امسح عوامل التصفية عندما تبدو قائمتك فارغة ولكنك تعلم أن لديك جلسات.",
+    "he": "טיפים: נקה מסננים כאשר הרשימה שלך נראית ריקה אבל אתה יודע שיש לך הפעלות.",
+    "de": "Tipps: Löschen Sie die Filter, wenn Ihre Liste leer aussieht, Sie aber wissen, dass Sie Sitzungen haben.",
+    "fr": "Conseils : effacez les filtres lorsque votre liste semble vide mais que vous savez que vous avez des sessions.",
+    "hi": "युक्तियाँ: जब आपकी सूची खाली दिखे लेकिन आपको पता हो कि आपके पास सत्र हैं तो फ़िल्टर साफ़ करें।"
+  },
+  "ui.40281905b158df5c7707488d": {
+    "en": "Tips: If you indicate a difficult emotional outcome, the app may offer supportive resources you can open or dismiss.",
+    "zh-Hans": "提示：如果您表示出现困难的情绪结果，该应用程序可能会提供您可以打开或关闭的支持资源。",
+    "ja": "ヒント: 感情的に困難な結果を示した場合、アプリは、開いたり無視したりできる支援リソースを提供する場合があります。",
+    "ko": "팁: 어려운 감정적 결과를 나타내는 경우 앱에서 열거나 닫을 수 있는 지원 리소스를 제공할 수 있습니다.",
+    "vi": "Mẹo: Nếu bạn chỉ ra một kết quả khó khăn về mặt cảm xúc, ứng dụng có thể cung cấp các tài nguyên hỗ trợ mà bạn có thể mở hoặc loại bỏ.",
+    "es": "Consejos: si indica un resultado emocional difícil, la aplicación puede ofrecer recursos de apoyo que puede abrir o cerrar.",
+    "ar": "نصائح: إذا أشرت إلى نتيجة عاطفية صعبة، فقد يقدم التطبيق موارد داعمة يمكنك فتحها أو رفضها.",
+    "he": "טיפים: אם אתה מציין תוצאה רגשית קשה, האפליקציה עשויה להציע משאבים תומכים שתוכל לפתוח או לבטל.",
+    "de": "Tipps: Wenn Sie auf ein schwieriges emotionales Ergebnis hinweisen, bietet die App möglicherweise unterstützende Ressourcen, die Sie öffnen oder schließen können.",
+    "fr": "Conseils : Si vous indiquez un résultat émotionnel difficile, l'application peut proposer des ressources de soutien que vous pouvez ouvrir ou ignorer.",
+    "hi": "युक्तियाँ: यदि आप किसी कठिन भावनात्मक परिणाम का संकेत देते हैं, तो ऐप सहायक संसाधन प्रदान कर सकता है जिसे आप खोल या खारिज कर सकते हैं।"
+  },
+  "ui.f180af5ebc27f82400f1aaea": {
+    "en": "Tips: Keep bankroll and unit size in Settings updated so risk views stay meaningful.",
+    "zh-Hans": "提示：保持“设置”中的资金和单位规模更新，以便风险视图保持有意义。",
+    "ja": "ヒント: リスクビューが意味のあるものであり続けるように、[設定] のバンクロールとユニットサイズを常に最新の状態に保ってください。",
+    "ko": "팁: 위험 보기가 의미 있게 유지되도록 설정에서 자금 및 단위 크기를 업데이트하세요.",
+    "vi": "Mẹo: Luôn cập nhật số tiền ngân hàng và quy mô đơn vị trong Cài đặt để các chế độ xem rủi ro luôn có ý nghĩa.",
+    "es": "Consejos: mantenga actualizados los fondos y el tamaño de la unidad en Configuración para que las vistas de riesgo sigan siendo significativas.",
+    "ar": "نصائح: حافظ على تحديث التمويل وحجم الوحدة في الإعدادات حتى تظل طرق عرض المخاطر ذات معنى.",
+    "he": "טיפים: עדכנו את גודל הכסף והיחידה בהגדרות כדי שצפיות בסיכון יישארו משמעותיות.",
+    "de": "Tipps: Halten Sie das Guthaben und die Einheitengröße in den Einstellungen auf dem neuesten Stand, damit die Risikoansichten aussagekräftig bleiben.",
+    "fr": "Conseils : gardez à jour la bankroll et la taille des unités dans les paramètres afin que les vues sur les risques restent significatives.",
+    "hi": "युक्तियाँ: सेटिंग्स में बैंकरोल और इकाई आकार को अद्यतन रखें ताकि जोखिम विचार सार्थक बने रहें।"
+  },
+  "ui.3a134f98e027a22c7bd49542": {
+    "en": "Tips: Keep the watch and phone in sync for the most reliable session state.",
+    "zh-Hans": "提示：保持手表和手机同步，以获得最可靠的会话状态。",
+    "ja": "ヒント: 最も信頼性の高いセッション状態を得るには、時計と携帯電話の同期を維持してください。",
+    "ko": "팁: 가장 안정적인 세션 상태를 위해 시계와 휴대폰을 동기화 상태로 유지하세요.",
+    "vi": "Mẹo: Giữ đồng hồ và điện thoại đồng bộ để có trạng thái phiên đáng tin cậy nhất.",
+    "es": "Consejos: Mantenga el reloj y el teléfono sincronizados para obtener el estado de sesión más confiable.",
+    "ar": "نصائح: حافظ على مزامنة الساعة والهاتف للحصول على حالة الجلسة الأكثر موثوقية.",
+    "he": "טיפים: שמור את השעון והטלפון מסונכרנים לקבלת מצב ההפעלה האמין ביותר.",
+    "de": "Tipps: Halten Sie die Uhr und das Telefon synchron, um den zuverlässigsten Sitzungsstatus zu gewährleisten.",
+    "fr": "Conseils : gardez la montre et le téléphone synchronisés pour obtenir l'état de session le plus fiable.",
+    "hi": "टिप्स: सबसे विश्वसनीय सत्र स्थिति के लिए घड़ी और फोन को सिंक में रखें।"
+  },
+  "ui.c2c2403c3a864a313d0b09dd": {
+    "en": "Tips: Link sessions after the fact if you forgot during play.",
+    "zh-Hans": "提示：如果您在游戏过程中忘记了，请在事后链接会话。",
+    "ja": "ヒント: プレイ中に忘れた場合は、事後的にセッションをリンクします。",
+    "ko": "팁: 플레이 중에 잊어버린 경우 나중에 세션을 연결하세요.",
+    "vi": "Lời khuyên: Liên kết các buổi chơi sau nếu bạn quên trong quá trình chơi.",
+    "es": "Consejos: vincula las sesiones después del hecho si lo olvidaste durante el juego.",
+    "ar": "نصائح: قم بربط الجلسات بعد حدوثها إذا نسيت أثناء اللعب.",
+    "he": "טיפים: קישור הפעלות לאחר מעשה אם שכחת במהלך המשחק.",
+    "de": "Tipps: Verknüpfen Sie die Sitzungen nachträglich, wenn Sie es während des Spiels vergessen haben.",
+    "fr": "Conseils : liez les sessions après coup si vous avez oublié pendant le jeu.",
+    "hi": "युक्तियाँ: यदि आप खेल के दौरान भूल गए हैं तो उसके बाद सत्र को लिंक करें।"
+  },
+  "ui.68734b343db7c858381e3bb4": {
+    "en": "Tips: Log buy-ins as they happen so totals stay accurate. Use private notes during play for anything you want to remember later.",
+    "zh-Hans": "提示：记录买入发生时的情况，以便总数保持准确。在游戏过程中使用私人笔记记录您以后想要记住的任何事情。",
+    "ja": "ヒント: 合計を正確に保つために、バイインが発生したときにログを記録します。後で思い出したいことについては、プレイ中にプライベートメモを使用してください。",
+    "ko": "팁: 바이인이 발생하면 기록하여 총계가 정확하게 유지되도록 하세요. 나중에 기억하고 싶은 내용을 플레이하는 동안 비공개 메모로 사용하세요.",
+    "vi": "Mẹo: Đăng nhập các lượt mua khi chúng diễn ra để tổng số luôn chính xác. Sử dụng ghi chú riêng tư trong khi chơi cho bất kỳ điều gì bạn muốn ghi nhớ sau này.",
+    "es": "Consejos: registre las compras a medida que ocurren para que los totales sean precisos. Utilice notas privadas durante el juego para cualquier cosa que desee recordar más adelante.",
+    "ar": "نصائح: قم بتسجيل عمليات الاشتراك فور حدوثها حتى تظل الإجماليات دقيقة. استخدم الملاحظات الخاصة أثناء اللعب لأي شيء تريد تذكره لاحقًا.",
+    "he": "טיפים: התחבר לרכישות כשהן מתרחשות כדי שהסיכומים יישארו מדויקים. השתמש בהערות פרטיות במהלך המשחק עבור כל מה שתרצה לזכור מאוחר יותר.",
+    "de": "Tipps: Protokollieren Sie Buy-Ins, sobald sie stattfinden, damit die Gesamtsummen korrekt bleiben. Nutzen Sie während des Spiels private Notizen für alles, woran Sie sich später erinnern möchten.",
+    "fr": "Conseils : Enregistrez les buy-ins au fur et à mesure qu'ils se produisent afin que les totaux restent précis. Utilisez des notes privées pendant le jeu pour tout ce dont vous souhaitez vous souvenir plus tard.",
+    "hi": "सुझाव: खरीदारी होते ही लॉग-इन करें ताकि कुल योग सटीक रहे। जो कुछ भी आप बाद में याद रखना चाहते हैं उसके लिए खेल के दौरान निजी नोट्स का उपयोग करें।"
+  },
+  "ui.344c8e928f61472467532386": {
+    "en": "Tips: More accurate average bet and tier fields make analytics more useful.",
+    "zh-Hans": "提示：更准确的平均投注和等级字段使分析更加有用。",
+    "ja": "ヒント: 平均ベットとティアのフィールドがより正確になると、分析がより便利になります。",
+    "ko": "팁: 평균 베팅 및 계층 필드가 더 정확할수록 분석이 더 유용해집니다.",
+    "vi": "Mẹo: Các trường cấp độ và mức đặt cược trung bình chính xác hơn giúp việc phân tích trở nên hữu ích hơn.",
+    "es": "Consejos: Los campos de nivel y apuesta promedio más precisos hacen que los análisis sean más útiles.",
+    "ar": "نصائح: متوسط ​​الرهان وحقول المستوى الأكثر دقة تجعل التحليلات أكثر فائدة.",
+    "he": "טיפים: שדות הימורים ממוצעים מדויקים יותר הופכים את הניתוח לשימושי יותר.",
+    "de": "Tipps: Genauere Durchschnittseinsatz- und Rangfelder machen Analysen nützlicher.",
+    "fr": "Conseils : Des champs de pari moyen et de niveau plus précis rendent les analyses plus utiles.",
+    "hi": "टिप्स: अधिक सटीक औसत दांव और टियर फ़ील्ड विश्लेषण को अधिक उपयोगी बनाते हैं।"
+  },
+  "ui.eb2f4d3adf10231d3688399f": {
+    "en": "Tips: Signing out does not erase sessions stored on the device.",
+    "zh-Hans": "提示：注销不会删除设备上存储的会话。",
+    "ja": "ヒント: サインアウトしても、デバイスに保存されているセッションは消去されません。",
+    "ko": "팁: 로그아웃해도 기기에 저장된 세션은 삭제되지 않습니다.",
+    "vi": "Mẹo: Việc đăng xuất không xóa các phiên được lưu trên thiết bị.",
+    "es": "Consejos: Cerrar sesión no borra las sesiones almacenadas en el dispositivo.",
+    "ar": "نصائح: لا يؤدي تسجيل الخروج إلى مسح الجلسات المخزنة على الجهاز.",
+    "he": "טיפים: יציאה אינה מוחקת הפעלות המאוחסנות במכשיר.",
+    "de": "Tipps: Durch das Abmelden werden die auf dem Gerät gespeicherten Sitzungen nicht gelöscht.",
+    "fr": "Conseils : La déconnexion n'efface pas les sessions stockées sur l'appareil.",
+    "hi": "युक्तियाँ: साइन आउट करने से डिवाइस पर संग्रहीत सत्र नहीं मिटते।"
+  },
+  "ui.f30818c27cd37114921726ed": {
+    "en": "Tips: Theme presets and custom colors change gradients across the app.",
+    "zh-Hans": "提示：主题预设和自定义颜色会改变整个应用程序的渐变。",
+    "ja": "ヒント: テーマのプリセットとカスタムカラーは、アプリ全体のグラデーションを変更します。",
+    "ko": "팁: 테마 사전 설정 및 사용자 정의 색상은 앱 전체에서 그라데이션을 변경합니다.",
+    "vi": "Mẹo: Các cài đặt trước của chủ đề và màu tùy chỉnh sẽ thay đổi độ dốc trên ứng dụng.",
+    "es": "Consejos: Los ajustes preestablecidos del tema y los colores personalizados cambian los degradados en toda la aplicación.",
+    "ar": "نصائح: تعمل الإعدادات المسبقة للموضوع والألوان المخصصة على تغيير التدرجات عبر التطبيق.",
+    "he": "טיפים: ערכות נושא מראש וצבעים מותאמים אישית משנים מעברי צבע באפליקציה.",
+    "de": "Tipps: Designvoreinstellungen und benutzerdefinierte Farben ändern die Farbverläufe in der gesamten App.",
+    "fr": "Conseils : les thèmes prédéfinis et les couleurs personnalisées modifient les dégradés dans l'application.",
+    "hi": "टिप्स: थीम प्रीसेट और कस्टम रंग पूरे ऐप में ग्रेडिएंट बदलते हैं।"
+  },
+  "ui.55293ca06fc4ef5250e33c50": {
+    "en": "Tips: Without Pro or a signed-in account, you’ll see upgrade prompts instead of the feed.",
+    "zh-Hans": "提示：如果没有 Pro 版或登录帐户，您将看到升级提示而不是 Feed。",
+    "ja": "ヒント: Pro またはサインインしたアカウントがない場合は、フィードの代わりにアップグレードのプロンプトが表示されます。",
+    "ko": "팁: Pro 또는 로그인된 계정이 없으면 피드 대신 업그레이드 메시지가 표시됩니다.",
+    "vi": "Mẹo: Nếu không có tài khoản Pro hoặc đăng nhập, bạn sẽ thấy lời nhắc nâng cấp thay vì nguồn cấp dữ liệu.",
+    "es": "Consejos: sin Pro o una cuenta iniciada, verás mensajes de actualización en lugar del feed.",
+    "ar": "نصائح: بدون حساب Pro أو حساب مسجل الدخول، سترى مطالبات بالترقية بدلاً من الموجز.",
+    "he": "טיפים: ללא Pro או חשבון מחובר, תראה הנחיות לשדרוג במקום העדכון.",
+    "de": "Tipps: Ohne Pro oder ohne angemeldetes Konto werden anstelle des Feeds Upgrade-Eingabeaufforderungen angezeigt.",
+    "fr": "Conseils : sans Pro ni compte connecté, vous verrez des invites de mise à niveau au lieu du flux.",
+    "hi": "युक्तियाँ: प्रो या साइन-इन खाते के बिना, आपको फ़ीड के बजाय अपग्रेड संकेत दिखाई देंगे।"
+  },
+  "ui.c5e4a6a9c8477330eda72c0b": {
+    "en": "Tips: You must have at least one buy-in, plus game and location filled in, before you can close out.",
+    "zh-Hans": "提示：您必须至少有一项买入，并填写游戏和地点，然后才能平仓。",
+    "ja": "ヒント: クローズする前に、少なくとも 1 つのバイインと、ゲームと場所の入力が必要です。",
+    "ko": "팁: 종료하기 전에 최소한 한 번의 바이인과 게임 및 위치를 입력해야 합니다.",
+    "vi": "Mẹo: Bạn phải có ít nhất một lượt mua vào, cùng với trò chơi và địa điểm được điền đầy đủ trước khi bạn có thể đóng.",
+    "es": "Consejos: Debes tener al menos una entrada, además del juego y la ubicación, antes de poder cerrar.",
+    "ar": "نصائح: يجب أن يكون لديك اشتراك واحد على الأقل، بالإضافة إلى اللعبة والموقع، قبل أن تتمكن من الإغلاق.",
+    "he": "טיפים: עליך למלא לפחות כניסה אחת, בתוספת משחק ומיקום, לפני שתוכל לסגור.",
+    "de": "Tipps: Sie müssen mindestens ein Buy-in sowie Spiel und Ort ausgefüllt haben, bevor Sie schließen können.",
+    "fr": "Conseils : Vous devez avoir au moins un buy-in, ainsi que le jeu et le lieu renseignés, avant de pouvoir clôturer.",
+    "hi": "युक्तियाँ: बंद करने से पहले आपके पास कम से कम एक बाय-इन, प्लस गेम और स्थान भरा होना चाहिए।"
   },
   "ui.f4b06ef6d3c81436f60a318c": {
     "en": "To",
@@ -5985,6 +7162,19 @@
     "fr": "Voyages",
     "hi": "ट्रिप्स"
   },
+  "ui.c3af076f92c5ed8dcb0d0b0d": {
+    "en": "Troubleshooting",
+    "zh-Hans": "故障排除",
+    "ja": "トラブルシューティング",
+    "ko": "문제 해결",
+    "vi": "Khắc phục sự cố",
+    "es": "Solución de problemas",
+    "ar": "استكشاف الأخطاء وإصلاحها",
+    "he": "פתרון בעיות",
+    "de": "Fehlerbehebung",
+    "fr": "Dépannage",
+    "hi": "समस्या निवारण"
+  },
   "ui.9facacb666c394731bb22a1c": {
     "en": "Try adjusting filters or search.",
     "zh-Hans": "尝试调整过滤器或搜索。",
@@ -6011,6 +7201,19 @@
     "fr": "Taper",
     "hi": "प्रकार"
   },
+  "ui.8872b442a3f851ac27b77bb6": {
+    "en": "Type a screen name",
+    "zh-Hans": "输入屏幕名称",
+    "ja": "スクリーン名を入力します",
+    "ko": "대화명을 입력하세요.",
+    "vi": "Nhập tên màn hình",
+    "es": "Escribe un nombre de usuario",
+    "ar": "اكتب اسم الشاشة",
+    "he": "הקלד שם מסך",
+    "de": "Geben Sie einen Bildschirmnamen ein",
+    "fr": "Tapez un pseudonyme",
+    "hi": "एक स्क्रीन नाम टाइप करें"
+  },
   "ui.9d1ff237078a9364aa71eb90": {
     "en": "Typing speed",
     "zh-Hans": "打字速度",
@@ -6023,6 +7226,19 @@
     "de": "Tippgeschwindigkeit",
     "fr": "Vitesse de frappe",
     "hi": "टाइपिंग स्पीड"
+  },
+  "ui.8cc08731a42d654180000284": {
+    "en": "Unknown error.",
+    "zh-Hans": "未知错误。",
+    "ja": "不明なエラー。",
+    "ko": "알 수 없는 오류입니다.",
+    "vi": "Lỗi không xác định.",
+    "es": "Error desconocido.",
+    "ar": "خطأ غير معروف.",
+    "he": "שגיאה לא ידועה.",
+    "de": "Unbekannter Fehler.",
+    "fr": "Erreur inconnue.",
+    "hi": "अज्ञात त्रुटि."
   },
   "ui.89cb3389c302d30a678f2e0d": {
     "en": "Unlock TierTap Pro",
@@ -6050,18 +7266,31 @@
     "fr": "Débloquez des résumés et des suggestions avancés d'IA pour vos sessions.",
     "hi": "अपने सत्रों के लिए उन्नत AI सारांश और सुझाव अनलॉक करें।"
   },
+  "ui.3b8bd119094b2acea5580c83": {
+    "en": "Unlock method",
+    "zh-Hans": "解锁方法",
+    "ja": "ロック解除方法",
+    "ko": "잠금 해제 방법",
+    "vi": "Phương pháp mở khóa",
+    "es": "Método de desbloqueo",
+    "ar": "طريقة فتح",
+    "he": "שיטת ביטול הנעילה",
+    "de": "Entsperrmethode",
+    "fr": "Méthode de déverrouillage",
+    "hi": "अनलॉक विधि"
+  },
   "ui.33c8e8de41c3a35124251370": {
     "en": "Unverified",
-    "zh-Hans": "Unverified",
-    "ja": "Unverified",
-    "ko": "Unverified",
-    "vi": "Unverified",
-    "es": "Unverified",
-    "ar": "Unverified",
-    "he": "Unverified",
-    "de": "Unverified",
-    "fr": "Unverified",
-    "hi": "Unverified"
+    "zh-Hans": "未验证",
+    "ja": "未検証",
+    "ko": "확인되지 않음",
+    "vi": "Chưa được xác minh",
+    "es": "Inconfirmado",
+    "ar": "لم يتم التحقق منها",
+    "he": "לא מאומת",
+    "de": "Nicht bestätigt",
+    "fr": "Non vérifié",
+    "hi": "असत्यापित"
   },
   "ui.5f1a2542e4e4ca5ed784e15f": {
     "en": "Upcoming",
@@ -6075,6 +7304,19 @@
     "de": "Demnächst",
     "fr": "Prochain",
     "hi": "आगामी"
+  },
+  "ui.27511c9571712ef9067d0808": {
+    "en": "Use Export sessions as CSV in Settings to send a file to Files, email, or another app.",
+    "zh-Hans": "使用“设置”中的“将会话导出为 CSV”将文件发送到“文件”、电子邮件或其他应用程序。",
+    "ja": "[設定] で [セッションを CSV としてエクスポート] を使用して、ファイル、電子メール、または別のアプリにファイルを送信します。",
+    "ko": "파일, 이메일 또는 다른 앱으로 파일을 보내려면 설정에서 세션을 CSV로 내보내기를 사용하세요.",
+    "vi": "Sử dụng Xuất phiên dưới dạng CSV trong Cài đặt để gửi tệp tới Tệp, email hoặc ứng dụng khác.",
+    "es": "Utilice Exportar sesiones como CSV en Configuración para enviar un archivo a Archivos, correo electrónico u otra aplicación.",
+    "ar": "استخدم تصدير الجلسات كملف CSV في الإعدادات لإرسال ملف إلى الملفات أو البريد الإلكتروني أو تطبيق آخر.",
+    "he": "השתמש בייצוא הפעלות כ-CSV בהגדרות כדי לשלוח קובץ לקבצים, אימייל או אפליקציה אחרת.",
+    "de": "Verwenden Sie „Sitzungen als CSV exportieren“ in den Einstellungen, um eine Datei an Dateien, E-Mail oder eine andere App zu senden.",
+    "fr": "Utilisez Exporter les sessions au format CSV dans Paramètres pour envoyer un fichier vers Fichiers, par courrier électronique ou vers une autre application.",
+    "hi": "फ़ाइलों, ईमेल या किसी अन्य ऐप पर फ़ाइल भेजने के लिए सेटिंग्स में CSV के रूप में निर्यात सत्र का उपयोग करें।"
   },
   "ui.773d765417bdfb680f62cf2d": {
     "en": "Use as cash-out amount",
@@ -6115,6 +7357,32 @@
     "fr": "Utilisez le bouton Compte en haut à droite pour vous connecter.",
     "hi": "साइन इन करने के लिए ऊपर दाईं ओर खाता बटन का उपयोग करें।"
   },
+  "ui.158457c3f9122ee1a568df0b": {
+    "en": "Use the magic wand entry in the toolbar for AI-assisted trip suggestions when available.",
+    "zh-Hans": "使用工具栏中的魔棒条目获取人工智能辅助的旅行建议（如果有）。",
+    "ja": "利用可能な場合は、ツールバーの魔法の杖のエントリを使用して、AI による旅行の提案を表示します。",
+    "ko": "가능한 경우 AI 지원 여행 제안을 보려면 도구 모음의 마술 지팡이 항목을 사용하세요.",
+    "vi": "Sử dụng mục nhập cây đũa thần trên thanh công cụ để có các đề xuất chuyến đi được hỗ trợ bởi AI nếu có.",
+    "es": "Utilice la entrada de varita mágica en la barra de herramientas para obtener sugerencias de viajes asistidas por IA cuando esté disponible.",
+    "ar": "استخدم إدخال العصا السحرية في شريط الأدوات للحصول على اقتراحات الرحلات المدعومة بالذكاء الاصطناعي عندما تكون متاحة.",
+    "he": "השתמש בערך שרביט הקסמים בסרגל הכלים לקבלת הצעות לטיול בעזרת בינה מלאכותית, כאשר זמין.",
+    "de": "Verwenden Sie den Zauberstab-Eintrag in der Symbolleiste für KI-gestützte Reisevorschläge, sofern verfügbar.",
+    "fr": "Utilisez l'entrée de la baguette magique dans la barre d'outils pour les suggestions de voyages assistées par l'IA, lorsqu'elles sont disponibles.",
+    "hi": "उपलब्ध होने पर एआई-सहायता प्राप्त यात्रा सुझावों के लिए टूलबार में जादू की छड़ी प्रविष्टि का उपयोग करें।"
+  },
+  "ui.b8d3db2797fb1db6757716f4": {
+    "en": "Use the shortcut row for one-tap starts when you’ve set up favorite games and locations.",
+    "zh-Hans": "当您设置了喜爱的游戏和位置后，可以使用快捷方式一键启动。",
+    "ja": "お気に入りのゲームや場所を設定した場合は、ショートカット行を使用してワンタップで開始します。",
+    "ko": "좋아하는 게임과 위치를 설정한 경우 원터치 시작을 위한 바로가기 행을 사용하세요.",
+    "vi": "Sử dụng hàng phím tắt để bắt đầu bằng một lần nhấn khi bạn đã thiết lập các trò chơi và địa điểm yêu thích.",
+    "es": "Utilice la fila de acceso directo para iniciar con un solo toque cuando haya configurado juegos y ubicaciones favoritos.",
+    "ar": "استخدم صف الاختصار للبدء بنقرة واحدة عند إعداد الألعاب والمواقع المفضلة.",
+    "he": "השתמש בשורת הקיצור להתחלות בלחיצה אחת לאחר שהגדרת משחקים ומיקומים מועדפים.",
+    "de": "Wenn Sie Ihre Lieblingsspiele und -orte eingerichtet haben, verwenden Sie die Shortcut-Zeile, um mit nur einem Fingertipp zu starten.",
+    "fr": "Utilisez la ligne de raccourcis pour démarrer en un seul clic lorsque vous avez configuré vos jeux et emplacements favoris.",
+    "hi": "जब आप पसंदीदा गेम और स्थान सेट कर लें तो वन-टैप प्रारंभ के लिए शॉर्टकट पंक्ति का उपयोग करें।"
+  },
   "ui.562f1d9f3de24f92c3ec644c": {
     "en": "Use trip dates for filter",
     "zh-Hans": "使用旅行日期进行过滤",
@@ -6128,44 +7396,83 @@
     "fr": "Utiliser les dates de voyage pour filtrer",
     "hi": "फ़िल्टर के लिए यात्रा तिथियों का उपयोग करें"
   },
-  "ui.a6eb8043c2ed02ee1932c3db": {
-    "en": "Use wheel or type exact.",
-    "zh-Hans": "使用滚轮或精确键入。",
-    "ja": "ホイールを使用するか、正確に入力してください。",
-    "ko": "휠을 사용하거나 정확하게 입력하세요.",
-    "vi": "Sử dụng bánh xe hoặc gõ chính xác.",
-    "es": "Utilice rueda o tipo exacto.",
-    "ar": "استخدم العجلة أو اكتب بالضبط.",
-    "he": "השתמש בגלגל או הקלד מדויק.",
-    "de": "Verwenden Sie das Rad oder geben Sie exakt ein.",
-    "fr": "Utilisez la roue ou tapez exactement.",
-    "hi": "व्हील का प्रयोग करें या सटीक टाइप करें।"
+  "ui.d131ef7f9b5e2b457faba856": {
+    "en": "User Guide",
+    "zh-Hans": "用户指南",
+    "ja": "ユーザーガイド",
+    "ko": "사용자 가이드",
+    "vi": "Hướng dẫn sử dụng",
+    "es": "Guía del usuario",
+    "ar": "دليل المستخدم",
+    "he": "מדריך למשתמש",
+    "de": "Benutzerhandbuch",
+    "fr": "Guide de l'utilisateur",
+    "hi": "उपयोगकर्ता गाइड"
+  },
+  "ui.ac34b5a27dc719182258cc0b": {
+    "en": "Uses Face ID or Touch ID when available, with your device passcode as a backup.",
+    "zh-Hans": "使用面容 ID 或触摸 ID（如果有），并使用您的设备密码作为备份。",
+    "ja": "利用可能な場合は Face ID または Touch ID を使用し、デバイスのパスコードをバックアップとして使用します。",
+    "ko": "가능한 경우 장치 암호와 함께 Face ID 또는 Touch ID를 백업으로 사용합니다.",
+    "vi": "Sử dụng Face ID hoặc Touch ID khi khả dụng, với mật mã thiết bị của bạn làm bản sao lưu.",
+    "es": "Utiliza Face ID o Touch ID cuando esté disponible, con el código de acceso de su dispositivo como respaldo.",
+    "ar": "يستخدم Face ID أو Touch ID عندما يكون ذلك متاحًا، مع رمز مرور جهازك كنسخة احتياطية.",
+    "he": "משתמש ב-Face ID או Touch ID כאשר זמין, עם קוד הגישה של המכשיר שלך כגיבוי.",
+    "de": "Verwendet Face ID oder Touch ID, sofern verfügbar, mit Ihrem Gerätepasscode als Backup.",
+    "fr": "Utilise Face ID ou Touch ID lorsqu'ils sont disponibles, avec le code d'accès de votre appareil comme sauvegarde.",
+    "hi": "उपलब्ध होने पर बैकअप के रूप में आपके डिवाइस पासकोड के साथ फेस आईडी या टच आईडी का उपयोग करता है।"
+  },
+  "ui.bac0dfc39f75082e5166c08f": {
+    "en": "Uses the same system screen as your iPhone passcode. iOS may offer Face ID or Touch ID first; you can choose the passcode option if you prefer.",
+    "zh-Hans": "使用与 iPhone 密码相同的系统屏幕。 iOS 可能会首先提供 Face ID 或 Touch ID；如果您愿意，可以选择密码选项。",
+    "ja": "iPhone のパスコードと同じシステム画面を使用します。 iOS は最初に Face ID または Touch ID を提供する可能性があります。必要に応じてパスコード オプションを選択できます。",
+    "ko": "iPhone 비밀번호와 동일한 시스템 화면을 사용합니다. iOS는 Face ID나 Touch ID를 먼저 제공할 수 있습니다. 원하는 경우 비밀번호 옵션을 선택할 수 있습니다.",
+    "vi": "Sử dụng cùng màn hình hệ thống với mật mã iPhone của bạn. iOS có thể cung cấp Face ID hoặc Touch ID trước; bạn có thể chọn tùy chọn mật mã nếu muốn.",
+    "es": "Utiliza la misma pantalla del sistema que la contraseña de tu iPhone. iOS puede ofrecer primero Face ID o Touch ID; puedes elegir la opción de contraseña si lo prefieres.",
+    "ar": "يستخدم نفس شاشة النظام مثل رمز مرور iPhone الخاص بك. قد يقدم نظام iOS ميزة Face ID أو Touch ID أولاً؛ يمكنك اختيار خيار رمز المرور إذا كنت تفضل ذلك.",
+    "he": "משתמש באותו מסך מערכת כמו קוד הסיסמה של האייפון שלך. iOS עשויה להציע תחילה Face ID או Touch ID; אתה יכול לבחור את אפשרות קוד הגישה אם אתה מעדיף.",
+    "de": "Verwendet denselben Systembildschirm wie Ihr iPhone-Passcode. iOS bietet möglicherweise zuerst Face ID oder Touch ID an; Sie können die Passcode-Option wählen, wenn Sie möchten.",
+    "fr": "Utilise le même écran système que le mot de passe de votre iPhone. iOS peut proposer en premier Face ID ou Touch ID ; vous pouvez choisir l’option de mot de passe si vous préférez.",
+    "hi": "आपके iPhone पासकोड के समान सिस्टम स्क्रीन का उपयोग करता है। iOS पहले फेस आईडी या टच आईडी पेश कर सकता है; यदि आप चाहें तो आप पासकोड विकल्प चुन सकते हैं।"
+  },
+  "ui.0c5dfb4db387234074582b14": {
+    "en": "Uses the system passcode screen; biometrics may be offered first.",
+    "zh-Hans": "使用系统密码屏幕；可以首先提供生物识别技术。",
+    "ja": "システムのパスコード画面を使用します。生体認証が最初に提供される場合があります。",
+    "ko": "시스템 비밀번호 화면을 사용합니다. 생체 인식이 먼저 제공될 수 있습니다.",
+    "vi": "Sử dụng màn hình mật mã hệ thống; sinh trắc học có thể được cung cấp đầu tiên.",
+    "es": "Utiliza la pantalla de contraseña del sistema; La biometría puede ofrecerse primero.",
+    "ar": "يستخدم شاشة رمز مرور النظام؛ يمكن تقديم القياسات الحيوية أولاً.",
+    "he": "משתמש במסך קוד הסיסמה של המערכת; תחילה ניתן להציע ביומטריה.",
+    "de": "Verwendet den System-Passcode-Bildschirm; Biometrie kann zuerst angeboten werden.",
+    "fr": "Utilise l'écran de code d'accès du système ; la biométrie peut être proposée en premier.",
+    "hi": "सिस्टम पासकोड स्क्रीन का उपयोग करता है; पहले बायोमेट्रिक्स की पेशकश की जा सकती है।"
   },
   "ui.7140f4f19dec525960aabacb": {
     "en": "Verification",
-    "zh-Hans": "Verification",
-    "ja": "Verification",
-    "ko": "Verification",
-    "vi": "Verification",
-    "es": "Verification",
-    "ar": "Verification",
-    "he": "Verification",
-    "de": "Verification",
-    "fr": "Verification",
-    "hi": "Verification"
+    "zh-Hans": "确认",
+    "ja": "検証",
+    "ko": "확인",
+    "vi": "Xác minh",
+    "es": "Verificación",
+    "ar": "تَحَقّق",
+    "he": "אימות",
+    "de": "Überprüfung",
+    "fr": "Vérification",
+    "hi": "सत्यापन"
   },
   "ui.4f7838402f37674e8ebedb6c": {
     "en": "Verified",
-    "zh-Hans": "Verified",
-    "ja": "Verified",
-    "ko": "Verified",
-    "vi": "Verified",
-    "es": "Verified",
-    "ar": "Verified",
-    "he": "Verified",
-    "de": "Verified",
-    "fr": "Verified",
-    "hi": "Verified"
+    "zh-Hans": "已验证",
+    "ja": "確認済み",
+    "ko": "확인됨",
+    "vi": "Đã xác minh",
+    "es": "Verificado",
+    "ar": "تم التحقق منه",
+    "he": "מְאוּמָת",
+    "de": "Verifiziert",
+    "fr": "Vérifié",
+    "hi": "सत्यापित"
   },
   "ui.ee1bcdc62141fd28f77fe217": {
     "en": "W/L",
@@ -6245,6 +7552,162 @@
     "fr": "Nous générerons des images pour les analyses sélectionnées et ouvrirons la feuille de partage du système afin que vous puissiez les envoyer comme vous le souhaitez.",
     "hi": "हम चयनित एनालिटिक्स के लिए छवियां तैयार करेंगे और सिस्टम शेयर शीट खोलेंगे ताकि आप उन्हें अपनी इच्छानुसार भेज सकें।"
   },
+  "ui.7c006c061bc583960332fc54": {
+    "en": "What it does: A feed of sessions shared by the community, with filters and map viewing when you’re subscribed and signed in.",
+    "zh-Hans": "它的作用：社区共享的会话提要，当您订阅并登录时，可以使用过滤器和地图查看功能。",
+    "ja": "機能: コミュニティによって共有されるセッションのフィード。サブスクライブしてサインインすると、フィルターと地図が表示されます。",
+    "ko": "기능: 커뮤니티에서 공유하는 세션 피드로, 구독하고 로그인하면 필터와 지도 보기가 가능합니다.",
+    "vi": "Chức năng: Nguồn cấp dữ liệu về các phiên được cộng đồng chia sẻ, với các bộ lọc và chế độ xem bản đồ khi bạn đăng ký và đăng nhập.",
+    "es": "Qué hace: un feed de sesiones compartidas por la comunidad, con filtros y visualización de mapas cuando estás suscrito e iniciado sesión.",
+    "ar": "ماذا يفعل: موجز للجلسات التي يشاركها المجتمع، مع عوامل التصفية وعرض الخريطة عند الاشتراك وتسجيل الدخول.",
+    "he": "מה זה עושה: עדכון של הפעלות משותף על ידי הקהילה, עם מסננים וצפייה במפות כשאתה מנוי ונכנס.",
+    "de": "Was es macht: Ein Feed mit von der Community geteilten Sitzungen, mit Filtern und Kartenansicht, wenn Sie abonniert und angemeldet sind.",
+    "fr": "Ce qu'il fait : Un flux de sessions partagées par la communauté, avec des filtres et un affichage de la carte lorsque vous êtes abonné et connecté.",
+    "hi": "यह क्या करता है: आपके द्वारा सदस्यता लेने और साइन इन करने पर फ़िल्टर और मानचित्र देखने के साथ समुदाय द्वारा साझा किए गए सत्रों की एक फ़ीड।"
+  },
+  "ui.09978fa9f22b16e6adb836a4": {
+    "en": "What it does: A running timer and ledger for the session you’re in now.",
+    "zh-Hans": "它的作用：为您现在所在的会话运行计时器和分类帐。",
+    "ja": "機能: 現在参加しているセッションの実行中のタイマーと台帳。",
+    "ko": "기능: 현재 진행 중인 세션에 대한 실행 타이머 및 원장입니다.",
+    "vi": "Công dụng của nó: Đồng hồ bấm giờ và sổ cái đang chạy cho phiên bạn đang tham gia.",
+    "es": "Qué hace: un cronómetro y un libro de contabilidad en ejecución para la sesión en la que se encuentra ahora.",
+    "ar": "ماذا يفعل: مؤقت قيد التشغيل ودفتر أستاذ للجلسة التي تتواجد فيها الآن.",
+    "he": "מה זה עושה: טיימר פועל ופנקס עבור הפגישה בה אתה נמצא כעת.",
+    "de": "Was es macht: Ein laufender Timer und ein Protokoll für die Sitzung, in der Sie sich gerade befinden.",
+    "fr": "Ce qu'il fait : Un minuteur et un registre pour la session dans laquelle vous vous trouvez actuellement.",
+    "hi": "यह क्या करता है: जिस सत्र में आप अभी हैं उसके लिए एक रनिंग टाइमर और लेजर।"
+  },
+  "ui.3b24ee99e8e30d1834a179b1": {
+    "en": "What it does: Account, subscriptions, bankroll and currency, favorites, session mood prompts, TierTap AI tone and typing speed, themes, data export, privacy links, and more.",
+    "zh-Hans": "它的作用：帐户、订阅、资金和货币、收藏夹、会话情绪提示、TierTap AI 语气和打字速度、主题、数据导出、隐私链接等。",
+    "ja": "機能: アカウント、サブスクリプション、資金と通貨、お気に入り、セッション ムード プロンプト、TierTap AI のトーンとタイピング速度、テーマ、データ エクスポート、プライバシー リンクなど。",
+    "ko": "기능: 계정, 구독, 자금 및 통화, 즐겨찾기, 세션 분위기 프롬프트, TierTap AI 톤 및 입력 속도, 테마, 데이터 내보내기, 개인 정보 보호 링크 등.",
+    "vi": "Chức năng của nó: Tài khoản, đăng ký, tài khoản ngân hàng và tiền tệ, mục yêu thích, lời nhắc tâm trạng phiên, giai điệu TierTap AI và tốc độ gõ, chủ đề, xuất dữ liệu, liên kết quyền riêng tư, v.v.",
+    "es": "Qué hace: cuenta, suscripciones, fondos y moneda, favoritos, indicaciones de estado de ánimo de sesión, tono de TierTap AI y velocidad de escritura, temas, exportación de datos, enlaces de privacidad y más.",
+    "ar": "ماذا يفعل: الحساب، والاشتراكات، والتمويل والعملة، والمفضلات، ومطالبات مزاج الجلسة، ونغمة TierTap AI وسرعة الكتابة، والموضوعات، وتصدير البيانات، وروابط الخصوصية، والمزيد.",
+    "he": "מה זה עושה: חשבון, מנויים, כספים ומטבעות, מועדפים, הנחיות מצב רוח הפעלה, צליל TierTap AI ומהירות הקלדה, ערכות נושא, ייצוא נתונים, קישורי פרטיות ועוד.",
+    "de": "Was es macht: Konto, Abonnements, Guthaben und Währung, Favoriten, Aufforderungen zur Sitzungsstimmung, TierTap AI-Ton und Tippgeschwindigkeit, Themen, Datenexport, Datenschutzlinks und mehr.",
+    "fr": "Ce qu'il fait : compte, abonnements, fonds et devises, favoris, invites d'humeur de session, tonalité et vitesse de frappe de TierTap AI, thèmes, exportation de données, liens de confidentialité, etc.",
+    "hi": "यह क्या करता है: खाता, सदस्यता, बैंकरोल और मुद्रा, पसंदीदा, सत्र मूड संकेत, टियरटैप एआई टोन और टाइपिंग गति, थीम, डेटा निर्यात, गोपनीयता लिंक और बहुत कुछ।"
+  },
+  "ui.82222dafe1b1dc9b2ed32906": {
+    "en": "What it does: Charts and summaries of closed sessions, broken out by table games, slots, or poker where applicable.",
+    "zh-Hans": "它的作用：封闭会议的图表和摘要，按桌面游戏、老虎机或扑克（如果适用）细分。",
+    "ja": "機能: 該当するテーブル ゲーム、スロット、またはポーカーごとに分けられたクローズド セッションのグラフと概要。",
+    "ko": "기능: 해당되는 경우 테이블 게임, 슬롯 또는 포커별로 분류된 마감 세션의 차트 및 요약입니다.",
+    "vi": "Công dụng: Biểu đồ và tóm tắt các phiên kín, được chia theo trò chơi trên bàn, máy đánh bạc hoặc bài poker nếu có.",
+    "es": "Qué hace: gráficos y resúmenes de sesiones cerradas, desglosados ​​por juegos de mesa, tragamonedas o póquer, cuando corresponda.",
+    "ar": "ماذا يفعل: رسوم بيانية وملخصات للجلسات المغلقة، مقسمة حسب ألعاب الطاولة أو ماكينات القمار أو البوكر حيثما ينطبق ذلك.",
+    "he": "מה זה עושה: תרשימים וסיכומים של מפגשים סגורים, בחלוקה לפי משחקי שולחן, משבצות או פוקר במידת האפשר.",
+    "de": "Was es macht: Diagramme und Zusammenfassungen geschlossener Sitzungen, aufgeschlüsselt nach Tischspielen, Spielautomaten oder Poker, sofern zutreffend.",
+    "fr": "Ce qu'il fait : graphiques et résumés des sessions fermées, répartis par jeux de table, machines à sous ou poker, le cas échéant.",
+    "hi": "यह क्या करता है: बंद सत्रों के चार्ट और सारांश, जहां लागू हो, टेबल गेम, स्लॉट या पोकर द्वारा विभाजित।"
+  },
+  "ui.28265fd64db2bd57e67f7447": {
+    "en": "What it does: Companion experience to start or monitor play from your wrist, with details completed on iPhone when needed.",
+    "zh-Hans": "用途：从手腕开始或监控游戏的同伴体验，并在需要时在 iPhone 上完成详细信息。",
+    "ja": "機能: 手首からプレイを開始または監視するコンパニオン エクスペリエンス。必要に応じて iPhone で詳細を完了できます。",
+    "ko": "기능: 손목에서 플레이를 시작하거나 모니터링하고 필요할 때 iPhone에서 세부 정보를 완성할 수 있는 동반자 경험입니다.",
+    "vi": "Chức năng: Trải nghiệm đồng hành để bắt đầu hoặc theo dõi quá trình chơi từ cổ tay của bạn, với các chi tiết được hoàn thành trên iPhone khi cần.",
+    "es": "Qué hace: Experiencia complementaria para iniciar o monitorear la reproducción desde tu muñeca, con detalles completados en el iPhone cuando sea necesario.",
+    "ar": "وظيفته: تجربة مصاحبة لبدء اللعب أو مراقبته من معصمك، مع استكمال التفاصيل على iPhone عند الحاجة.",
+    "he": "מה זה עושה: חוויה נלווית כדי להתחיל או לעקוב אחר הפעלה מפרק כף היד שלך, עם פרטים שהושלמו באייפון בעת ​​הצורך.",
+    "de": "Was es macht: Begleiterlebnis zum Starten oder Überwachen des Spiels von Ihrem Handgelenk aus, mit Details, die bei Bedarf auf dem iPhone vervollständigt werden.",
+    "fr": "Ce qu'il fait : Expérience compagnon pour démarrer ou surveiller la lecture depuis votre poignet, avec des détails complétés sur iPhone si nécessaire.",
+    "hi": "यह क्या करता है: आपकी कलाई से खेल शुरू करने या उसकी निगरानी करने का सहयोगी अनुभव, जरूरत पड़ने पर iPhone पर विवरण पूरा करने के साथ।"
+  },
+  "ui.674876ca6a39bfebf2893452": {
+    "en": "What it does: Groups travel plans and past visits; link sessions to trips and share trip cards.",
+    "zh-Hans": "用途：团体旅行计划和过去的访问；将会话链接到旅行并共享旅行卡。",
+    "ja": "内容: グループ旅行計画と過去の訪問。セッションを旅行にリンクし、旅行カードを共有します。",
+    "ko": "하는 일: 단체 여행 계획 및 과거 방문; 세션을 여행에 연결하고 여행 카드를 공유하세요.",
+    "vi": "Chức năng của nó: Kế hoạch du lịch của nhóm và những chuyến thăm trước đây; liên kết các phiên với các chuyến đi và chia sẻ thẻ chuyến đi.",
+    "es": "Qué hace: Planes de viajes de grupos y visitas anteriores; vincular sesiones a viajes y compartir tarjetas de viaje.",
+    "ar": "ماذا يفعل: خطط سفر المجموعات والزيارات السابقة؛ ربط الجلسات بالرحلات ومشاركة بطاقات الرحلة.",
+    "he": "מה זה עושה: תוכניות טיול לקבוצות וביקורים קודמים; קישור הפעלות לטיולים ושתף כרטיסי טיול.",
+    "de": "Was es macht: Gruppenreisepläne und vergangene Besuche; Verknüpfen Sie Sitzungen mit Reisen und teilen Sie Reisekarten.",
+    "fr": "Ce qu'il fait : Regroupe les projets de voyage et les visites passées des groupes ; associez des sessions à des voyages et partagez des cartes de voyage.",
+    "hi": "यह क्या करता है: समूह यात्रा योजनाएँ और पिछली यात्राएँ; सत्रों को यात्राओं से लिंक करें और यात्रा कार्ड साझा करें।"
+  },
+  "ui.fb5a9532bf69e7822941947d": {
+    "en": "What it does: Lets you record a session that already ended so your stats stay complete.",
+    "zh-Hans": "它的作用：让您记录已经结束的会话，以便您的统计数据保持完整。",
+    "ja": "機能: すでに終了したセッションを記録して、統計を完全な状態に保ちます。",
+    "ko": "기능: 이미 종료된 세션을 기록하여 통계를 완전한 상태로 유지할 수 있습니다.",
+    "vi": "Công dụng: Cho phép bạn ghi lại một phiên đã kết thúc để số liệu thống kê của bạn luôn đầy đủ.",
+    "es": "Qué hace: te permite grabar una sesión que ya finalizó para que tus estadísticas permanezcan completas.",
+    "ar": "ماذا يفعل: يتيح لك تسجيل جلسة انتهت بالفعل حتى تظل إحصائياتك كاملة.",
+    "he": "מה זה עושה: מאפשר לך להקליט הפעלה שכבר הסתיימה כדי שהסטטיסטיקה שלך תישאר מלאה.",
+    "de": "Was es macht: Ermöglicht das Aufzeichnen einer bereits beendeten Sitzung, damit Ihre Statistiken vollständig bleiben.",
+    "fr": "Ce qu'il fait : Vous permet d'enregistrer une session déjà terminée afin que vos statistiques restent complètes.",
+    "hi": "यह क्या करता है: आपको एक सत्र रिकॉर्ड करने की सुविधा देता है जो पहले ही समाप्त हो चुका है ताकि आपके आँकड़े पूर्ण रहें।"
+  },
+  "ui.7c21347113e999b21c53b05a": {
+    "en": "What it does: Searchable, filterable list of saved sessions.",
+    "zh-Hans": "它的作用：可搜索、可过滤的已保存会话列表。",
+    "ja": "機能: 保存されたセッションの検索およびフィルター可能なリスト。",
+    "ko": "기능: 검색 가능하고 필터링 가능한 저장된 세션 목록입니다.",
+    "vi": "Chức năng: Danh sách các phiên đã lưu có thể tìm kiếm và lọc được.",
+    "es": "Qué hace: lista de sesiones guardadas que se puede buscar y filtrar.",
+    "ar": "ماذا يفعل: قائمة الجلسات المحفوظة القابلة للبحث والتصفية.",
+    "he": "מה זה עושה: רשימה ניתנת לחיפוש וסינון של הפעלות שמורות.",
+    "de": "Was es tut: Durchsuchbare, filterbare Liste gespeicherter Sitzungen.",
+    "fr": "Ce qu'il fait : Liste consultable et filtrable des sessions enregistrées.",
+    "hi": "यह क्या करता है: सहेजे गए सत्रों की खोजने योग्य, फ़िल्टर करने योग्य सूची।"
+  },
+  "ui.650c54f280d042d270b1391e": {
+    "en": "What it does: Sign in or out, manage TierTap Pro, and configure optional app lock.",
+    "zh-Hans": "它的作用：登录或注销、管理 TierTap Pro 以及配置可选的应用程序锁定。",
+    "ja": "機能: サインインまたはサインアウトし、TierTap Pro を管理し、オプションのアプリロックを構成します。",
+    "ko": "기능: 로그인 또는 로그아웃, TierTap Pro 관리, 선택적 앱 잠금 구성.",
+    "vi": "Chức năng: Đăng nhập hoặc đăng xuất, quản lý TierTap Pro và định cấu hình khóa ứng dụng tùy chọn.",
+    "es": "Qué hace: iniciar o cerrar sesión, administrar TierTap Pro y configurar el bloqueo de aplicaciones opcional.",
+    "ar": "ماذا يفعل: قم بتسجيل الدخول أو الخروج، وإدارة TierTap Pro، وتكوين قفل التطبيق الاختياري.",
+    "he": "מה זה עושה: היכנס או צא, נהל את TierTap Pro והגדר נעילת אפליקציה אופציונלית.",
+    "de": "Was es tut: An- oder Abmelden, TierTap Pro verwalten und optionale App-Sperre konfigurieren.",
+    "fr": "Ce qu'il fait : connectez-vous ou déconnectez-vous, gérez TierTap Pro et configurez le verrouillage d'application en option.",
+    "hi": "यह क्या करता है: साइन इन या आउट करें, टियरटैप प्रो प्रबंधित करें और वैकल्पिक ऐप लॉक कॉन्फ़िगर करें।"
+  },
+  "ui.2a5565f45ca9af56feb17d41": {
+    "en": "What it does: Tracks bankroll-related views tied to your settings and play (alongside bankroll fields in Settings).",
+    "zh-Hans": "它的作用：跟踪与您的设置和游戏相关的资金相关视图（以及“设置”中的资金字段）。",
+    "ja": "機能: 設定とプレイに関連付けられたバンクロール関連のビューを (設定のバンクロール フィールドとともに) 追跡します。",
+    "ko": "기능: 설정 및 플레이와 관련된 자금 관련 조회수를 추적합니다(설정의 자금 필드와 함께).",
+    "vi": "Chức năng của nó: Theo dõi các chế độ xem liên quan đến tài khoản ngân hàng được gắn với cài đặt và cách chơi của bạn (cùng với các trường tài khoản ngân hàng trong Cài đặt).",
+    "es": "Qué hace: realiza un seguimiento de las vistas relacionadas con los fondos vinculadas a su configuración y juego (junto con los campos de fondos en Configuración).",
+    "ar": "ماذا يفعل: يتتبع طرق العرض المتعلقة بالتمويل المرتبطة بإعداداتك واللعب (إلى جانب حقول التمويل في الإعدادات).",
+    "he": "מה זה עושה: עוקב אחר תצוגות הקשורות לבנקים הקשורים להגדרות ולמשחק שלך (לצד שדות חשבון בהגדרות).",
+    "de": "Was es macht: Verfolgt bankrollbezogene Ansichten, die mit Ihren Einstellungen und Ihrem Spiel verknüpft sind (neben den Bankroll-Feldern in den Einstellungen).",
+    "fr": "Ce qu'il fait : suit les vues liées à la bankroll liées à vos paramètres et à votre jeu (aux côtés des champs de bankroll dans les paramètres).",
+    "hi": "यह क्या करता है: आपकी सेटिंग्स और प्ले से जुड़े बैंकरोल-संबंधित दृश्यों को ट्रैक करता है (सेटिंग्स में बैंकरोल फ़ील्ड के साथ)।"
+  },
+  "ui.41e2fa1a6f2649905d9184c7": {
+    "en": "What it does: Turns a live session into a saved record with win/loss, tier progress, and optional photo or chip tools.",
+    "zh-Hans": "它的作用：将实时会话转变为保存的记录，其中包含输赢、级别进度以及可选的照片或筹码工具。",
+    "ja": "機能: ライブ セッションを、勝敗、ティアの進行状況、およびオプションの写真またはチップ ツールを含む保存された記録に変換します。",
+    "ko": "기능: 실시간 세션을 승리/패배, 등급 진행 상황, 선택적 사진 또는 칩 도구가 포함된 저장된 기록으로 전환합니다.",
+    "vi": "Công dụng: Biến phiên trực tiếp thành bản ghi đã lưu với thắng/thua, tiến trình cấp độ và các công cụ ảnh hoặc chip tùy chọn.",
+    "es": "Qué hace: convierte una sesión en vivo en un registro guardado con ganancias/pérdidas, progreso de nivel y herramientas opcionales de fotografía o chip.",
+    "ar": "ماذا يفعل: تحويل الجلسة المباشرة إلى سجل محفوظ يتضمن الفوز/الخسارة والتقدم في المستوى وأدوات الصور أو الشرائح الاختيارية.",
+    "he": "מה זה עושה: הופך הפעלה חיה לרשומה שמור עם ניצחון/הפסד, התקדמות ברמה וכלי צילום או שבב אופציונליים.",
+    "de": "Was es macht: Verwandelt eine Live-Sitzung in eine gespeicherte Aufzeichnung mit Sieg/Niederlage, Stufenfortschritt und optionalen Foto- oder Chip-Tools.",
+    "fr": "Ce qu'il fait : Transforme une session en direct en un enregistrement enregistré avec des gains/pertes, une progression de niveau et des outils de photo ou de puce en option.",
+    "hi": "यह क्या करता है: लाइव सत्र को जीत/हार, स्तरीय प्रगति और वैकल्पिक फोटो या चिप टूल के साथ सहेजे गए रिकॉर्ड में बदल देता है।"
+  },
+  "ui.d5d5115f22a72fc9b4fc5cd0": {
+    "en": "What it does: Your hub for starting sessions, seeing an active session at a glance, and opening bankroll, history, and related tools.",
+    "zh-Hans": "它的作用：您的中心，用于启动会话、一目了然地查看活动会话以及打开资金、历史记录和相关工具。",
+    "ja": "機能: セッションを開始し、アクティブなセッションを一目で確認し、バンクロール、履歴、関連ツールを開くためのハブです。",
+    "ko": "기능: 세션 시작, 활성 세션 한 눈에 보기, 자금 열기, 내역 및 관련 도구를 위한 허브입니다.",
+    "vi": "Chức năng của nó: Trung tâm của bạn để bắt đầu các phiên, xem nhanh một phiên đang hoạt động và mở danh sách ngân hàng, lịch sử và các công cụ liên quan.",
+    "es": "Qué hace: su centro para iniciar sesiones, ver una sesión activa de un vistazo y abrir fondos, historial y herramientas relacionadas.",
+    "ar": "ماذا يفعل: المركز الخاص بك لبدء الجلسات، ورؤية الجلسة النشطة في لمحة سريعة، وفتح التمويل، والسجل، والأدوات ذات الصلة.",
+    "he": "מה זה עושה: המרכז שלך לתחילת הפעלות, לראות הפעלה פעילה במבט חטוף, ופתיחת חשבונות כספים, היסטוריה וכלים קשורים.",
+    "de": "Was es tut: Ihr Hub zum Starten von Sitzungen, zum Anzeigen einer aktiven Sitzung auf einen Blick und zum Öffnen von Bankroll, Verlauf und verwandten Tools.",
+    "fr": "Ce qu'il fait : Votre hub pour démarrer des sessions, voir une session active en un coup d'œil et ouvrir la bankroll, l'historique et les outils associés.",
+    "hi": "यह क्या करता है: सत्र शुरू करने, एक सक्रिय सत्र को एक नज़र में देखने और बैंकरोल, इतिहास और संबंधित टूल खोलने के लिए आपका केंद्र।"
+  },
   "ui.41a1acbef29623685b95a789": {
     "en": "What you get",
     "zh-Hans": "你得到什么",
@@ -6257,6 +7720,45 @@
     "de": "Was Sie bekommen",
     "fr": "Ce que vous obtenez",
     "hi": "आपको क्या मिलता है"
+  },
+  "ui.685bfe598fc97a5d23c9750b": {
+    "en": "When a session is live, a card shows elapsed time, venue, game, buy-in total, and comps. Tap it to open the full live session screen.",
+    "zh-Hans": "当一场比赛进行时，一张卡片会显示经过的时间、地点、比赛、买入总额和比赛。点击它可打开完整的实时会话屏幕。",
+    "ja": "セッションがライブの場合、カードには経過時間、会場、ゲーム、バイイン合計、およびコンプが表示されます。それをタップすると、完全なライブ セッション画面が開きます。",
+    "ko": "세션이 시작되면 카드에 경과 시간, 장소, 게임, 총 바이인 및 조합이 표시됩니다. 전체 라이브 세션 화면을 열려면 탭하세요.",
+    "vi": "Khi một phiên đang diễn ra, một thẻ sẽ hiển thị thời gian đã trôi qua, địa điểm, trận đấu, tổng số lượt mua và tỷ lệ. Nhấn vào nó để mở toàn bộ màn hình phiên trực tiếp.",
+    "es": "Cuando una sesión está en vivo, una tarjeta muestra el tiempo transcurrido, el lugar, el juego, la entrada total y las competiciones. Tóquelo para abrir la pantalla completa de la sesión en vivo.",
+    "ar": "عندما تكون الجلسة مباشرة، تعرض البطاقة الوقت المنقضي والمكان واللعبة وإجمالي الاشتراكات والتركيبات. اضغط عليه لفتح شاشة الجلسة المباشرة الكاملة.",
+    "he": "כאשר הפעלה בשידור חי, כרטיס מציג את הזמן שחלף, המקום, המשחק, סך כל הרכישות והמשימות. הקש עליו כדי לפתוח את מסך ההפעלה החי המלא.",
+    "de": "Wenn eine Sitzung live ist, werden auf einer Karte die verstrichene Zeit, der Veranstaltungsort, das Spiel, die Buy-in-Gesamtsumme und die Comps angezeigt. Tippen Sie darauf, um den vollständigen Live-Sitzungsbildschirm zu öffnen.",
+    "fr": "Lorsqu'une session est en direct, une carte indique le temps écoulé, le lieu, le jeu, le buy-in total et les compositions. Appuyez dessus pour ouvrir l'écran complet de la session en direct.",
+    "hi": "जब कोई सत्र लाइव होता है, तो एक कार्ड बीता हुआ समय, स्थान, खेल, कुल खरीदारी और गणना दिखाता है। पूर्ण लाइव सत्र स्क्रीन खोलने के लिए इसे टैप करें।"
+  },
+  "ui.5696f5fd3c495a6afc899b03": {
+    "en": "When lock down is on, you must use Face ID, Touch ID, or your device passcode to open TierTap after you leave the app or when you launch it again. This adds a layer of privacy on top of your phone’s lock.",
+    "zh-Hans": "锁定开启后，您离开应用程序或再次启动应用程序时，必须使用 Face ID、Touch ID 或设备密码才能打开 TierTap。这在手机锁的基础上增加了一层隐私。",
+    "ja": "ロックダウンがオンになっている場合、アプリを終了した後、またはアプリを再度起動するときに、Face ID、Touch ID、またはデバイスのパスコードを使用して TierTap を開く必要があります。これにより、携帯電話のロックの上にプライバシーの層が追加されます。",
+    "ko": "잠금이 켜져 있으면 앱을 종료하거나 다시 시작할 때 TierTap을 열려면 Face ID, Touch ID 또는 장치 암호를 사용해야 합니다. 이렇게 하면 휴대폰 잠금 장치 위에 개인 정보 보호 계층이 추가됩니다.",
+    "vi": "Khi tính năng khóa được bật, bạn phải sử dụng Face ID, Touch ID hoặc mật mã thiết bị của mình để mở TierTap sau khi bạn rời khỏi ứng dụng hoặc khi bạn khởi chạy lại ứng dụng. Điều này sẽ thêm một lớp bảo mật lên trên khóa điện thoại của bạn.",
+    "es": "Cuando el bloqueo está activado, debe usar Face ID, Touch ID o la contraseña de su dispositivo para abrir TierTap después de salir de la aplicación o cuando la inicie nuevamente. Esto agrega una capa de privacidad además del bloqueo de su teléfono.",
+    "ar": "عند تشغيل القفل، يجب عليك استخدام Face ID أو Touch ID أو رمز مرور جهازك لفتح TierTap بعد مغادرة التطبيق أو عند تشغيله مرة أخرى. يؤدي هذا إلى إضافة طبقة من الخصوصية أعلى قفل هاتفك.",
+    "he": "כאשר הנעילה מופעלת, עליך להשתמש ב-Face ID, ב-Touch ID או בקוד הסיסמה של המכשיר שלך כדי לפתוח את TierTap לאחר שתעזוב את האפליקציה או כשאתה מפעיל אותה שוב. זה מוסיף שכבה של פרטיות על המנעול של הטלפון שלך.",
+    "de": "Wenn die Sperre aktiviert ist, müssen Sie Face ID, Touch ID oder Ihren Gerätepasscode verwenden, um TierTap zu öffnen, nachdem Sie die App verlassen oder erneut starten. Dadurch wird zusätzlich zur Sperre Ihres Telefons eine weitere Ebene der Privatsphäre hinzugefügt.",
+    "fr": "Lorsque le verrouillage est activé, vous devez utiliser Face ID, Touch ID ou le code d'accès de votre appareil pour ouvrir TierTap après avoir quitté l'application ou lorsque vous la relancez. Cela ajoute une couche de confidentialité au-dessus du verrouillage de votre téléphone.",
+    "hi": "जब लॉक डाउन चालू हो, तो आपको ऐप छोड़ने के बाद या इसे दोबारा लॉन्च करते समय टियरटैप खोलने के लिए फेस आईडी, टच आईडी या अपने डिवाइस पासकोड का उपयोग करना होगा। यह आपके फ़ोन के लॉक के ऊपर गोपनीयता की एक परत जोड़ देता है।"
+  },
+  "ui.b55aa6e6f29415ca2b8d30be": {
+    "en": "When off, posts appear as Anonymous in the feed.",
+    "zh-Hans": "关闭后，帖子在摘要中显示为匿名。",
+    "ja": "オフにすると、投稿はフィード内に匿名として表示されます。",
+    "ko": "끄면 게시물이 피드에 익명으로 표시됩니다.",
+    "vi": "Khi tắt, các bài đăng sẽ xuất hiện dưới dạng Ẩn danh trong nguồn cấp dữ liệu.",
+    "es": "Cuando está desactivado, las publicaciones aparecen como anónimas en el feed.",
+    "ar": "عند إيقاف التشغيل، تظهر المنشورات كمجهول في الموجز.",
+    "he": "כאשר כבוי, פוסטים מופיעים כאנונימי בפיד.",
+    "de": "Wenn diese Option deaktiviert ist, werden Beiträge im Feed als „Anonym“ angezeigt.",
+    "fr": "Lorsqu'elle est désactivée, les publications apparaissent comme anonymes dans le fil.",
+    "hi": "बंद होने पर, पोस्ट फ़ीड में अज्ञात के रूप में दिखाई देते हैं।"
   },
   "ui.8b293cb32c82f3cc7c7d93ac": {
     "en": "When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.",
@@ -6284,6 +7786,32 @@
     "fr": "Lorsqu'elle est activée, les actions majeures telles que l'enregistrement, les buy-ins, la clôture des sessions et le partage émettront des carillons rapides de style casino et des haptiques de réussite.",
     "hi": "चालू होने पर, चेक-इन, बाय-इन, सत्र बंद करना और साझा करने जैसी प्रमुख कार्रवाइयां त्वरित कैसीनो-शैली की झंकार और सफलता की झलकियां बजाएंगी।"
   },
+  "ui.40160778403ca588daab25ba": {
+    "en": "When you’re ready to leave, start close-out to enter cash-out, ending tier points, and other wrap-up details.",
+    "zh-Hans": "当您准备离开时，开始结算以输入兑现、结束等级积分和其他总结详细信息。",
+    "ja": "出発する準備ができたら、クローズアウトを開始して、キャッシュアウト、終了ティアポイント、その他のまとめの詳細を入力します。",
+    "ko": "떠날 준비가 되면 종료를 시작하여 현금 인출, 등급 포인트 종료 및 기타 마무리 세부정보를 입력하세요.",
+    "vi": "Khi bạn đã sẵn sàng rời đi, hãy bắt đầu kết thúc để rút tiền, kết thúc điểm cấp độ và các chi tiết tổng kết khác.",
+    "es": "Cuando esté listo para irse, comience a cerrar para ingresar el retiro de efectivo, finalizar los puntos de nivel y otros detalles finales.",
+    "ar": "عندما تكون مستعدًا للمغادرة، ابدأ بالإغلاق لإدخال السحب النقدي ونقاط الطبقة النهائية والتفاصيل الختامية الأخرى.",
+    "he": "כשתהיה מוכן לצאת, התחל לסגור כדי להזין מזומנים, נקודות סיום דרג ופרטי סיכום אחרים.",
+    "de": "Wenn Sie bereit sind zu gehen, beginnen Sie mit dem Abschluss, um die Auszahlung, Endpunktpunkte und andere Abschlussdetails einzugeben.",
+    "fr": "Lorsque vous êtes prêt à partir, commencez la clôture pour saisir le retrait, les points de fin de niveau et d'autres détails de clôture.",
+    "hi": "जब आप जाने के लिए तैयार हों, तो कैश-आउट, अंतिम स्तर के अंक और अन्य रैप-अप विवरण दर्ज करने के लिए क्लोज़-आउट शुरू करें।"
+  },
+  "ui.86f3d1e73ee98453fb3c4eba": {
+    "en": "Where did my session go?",
+    "zh-Hans": "我的会话去哪儿了？",
+    "ja": "私のセッションはどこへ行ったのでしょうか?",
+    "ko": "내 세션은 어디로 갔나요?",
+    "vi": "Phiên của tôi đã đi đâu?",
+    "es": "¿A dónde fue mi sesión?",
+    "ar": "أين ذهبت جلستي؟",
+    "he": "לאן נעלמה הפגישה שלי?",
+    "de": "Wo ist meine Sitzung geblieben?",
+    "fr": "Où est passée ma séance ?",
+    "hi": "मेरा सत्र कहाँ गया?"
+  },
   "ui.459f82d5a833a2fe26f5ec5e": {
     "en": "Where you stayed",
     "zh-Hans": "你住过的地方",
@@ -6296,6 +7824,19 @@
     "de": "Wo du übernachtet hast",
     "fr": "Où tu es resté",
     "hi": "जहाँ आप रहें"
+  },
+  "ui.00b7519662dcb5b230aeadc8": {
+    "en": "Why can’t I close out?",
+    "zh-Hans": "为什么我不能关闭？",
+    "ja": "なぜクローズできないのですか?",
+    "ko": "왜 문을 닫을 수 없나요?",
+    "vi": "Tại sao tôi không thể đóng cửa?",
+    "es": "¿Por qué no puedo cerrar?",
+    "ar": "لماذا لا أستطيع أن أغلق؟",
+    "he": "למה אני לא יכול לסגור?",
+    "de": "Warum kann ich nicht schließen?",
+    "fr": "Pourquoi ne puis-je pas clôturer ?",
+    "hi": "मैं बंद क्यों नहीं कर सकता?"
   },
   "ui.44e88162a47c348a4d550525": {
     "en": "Why create a TierTap account?",
@@ -6322,6 +7863,19 @@
     "de": "Warum ein Konto erstellen?",
     "fr": "Pourquoi créer un compte ?",
     "hi": "अकाउंट क्यों बनाया जाए?"
+  },
+  "ui.8ca2ac6b2c9f0a3a2e02e078": {
+    "en": "Why doesn’t Community or AI work?",
+    "zh-Hans": "为什么社区或人工智能不起作用？",
+    "ja": "コミュニティや AI が機能しないのはなぜですか?",
+    "ko": "커뮤니티나 AI가 작동하지 않는 이유는 무엇입니까?",
+    "vi": "Tại sao Cộng đồng hoặc AI không hoạt động?",
+    "es": "¿Por qué no funciona la comunidad o la IA?",
+    "ar": "لماذا لا يعمل المجتمع أو الذكاء الاصطناعي؟",
+    "he": "למה קהילה או AI לא עובדים?",
+    "de": "Warum funktionieren Community oder KI nicht?",
+    "fr": "Pourquoi la communauté ou l'IA ne fonctionnent-elles pas ?",
+    "hi": "समुदाय या AI काम क्यों नहीं करता?"
   },
   "ui.25bad5b4b4720ff697021e74": {
     "en": "Why this amount",
@@ -6362,6 +7916,19 @@
     "fr": "Victoire contre gain de niveau",
     "hi": "जीत बनाम स्तरीय लाभ"
   },
+  "ui.cdaf04cbbcf49aee2d718722": {
+    "en": "With TierTap Pro, use Ask TierTap for natural-language style summaries of your data and share selected charts as images.",
+    "zh-Hans": "借助 TierTap Pro，使用 Ask TierTap 获取数据的自然语言风格摘要，并将选定的图表作为图像共享。",
+    "ja": "TierTap Pro では、Ask TierTap を使用してデータの自然言語スタイルの概要を作成し、選択したグラフを画像として共有します。",
+    "ko": "TierTap Pro를 사용하면 Ask TierTap을 사용하여 데이터에 대한 자연어 스타일 요약을 확인하고 선택한 차트를 이미지로 공유할 수 있습니다.",
+    "vi": "Với TierTap Pro, hãy sử dụng Ask TierTap để có bản tóm tắt dữ liệu theo kiểu ngôn ngữ tự nhiên và chia sẻ các biểu đồ đã chọn dưới dạng hình ảnh.",
+    "es": "Con TierTap Pro, utilice Ask TierTap para obtener resúmenes de sus datos en estilo de lenguaje natural y comparta gráficos seleccionados como imágenes.",
+    "ar": "مع TierTap Pro، استخدم Ask TierTap للحصول على ملخصات بنمط اللغة الطبيعية لبياناتك ومشاركة المخططات المحددة كصور.",
+    "he": "עם TierTap Pro, השתמש ב- Ask TierTap עבור סיכומים בסגנון שפה טבעית של הנתונים שלך ושתף תרשימים נבחרים כתמונות.",
+    "de": "Mit TierTap Pro können Sie Ask TierTap für Zusammenfassungen Ihrer Daten in natürlicher Sprache verwenden und ausgewählte Diagramme als Bilder teilen.",
+    "fr": "Avec TierTap Pro, utilisez Ask TierTap pour obtenir des résumés en langage naturel de vos données et partagez les graphiques sélectionnés sous forme d'images.",
+    "hi": "टियरटैप प्रो के साथ, अपने डेटा के प्राकृतिक-भाषा शैली सारांश के लिए आस्क टियरटैप का उपयोग करें और चयनित चार्ट को छवियों के रूप में साझा करें।"
+  },
   "ui.36c901e9f1e453c2c0c8ed5c": {
     "en": "Within trip dates",
     "zh-Hans": "行程日期内",
@@ -6374,6 +7941,19 @@
     "de": "Innerhalb der Reisedaten",
     "fr": "Dans les dates de voyage",
     "hi": "यात्रा तिथियों के भीतर"
+  },
+  "ui.d10f5d5e2757e9604f7a70f8": {
+    "en": "Yes—use App language and Currency in Settings under Bankroll & Localization.",
+    "zh-Hans": "是 - 在“资金和本地化”下的“设置”中使用应用程序语言和货币。",
+    "ja": "はい - バンクロールとローカリゼーションの設定でアプリの言語と通貨を使用します。",
+    "ko": "예. 설정의 자금 및 현지화에서 앱 언어와 통화를 사용하세요.",
+    "vi": "Có—sử dụng ngôn ngữ Ứng dụng và Đơn vị tiền tệ trong Cài đặt trong Danh sách ngân hàng & Bản địa hóa.",
+    "es": "Sí, use el idioma y la moneda de la aplicación en Configuración en Fondos y localización.",
+    "ar": "نعم - استخدم لغة التطبيق والعملة في الإعدادات ضمن التمويل والتعريب.",
+    "he": "כן - השתמש בשפה ובמטבע של האפליקציה בהגדרות תחת חשבונות ולוקליזציה.",
+    "de": "Ja – verwenden Sie App-Sprache und Währung in den Einstellungen unter „Budget & Lokalisierung“.",
+    "fr": "Oui : utilisez la langue et la devise de l'application dans Paramètres sous Financement et localisation.",
+    "hi": "हाँ—बैंकरोल और स्थानीयकरण के अंतर्गत सेटिंग्स में ऐप भाषा और मुद्रा का उपयोग करें।"
   },
   "ui.439f281a3b5d2eabebd0a821": {
     "en": "You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.",
@@ -6426,6 +8006,19 @@
     "de": "Sie haben eine Live-Sitzung. Fortsetzen oder beenden, um ein neues zu beginnen?",
     "fr": "Vous avez une session en direct. Le reprendre ou y mettre fin pour en démarrer un nouveau ?",
     "hi": "आपके पास एक लाइव सत्र है. इसे फिर से शुरू करें या एक नई शुरुआत करने के लिए इसे समाप्त करें?"
+  },
+  "ui.ede64376376ebf77d46680dc": {
+    "en": "You may be signed out, or the app may be offering account setup after unlock. Sign in once or dismiss if you’ll continue without account features.",
+    "zh-Hans": "您可能已注销，或者应用程序可能在解锁后提供帐户设置。登录一次或关闭（如果您不使用帐户功能继续）。",
+    "ja": "サインアウトしているか、アプリがロック解除後にアカウントのセットアップを提供している可能性があります。一度サインインするか、アカウント機能を使用せずに続行する場合は閉じてください。",
+    "ko": "로그아웃되었거나 앱이 잠금 해제 후 계정 설정을 제공할 수 있습니다. 한 번 로그인하거나 계정 기능 없이 계속하려면 로그인을 취소하세요.",
+    "vi": "Bạn có thể đã đăng xuất hoặc ứng dụng có thể cung cấp thiết lập tài khoản sau khi mở khóa. Đăng nhập một lần hoặc loại bỏ nếu bạn tiếp tục mà không có tính năng tài khoản.",
+    "es": "Es posible que haya cerrado sesión o que la aplicación ofrezca configuración de cuenta después del desbloqueo. Inicie sesión una vez o descarte si continúa sin las funciones de la cuenta.",
+    "ar": "ربما قمت بتسجيل الخروج، أو قد يوفر التطبيق إعداد الحساب بعد إلغاء القفل. قم بتسجيل الدخول مرة واحدة أو قم بالرفض إذا كنت ستستمر بدون ميزات الحساب.",
+    "he": "ייתכן שיצאת מהחשבון, או שהאפליקציה מציעה הגדרת חשבון לאחר ביטול הנעילה. היכנס פעם אחת או סגור אם תמשיך ללא תכונות החשבון.",
+    "de": "Möglicherweise sind Sie abgemeldet oder die App bietet nach der Entsperrung die Einrichtung eines Kontos an. Melden Sie sich einmal an oder schließen Sie die Anmeldung, wenn Sie ohne Kontofunktionen fortfahren möchten.",
+    "fr": "Vous êtes peut-être déconnecté ou l'application propose peut-être la configuration d'un compte après le déverrouillage. Connectez-vous une fois ou rejetez si vous continuez sans les fonctionnalités du compte.",
+    "hi": "हो सकता है कि आप साइन आउट हो गए हों, या ऐप अनलॉक के बाद खाता सेटअप की पेशकश कर रहा हो। यदि आप खाता सुविधाओं के बिना जारी रखेंगे तो एक बार साइन इन करें या खारिज कर दें।"
   },
   "ui.038793ddc5f836490cc6a6e1": {
     "en": "You're currently subscribed",
@@ -6517,6 +8110,19 @@
     "de": "Ihr Fortschritt",
     "fr": "Votre progression",
     "hi": "आपकी प्रगति"
+  },
+  "ui.62ceef210417fa3483322226": {
+    "en": "You’ll briefly see the splash screen, then land on the main tab bar.",
+    "zh-Hans": "您将短暂地看到启动屏幕，然后到达主选项卡栏。",
+    "ja": "スプラッシュ画面が一瞬表示され、メイン タブ バーが表示されます。",
+    "ko": "스플래시 화면이 잠시 표시된 다음 기본 탭 표시줄에 표시됩니다.",
+    "vi": "Bạn sẽ thấy nhanh màn hình giật gân, sau đó đến thanh tab chính.",
+    "es": "Verá brevemente la pantalla de presentación y luego llegará a la barra de pestañas principal.",
+    "ar": "سترى شاشة البداية لفترة وجيزة، ثم تهبط على شريط علامات التبويب الرئيسي.",
+    "he": "אתה תראה לזמן קצר את מסך הפתיחה, ואז תנחת בסרגל הכרטיסיות הראשי.",
+    "de": "Sie sehen kurz den Begrüßungsbildschirm und gelangen dann zur Hauptregisterkartenleiste.",
+    "fr": "Vous verrez brièvement l’écran de démarrage, puis atterrirez sur la barre d’onglets principale.",
+    "hi": "आप संक्षेप में स्प्लैश स्क्रीन देखेंगे, फिर मुख्य टैब बार पर पहुंचेंगे।"
   },
   "ui.bba2764382736bb289285e1d": {
     "en": "You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.",
@@ -6621,31 +8227,5 @@
     "de": "🧠 Wie hat sich die Sitzung angefühlt?",
     "fr": "🧠 Comment s’est passée la séance ?",
     "hi": "🧠 सत्र कैसा लगा?"
-  },
-  "ui.74f30a15663942a3f6c945f2": {
-    "en": "Search by screen name",
-    "zh-Hans": "按屏幕名称搜索",
-    "ja": "スクリーン名で検索",
-    "ko": "화면 이름으로 검색",
-    "vi": "Tìm theo tên hiển thị",
-    "es": "Buscar por nombre de pantalla",
-    "ar": "البحث حسب اسم الشاشة",
-    "he": "חיפוש לפי שם מסך",
-    "de": "Nach Bildschirmnamen suchen",
-    "fr": "Rechercher par nom d'écran",
-    "hi": "स्क्रीन नाम से खोजें"
-  },
-  "ui.8872b442a3f851ac27b77bb6": {
-    "en": "Type a screen name",
-    "zh-Hans": "输入屏幕名称",
-    "ja": "スクリーン名を入力",
-    "ko": "화면 이름 입력",
-    "vi": "Nhập tên hiển thị",
-    "es": "Escriba un nombre de pantalla",
-    "ar": "اكتب اسم الشاشة",
-    "he": "הקליד שם מסך",
-    "de": "Bildschirmnamen eingeben",
-    "fr": "Saisir un nom d'écran",
-    "hi": "स्क्रीन नाम टाइप करें"
   }
 }

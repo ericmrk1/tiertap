@@ -457,31 +457,25 @@ struct TripMagicWandView: View {
     }
 
     private func datePickerRow(start: Binding<Date>, end: Binding<Date>) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
                 L10nText("Start")
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: start, displayedComponents: [.date])
                     .labelsHidden()
                     .tint(.green)
+                    .font(.caption2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Rectangle()
-                .fill(Color.white.opacity(0.22))
-                .frame(width: 1)
-                .padding(.vertical, 4)
-
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 L10nText("End")
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.white.opacity(0.85))
                 DatePicker("", selection: end, displayedComponents: [.date])
                     .labelsHidden()
                     .tint(.green)
+                    .font(.caption2)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(14)
         .background(Color(.systemGray6).opacity(0.25))

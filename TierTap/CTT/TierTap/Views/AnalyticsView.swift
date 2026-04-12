@@ -445,39 +445,42 @@ struct AnalyticsView: View {
                     .foregroundColor(.white)
                 Spacer()
             }
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
                     L10nText("From")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundColor(.gray)
-                    HStack(spacing: 8) {
-                        DatePicker("", selection: Binding(
-                            get: { analyticsFromDate ?? Calendar.current.date(from: DateComponents(year: Calendar.current.component(.year, from: Date()), month: 1, day: 1)) ?? Date() },
-                            set: { analyticsFromDate = $0 }
-                        ), displayedComponents: .date)
-                            .labelsHidden()
-                            .colorScheme(.dark)
-                        FilterPanelPillButton(title: analyticsFromDate == nil ? "All" : "Clear Filter") {
-                            analyticsFromDate = nil
-                        }
+                    DatePicker("", selection: Binding(
+                        get: { analyticsFromDate ?? Calendar.current.date(from: DateComponents(year: Calendar.current.component(.year, from: Date()), month: 1, day: 1)) ?? Date() },
+                        set: { analyticsFromDate = $0 }
+                    ), displayedComponents: .date)
+                        .labelsHidden()
+                        .colorScheme(.dark)
+                        .font(.caption2)
+                    FilterPanelPillButton(title: analyticsFromDate == nil ? "All" : "Clear Filter") {
+                        analyticsFromDate = nil
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .leading, spacing: 6) {
+                Rectangle()
+                    .fill(Color.white.opacity(0.22))
+                    .frame(width: 1)
+                    .padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 4) {
                     L10nText("To")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundColor(.gray)
-                    HStack(spacing: 8) {
-                        DatePicker("", selection: Binding(
-                            get: { analyticsToDate ?? Date() },
-                            set: { analyticsToDate = $0 }
-                        ), displayedComponents: .date)
-                            .labelsHidden()
-                            .colorScheme(.dark)
-                        FilterPanelPillButton(title: analyticsToDate == nil ? "All" : "Clear Filter") {
-                            analyticsToDate = nil
-                        }
+                    DatePicker("", selection: Binding(
+                        get: { analyticsToDate ?? Date() },
+                        set: { analyticsToDate = $0 }
+                    ), displayedComponents: .date)
+                        .labelsHidden()
+                        .colorScheme(.dark)
+                        .font(.caption2)
+                    FilterPanelPillButton(title: analyticsToDate == nil ? "All" : "Clear Filter") {
+                        analyticsToDate = nil
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

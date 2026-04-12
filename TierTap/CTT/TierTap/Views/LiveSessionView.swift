@@ -32,10 +32,6 @@ struct LiveSessionView: View {
         [50, 100, 200, 500, 1_000, 5_000, 10_000, 20_000, 50_000, 100_000]
     }
 
-    private var quickCompAmounts: [Int] {
-        [5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000]
-    }
-
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
     var body: some View {
@@ -285,8 +281,6 @@ struct LiveSessionView: View {
             .adaptiveSheet(isPresented: $showCompSheet) {
                 CompQuickAddSheet(
                     existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
-                    existingDollarsCreditsCompTotal: store.liveSession?.totalCompDollarsCredits ?? 0,
-                    quickAmounts: quickCompAmounts,
                     sessionGame: store.liveSession?.game ?? "",
                     sessionCasino: store.liveSession?.casino ?? "",
                     sessionCasinoLatitude: store.liveSession?.casinoLatitude,
