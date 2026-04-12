@@ -7,6 +7,8 @@ struct TripDetailView: View {
     @EnvironmentObject var tripStore: TripStore
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showEditor = false
@@ -89,6 +91,8 @@ struct TripDetailView: View {
             SessionDetailView(session: session)
                 .environmentObject(sessionStore)
                 .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
         }
         .adaptiveSheet(item: $legForMap) { leg in
             flightMapSheet(leg)

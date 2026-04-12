@@ -1468,6 +1468,12 @@
     "fr": "Consultez l’appli de fidélité du casino. Sélection rapide 1 000–50 000 ou saisissez le montant exact (pas zéro).",
     "hi": "अपने कैसीनो लॉयल्टी ऐप में देखें। 1,000–50,000 त्वरित चुनें या सटीक अंक दर्ज करें (शून्य नहीं)।"
   },
+  "ui.728ee21478bf45e0fe7d584d": {
+    "en": "Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track."
+  },
+  "ui.020c0766989356b7d803347b": {
+    "en": "Starting sessions without a Tier rating will make it difficult to track Tier levels and points."
+  },
   "ui.e0c9c0d1d13de202eb4fca74": {
     "en": "Chinese Poker",
     "zh-Hans": "中国扑克",
@@ -2195,6 +2201,45 @@
     "de": "Anzeigename",
     "fr": "Nom d'affichage",
     "hi": "प्रदर्शित होने वाला नाम"
+  },
+  "ui.8f6bb7910da2477f6df5adce": {
+    "en": "Screen Name",
+    "zh-Hans": "屏幕名称",
+    "ja": "スクリーン名",
+    "ko": "화면 이름",
+    "vi": "Tên hiển thị",
+    "es": "Nombre de pantalla",
+    "ar": "اسم الشاشة",
+    "he": "שם מסך",
+    "de": "Bildschirmname",
+    "fr": "Nom d'écran",
+    "hi": "स्क्रीन नाम"
+  },
+  "ui.16140b7c2f9226ffa2b04c90": {
+    "en": "Shown on Community when you publish",
+    "zh-Hans": "发布到社区时显示",
+    "ja": "コミュニティに投稿すると表示されます",
+    "ko": "커뮤니티에 게시할 때 표시",
+    "vi": "Hiển thị khi bạn đăng lên Cộng đồng",
+    "es": "Se muestra en la comunidad al publicar",
+    "ar": "يظهر في المجتمع عند النشر",
+    "he": "מוצג בקהילה כשאתה מפרסם",
+    "de": "Wird in der Community angezeigt, wenn du veröffentlichst",
+    "fr": "Affiché dans la communauté lorsque vous publiez",
+    "hi": "प्रकाशित करने पर समुदाय में दिखता है"
+  },
+  "ui.0a02372195987a90679a2b93": {
+    "en": "Screen names",
+    "zh-Hans": "屏幕名称",
+    "ja": "スクリーン名",
+    "ko": "화면 이름",
+    "vi": "Tên hiển thị",
+    "es": "Nombres de pantalla",
+    "ar": "أسماء الشاشة",
+    "he": "שמות מסך",
+    "de": "Bildschirmnamen",
+    "fr": "Noms d'écran",
+    "hi": "स्क्रीन नाम"
   },
   "ui.11a6767d5674c7e45f7e00dc": {
     "en": "Done",

@@ -41,7 +41,7 @@ final class AuthStore: ObservableObject {
         return combined.isEmpty ? nil : combined
     }
 
-    /// User-editable display name (stored in metadata). Falls back to provider name if not set.
+    /// User-editable screen name (stored in metadata as `display_name`). Falls back to provider name if not set.
     var userDisplayName: String? {
         if let custom = stringFromUserMetadata("display_name"), !custom.isEmpty { return custom }
         return userFullName
@@ -64,19 +64,45 @@ final class AuthStore: ObservableObject {
         return UIImage(contentsOfFile: url.path)
     }
 
-    /// Short label for UI: display name or "email@example.com" when no name is available.
+    /// Short label for UI: screen name or "email@example.com" when no name is available.
     var signedInSummary: String? {
         if let name = userDisplayName, !name.isEmpty { return name }
         guard let email = session?.user.email, !email.isEmpty else { return nil }
         return email
     }
 
-    /// Update profile display name and/or emojis in Supabase user metadata.
+    /// Update profile screen name and/or emojis in Supabase user metadata (`display_name` key).
+    /// Claims a globally unique screen name in `UserScreenNames` / `UserScreenNames_Test` when a non-empty name is saved.
     /// To update the profile photo, call `uploadProfilePhoto(_:)` separately.
     func updateProfile(displayName: String?, emojis: String?) async {
         guard let client = supabase else { return }
+        errorMessage = nil
+
+        let trimmedName = displayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let finalName: String? = trimmedName.isEmpty ? nil : trimmedName
+
+        if let userId = session?.user.id {
+            do {
+                if let name = finalName {
+                    try await UserScreenNamesAPI.upsertRegisteredScreenName(userId: userId, screenName: name)
+                } else {
+                    try await UserScreenNamesAPI.deleteRegisteredScreenName(userId: userId)
+                }
+            } catch let sn as UserScreenNamesError {
+                await MainActor.run { errorMessage = sn.localizedDescription }
+                return
+            } catch {
+                await MainActor.run { errorMessage = error.localizedDescription }
+                return
+            }
+        }
+
         var data: [String: AnyJSON] = [:]
-        if let name = displayName { data["display_name"] = .string(name) }
+        if let name = finalName {
+            data["display_name"] = .string(name)
+        } else {
+            data["display_name"] = .null
+        }
         if let e = emojis { data["profile_emojis"] = .string(e) }
         guard !data.isEmpty else { return }
         do {

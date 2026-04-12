@@ -7,8 +7,8 @@ struct BankrollView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
-    @State private var showResetSheet = false
     @State private var resetEntryText = ""
+    @State private var showResetDialPad = false
     #if os(iOS)
     @State private var isShareSheetPresented = false
     @State private var shareURL: URL?
@@ -34,6 +34,12 @@ struct BankrollView: View {
             .compactMap(\.winLoss)
             .reduce(0, +)
         return lastResetValue + sum
+    }
+
+    private var pendingResetAmount: Int? {
+        let digits = resetEntryText.filter { $0.isNumber }
+        guard let v = Int(digits), v >= 0 else { return nil }
+        return v
     }
 
     /// Timeline points (date, bankroll) and history rows built in one pass.
@@ -132,10 +138,12 @@ struct BankrollView: View {
                 }
                 #endif
             }
-            .adaptiveSheet(isPresented: $showResetSheet) {
-                resetSheet
+            .sheet(isPresented: $showResetDialPad) {
+                NumericDialPadSheet(value: $resetEntryText, navigationTitle: "Reset Bankroll")
+                    .environmentObject(settingsStore)
             }
             .onAppear {
+                resetEntryText = "\(currentTotal)"
                 BankrollDatabase.shared.open()
                 BankrollDatabase.shared.syncSessions(store.sessions)
             }
@@ -217,17 +225,39 @@ struct BankrollView: View {
     }
 
     private var resetButton: some View {
-        Button {
-            resetEntryText = "\(settingsStore.bankroll)"
-            showResetSheet = true
-        } label: {
-            LocalizedLabel(title: "Reset Bankroll", systemImage: "arrow.counterclockwise")
-                .font(.headline)
+        HStack(spacing: 12) {
+            Button {
+                if let v = pendingResetAmount {
+                    settingsStore.resetBankroll(to: v)
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                    VStack(alignment: .leading, spacing: 4) {
+                        L10nText("Reset Bankroll")
+                            .font(.headline)
+                        if let v = pendingResetAmount {
+                            Text("\(settingsStore.currencySymbol)\(v.formatted(.number.grouping(.automatic)))")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.white.opacity(0.95))
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.orange.opacity(0.25))
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .disabled(pendingResetAmount == nil)
+
+            DialPadLaunchButton {
+                resetEntryText = "\(currentTotal)"
+                showResetDialPad = true
+            }
         }
     }
 
@@ -303,50 +333,6 @@ struct BankrollView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private var resetSheet: some View {
-        NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                VStack(spacing: 20) {
-                    L10nText("Enter new bankroll value. This updates the bankroll in Settings and starts tracking from this value.")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.9))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-
-                    TextField("Bankroll (\(settingsStore.currencySymbol))", text: $resetEntryText)
-                        .textFieldStyle(DarkTextFieldStyle())
-                        .keyboardType(.numberPad)
-                        .padding(.horizontal)
-
-                    Spacer()
-                }
-                .padding(.top, 24)
-            }
-            .localizedNavigationTitle("Reset Bankroll")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        showResetSheet = false
-                    }
-                    .foregroundColor(.green)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Reset") {
-                        if let v = Int(resetEntryText.filter { $0.isNumber }), v >= 0 {
-                            settingsStore.resetBankroll(to: v)
-                            showResetSheet = false
-                        }
-                    }
-                    .foregroundColor((Int(resetEntryText.filter { $0.isNumber }) ?? 0) >= 0 ? .green : .gray)
-                    .disabled(Int(resetEntryText.filter { $0.isNumber }) == nil)
-                }
-            }
-        }
-    }
 }
 
 /// Card view used when rendering the bankroll graph for the share sheet (title + total + chart).

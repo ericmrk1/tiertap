@@ -6,6 +6,7 @@ enum CommunityPublisherError: LocalizedError {
     case notSignedIn
     case noClient
     case noSessions
+    case screenNameNotRegistered
 
     var errorDescription: String? {
         switch self {
@@ -17,6 +18,8 @@ enum CommunityPublisherError: LocalizedError {
             return "Unable to create Supabase client."
         case .noSessions:
             return "There are no sessions to publish."
+        case .screenNameNotRegistered:
+            return "Save a unique screen name in Community → Account before publishing. Open Account from the Community tab, choose a name that is not already taken, then tap Save profile."
         }
     }
 }
@@ -58,6 +61,12 @@ struct CommunityPublisher {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
+        let userId = session.user.id
+        let registeredScreenName = try await UserScreenNamesAPI.fetchRegisteredScreenName(userId: userId)
+        guard let screenNameForPost = registeredScreenName, !screenNameForPost.isEmpty else {
+            throw CommunityPublisherError.screenNameNotRegistered
+        }
+
         let payloads: [TableGamePostPayload] = completed.map { s in
             let start = formatter.string(from: s.startTime)
             let end = s.endTime.map { formatter.string(from: $0) }
@@ -68,7 +77,8 @@ struct CommunityPublisher {
                 game: s.game,
                 start_time: start,
                 end_time: end,
-                comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t }
+                comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t },
+                screen_name: screenNameForPost
             )
 
             let includeCompSummary = publishCompDetails && !s.compEvents.isEmpty
@@ -126,6 +136,8 @@ struct TableGamePostSessionDetails: Codable {
     let end_time: String?
     /// Optional short comment from the poster; shown as one line in the feed.
     let comment: String?
+    /// TierTap account screen name at publish time; shown in Community and used for filters.
+    let screen_name: String?
 }
 
 /// JSON body stored in the `metrics` column when reading from the feed.
@@ -181,6 +193,16 @@ struct TableGamePostRow: Decodable, Identifiable {
     let game: String?
     let metrics: TableGamePostMetrics?
     let user_id: UUID?
+}
+
+extension TableGamePostRow {
+    /// Screen name stored on the post (`session_details.screen_name`). Nil for legacy rows or empty values.
+    var feedScreenName: String? {
+        guard let raw = session_details?.screen_name?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return nil
+        }
+        return raw
+    }
 }
 
 

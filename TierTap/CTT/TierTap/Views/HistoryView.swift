@@ -500,7 +500,13 @@ struct HistoryView: View {
                     }
                 }
             }
-            .adaptiveSheet(item: $selectedSession) { SessionDetailView(session: $0) }
+            .adaptiveSheet(item: $selectedSession) {
+                SessionDetailView(session: $0)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(authStore)
+            }
             .adaptiveSheet(item: $sessionToEdit) { s in
                 EditSessionView(session: s)
                     .environmentObject(store)

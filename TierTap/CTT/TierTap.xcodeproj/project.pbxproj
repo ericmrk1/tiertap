@@ -35,6 +35,9 @@
 		821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89A89EFB8A3238E20A9044B /* SharedComponents.swift */; };
 		8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AACDC5094128715EAA64A9 /* LiveSessionView.swift */; };
 		8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692681C1D425214EB9F4B3A2 /* TierTapApp.swift */; };
+		APPLOCKSVC01B2C3D4E5F6A7B8C9D0 /* AppLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */; };
+		APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */; };
+		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
 		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
 		APRT1E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */; };
@@ -173,6 +176,9 @@
 		59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CasinoTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
+		APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
+		APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockGateView.swift; sourceTree = "<group>"; };
+		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
@@ -309,6 +315,8 @@
 				SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */,
 				GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */,
 				ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */,
+				APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */,
+				TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */,
 				ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */,
 				TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */,
 				MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */,
@@ -429,6 +437,7 @@
 				2E255D112F5FC59400CAF0D7 /* Supabase Functions */,
 				2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */,
 				692681C1D425214EB9F4B3A2 /* TierTapApp.swift */,
+				APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */,
 				GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */,
 				SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */,
 				COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */,
@@ -668,6 +677,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */,
+				APPLOCKSVC01B2C3D4E5F6A7B8C9D0 /* AppLockService.swift in Sources */,
 				L10NB1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift in Sources */,
 				RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */,
 				TRIPB1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift in Sources */,
@@ -719,6 +729,8 @@
 				TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */,
 				ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */,
 				ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */,
+				APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */,
+				TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
 				VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */,

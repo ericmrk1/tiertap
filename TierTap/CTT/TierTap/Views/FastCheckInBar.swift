@@ -1,5 +1,20 @@
 import SwiftUI
 
+/// Resolved parameters for a one-tap fast check-in (home screen).
+struct FastCheckInPlan {
+    let category: SessionGameCategory
+    let template: Session?
+    let casinoValue: String
+    let gameName: String
+    let startingTier: Int
+    let initialBuyIn: Int
+    let rewardsProgramName: String?
+    let casinoLatitude: Double?
+    let casinoLongitude: Double?
+
+    var needsTierTrackingWarning: Bool { startingTier <= 0 }
+}
+
 /// Shared fast check-in logic (used from the home screen).
 enum FastCheckInHelper {
     static func composedPokerGameName(
@@ -70,7 +85,7 @@ enum FastCheckInHelper {
         )
     }
 
-    static func performFastCheckIn(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore) {
+    static func makePlan(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore) -> FastCheckInPlan {
         let template = store.mostRecentSession(forGameCategory: category)
 
         let casinoValue: String
@@ -94,7 +109,7 @@ enum FastCheckInHelper {
                     gameName = composedPokerGameName(from: lastPokerDefaultsMatchingSession(t, settingsStore: settingsStore))
                 }
             }
-            startingTier = t.startingTierPoints > 0 ? t.startingTierPoints : 1
+            startingTier = t.startingTierPoints
             initialBuyIn = t.initialBuyIn.flatMap { $0 > 0 ? $0 : nil } ?? 1
             rewardsProgramName = t.rewardsProgramName
             lat = t.casinoLatitude
@@ -109,7 +124,7 @@ enum FastCheckInHelper {
             case .poker:
                 gameName = composedPokerGameName(from: pokerDefaultsForFastCheckIn(settingsStore: settingsStore))
             }
-            startingTier = 1
+            startingTier = 0
             initialBuyIn = 1
             if store.hasSessionHistory(forExactCasino: casinoValue) {
                 if let tier = store.defaultEndingTierPoints(for: casinoValue), tier > 0 {
@@ -124,14 +139,31 @@ enum FastCheckInHelper {
             lon = nil
         }
 
-        store.startSession(
-            game: gameName,
-            casino: casinoValue,
+        return FastCheckInPlan(
+            category: category,
+            template: template,
+            casinoValue: casinoValue,
+            gameName: gameName,
             startingTier: startingTier,
             initialBuyIn: initialBuyIn,
             rewardsProgramName: rewardsProgramName,
             casinoLatitude: lat,
             casinoLongitude: lon
+        )
+    }
+
+    static func performFastCheckIn(plan: FastCheckInPlan, store: SessionStore, settingsStore: SettingsStore) {
+        let category = plan.category
+        let template = plan.template
+
+        store.startSession(
+            game: plan.gameName,
+            casino: plan.casinoValue,
+            startingTier: plan.startingTier,
+            initialBuyIn: plan.initialBuyIn,
+            rewardsProgramName: plan.rewardsProgramName,
+            casinoLatitude: plan.casinoLatitude,
+            casinoLongitude: plan.casinoLongitude
         )
 
         if let t = template {
@@ -175,7 +207,7 @@ enum FastCheckInHelper {
             let d = lastPokerDefaultsMatchingSession(t, settingsStore: settingsStore)
             settingsStore.recordLastCheckInGameSelection(
                 gameCategory: cat,
-                selectedGame: gameName,
+                selectedGame: plan.gameName,
                 pokerGameKind: d.pokerGameKind,
                 pokerAllowsRebuy: d.pokerAllowsRebuy,
                 pokerAllowsAddOn: d.pokerAllowsAddOn,
@@ -212,7 +244,7 @@ enum FastCheckInHelper {
                 )
                 settingsStore.recordLastCheckInGameSelection(
                     gameCategory: .table,
-                    selectedGame: gameName,
+                    selectedGame: plan.gameName,
                     pokerGameKind: .cash,
                     pokerAllowsRebuy: false,
                     pokerAllowsAddOn: false,
@@ -256,7 +288,7 @@ enum FastCheckInHelper {
                 )
                 settingsStore.recordLastCheckInGameSelection(
                     gameCategory: .slots,
-                    selectedGame: gameName,
+                    selectedGame: plan.gameName,
                     pokerGameKind: .cash,
                     pokerAllowsRebuy: false,
                     pokerAllowsAddOn: false,
@@ -301,7 +333,7 @@ enum FastCheckInHelper {
                 )
                 settingsStore.recordLastCheckInGameSelection(
                     gameCategory: .poker,
-                    selectedGame: gameName,
+                    selectedGame: plan.gameName,
                     pokerGameKind: d.pokerGameKind,
                     pokerAllowsRebuy: d.pokerAllowsRebuy,
                     pokerAllowsAddOn: d.pokerAllowsAddOn,
@@ -330,6 +362,8 @@ struct FastCheckInBar: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @State private var showActiveSessionAlert = false
     @State private var pendingFastCategory: SessionGameCategory?
+    @State private var showTierTrackingWarning = false
+    @State private var pendingTierWarningPlan: FastCheckInPlan?
 
     var body: some View {
         VStack(spacing: 4) {
@@ -365,11 +399,35 @@ struct FastCheckInBar: View {
                 pendingFastCategory = nil
                 store.discardLiveSession()
                 if let cat {
-                    FastCheckInHelper.performFastCheckIn(category: cat, store: store, settingsStore: settingsStore)
+                    startFastCheckInOrWarn(for: cat)
                 }
             }
         } message: {
             L10nText("You have a live session. Resume it or end it to start a new one?")
+        }
+        .alert(
+            Text(L10n.tr("Tier points", language: settingsStore.appLanguage)),
+            isPresented: $showTierTrackingWarning
+        ) {
+            Button("Cancel", role: .cancel) { pendingTierWarningPlan = nil }
+            Button("Start anyway") {
+                if let plan = pendingTierWarningPlan {
+                    pendingTierWarningPlan = nil
+                    FastCheckInHelper.performFastCheckIn(plan: plan, store: store, settingsStore: settingsStore)
+                }
+            }
+        } message: {
+            Text(L10n.tr("Starting sessions without a Tier rating will make it difficult to track Tier levels and points.", language: settingsStore.appLanguage))
+        }
+    }
+
+    private func startFastCheckInOrWarn(for category: SessionGameCategory) {
+        let plan = FastCheckInHelper.makePlan(category: category, store: store, settingsStore: settingsStore)
+        if plan.needsTierTrackingWarning {
+            pendingTierWarningPlan = plan
+            showTierTrackingWarning = true
+        } else {
+            FastCheckInHelper.performFastCheckIn(plan: plan, store: store, settingsStore: settingsStore)
         }
     }
 
@@ -386,7 +444,7 @@ struct FastCheckInBar: View {
                 pendingFastCategory = category
                 showActiveSessionAlert = true
             } else {
-                FastCheckInHelper.performFastCheckIn(category: category, store: store, settingsStore: settingsStore)
+                startFastCheckInOrWarn(for: category)
             }
         } label: {
             HStack(spacing: 4) {

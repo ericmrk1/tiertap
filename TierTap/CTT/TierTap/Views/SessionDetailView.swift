@@ -5,10 +5,18 @@ struct SessionDetailView: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
     @State private var showCompleteSession = false
+    @State private var showEditSession = false
     @State private var privateNotes: String = ""
     @State private var tierPointsVerification: SessionTierPointsVerification = .verified
+
+    /// Latest session from the store so the detail updates after edits.
+    private var displaySession: Session {
+        store.sessions.first(where: { $0.id == session.id }) ?? session
+    }
 
     var body: some View {
         NavigationStack {
@@ -16,7 +24,7 @@ struct SessionDetailView: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 20) {
-                        if session.requiresMoreInfo {
+                        if displaySession.requiresMoreInfo {
                             Button {
                                 showCompleteSession = true
                             } label: {
@@ -35,23 +43,25 @@ struct SessionDetailView: View {
 
                         // Header
                         VStack(spacing: 6) {
-                            Text(session.casino).font(.title.bold()).foregroundColor(.white)
-                            Text(session.game).font(.subheadline).foregroundColor(.gray)
-                            Text(session.startTime, style: .date).font(.caption).foregroundColor(.gray)
-                            if let mood = session.sessionMood {
+                            Text(displaySession.casino).font(.title.bold()).foregroundColor(.white)
+                            Text(displaySession.game).font(.subheadline).foregroundColor(.gray)
+                            Text(displaySession.startTime, style: .date).font(.caption).foregroundColor(.gray)
+                            if let mood = displaySession.sessionMood {
                                 Text(mood.label)
                                     .font(.subheadline.weight(.medium))
                                     .foregroundColor(.white.opacity(0.9))
                                     .padding(.top, 4)
                             }
                         }
-                        .frame(maxWidth: .infinity).padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .frame(maxWidth: .infinity)
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
 
                         if hasSessionPhotosContent {
                             DetailSection(title: "Session Photos", icon: "photo.on.rectangle.angled") {
                                 VStack(alignment: .leading, spacing: 16) {
-                                    if let fileName = session.chipEstimatorImageFilename,
+                                    if let fileName = displaySession.chipEstimatorImageFilename,
                                        let url = ChipEstimatorPhotoStorage.url(for: fileName),
                                        let uiImage = UIImage(contentsOfFile: url.path) {
                                         VStack(alignment: .leading, spacing: 6) {
@@ -68,7 +78,7 @@ struct SessionDetailView: View {
                                                 )
                                         }
                                     }
-                                    ForEach(session.compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
+                                    ForEach(displaySession.compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text("Comp receipt · \(settingsStore.currencySymbol)\(ev.amount) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))")
                                                 .font(.caption.bold())
@@ -92,22 +102,22 @@ struct SessionDetailView: View {
 
                         // Metrics highlights
                         HStack(spacing: 12) {
-                            if let e = session.tierPointsEarned {
+                            if let e = displaySession.tierPointsEarned {
                                 MetricCard(title: "Pts Earned",
                                            value: "\(e >= 0 ? "+" : "")\(e)",
                                            color: e >= 0 ? .green : .orange)
                             }
-                            if let wl = session.winLoss {
+                            if let wl = displaySession.winLoss {
                                 MetricCard(title: "Win/Loss",
                                            value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                            color: wl >= 0 ? .green : .red)
                             }
-                            if let ev = session.expectedValue {
+                            if let ev = displaySession.expectedValue {
                                 MetricCard(title: "EV",
                                            value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
                                            color: ev >= 0 ? .green : .red)
                             }
-                            if let rate = session.winRatePerHour {
+                            if let rate = displaySession.winRatePerHour {
                                 MetricCard(title: "Win Rate",
                                            value: String(format: "%@%.0f/hr",
                                                          rate >= 0 ? "+\(settingsStore.currencySymbol)" : "-\(settingsStore.currencySymbol)",
@@ -117,45 +127,45 @@ struct SessionDetailView: View {
                         }
 
                         DetailSection(title: "Session Time", icon: "clock") {
-                            DetailRow(label: "Started", value: session.startTime.formatted(date: .omitted, time: .shortened))
-                            if let end = session.endTime {
+                            DetailRow(label: "Started", value: displaySession.startTime.formatted(date: .omitted, time: .shortened))
+                            if let end = displaySession.endTime {
                                 DetailRow(label: "Ended", value: end.formatted(date: .omitted, time: .shortened))
                             }
-                            DetailRow(label: "Duration", value: Session.durationString(session.duration))
-                            DetailRow(label: "Hours", value: String(format: "%.2f hrs", session.hoursPlayed))
+                            DetailRow(label: "Duration", value: Session.durationString(displaySession.duration))
+                            DetailRow(label: "Hours", value: String(format: "%.2f hrs", displaySession.hoursPlayed))
                         }
 
                         DetailSection(title: "Buy-Ins", icon: "dollarsign.circle") {
-                            ForEach(session.buyInEvents) { ev in
+                            ForEach(displaySession.buyInEvents) { ev in
                                 DetailRow(label: ev.timestamp.formatted(date: .omitted, time: .shortened),
                                           value: "\(settingsStore.currencySymbol)\(ev.amount)")
                             }
-                            DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(session.totalBuyIn)", bold: true)
-                            if !session.compEvents.isEmpty {
-                                ForEach(session.compEvents) { ev in
+                            DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(displaySession.totalBuyIn)", bold: true)
+                            if !displaySession.compEvents.isEmpty {
+                                ForEach(displaySession.compEvents) { ev in
                                     DetailRow(
                                         label: ev.timestamp.formatted(date: .omitted, time: .shortened),
                                         value: "\(settingsStore.currencySymbol)\(ev.amount)"
                                     )
                                 }
-                                DetailRow(label: "Total Comps", value: "\(settingsStore.currencySymbol)\(session.totalComp)", bold: true)
+                                DetailRow(label: "Total Comps", value: "\(settingsStore.currencySymbol)\(displaySession.totalComp)", bold: true)
                             }
-                            if let co = session.cashOut {
+                            if let co = displaySession.cashOut {
                                 DetailRow(label: "Cash Out", value: "\(settingsStore.currencySymbol)\(co)", bold: true)
                             }
-                            if let wl = session.winLoss {
+                            if let wl = displaySession.winLoss {
                                 DetailRow(label: "Win/Loss",
                                           value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
                                           valueColor: wl >= 0 ? .green : .red, bold: true)
                             }
-                            if let ev = session.expectedValue {
+                            if let ev = displaySession.expectedValue {
                                 DetailRow(label: "EV (win/loss + comps)",
                                           value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
                                           valueColor: ev >= 0 ? .green : .red, bold: true)
                             }
                         }
 
-                        if let aba = session.avgBetActual, let abr = session.avgBetRated {
+                        if let aba = displaySession.avgBetActual, let abr = displaySession.avgBetRated {
                             DetailSection(title: "Betting", icon: "chart.bar") {
                                 DetailRow(label: "Avg Bet Actual", value: "\(settingsStore.currencySymbol)\(aba)")
                                 DetailRow(label: "Avg Bet Rated", value: "\(settingsStore.currencySymbol)\(abr)")
@@ -178,11 +188,11 @@ struct SessionDetailView: View {
                                 .pickerStyle(.segmented)
                                 .tint(.green)
                             }
-                            DetailRow(label: "Starting", value: "\(session.startingTierPoints)")
-                            if let et = session.endingTierPoints {
+                            DetailRow(label: "Starting", value: "\(displaySession.startingTierPoints)")
+                            if let et = displaySession.endingTierPoints {
                                 DetailRow(label: "Ending", value: "\(et)")
                             }
-                            if let e = session.tierPointsEarned {
+                            if let e = displaySession.tierPointsEarned {
                                 DetailRow(label: "Earned",
                                           value: "\(e >= 0 ? "+" : "")\(e)",
                                           valueColor: e >= 0 ? .green : .orange, bold: true)
@@ -190,17 +200,17 @@ struct SessionDetailView: View {
                         }
 
                         DetailSection(title: "Metrics", icon: "chart.line.uptrend.xyaxis") {
-                            if let t = session.tiersPerHour {
+                            if let t = displaySession.tiersPerHour {
                                 DetailRow(label: "Tiers / Hour", value: String(format: "%.2f", t))
                             }
-                            if let t100 = session.tiersPerHundredRatedBetHour {
+                            if let t100 = displaySession.tiersPerHundredRatedBetHour {
                                 DetailRow(label: "Tiers per 100 \(settingsStore.currencySymbol) Rated Bet-Hour",
                                           value: String(format: "%.3f", t100))
                             }
-                            if let wl = session.winLoss,
-                               let abet = session.avgBetActual ?? session.avgBetRated, abet > 0,
-                               session.hoursPlayed > 0,
-                               let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: session.game, winLoss: wl, avgBet: abet, hours: session.hoursPlayed) {
+                            if let wl = displaySession.winLoss,
+                               let abet = displaySession.avgBetActual ?? displaySession.avgBetRated, abet > 0,
+                               displaySession.hoursPlayed > 0,
+                               let result = StrategyDatabase.expectedLossAndAboveEdge(gameName: displaySession.game, winLoss: wl, avgBet: abet, hours: displaySession.hoursPlayed) {
                                 let above = result.aboveEdge >= 0
                                 let amount = Int(round(abs(result.aboveEdge)))
                                 DetailRow(label: "Vs house edge",
@@ -209,37 +219,37 @@ struct SessionDetailView: View {
                             }
                         }
 
-                        if session.gameCategory == .poker ||
-                            session.pokerSmallBlind != nil ||
-                            session.pokerBigBlind != nil ||
-                            session.pokerAnte != nil ||
-                            session.pokerLevelMinutes != nil ||
-                            session.pokerStartingStack != nil {
+                        if displaySession.gameCategory == .poker ||
+                            displaySession.pokerSmallBlind != nil ||
+                            displaySession.pokerBigBlind != nil ||
+                            displaySession.pokerAnte != nil ||
+                            displaySession.pokerLevelMinutes != nil ||
+                            displaySession.pokerStartingStack != nil {
                             DetailSection(title: "Poker Structure", icon: "suit.club.fill") {
-                                if let sb = session.pokerSmallBlind, let bb = session.pokerBigBlind {
+                                if let sb = displaySession.pokerSmallBlind, let bb = displaySession.pokerBigBlind {
                                     DetailRow(
                                         label: "Blinds",
-                                        value: "\(settingsStore.currencySymbol)\(sb)/\(settingsStore.currencySymbol)\(bb)\(session.pokerAnte.map { " (ante \(settingsStore.currencySymbol)\($0))" } ?? "")"
+                                        value: "\(settingsStore.currencySymbol)\(sb)/\(settingsStore.currencySymbol)\(bb)\(displaySession.pokerAnte.map { " (ante \(settingsStore.currencySymbol)\($0))" } ?? "")"
                                     )
-                                } else if let sb = session.pokerSmallBlind {
+                                } else if let sb = displaySession.pokerSmallBlind {
                                     DetailRow(
                                         label: "Small blind",
                                         value: "\(settingsStore.currencySymbol)\(sb)"
                                     )
-                                } else if let bb = session.pokerBigBlind {
+                                } else if let bb = displaySession.pokerBigBlind {
                                     DetailRow(
                                         label: "Big blind",
                                         value: "\(settingsStore.currencySymbol)\(bb)"
                                     )
                                 }
 
-                                if let minutes = session.pokerLevelMinutes {
+                                if let minutes = displaySession.pokerLevelMinutes {
                                     DetailRow(
                                         label: "Level clock",
                                         value: "\(minutes) min"
                                     )
                                 }
-                                if let stack = session.pokerStartingStack {
+                                if let stack = displaySession.pokerStartingStack {
                                     DetailRow(
                                         label: "Starting stack",
                                         value: "\(stack) chips"
@@ -248,15 +258,15 @@ struct SessionDetailView: View {
                             }
                         }
 
-                        if session.hasSlotMetadata {
+                        if displaySession.hasSlotMetadata {
                             DetailSection(title: "Slot details", icon: "square.grid.3x3.fill") {
-                                if let line = session.slotFormatDisplayLabel {
+                                if let line = displaySession.slotFormatDisplayLabel {
                                     DetailRow(label: "Format", value: line)
                                 }
-                                if let line = session.slotFeatureDisplayLabel {
+                                if let line = displaySession.slotFeatureDisplayLabel {
                                     DetailRow(label: "Major feature", value: line)
                                 }
-                                if let n = session.slotNotes?.trimmingCharacters(in: .whitespacesAndNewlines), !n.isEmpty {
+                                if let n = displaySession.slotNotes?.trimmingCharacters(in: .whitespacesAndNewlines), !n.isEmpty {
                                     DetailRow(label: "Notes", value: n)
                                 }
                             }
@@ -276,11 +286,17 @@ struct SessionDetailView: View {
                 }
             }
             .onAppear {
-                privateNotes = session.privateNotes ?? ""
-                tierPointsVerification = session.effectiveTierPointsVerification
+                privateNotes = displaySession.privateNotes ?? ""
+                tierPointsVerification = displaySession.effectiveTierPointsVerification
+            }
+            .onChange(of: showEditSession) { isEditing in
+                if !isEditing {
+                    privateNotes = displaySession.privateNotes ?? ""
+                    tierPointsVerification = displaySession.effectiveTierPointsVerification
+                }
             }
             .onChange(of: tierPointsVerification) { newValue in
-                guard let idx = store.sessions.firstIndex(where: { $0.id == session.id }) else { return }
+                guard let idx = store.sessions.firstIndex(where: { $0.id == displaySession.id }) else { return }
                 var s = store.sessions[idx]
                 if s.tierPointsVerification == nil, newValue == .verified { return }
                 guard s.tierPointsVerification != newValue else { return }
@@ -289,7 +305,7 @@ struct SessionDetailView: View {
             }
             .onDisappear {
                 let trimmed = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard let idx = store.sessions.firstIndex(where: { $0.id == session.id }) else { return }
+                guard let idx = store.sessions.firstIndex(where: { $0.id == displaySession.id }) else { return }
                 var s = store.sessions[idx]
                 let newNotes = trimmed.isEmpty ? nil : trimmed
                 if s.privateNotes != newNotes {
@@ -302,14 +318,32 @@ struct SessionDetailView: View {
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showEditSession = true
+                    } label: {
+                        L10nText("Edit")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.green)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Edit session information")
+                }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }.foregroundColor(.green)
                 }
             }
             .adaptiveSheet(isPresented: $showCompleteSession) {
-                CompleteSessionView(session: session)
+                CompleteSessionView(session: displaySession)
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+            }
+            .adaptiveSheet(isPresented: $showEditSession) {
+                EditSessionView(session: displaySession)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(authStore)
             }
         }
     }
@@ -320,12 +354,12 @@ struct SessionDetailView: View {
     }
 
     private var hasSessionPhotosContent: Bool {
-        if let fileName = session.chipEstimatorImageFilename,
+        if let fileName = displaySession.chipEstimatorImageFilename,
            let url = ChipEstimatorPhotoStorage.url(for: fileName),
            FileManager.default.fileExists(atPath: url.path) {
             return true
         }
-        return session.compEvents.contains { compHasReceiptPhoto($0.id) }
+        return displaySession.compEvents.contains { compHasReceiptPhoto($0.id) }
     }
 }
 

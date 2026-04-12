@@ -139,6 +139,107 @@ enum SupabaseTables {
     static var casinoLocations: String {
         return shouldUseTestSupabaseTables() ? "CasinoLocations_Test" : "CasinoLocations"
     }
+
+    /// Registered Community screen names (globally unique, case-insensitive). Mirrors `_Test` in simulator / TestFlight.
+    static var userScreenNames: String {
+        return shouldUseTestSupabaseTables() ? "UserScreenNames_Test" : "UserScreenNames"
+    }
+}
+
+// MARK: - User screen names (Community)
+
+private struct UserScreenNameUpsertRow: Encodable {
+    let user_id: UUID
+    let screen_name: String
+}
+
+private struct UserScreenNameSelectRow: Decodable {
+    let screen_name: String
+}
+
+enum UserScreenNamesError: LocalizedError {
+    case supabaseNotConfigured
+    case emptyScreenName
+    case duplicate
+    case requestFailed(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .supabaseNotConfigured:
+            return "Supabase is not configured."
+        case .emptyScreenName:
+            return "Screen name cannot be empty."
+        case .duplicate:
+            return "That screen name is already taken. Try another."
+        case .requestFailed(let message):
+            return message
+        }
+    }
+}
+
+enum UserScreenNamesAPI {
+    /// Trims whitespace; used for payloads and comparisons.
+    static func normalizedForm(_ s: String) -> String {
+        s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Inserts or updates this user’s registered screen name. Fails with ``UserScreenNamesError/duplicate`` if another account already claimed the same name (case-insensitive).
+    static func upsertRegisteredScreenName(userId: UUID, screenName: String) async throws {
+        guard let client = supabase else {
+            throw UserScreenNamesError.supabaseNotConfigured
+        }
+        let trimmed = normalizedForm(screenName)
+        guard !trimmed.isEmpty else {
+            throw UserScreenNamesError.emptyScreenName
+        }
+        let row = UserScreenNameUpsertRow(user_id: userId, screen_name: trimmed)
+        do {
+            try await client.database
+                .from(SupabaseTables.userScreenNames)
+                .upsert(row, onConflict: "user_id")
+                .execute()
+        } catch {
+            if isUniqueViolation(error) {
+                throw UserScreenNamesError.duplicate
+            }
+            throw UserScreenNamesError.requestFailed(error.localizedDescription)
+        }
+    }
+
+    /// Removes this user’s registration row (when they clear their screen name).
+    static func deleteRegisteredScreenName(userId: UUID) async throws {
+        guard let client = supabase else {
+            throw UserScreenNamesError.supabaseNotConfigured
+        }
+        try await client.database
+            .from(SupabaseTables.userScreenNames)
+            .delete()
+            .eq("user_id", value: userId)
+            .execute()
+    }
+
+    /// Returns the registered screen name for Community, or nil if the user has not saved one.
+    static func fetchRegisteredScreenName(userId: UUID) async throws -> String? {
+        guard let client = supabase else {
+            throw UserScreenNamesError.supabaseNotConfigured
+        }
+        let rows: [UserScreenNameSelectRow] = try await client.database
+            .from(SupabaseTables.userScreenNames)
+            .select("screen_name")
+            .eq("user_id", value: userId)
+            .limit(1)
+            .execute()
+            .value
+        guard let raw = rows.first?.screen_name else { return nil }
+        let trimmed = normalizedForm(raw)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private static func isUniqueViolation(_ error: Error) -> Bool {
+        if let pe = error as? PostgrestError, pe.code == "23505" { return true }
+        let m = error.localizedDescription.lowercased()
+        return m.contains("duplicate key") || m.contains("unique constraint")
+    }
 }
 
 // MARK: - Supabase TableGames helpers

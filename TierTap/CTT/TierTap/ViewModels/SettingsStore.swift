@@ -38,6 +38,9 @@ private let keyLastPokerDefaults = "ctt_last_poker_defaults"
 private let keyLastSlotDefaults = "ctt_last_slot_defaults"
 private let keyAnalyticsUseExpectedValue = "ctt_analytics_use_expected_value"
 private let keyAppLanguage = "ctt_app_language"
+private let keyAppLockEnabled = "ctt_app_lock_enabled"
+private let keyAppLockAuthMethod = "ctt_app_lock_auth_method"
+private let keyAppLockPinModeLegacy = "ctt_app_lock_pin_mode"
 private let appGroupSuiteName = "group.com.app.tiertap"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
@@ -489,6 +492,22 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// Require Face ID / Touch ID or the device passcode to open the app after backgrounding or launch.
+    @Published var appLockEnabled: Bool {
+        didSet { UserDefaults.standard.set(appLockEnabled, forKey: keyAppLockEnabled) }
+    }
+
+    enum AppLockAuthMethod: String, CaseIterable, Identifiable, Codable {
+        case faceID
+        case pin
+
+        var id: String { rawValue }
+    }
+
+    @Published var appLockAuthMethod: AppLockAuthMethod {
+        didSet { UserDefaults.standard.set(appLockAuthMethod.rawValue, forKey: keyAppLockAuthMethod) }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -616,6 +635,18 @@ final class SettingsStore: ObservableObject {
             self.appLanguage = lang
         } else {
             self.appLanguage = .english
+        }
+
+        self.appLockEnabled = UserDefaults.standard.bool(forKey: keyAppLockEnabled)
+        if let raw = UserDefaults.standard.string(forKey: keyAppLockAuthMethod),
+           let m = AppLockAuthMethod(rawValue: raw) {
+            self.appLockAuthMethod = m
+        } else {
+            self.appLockAuthMethod = .faceID
+        }
+        if UserDefaults.standard.object(forKey: keyAppLockPinModeLegacy) != nil {
+            AppLockPINLegacy.clearFromKeychain()
+            UserDefaults.standard.removeObject(forKey: keyAppLockPinModeLegacy)
         }
 
         self.subscriptionOverrideCode = UserDefaults.standard.string(forKey: keySubscriptionOverrideCode) ?? ""

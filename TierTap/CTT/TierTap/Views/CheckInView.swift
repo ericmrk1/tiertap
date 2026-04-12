@@ -14,6 +14,7 @@ struct CheckInView: View {
     @State private var selectedRewardsProgram = ""
     @State private var showGamePicker = false
     @State private var showExistingAlert = false
+    @State private var showTierTrackingWarning = false
     @State private var showBuyInPicker = false
     // Casino game type metadata
     @State private var gameCategory: SessionGameCategory = .table
@@ -171,8 +172,15 @@ struct CheckInView: View {
 
     var isValid: Bool {
         let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
-        return hasGame && !casino.isEmpty &&
-        (Int(startingTier) ?? 0) > 0 && (Int(initialBuyIn) ?? 0) > 0
+        return hasGame && !casino.isEmpty && (Int(initialBuyIn) ?? 0) > 0
+    }
+
+    /// True when tier field is empty, non-numeric, or zero or negative — session may still start after confirmation.
+    private var needsTierTrackingWarning: Bool {
+        let s = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.isEmpty { return true }
+        guard let t = Int(s) else { return true }
+        return t <= 0
     }
 
     /// Discrete blind values used for SB / BB / Ante wheels and presets.
@@ -567,7 +575,7 @@ struct CheckInView: View {
                                 .tint(.white)
                             }
                         }
-                        L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
+                        L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track.")
                             .font(.caption).foregroundColor(.gray)
                         TierPointsQuickPickRow(tierPointsText: $startingTier)
                             .environmentObject(settingsStore)
@@ -622,7 +630,11 @@ struct CheckInView: View {
                     .cornerRadius(16)
 
                         Button {
-                            if store.liveSession != nil { showExistingAlert = true } else { go() }
+                            if store.liveSession != nil {
+                                showExistingAlert = true
+                            } else {
+                                attemptGo()
+                            }
                         } label: {
                             L10nText("Let’s F@#$@ Go!")
                                 .frame(maxWidth: .infinity)
@@ -684,9 +696,21 @@ struct CheckInView: View {
             }
             .alert("Active Session", isPresented: $showExistingAlert) {
                 Button("Resume Existing", role: .cancel) { dismiss() }
-                Button("End & Start New", role: .destructive) { store.discardLiveSession(); go() }
+                Button("End & Start New", role: .destructive) {
+                    store.discardLiveSession()
+                    attemptGo()
+                }
             } message: {
                 L10nText("You have a live session. Resume it or end it to start a new one?")
+            }
+            .alert(
+                Text(L10n.tr("Tier points", language: settingsStore.appLanguage)),
+                isPresented: $showTierTrackingWarning
+            ) {
+                Button("Cancel", role: .cancel) {}
+                Button("Start anyway") { go(skipTierTrackingWarning: true) }
+            } message: {
+                Text(L10n.tr("Starting sessions without a Tier rating will make it difficult to track Tier levels and points.", language: settingsStore.appLanguage))
             }
             .onAppear {
                 if casino.isEmpty, let recent = store.mostRecentCasino() {
@@ -754,7 +778,15 @@ struct CheckInView: View {
         pokerTournamentCostText = d.pokerTournamentCostText
     }
 
-    func go() {
+    private func attemptGo() {
+        if needsTierTrackingWarning {
+            showTierTrackingWarning = true
+        } else {
+            go(skipTierTrackingWarning: true)
+        }
+    }
+
+    func go(skipTierTrackingWarning: Bool = false) {
         if gameCategory == .poker {
             selectedGame = FastCheckInHelper.composedPokerGameName(
                 pokerGameKind: pokerGameKind,
@@ -765,7 +797,14 @@ struct CheckInView: View {
             )
         }
 
-        guard let tier = Int(startingTier), tier > 0, let buy = Int(initialBuyIn) else { return }
+        if !skipTierTrackingWarning && needsTierTrackingWarning {
+            showTierTrackingWarning = true
+            return
+        }
+
+        guard let buy = Int(initialBuyIn), buy > 0 else { return }
+        let trimmedTier = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tier = trimmedTier.isEmpty ? 0 : (Int(trimmedTier) ?? 0)
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
         store.startSession(
             game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy,

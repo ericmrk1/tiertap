@@ -81,10 +81,12 @@ struct CommunitySessionsView: View {
     @State private var feedSessions: [TableGamePostRow] = []
     @State private var selectedGames: Set<String> = []
     @State private var selectedLocations: Set<String> = []
+    @State private var selectedScreenNames: Set<String> = []
     @State private var isLoadingFeed = false
     @State private var feedErrorMessage: String?
     @State private var availableGames: [String] = []
     @State private var availableLocations: [String] = []
+    @State private var availableScreenNames: [String] = []
     @State private var filterStartDate: Date = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date().addingTimeInterval(-24 * 60 * 60)
     @State private var filterEndDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @State private var showMapSheet = false
@@ -122,7 +124,16 @@ struct CommunitySessionsView: View {
                 matchesLocation = selectedLocations.contains(locationName)
             }
 
-            return matchesGame && matchesLocation
+            let matchesScreenName: Bool
+            if selectedScreenNames.isEmpty {
+                matchesScreenName = true
+            } else if let screenName = item.feedScreenName {
+                matchesScreenName = selectedScreenNames.contains(screenName)
+            } else {
+                matchesScreenName = false
+            }
+
+            return matchesGame && matchesLocation && matchesScreenName
         }
     }
 
@@ -153,8 +164,10 @@ struct CommunitySessionsView: View {
                             filterEndDate: $filterEndDate,
                             selectedGames: $selectedGames,
                             selectedLocations: $selectedLocations,
+                            selectedScreenNames: $selectedScreenNames,
                             availableGames: availableGames,
                             availableLocations: availableLocations,
+                            availableScreenNames: availableScreenNames,
                             isLoading: isLoadingFeed,
                             onApply: {
                                 Task { await reloadCommunityFeed() }
@@ -164,6 +177,7 @@ struct CommunitySessionsView: View {
                                 filterEndDate = Date()
                                 selectedGames.removeAll()
                                 selectedLocations.removeAll()
+                                selectedScreenNames.removeAll()
                                 Task { await reloadCommunityFeed() }
                             }
                         )
@@ -421,6 +435,7 @@ struct CommunitySessionsView: View {
 struct CommunityAuthSheet: View {
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.appLanguage) private var appLanguage
     @Binding var emailInput: String
     var onDismiss: () -> Void
 
@@ -547,10 +562,10 @@ struct CommunityAuthSheet: View {
                     }
                 }
 
-                L10nText("Display name")
+                L10nText("Screen Name")
                     .font(.subheadline.bold())
                     .foregroundColor(.white.opacity(0.9))
-                TextField("Your name", text: $profileDisplayName)
+                TextField(L10n.tr("Shown on Community when you publish", language: appLanguage), text: $profileDisplayName)
                     .textContentType(.name)
                     .autocorrectionDisabled()
                     .padding(14)
@@ -585,6 +600,13 @@ struct CommunityAuthSheet: View {
             .background(Color.white.opacity(0.08))
             .cornerRadius(16)
 
+            if let msg = authStore.errorMessage {
+                Text(msg)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             if profileSaved {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.circle.fill")
@@ -599,21 +621,26 @@ struct CommunityAuthSheet: View {
 
     private func saveProfile() {
         profileSaved = false
+        authStore.errorMessage = nil
         isSavingProfile = true
         Task {
             await authStore.updateProfile(
                 displayName: profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileDisplayName.trimmingCharacters(in: .whitespacesAndNewlines),
                 emojis: profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : profileEmojis.trimmingCharacters(in: .whitespacesAndNewlines)
             )
-            if let image = profilePhoto,
-               let data = image.jpegData(compressionQuality: 0.8) {
-                try? authStore.saveProfilePhotoLocally(data)
-            } else {
-                try? authStore.deleteLocalProfilePhoto()
+            if authStore.errorMessage == nil {
+                if let image = profilePhoto,
+                   let data = image.jpegData(compressionQuality: 0.8) {
+                    try? authStore.saveProfilePhotoLocally(data)
+                } else {
+                    try? authStore.deleteLocalProfilePhoto()
+                }
             }
             await MainActor.run {
                 isSavingProfile = false
-                profileSaved = true
+                if authStore.errorMessage == nil {
+                    profileSaved = true
+                }
             }
         }
     }
@@ -646,7 +673,7 @@ struct CommunityAuthSheet: View {
                     .multilineTextAlignment(.center)
                     .padding()
             } else if authStore.isSignedIn {
-                // Profile: display name & emojis (large section)
+                // Profile: screen name & emojis (large section)
                 profileSection
 
                 // Current login info moved below profile in its own bubble
@@ -823,6 +850,8 @@ struct CommunityAuthSheet: View {
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
             }
+
+            LockDownTierTapSection()
         }
         .frame(maxWidth: .infinity)
     }
@@ -949,6 +978,12 @@ extension CommunitySessionsView {
                 .filter { !$0.isEmpty }
             )
 
+            let screenNamesSet = Set(
+                items.compactMap { row in
+                    row.feedScreenName
+                }
+            )
+
             await MainActor.run {
                 feedSessions = items
                 hasMoreFeedPages = items.count == communityPageSize
@@ -956,8 +991,11 @@ extension CommunitySessionsView {
                     .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
                 availableLocations = Array(locationsSet)
                     .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+                availableScreenNames = Array(screenNamesSet)
+                    .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
                 selectedGames = selectedGames.intersection(gamesSet)
                 selectedLocations = selectedLocations.intersection(locationsSet)
+                selectedScreenNames = selectedScreenNames.intersection(screenNamesSet)
                 isLoadingFeed = false
             }
             await preloadLocationLookup(for: items)
@@ -1050,6 +1088,12 @@ extension CommunitySessionsView {
                 .filter { !$0.isEmpty }
             )
 
+            let screenNamesSet = Set(
+                allItems.compactMap { row in
+                    row.feedScreenName
+                }
+            )
+
             await MainActor.run {
                 feedSessions = allItems
                 hasMoreFeedPages = moreItems.count == communityPageSize
@@ -1057,8 +1101,11 @@ extension CommunitySessionsView {
                     .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
                 availableLocations = Array(locationsSet)
                     .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+                availableScreenNames = Array(screenNamesSet)
+                    .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
                 selectedGames = selectedGames.intersection(gamesSet)
                 selectedLocations = selectedLocations.intersection(locationsSet)
+                selectedScreenNames = selectedScreenNames.intersection(screenNamesSet)
                 isLoadingFeed = false
             }
             await preloadLocationLookup(for: allItems)
@@ -1276,6 +1323,17 @@ struct CommunityFeedRow: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white.opacity(0.95))
                         .lineLimit(2)
+
+                    if let screenName = item.feedScreenName {
+                        HStack(spacing: 4) {
+                            Image(systemName: "person.text.rectangle")
+                                .font(.caption2)
+                            Text(screenName)
+                                .font(.caption.weight(.medium))
+                        }
+                        .foregroundColor(.white.opacity(0.8))
+                        .accessibilityLabel("Screen Name \(screenName)")
+                    }
 
                     if let comment = item.session_details?.comment, !comment.isEmpty {
                         Text(comment)
@@ -1508,9 +1566,11 @@ struct CommunityFeedFiltersView: View {
     @Binding var filterEndDate: Date
     @Binding var selectedGames: Set<String>
     @Binding var selectedLocations: Set<String>
+    @Binding var selectedScreenNames: Set<String>
 
     let availableGames: [String]
     let availableLocations: [String]
+    let availableScreenNames: [String]
     let isLoading: Bool
     let onApply: () -> Void
     let onClear: () -> Void
@@ -1530,6 +1590,9 @@ struct CommunityFeedFiltersView: View {
         }
         if !selectedLocations.isEmpty {
             parts.append("\(selectedLocations.count) location\(selectedLocations.count == 1 ? "" : "s")")
+        }
+        if !selectedScreenNames.isEmpty {
+            parts.append("\(selectedScreenNames.count) screen name\(selectedScreenNames.count == 1 ? "" : "s")")
         }
         return parts.joined(separator: " · ")
     }
@@ -1676,6 +1739,46 @@ struct CommunityFeedFiltersView: View {
                                             }
                                         } label: {
                                             Text(location)
+                                                .font(.caption)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                                .foregroundColor(isSelected ? .black : .white)
+                                                .cornerRadius(16)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if !availableScreenNames.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                LocalizedLabel(title: "Screen names", systemImage: "person.text.rectangle")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.9))
+                                Spacer()
+                                if !selectedScreenNames.isEmpty {
+                                    Text("\(selectedScreenNames.count) selected")
+                                        .font(.caption2)
+                                        .foregroundColor(.green)
+                                }
+                            }
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(availableScreenNames, id: \.self) { name in
+                                        let isSelected = selectedScreenNames.contains(name)
+                                        Button {
+                                            if isSelected {
+                                                selectedScreenNames.remove(name)
+                                            } else {
+                                                selectedScreenNames.insert(name)
+                                            }
+                                        } label: {
+                                            Text(name)
                                                 .font(.caption)
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 6)

@@ -16,11 +16,10 @@ struct SettingsView: View {
     @State private var isSessionsExpanded: Bool = false
     @State private var isFavoritesExpanded: Bool = false
     @State private var isThemeExpanded: Bool = false
-    @State private var isSocialLoginsExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
     @State private var isTierTapAIExpanded: Bool = false
-    @State private var isSubscriptionExpanded: Bool = true
+    @State private var isAccountExpanded: Bool = true
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
     @State private var isShowingSlotGamePicker: Bool = false
@@ -35,7 +34,8 @@ struct SettingsView: View {
     @State private var casinoPickerSelection: String = ""
     @State private var subscriptionOverrideText: String = ""
     @State private var exportGameCategory: SessionGameCategory = .table
-    @State private var isConfirmingSignOut = false
+    @State private var showDenominationDialPad = false
+    @State private var denominationDialPadDraft = ""
 
     var body: some View {
         NavigationStack {
@@ -43,14 +43,13 @@ struct SettingsView: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     VStack(spacing: 24) {
-                        subscriptionSection
+                        accountSection
                         bankrollSection
                         riskOfRuinSection
                         favoritesSection
                         sessionsSection
                         themeSection
                         tierTapAISection
-                        socialLoginsSection
                         dataExportSection
                         aboutSection
                     }
@@ -59,7 +58,7 @@ struct SettingsView: View {
             }
             .localizedNavigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
                 bankrollText = settingsStore.bankroll > 0 ? "\(settingsStore.bankroll)" : ""
@@ -137,18 +136,6 @@ struct SettingsView: View {
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
             }
-            .confirmationDialog(
-                "Sign out of TierTap?",
-                isPresented: $isConfirmingSignOut,
-                titleVisibility: .visible
-            ) {
-                Button("Sign out", role: .destructive) {
-                    authStore.signOut()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                L10nText("You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.")
-            }
         }
     }
 
@@ -159,6 +146,25 @@ struct SettingsView: View {
             isExpanded: $isBankrollExpanded
         ) {
             VStack(spacing: 10) {
+                InputRow(
+                    label: "Bankroll (\(settingsStore.currencySymbol))",
+                    placeholder: "Total bankroll",
+                    value: $bankrollText,
+                    dialPadNavigationTitle: "Bankroll"
+                )
+                    .onChange(of: bankrollText) { new in
+                        if let v = Int(new.filter { $0.isNumber }) { settingsStore.bankroll = v }
+                    }
+                InputRow(
+                    label: "Unit size (\(settingsStore.currencySymbol))",
+                    placeholder: "Max bet per unit (recommended 1–2% of bankroll)",
+                    value: $unitSizeText,
+                    dialPadNavigationTitle: "Unit size"
+                )
+                    .onChange(of: unitSizeText) { new in
+                        if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
+                    }
+
                 VStack(alignment: .leading, spacing: 6) {
                     L10nText("Currency")
                         .font(.subheadline.bold())
@@ -178,15 +184,6 @@ struct SettingsView: View {
                 .padding()
                 .background(Color(.systemGray6).opacity(0.15))
                 .cornerRadius(12)
-
-                InputRow(label: "Bankroll (\(settingsStore.currencySymbol))", placeholder: "Total bankroll", value: $bankrollText)
-                    .onChange(of: bankrollText) { new in
-                        if let v = Int(new.filter { $0.isNumber }) { settingsStore.bankroll = v }
-                    }
-                InputRow(label: "Unit size (\(settingsStore.currencySymbol))", placeholder: "Max bet per unit (recommended 1–2% of bankroll)", value: $unitSizeText)
-                    .onChange(of: unitSizeText) { new in
-                        if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
-                    }
 
                 VStack(alignment: .leading, spacing: 6) {
                     L10nText("App language")
@@ -215,7 +212,12 @@ struct SettingsView: View {
             systemImage: "target",
             isExpanded: $isRiskOfRuinExpanded
         ) {
-            InputRow(label: "Target win per session (\(settingsStore.currencySymbol))", placeholder: "Optional — e.g. 100", value: $targetAverageText)
+            InputRow(
+                label: "Target win per session (\(settingsStore.currencySymbol))",
+                placeholder: "Optional — e.g. 100",
+                value: $targetAverageText,
+                dialPadNavigationTitle: "Target win per session"
+            )
                 .onChange(of: targetAverageText) { new in
                     let n = new.replacingOccurrences(of: ",", with: ".")
                     if n.isEmpty {
@@ -303,64 +305,102 @@ struct SettingsView: View {
         }
     }
 
-    private var subscriptionSection: some View {
+    private var accountSection: some View {
         SettingsSection(
-            title: "Subscriptions",
-            systemImage: "crown.fill",
-            isExpanded: $isSubscriptionExpanded
+            title: "Account",
+            systemImage: "person.crop.circle.fill",
+            isExpanded: $isAccountExpanded
         ) {
-            Button {
-                isShowingSubscriptionPaywall = true
-            } label: {
-                HStack {
-                    Image(systemName: "crown.fill")
-                    Text(hasProAccess ? "Manage TierTap Pro" : "Upgrade to TierTap Pro")
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 10) {
+                    L10nText("Subscriptions")
                         .font(.subheadline.bold())
-                    Spacer()
-                    if hasProAccess {
-                        L10nText("Active")
-                            .font(.caption2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.white.opacity(0.15))
-                            .cornerRadius(6)
-                    }
-                    Image(systemName: "chevron.right")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.systemGray6).opacity(0.25))
-                .foregroundColor(.white)
-                .cornerRadius(12)
-            }
-            .buttonStyle(.plain)
+                        .foregroundColor(.white)
 
-            L10nText("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
-                .font(.caption)
-                .foregroundColor(.gray)
-
-            VStack(alignment: .leading, spacing: 6) {
-                L10nText("Developer subscription override")
-                    .font(.caption.bold())
-                    .foregroundColor(.gray)
-                TextField("Enter override code", text: $subscriptionOverrideText)
-                    .textFieldStyle(DarkTextFieldStyle())
-                    .keyboardType(.numberPad)
-                    .onChange(of: subscriptionOverrideText) { new in
-                        let digitsOnly = new.filter { $0.isNumber }
-                        if digitsOnly != new {
-                            subscriptionOverrideText = digitsOnly
+                    Button {
+                        isShowingSubscriptionPaywall = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "crown.fill")
+                            Text(hasProAccess ? "Manage TierTap Pro" : "Upgrade to TierTap Pro")
+                                .font(.subheadline.bold())
+                            Spacer()
+                            if hasProAccess {
+                                L10nText("Active")
+                                    .font(.caption2)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.green)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.white.opacity(0.15))
+                                    .cornerRadius(6)
+                            }
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.7))
                         }
-                        settingsStore.subscriptionOverrideCode = digitsOnly
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                     }
-                if settingsStore.isSubscriptionOverrideActive {
-                    L10nText("Override is active for this build; subscription checks are bypassed.")
-                        .font(.caption2)
-                        .foregroundColor(.green)
+                    .buttonStyle(.plain)
+
+                    L10nText("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        L10nText("Developer subscription override")
+                            .font(.caption.bold())
+                            .foregroundColor(.gray)
+                        NumericEntryWithDialPad(
+                            placeholder: "Enter override code",
+                            text: $subscriptionOverrideText,
+                            dialPadNavigationTitle: "Subscription override"
+                        )
+                            .onChange(of: subscriptionOverrideText) { new in
+                                let digitsOnly = new.filter { $0.isNumber }
+                                if digitsOnly != new {
+                                    subscriptionOverrideText = digitsOnly
+                                }
+                                settingsStore.subscriptionOverrideCode = digitsOnly
+                            }
+                        if settingsStore.isSubscriptionOverrideActive {
+                            L10nText("Override is active for this build; subscription checks are bypassed.")
+                                .font(.caption2)
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 10) {
+                    L10nText("TierTap account")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    NavigationLink {
+                        TierTapAccountView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "person.crop.circle")
+                            L10nText("TierTap Account")
+                                .font(.subheadline.bold())
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -559,16 +599,37 @@ struct SettingsView: View {
                     L10nText("Common denominations")
                         .font(.caption)
                         .foregroundColor(.gray)
-                    TextField("e.g. 20, 100, 500, 1000, 10000", text: $denominationsText)
-                        .textFieldStyle(DarkTextFieldStyle())
-                        .keyboardType(.numbersAndPunctuation)
-                        .onChange(of: denominationsText) { new in
-                            let parts = new.split(separator: ",")
-                            let nums = parts.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
-                            if !nums.isEmpty {
-                                settingsStore.commonDenominations = nums
+                    HStack(spacing: 8) {
+                        TextField("e.g. 20, 100, 500, 1000, 10000", text: $denominationsText)
+                            .textFieldStyle(DarkTextFieldStyle())
+                            .keyboardType(.numbersAndPunctuation)
+                            .onChange(of: denominationsText) { new in
+                                let parts = new.split(separator: ",")
+                                let nums = parts.compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+                                if !nums.isEmpty {
+                                    settingsStore.commonDenominations = nums
+                                }
+                            }
+                        DialPadLaunchButton {
+                            denominationDialPadDraft = ""
+                            showDenominationDialPad = true
+                        }
+                    }
+                    .sheet(isPresented: $showDenominationDialPad, onDismiss: {
+                        if let v = Int(denominationDialPadDraft), v > 0 {
+                            if denominationsText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                denominationsText = "\(v)"
+                            } else {
+                                let trimmed = denominationsText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                let sep = trimmed.hasSuffix(",") ? " " : ", "
+                                denominationsText = trimmed + sep + "\(v)"
                             }
                         }
+                        denominationDialPadDraft = ""
+                    }) {
+                        NumericDialPadSheet(value: $denominationDialPadDraft, navigationTitle: "Add denomination")
+                            .environmentObject(settingsStore)
+                    }
                     Toggle("Use \(settingsStore.currencySymbol)18 increment mode", isOn: $settingsStore.useEighteenXMultipliers)
                         .tint(.green)
                     Text("When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for \(settingsStore.currencySymbol)18-style bets.")
@@ -720,53 +781,6 @@ struct SettingsView: View {
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
-    }
-
-    private var socialLoginsSection: some View {
-        SettingsSection(
-            title: "Account",
-            systemImage: "person.crop.circle.fill",
-            isExpanded: $isSocialLoginsExpanded
-        ) {
-            VStack(alignment: .leading, spacing: 12) {
-                if !SupabaseConfig.isConfigured {
-                    L10nText("Add Supabase keys to enable sign-in and sync.")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                } else if authStore.isSignedIn {
-                    HStack(spacing: 12) {
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(settingsStore.primaryGradient)
-                        VStack(alignment: .leading, spacing: 2) {
-                            L10nText("Signed in")
-                                .font(.subheadline.bold())
-                                .foregroundColor(.white)
-                            if let name = authStore.userFullName, !name.isEmpty {
-                                Text(name)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.95))
-                            }
-                            if let email = authStore.userEmail {
-                                Text(email)
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.9))
-                            }
-                        }
-                        Spacer()
-                        Button("Sign out", role: .destructive) {
-                            isConfirmingSignOut = true
-                        }
-                        .font(.subheadline)
-                    }
-                    .padding(.vertical, 4)
-                } else {
-                    L10nText("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
-            }
-        }
     }
 
     private var dataExportSection: some View {
