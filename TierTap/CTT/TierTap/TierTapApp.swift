@@ -31,6 +31,7 @@ private struct TierTapAppRoot: View {
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var settingsStore: SettingsStore
     @EnvironmentObject private var authStore: AuthStore
+    @EnvironmentObject private var subscriptionStore: SubscriptionStore
 
     @State private var showSplash = true
     @State private var showWelcome = false
@@ -108,6 +109,7 @@ private struct TierTapAppRoot: View {
             )
             .environmentObject(authStore)
             .environmentObject(settingsStore)
+            .environmentObject(subscriptionStore)
             .environment(\.appLanguage, settingsStore.appLanguage)
         }
     }

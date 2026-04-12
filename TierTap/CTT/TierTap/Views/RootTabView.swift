@@ -82,6 +82,7 @@ struct CommunitySessionsView: View {
     @State private var selectedGames: Set<String> = []
     @State private var selectedLocations: Set<String> = []
     @State private var selectedScreenNames: Set<String> = []
+    @State private var screenNameSearchText: String = ""
     @State private var isLoadingFeed = false
     @State private var feedErrorMessage: String?
     @State private var availableGames: [String] = []
@@ -124,16 +125,26 @@ struct CommunitySessionsView: View {
                 matchesLocation = selectedLocations.contains(locationName)
             }
 
-            let matchesScreenName: Bool
+            let matchesScreenNameBubbles: Bool
             if selectedScreenNames.isEmpty {
-                matchesScreenName = true
+                matchesScreenNameBubbles = true
             } else if let screenName = item.feedScreenName {
-                matchesScreenName = selectedScreenNames.contains(screenName)
+                matchesScreenNameBubbles = selectedScreenNames.contains(screenName)
             } else {
-                matchesScreenName = false
+                matchesScreenNameBubbles = false
             }
 
-            return matchesGame && matchesLocation && matchesScreenName
+            let screenNameQuery = screenNameSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let matchesScreenNameSearch: Bool
+            if screenNameQuery.isEmpty {
+                matchesScreenNameSearch = true
+            } else if let screenName = item.feedScreenName {
+                matchesScreenNameSearch = screenName.localizedStandardContains(screenNameQuery)
+            } else {
+                matchesScreenNameSearch = false
+            }
+
+            return matchesGame && matchesLocation && matchesScreenNameBubbles && matchesScreenNameSearch
         }
     }
 
@@ -165,6 +176,7 @@ struct CommunitySessionsView: View {
                             selectedGames: $selectedGames,
                             selectedLocations: $selectedLocations,
                             selectedScreenNames: $selectedScreenNames,
+                            screenNameSearchText: $screenNameSearchText,
                             availableGames: availableGames,
                             availableLocations: availableLocations,
                             availableScreenNames: availableScreenNames,
@@ -178,6 +190,7 @@ struct CommunitySessionsView: View {
                                 selectedGames.removeAll()
                                 selectedLocations.removeAll()
                                 selectedScreenNames.removeAll()
+                                screenNameSearchText = ""
                                 Task { await reloadCommunityFeed() }
                             }
                         )
@@ -348,6 +361,7 @@ struct CommunitySessionsView: View {
                 )
                 .environmentObject(authStore)
                 .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
             }
             .safeAreaInset(edge: .bottom) {
                 if SupabaseConfig.isConfigured,
@@ -435,6 +449,7 @@ struct CommunitySessionsView: View {
 struct CommunityAuthSheet: View {
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.appLanguage) private var appLanguage
     @Binding var emailInput: String
     var onDismiss: () -> Void
@@ -446,6 +461,64 @@ struct CommunityAuthSheet: View {
     @State private var profileSaved = false
     @State private var isShowingCameraPicker = false
     @State private var isShowingLibraryPicker = false
+    @State private var showSubscriptionPaywall = false
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var subscriptionPlanLabel: String {
+        if settingsStore.isSubscriptionOverrideActive {
+            return L10n.tr("TierTap Pro (developer override)", language: appLanguage)
+        }
+        if subscriptionStore.purchasedProductIds.isEmpty {
+            return L10n.tr("None (free tier)", language: appLanguage)
+        }
+        let id = subscriptionStore.purchasedProductIds.sorted().first!
+        if let product = subscriptionStore.products.first(where: { $0.id == id }) {
+            return product.displayName
+        }
+        switch id {
+        case TierTapProductId.monthly.rawValue:
+            return L10n.tr("TierTap Pro — Monthly", language: appLanguage)
+        case TierTapProductId.quarterly.rawValue:
+            return L10n.tr("TierTap Pro — Quarterly", language: appLanguage)
+        case TierTapProductId.yearly.rawValue:
+            return L10n.tr("TierTap Pro — Yearly", language: appLanguage)
+        default:
+            return L10n.tr("TierTap Pro", language: appLanguage)
+        }
+    }
+
+    private var subscriptionAccessRow: some View {
+        HStack(alignment: .center, spacing: 8) {
+            HStack(spacing: 4) {
+                L10nText("Subscription:")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.85))
+                Text(subscriptionPlanLabel)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+            }
+            Spacer(minLength: 4)
+            Button {
+                showSubscriptionPaywall = true
+            } label: {
+                L10nText(hasProAccess ? "Manage" : "Subscribe")
+                    .font(.caption2.weight(.bold))
+                    .underline()
+                    .foregroundColor(.white)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(10)
+    }
 
     private var logoImage: Image {
         if let processed = TransparentLogoCache.image {
@@ -460,7 +533,8 @@ struct CommunityAuthSheet: View {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 ScrollView {
                     authContent
-                        .padding(20)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
                 }
             }
             .localizedNavigationTitle("Account")
@@ -497,16 +571,23 @@ struct CommunityAuthSheet: View {
         .adaptiveSheet(isPresented: $isShowingLibraryPicker) {
             ProfilePhotoCaptureView(image: $profilePhoto, preferredSourceType: .photoLibrary)
         }
+        .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        .presentationDetents([.large])
     }
 
     private var profileSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 10) {
             L10nText("Profile")
-                .font(.title2.bold())
+                .font(.headline.bold())
                 .foregroundColor(.white)
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .center, spacing: 10) {
                     ZStack {
                         if let image = profilePhoto {
                             Image(uiImage: image)
@@ -514,63 +595,67 @@ struct CommunityAuthSheet: View {
                                 .scaledToFill()
                         } else if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
                             Text(emojis)
-                                .font(.system(size: 40))
+                                .font(.system(size: 30))
                         } else {
                             Image(systemName: "person.crop.circle.fill")
-                                .font(.system(size: 40))
+                                .font(.system(size: 30))
                         }
                     }
-                    .frame(width: 72, height: 72)
+                    .frame(width: 56, height: 56)
                     .clipShape(Circle())
                     .overlay(
                         Circle()
-                            .stroke(Color.white.opacity(0.6), lineWidth: 2)
+                            .stroke(Color.white.opacity(0.6), lineWidth: 1.5)
                     )
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 6) {
                         Button {
                             isShowingCameraPicker = true
                         } label: {
-                            HStack(spacing: 8) {
+                            HStack(spacing: 4) {
                                 Image(systemName: "camera.fill")
-                                L10nText("Take photo")
-                                    .font(.subheadline.bold())
+                                    .font(.caption)
+                                L10nText("Camera")
+                                    .font(.caption.bold())
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
                             .background(Color.white.opacity(0.18))
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(8)
                         }
                         .buttonStyle(.plain)
 
                         Button {
                             isShowingLibraryPicker = true
                         } label: {
-                            HStack(spacing: 8) {
+                            HStack(spacing: 4) {
                                 Image(systemName: "photo.on.rectangle")
-                                L10nText("Choose from library")
-                                    .font(.subheadline.bold())
+                                    .font(.caption)
+                                L10nText("Photos")
+                                    .font(.caption.bold())
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
                             .background(Color.white.opacity(0.18))
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(8)
                         }
                         .buttonStyle(.plain)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 L10nText("Screen Name")
-                    .font(.subheadline.bold())
+                    .font(.caption.bold())
                     .foregroundColor(.white.opacity(0.9))
                 TextField(L10n.tr("Shown on Community when you publish", language: appLanguage), text: $profileDisplayName)
                     .textContentType(.name)
                     .autocorrectionDisabled()
-                    .padding(14)
+                    .font(.subheadline)
+                    .padding(10)
                     .background(Color.white.opacity(0.15))
-                    .cornerRadius(12)
+                    .cornerRadius(10)
                     .foregroundColor(.white)
                     .submitLabel(.done)
                     .onSubmit { saveProfile() }
@@ -582,23 +667,24 @@ struct CommunityAuthSheet: View {
                         if isSavingProfile {
                             ProgressView()
                                 .tint(.white)
+                                .scaleEffect(0.9)
                         }
                         Text(isSavingProfile ? "Saving…" : "Save profile")
-                            .font(.subheadline.bold())
+                            .font(.caption.bold())
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 10)
                     .background(Color.white.opacity(0.22))
                     .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .cornerRadius(10)
                 }
                 .buttonStyle(.plain)
                 .disabled(isSavingProfile)
             }
-            .padding(20)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.white.opacity(0.08))
-            .cornerRadius(16)
+            .cornerRadius(14)
 
             if let msg = authStore.errorMessage {
                 Text(msg)
@@ -608,11 +694,12 @@ struct CommunityAuthSheet: View {
             }
 
             if profileSaved {
-                HStack(spacing: 6) {
+                HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
                         .foregroundColor(.green)
                     L10nText("Saved")
-                        .font(.subheadline)
+                        .font(.caption.bold())
                         .foregroundColor(.green)
                 }
             }
@@ -647,96 +734,90 @@ struct CommunityAuthSheet: View {
 
     @ViewBuilder
     private var authContent: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 16) {
+        VStack(spacing: 12) {
+            VStack(spacing: 6) {
                 logoImage
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 120)
-                    .shadow(radius: 10)
+                    .frame(maxWidth: 72)
+                    .shadow(radius: 6)
 
                 L10nText("Your TierTap Account")
-                    .font(.title2.bold())
+                    .font(.headline.bold())
                     .foregroundColor(.white)
 
                 L10nText("Sign in to unlock advanced AI features, sync your data, and join Community sessions.")
-                    .font(.footnote)
+                    .font(.caption)
                     .foregroundColor(.white.opacity(0.9))
                     .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.88)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.bottom, 4)
+
+            subscriptionAccessRow
 
             if !SupabaseConfig.isConfigured {
                 L10nText("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.")
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
-                    .padding()
+                    .padding(10)
             } else if authStore.isSignedIn {
                 // Profile: screen name & emojis (large section)
                 profileSection
 
-                // Current login info moved below profile in its own bubble
-                VStack {
-                    HStack(alignment: .center, spacing: 12) {
-                        Image(systemName: "person.crop.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundStyle(settingsStore.primaryGradient)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            L10nText("Signed in")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            if let name = authStore.userDisplayName, !name.isEmpty {
-                                Text(name)
-                                    .font(.subheadline.bold())
-                                    .foregroundColor(.white)
-                            }
-                            if let email = authStore.userEmail {
-                                Text(email)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                            }
-                            if let emojis = authStore.userProfileEmojis, !emojis.isEmpty {
-                                Text(emojis)
-                                    .font(.title3)
-                            }
+                HStack(alignment: .center, spacing: 8) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.body)
+                        .foregroundStyle(.green)
+                    VStack(alignment: .leading, spacing: 2) {
+                        L10nText("Signed in")
+                            .font(.caption.bold())
+                            .foregroundColor(.white)
+                        if let email = authStore.userEmail {
+                            Text(email)
+                                .font(.caption2)
+                                .foregroundColor(.white.opacity(0.88))
+                                .lineLimit(1)
+                                .truncationMode(.middle)
                         }
-                        Spacer()
                     }
+                    Spacer(minLength: 0)
                 }
-                .padding()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
                 .background(Color(.systemGray6).opacity(0.18))
-                .cornerRadius(16)
+                .cornerRadius(12)
 
                 Button("Log out", role: .destructive) {
                     authStore.signOut()
                     onDismiss()
                 }
                 .buttonStyle(.borderedProminent)
+                .controlSize(.small)
                 .tint(.red)
             } else {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
                     L10nText("Why create an account?")
-                        .font(.headline)
+                        .font(.subheadline.bold())
                         .foregroundColor(.white)
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
                         LocalizedLabel(title: "Advanced AI summaries and guidance for your sessions.", systemImage: "wand.and.stars")
                         LocalizedLabel(title: "Sync your sessions and bankroll safely across devices.", systemImage: "icloud")
                         LocalizedLabel(title: "See and publish Community sessions with other players.", systemImage: "person.3.sequence.fill")
                         LocalizedLabel(title: "Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
                     }
-                    .font(.footnote)
+                    .font(.caption2)
                     .foregroundColor(.white.opacity(0.9))
+                    .labelStyle(.titleAndIcon)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
+                .padding(12)
                 .background(Color.black.opacity(0.35))
-                .cornerRadius(18)
+                .cornerRadius(14)
 
                 Button {
                     authStore.signInWithApple()
@@ -745,10 +826,10 @@ struct CommunityAuthSheet: View {
                         Image(systemName: "apple.logo")
                         L10nText("Sign in with Apple")
                     }
-                    .font(.headline)
+                    .font(.subheadline.bold())
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .frame(height: 44)
                     .background(Color.black)
                     .cornerRadius(10)
                 }
@@ -762,23 +843,23 @@ struct CommunityAuthSheet: View {
                         Image(systemName: "globe")
                         L10nText("Sign in with Google")
                     }
-                    .font(.headline)
+                    .font(.subheadline.bold())
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .frame(height: 44)
                     .background(Color.white)
                     .cornerRadius(10)
                 }
                 .buttonStyle(.plain)
                 .disabled(authStore.isLoading)
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 6) {
                     L10nText("Email")
-                        .font(.headline)
+                        .font(.subheadline.bold())
                         .foregroundColor(.white)
 
                     L10nText("We'll email a one-time sign-in link — no password.")
-                        .font(.footnote)
+                        .font(.caption2)
                         .foregroundColor(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
 
@@ -787,7 +868,8 @@ struct CommunityAuthSheet: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .keyboardType(.emailAddress)
-                        .padding(12)
+                        .font(.subheadline)
+                        .padding(10)
                         .background(Color.white.opacity(0.15))
                         .cornerRadius(10)
                         .foregroundColor(.white)
@@ -827,9 +909,11 @@ struct CommunityAuthSheet: View {
 
                     if authStore.otpSent {
                         L10nText("Open the link in the email on this device to finish signing in. You can leave this screen open or close it.")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundColor(.white.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(4)
+                            .minimumScaleFactor(0.85)
                     }
                 }
 
@@ -837,21 +921,24 @@ struct CommunityAuthSheet: View {
                     onDismiss()
                 } label: {
                     L10nText("Continue without an account")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.caption.bold())
                         .frame(maxWidth: .infinity)
-                        .frame(height: 44)
+                        .frame(height: 40)
                         .background(Color.white.opacity(0.1))
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(10)
                 }
 
                 L10nText("You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
-                    .font(.footnote)
+                    .font(.caption2)
                     .foregroundColor(.white.opacity(0.85))
                     .multilineTextAlignment(.center)
+                    .lineLimit(4)
+                    .minimumScaleFactor(0.88)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
-            LockDownTierTapSection()
+            LockDownTierTapSection(compact: true)
         }
         .frame(maxWidth: .infinity)
     }
@@ -1562,11 +1649,13 @@ private struct CommunityFeedChipFlowLayout: Layout {
 }
 
 struct CommunityFeedFiltersView: View {
+    @Environment(\.appLanguage) private var appLanguage
     @Binding var filterStartDate: Date
     @Binding var filterEndDate: Date
     @Binding var selectedGames: Set<String>
     @Binding var selectedLocations: Set<String>
     @Binding var selectedScreenNames: Set<String>
+    @Binding var screenNameSearchText: String
 
     let availableGames: [String]
     let availableLocations: [String]
@@ -1593,6 +1682,10 @@ struct CommunityFeedFiltersView: View {
         }
         if !selectedScreenNames.isEmpty {
             parts.append("\(selectedScreenNames.count) screen name\(selectedScreenNames.count == 1 ? "" : "s")")
+        }
+        let trimmedSearch = screenNameSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedSearch.isEmpty {
+            parts.append("“\(trimmedSearch)”")
         }
         return parts.joined(separator: " · ")
     }
@@ -1753,20 +1846,36 @@ struct CommunityFeedFiltersView: View {
                         }
                     }
 
-                    if !availableScreenNames.isEmpty {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                LocalizedLabel(title: "Screen names", systemImage: "person.text.rectangle")
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.9))
-                                Spacer()
-                                if !selectedScreenNames.isEmpty {
-                                    Text("\(selectedScreenNames.count) selected")
-                                        .font(.caption2)
-                                        .foregroundColor(.green)
-                                }
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            LocalizedLabel(title: "Screen names", systemImage: "person.text.rectangle")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.9))
+                            Spacer()
+                            if !selectedScreenNames.isEmpty {
+                                Text("\(selectedScreenNames.count) selected")
+                                    .font(.caption2)
+                                    .foregroundColor(.green)
                             }
+                        }
 
+                        LocalizedLabel(title: "Search by screen name", systemImage: "magnifyingglass")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.85))
+                            .labelStyle(.titleAndIcon)
+
+                        TextField(
+                            L10n.tr("Type a screen name", language: appLanguage),
+                            text: $screenNameSearchText
+                        )
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .padding(12)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(12)
+                        .foregroundColor(.white)
+
+                        if !availableScreenNames.isEmpty {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 8) {
                                     ForEach(availableScreenNames, id: \.self) { name in

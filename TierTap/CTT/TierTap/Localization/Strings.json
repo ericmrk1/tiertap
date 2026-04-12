@@ -6621,5 +6621,31 @@
     "de": "🧠 Wie hat sich die Sitzung angefühlt?",
     "fr": "🧠 Comment s’est passée la séance ?",
     "hi": "🧠 सत्र कैसा लगा?"
+  },
+  "ui.74f30a15663942a3f6c945f2": {
+    "en": "Search by screen name",
+    "zh-Hans": "按屏幕名称搜索",
+    "ja": "スクリーン名で検索",
+    "ko": "화면 이름으로 검색",
+    "vi": "Tìm theo tên hiển thị",
+    "es": "Buscar por nombre de pantalla",
+    "ar": "البحث حسب اسم الشاشة",
+    "he": "חיפוש לפי שם מסך",
+    "de": "Nach Bildschirmnamen suchen",
+    "fr": "Rechercher par nom d'écran",
+    "hi": "स्क्रीन नाम से खोजें"
+  },
+  "ui.8872b442a3f851ac27b77bb6": {
+    "en": "Type a screen name",
+    "zh-Hans": "输入屏幕名称",
+    "ja": "スクリーン名を入力",
+    "ko": "화면 이름 입력",
+    "vi": "Nhập tên hiển thị",
+    "es": "Escriba un nombre de pantalla",
+    "ar": "اكتب اسم الشاشة",
+    "he": "הקליד שם מסך",
+    "de": "Bildschirmnamen eingeben",
+    "fr": "Saisir un nom d'écran",
+    "hi": "स्क्रीन नाम टाइप करें"
   }
 }

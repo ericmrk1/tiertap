@@ -3,6 +3,8 @@ import SwiftUI
 /// Lock Down TierTap (app lock) — same card everywhere account is shown full-screen.
 struct LockDownTierTapSection: View {
     @EnvironmentObject var settingsStore: SettingsStore
+    /// Tighter copy and spacing for sheets (e.g. Community Account) so content fits one screen.
+    var compact: Bool = false
 
     @State private var lockConfigAlert: String?
 
@@ -19,18 +21,27 @@ struct LockDownTierTapSection: View {
     }
 
     private var lockDownCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 10) {
+        VStack(alignment: .leading, spacing: compact ? 8 : 14) {
+            HStack(alignment: .center, spacing: compact ? 6 : 10) {
                 Text(settingsStore.appLockEnabled ? "\u{1F512}" : "\u{1F513}")
-                    .font(.system(size: 28))
+                    .font(.system(size: compact ? 22 : 28))
                 L10nText("Lock Down TierTap")
-                    .font(.headline)
+                    .font(compact ? .subheadline.bold() : .headline)
                     .foregroundColor(.white)
             }
 
-            L10nText("When lock down is on, you must use Face ID, Touch ID, or your device passcode to open TierTap after you leave the app or when you launch it again. This adds a layer of privacy on top of your phone’s lock.")
-                .font(.subheadline)
-                .foregroundColor(.white.opacity(0.88))
+            Group {
+                if compact {
+                    L10nText("Require Face ID, Touch ID, or your device passcode to reopen TierTap after you leave the app.")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.88))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    L10nText("When lock down is on, you must use Face ID, Touch ID, or your device passcode to open TierTap after you leave the app or when you launch it again. This adds a layer of privacy on top of your phone’s lock.")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.88))
+                }
+            }
 
             Toggle(isOn: Binding(
                 get: { settingsStore.appLockEnabled },
@@ -48,29 +59,44 @@ struct LockDownTierTapSection: View {
             .tint(.green)
 
             if settingsStore.appLockEnabled {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: compact ? 6 : 10) {
                     L10nText("Unlock method")
-                        .font(.subheadline.bold())
+                        .font(compact ? .caption.bold() : .subheadline.bold())
                         .foregroundColor(.white)
                     Picker("Unlock method", selection: $settingsStore.appLockAuthMethod) {
                         L10nText("Face ID / Touch ID").tag(SettingsStore.AppLockAuthMethod.faceID)
                         L10nText("Device passcode").tag(SettingsStore.AppLockAuthMethod.pin)
                     }
                     .pickerStyle(.segmented)
+                    .controlSize(compact ? .small : .regular)
 
                     if settingsStore.appLockAuthMethod == .pin {
-                        L10nText("Uses the same system screen as your iPhone passcode. iOS may offer Face ID or Touch ID first; you can choose the passcode option if you prefer.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        if compact {
+                            L10nText("Uses the system passcode screen; biometrics may be offered first.")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                                .fixedSize(horizontal: false, vertical: true)
+                        } else {
+                            L10nText("Uses the same system screen as your iPhone passcode. iOS may offer Face ID or Touch ID first; you can choose the passcode option if you prefer.")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
                     } else {
-                        L10nText("Uses Face ID or Touch ID when available, with your device passcode as a backup.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                        if compact {
+                            L10nText("Face ID or Touch ID when available, with passcode as backup.")
+                                .font(.caption2)
+                                .foregroundColor(.gray)
+                                .fixedSize(horizontal: false, vertical: true)
+                        } else {
+                            L10nText("Uses Face ID or Touch ID when available, with your device passcode as a backup.")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
                     }
                 }
             }
         }
-        .padding()
+        .padding(compact ? 12 : 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(16)

@@ -85,6 +85,7 @@ struct TierTapPaywallView: View {
             )
             .environmentObject(authStore)
             .environmentObject(settingsStore)
+            .environmentObject(subscriptionStore)
         }
     }
 

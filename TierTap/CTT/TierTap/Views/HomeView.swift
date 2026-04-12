@@ -21,6 +21,7 @@ struct HomeView: View {
     @State private var showAddPast = false
     @State private var showHistory = false
     @State private var showBankroll = false
+    @State private var showSubscriptionPaywall = false
     @State private var showLevelUpCelebration = false
     @State private var levelUpReached: TapLevel?
     /// In-memory last computed level; popup only when level increases from this (not on first load).
@@ -33,6 +34,10 @@ struct HomeView: View {
 
     private var quickCompAmounts: [Int] {
         [5, 10, 25, 50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 25_000, 100_000]
+    }
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
     /// Logo with black pixels made transparent so the gradient shows through.
@@ -169,7 +174,26 @@ struct HomeView: View {
                     .padding(.horizontal).padding(.bottom, 44)
                 }
             }
-            .navigationBarHidden(true)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarHidden(!hasProAccess)
+            .toolbar {
+                if hasProAccess {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showSubscriptionPaywall = true
+                        } label: {
+                            Text("PRO")
+                                .font(.subheadline.bold())
+                                .foregroundColor(.white)
+                        }
+                        .accessibilityLabel("TierTap Pro subscription")
+                    }
+                }
+            }
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .overlay {
                 if showLevelUpCelebration, let tap = levelUpReached {
                     TapLevelLevelUpCelebrationView(tapLevel: tap) {
@@ -256,6 +280,12 @@ struct HomeView: View {
                 .environmentObject(subscriptionStore)
         }
         .adaptiveSheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
     }
 }
 
