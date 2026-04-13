@@ -20,9 +20,20 @@ final class SubscriptionStore: ObservableObject {
 
     private var updateListenerTask: Task<Void, Error>?
 
-    /// Whether the user currently has any active TierTap subscription.
+    /// Whether the user has TierTap Pro access: an active subscription, or a TestFlight / sandbox build
+    /// (sandbox receipt path) where Pro is enabled by default for beta testers.
     var isPro: Bool {
-        !purchasedProductIds.isEmpty
+        Self.isTestFlightOrSandboxBuild || !purchasedProductIds.isEmpty
+    }
+
+    /// TestFlight and Xcode installs use a sandbox receipt; production App Store uses `receipt`.
+    private static var isTestFlightOrSandboxBuild: Bool {
+        Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+    }
+
+    /// Pro is unlocked without a StoreKit purchase (TestFlight / sandbox receipt). Used for UI that hides IAP when the catalog is empty.
+    var hasComplimentaryBetaProAccess: Bool {
+        Self.isTestFlightOrSandboxBuild
     }
 
     init() {

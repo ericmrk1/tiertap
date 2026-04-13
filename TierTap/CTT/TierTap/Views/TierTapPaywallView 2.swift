@@ -49,6 +49,9 @@ struct TierTapPaywallView: View {
                     .padding(.top, 16)
                     .padding(.bottom, 28)
                 }
+                .refreshable {
+                    await subscriptionStore.loadProducts()
+                }
             }
             .localizedNavigationTitle("TierTap Pro")
             .navigationBarTitleDisplayMode(.inline)
@@ -66,15 +69,11 @@ struct TierTapPaywallView: View {
                     .foregroundColor(.white)
                 }
             }
+            .task {
+                await subscriptionStore.loadProducts()
+            }
             .onAppear {
-                if selectedProduct == nil {
-                    // Prefer yearly plan by default, otherwise fall back to first product.
-                    if let yearly = subscriptionStore.products.first(where: { $0.id.contains("yearly") }) {
-                        selectedProduct = yearly
-                    } else {
-                        selectedProduct = subscriptionStore.products.first
-                    }
-                }
+                selectDefaultProductIfNeeded()
             }
         }
         .navigationViewStyle(.stack)
@@ -163,7 +162,12 @@ struct TierTapPaywallView: View {
                 ProBenefitRow(
                     icon: "camera.viewfinder",
                     title: "Chip Estimator at Close Out",
-                    subtitle: "Estimate chip stacks with AI before you cash out."
+                    subtitle: "Estimate chip stacks from a photo with AI before you cash out."
+                )
+                ProBenefitRow(
+                    icon: "photo",
+                    title: "Comp Estimator",
+                    subtitle: "Estimate comps from a photo with AI."
                 )
                 ProBenefitRow(
                     icon: "person.3.sequence.fill",
@@ -220,6 +224,42 @@ struct TierTapPaywallView: View {
                     Spacer()
                 }
                 .padding()
+            } else if subscriptionStore.products.isEmpty {
+                if hasProAccess {
+                    if subscriptionStore.hasComplimentaryBetaProAccess {
+                        L10nText("TierTap Pro is included on this TestFlight build.")
+                            .font(.footnote)
+                            .foregroundColor(.white.opacity(0.95))
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white.opacity(0.12))
+                            .cornerRadius(12)
+                    }
+                } else {
+                    VStack(spacing: 12) {
+                        L10nText("No plans loaded yet.")
+                            .font(.footnote)
+                            .foregroundColor(.white.opacity(0.95))
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                        Button {
+                            Task { await subscriptionStore.loadProducts() }
+                        } label: {
+                            Text("Retry")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(settingsStore.primaryColor.opacity(0.85))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding()
+                    .background(Color.white.opacity(0.12))
+                    .cornerRadius(12)
+                }
             } else {
                 VStack(spacing: 8) {
                     ForEach(subscriptionStore.products, id: \.id) { product in
@@ -235,7 +275,19 @@ struct TierTapPaywallView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
+                .onAppear {
+                    selectDefaultProductIfNeeded()
+                }
             }
+        }
+    }
+
+    private func selectDefaultProductIfNeeded() {
+        guard selectedProduct == nil else { return }
+        if let yearly = subscriptionStore.products.first(where: { $0.id.contains("yearly") }) {
+            selectedProduct = yearly
+        } else {
+            selectedProduct = subscriptionStore.products.first
         }
     }
 
@@ -258,24 +310,30 @@ struct TierTapPaywallView: View {
     }
 
     private var purchaseSection: some View {
-        Button(action: purchaseSelected) {
-            HStack {
-                if isPurchasing {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Text(purchaseButtonTitle)
-                        .font(.subheadline.weight(.semibold))
+        Group {
+            if hasProAccess && subscriptionStore.products.isEmpty {
+                EmptyView()
+            } else {
+                Button(action: purchaseSelected) {
+                    HStack {
+                        if isPurchasing {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text(purchaseButtonTitle)
+                                .font(.subheadline.weight(.semibold))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isPurchaseDisabled ? Color.gray : settingsStore.primaryColor)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
                 }
+                .buttonStyle(.plain)
+                .disabled(isPurchaseDisabled)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(isPurchaseDisabled ? Color.gray : settingsStore.primaryColor)
-            .foregroundColor(.white)
-            .cornerRadius(12)
         }
-        .buttonStyle(.plain)
-        .disabled(isPurchaseDisabled)
     }
 
     private var restoreSection: some View {

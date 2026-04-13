@@ -161,7 +161,12 @@ struct TierTapPaywallView: View {
                 ProBenefitRow(
                     icon: "camera.viewfinder",
                     title: "Chip Estimator at Close Out",
-                    subtitle: "Estimate chip stacks with AI before you cash out."
+                    subtitle: "Estimate chip stacks from a photo with AI before you cash out."
+                )
+                ProBenefitRow(
+                    icon: "photo",
+                    title: "Comp Estimator",
+                    subtitle: "Estimate comps from a photo with AI."
                 )
                 ProBenefitRow(
                     icon: "person.3.sequence.fill",
