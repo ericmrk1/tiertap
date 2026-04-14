@@ -16,6 +16,7 @@ struct HistoryView: View {
     @State private var selectedSession: Session?
     @State private var sessionToEdit: Session?
     @State private var sessionToDelete: Session?
+    @State private var isDeleteSelectorPresented: Bool = false
     @State private var searchText: String = ""
     /// Collapsed by default; header stays fixed above the scrolling list.
     @State private var isFilterPanelExpanded: Bool = false
@@ -479,6 +480,17 @@ struct HistoryView: View {
                                 if settingsStore.enableCasinoFeedback {
                                     CelebrationPlayer.shared.playQuickChime()
                                 }
+                                isDeleteSelectorPresented = true
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                            }
+                            .accessibilityLabel("Delete sessions")
+
+                            Button {
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
                                 isShareSelectorPresented = true
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
@@ -542,6 +554,12 @@ struct HistoryView: View {
                     .environmentObject(settingsStore)
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
+            }
+            .adaptiveSheet(isPresented: $isDeleteSelectorPresented) {
+                SessionDeleteSelectionView(sessions: store.sessions) { selectedSessionIDs in
+                    store.deleteSessions(withIDs: selectedSessionIDs)
+                }
+                .environmentObject(settingsStore)
             }
             .alert("Delete Session?", isPresented: showDeleteAlert) {
                 Button("Cancel", role: .cancel) { sessionToDelete = nil }
@@ -1180,6 +1198,169 @@ private struct SessionSelectableRow: View {
             }
             .padding(.vertical, 4)
         }
+    }
+}
+
+private struct SessionDeleteSelectionView: View {
+    let sessions: [Session]
+    let onDelete: (Set<UUID>) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedSessionIDs: Set<UUID> = []
+    @State private var showDeleteConfirmationAlert = false
+
+    private var sortedSessions: [Session] {
+        sessions.sorted { $0.startTime > $1.startTime }
+    }
+
+    private var allSelected: Bool {
+        !sortedSessions.isEmpty && selectedSessionIDs.count == sortedSessions.count
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                if sortedSessions.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "trash.slash")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                        L10nText("No sessions available to delete.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                } else {
+                    List {
+                        Section {
+                            HStack {
+                                Button {
+                                    selectedSessionIDs = Set(sortedSessions.map { $0.id })
+                                } label: {
+                                    HStack {
+                                        Image(systemName: allSelected ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(.green)
+                                        L10nText("Select All Sessions")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+
+                                Spacer()
+
+                                Button {
+                                    selectedSessionIDs.removeAll()
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "xmark.circle")
+                                            .foregroundColor(.red)
+                                        L10nText("Clear All")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(Color(.systemGray6).opacity(0.2))
+                        }
+
+                        Section(header: L10nText("Choose sessions to delete").foregroundColor(.gray)) {
+                            ForEach(sortedSessions) { session in
+                                SessionDeleteSelectableRow(
+                                    session: session,
+                                    isSelected: selectedSessionIDs.contains(session.id)
+                                ) {
+                                    toggleSelection(for: session)
+                                }
+                                .listRowBackground(Color(.systemGray6).opacity(0.15))
+                            }
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .localizedNavigationTitle("Delete Sessions")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Delete") {
+                        showDeleteConfirmationAlert = true
+                    }
+                    .foregroundColor(selectedSessionIDs.isEmpty ? .gray : .red)
+                    .disabled(selectedSessionIDs.isEmpty)
+                }
+            }
+            .alert("Delete selected sessions?", isPresented: $showDeleteConfirmationAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    guard !selectedSessionIDs.isEmpty else { return }
+                    onDelete(selectedSessionIDs)
+                    dismiss()
+                }
+            } message: {
+                let count = selectedSessionIDs.count
+                Text("You are about to permanently delete \(count) session\(count == 1 ? "" : "s"). This cannot be undone.")
+            }
+        }
+    }
+
+    private func toggleSelection(for session: Session) {
+        if selectedSessionIDs.contains(session.id) {
+            selectedSessionIDs.remove(session.id)
+        } else {
+            selectedSessionIDs.insert(session.id)
+        }
+    }
+}
+
+private struct SessionDeleteSelectableRow: View {
+    let session: Session
+    let isSelected: Bool
+    let onToggle: () -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+
+    var body: some View {
+        Button(action: onToggle) {
+            HStack(spacing: 12) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isSelected ? .green : .gray)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(session.casino)
+                            .font(.subheadline.bold())
+                            .foregroundColor(.white)
+                        Spacer()
+                        if let wl = session.winLoss {
+                            Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
+                                .font(.caption.bold())
+                                .foregroundColor(wl >= 0 ? .green : .red)
+                        }
+                    }
+                    HStack(spacing: 6) {
+                        Text(session.game)
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        L10nText("•")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Text(session.startTime, style: .date)
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(.plain)
     }
 }
 

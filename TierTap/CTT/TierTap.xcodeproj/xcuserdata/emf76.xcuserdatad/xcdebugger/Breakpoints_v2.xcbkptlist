@@ -18,6 +18,204 @@
             endingLineNumber = "920"
             landmarkName = "estimateAmount()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 745419a28db806d7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 9e979299e025971f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(9) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - b31c78cdc1f91bd5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(20) await resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 3be59d1d552d448f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(22) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - badd36e2f73091a0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(23) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 39b4aba89114aeb1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(24) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - b86c5f7e3378fbc2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(25) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 3743f043cd5c08d3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(26) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - b63b65096ea025e4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(27) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 139a4b7b3900758f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(31) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 9271fc40db6382a0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(32) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 112991167547dfb1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(33) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 90010adc16abecc2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(34) suspend resume partial function for TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+               <Location
+                  uuid = "0CD65D8D-42EA-4033-A246-5B4486D0243A - 1025b6aa0be7b60"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor @Sendable () -&gt; () in TierTap.ChipEstimatorSheetView.estimateAmount() async -&gt; ()"
+                  moduleName = "TierTap.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "920"
+                  endingLineNumber = "920">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

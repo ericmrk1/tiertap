@@ -17,6 +17,10 @@ struct FastCheckInPlan {
 
 /// Shared fast check-in logic (used from the home screen).
 enum FastCheckInHelper {
+    static func canFastCheckIn(category: SessionGameCategory, store: SessionStore) -> Bool {
+        store.mostRecentSession(forGameCategory: category) != nil
+    }
+
     static func composedPokerGameName(
         pokerGameKind: SessionPokerGameKind,
         pokerVariant: String,
@@ -155,6 +159,7 @@ enum FastCheckInHelper {
     static func performFastCheckIn(plan: FastCheckInPlan, store: SessionStore, settingsStore: SettingsStore) {
         let category = plan.category
         let template = plan.template
+        guard template != nil else { return }
 
         store.startSession(
             game: plan.gameName,
@@ -422,6 +427,7 @@ struct FastCheckInBar: View {
     }
 
     private func startFastCheckInOrWarn(for category: SessionGameCategory) {
+        guard FastCheckInHelper.canFastCheckIn(category: category, store: store) else { return }
         let plan = FastCheckInHelper.makePlan(category: category, store: store, settingsStore: settingsStore)
         if plan.needsTierTrackingWarning {
             pendingTierWarningPlan = plan
@@ -439,7 +445,9 @@ struct FastCheckInBar: View {
 
     @ViewBuilder
     private func fastZone(_ category: SessionGameCategory, emoji: String, title: String) -> some View {
+        let canFastStart = FastCheckInHelper.canFastCheckIn(category: category, store: store)
         Button {
+            guard canFastStart else { return }
             if store.liveSession != nil {
                 pendingFastCategory = category
                 showActiveSessionAlert = true
@@ -458,7 +466,9 @@ struct FastCheckInBar: View {
             }
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
+            .opacity(canFastStart ? 1 : 0.4)
         }
         .buttonStyle(.plain)
+        .disabled(!canFastStart)
     }
 }

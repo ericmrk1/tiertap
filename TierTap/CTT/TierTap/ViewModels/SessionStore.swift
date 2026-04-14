@@ -378,6 +378,21 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    func deleteSessions(withIDs ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        #if os(iOS)
+        let sessionsToDelete = sessions.filter { ids.contains($0.id) }
+        for session in sessionsToDelete {
+            CompPhotoStorage.deleteImages(for: session.compEvents)
+        }
+        #endif
+        sessions.removeAll { ids.contains($0.id) }
+        saveSessions()
+        #if os(iOS)
+        pushContext()
+        #endif
+    }
+
     // MARK: Persistence
     private func load() {
         if let d = defaults.data(forKey: sessKey),
