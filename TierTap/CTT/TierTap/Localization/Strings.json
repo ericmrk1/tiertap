@@ -1494,6 +1494,32 @@
     "fr": "Annuler — Revenir à la session",
     "hi": "रद्द करें - सत्र पर लौटें"
   },
+  "ui.989c62d78da209586a8bd1c9": {
+    "en": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "zh-Hans": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "ja": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "ko": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "vi": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "es": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "ar": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "he": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "de": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "fr": "Capture the slot machine title and TierTap will try to fill in the game name.",
+    "hi": "Capture the slot machine title and TierTap will try to fill in the game name."
+  },
+  "ui.93985f84673405070ffdf7e6": {
+    "en": "Card details",
+    "zh-Hans": "Card details",
+    "ja": "Card details",
+    "ko": "Card details",
+    "vi": "Card details",
+    "es": "Card details",
+    "ar": "Card details",
+    "he": "Card details",
+    "de": "Card details",
+    "fr": "Card details",
+    "hi": "Card details"
+  },
   "ui.3733456f4796edb8b2d033d1": {
     "en": "Cash Out & Avg Bets",
     "zh-Hans": "兑现和平均投注",
@@ -1676,6 +1702,19 @@
     "fr": "Photo de puce (facultatif)",
     "hi": "चिप फोटो (वैकल्पिक)"
   },
+  "ui.fc73c2b8629a27df926d9f8b": {
+    "en": "Choose Camera or Photo Library and capture the machine title area as clearly as possible.",
+    "zh-Hans": "选择相机或照片库并尽可能清晰地捕获机器标题区域。",
+    "ja": "カメラまたはフォト ライブラリを選択し、マシンのタイトル領域をできるだけ鮮明にキャプチャします。",
+    "ko": "카메라 또는 사진 라이브러리를 선택하고 기계 제목 영역을 최대한 명확하게 캡처하십시오.",
+    "vi": "Chọn Máy ảnh hoặc Thư viện ảnh và chụp vùng tiêu đề máy rõ ràng nhất có thể.",
+    "es": "Elija Cámara o Biblioteca de fotos y capture el área del título de la máquina lo más claramente posible.",
+    "ar": "اختر الكاميرا أو مكتبة الصور والتقط منطقة عنوان الجهاز بأكبر قدر ممكن من الوضوح.",
+    "he": "בחר מצלמה או ספריית תמונות ותפוס את אזור כותרת המכונה בצורה ברורה ככל האפשר.",
+    "de": "Wählen Sie „Kamera“ oder „Fotobibliothek“ und erfassen Sie den Titelbereich der Maschine so klar wie möglich.",
+    "fr": "Choisissez Appareil photo ou Bibliothèque de photos et capturez la zone de titre de la machine aussi clairement que possible.",
+    "hi": "कैमरा या फोटो लाइब्रेरी चुनें और मशीन शीर्षक क्षेत्र को यथासंभव स्पष्ट रूप से कैप्चर करें।"
+  },
   "ui.d3a23abcc54ea4cb34ebc55a": {
     "en": "Choose from library",
     "zh-Hans": "从库中选择",
@@ -1701,6 +1740,19 @@
     "de": "Foto auswählen",
     "fr": "Choisir une photo",
     "hi": "तस्विर का चयन करो"
+  },
+  "ui.52aeadc803dc3a4d4e36f7ef": {
+    "en": "Choose sessions to delete",
+    "zh-Hans": "Choose sessions to delete",
+    "ja": "Choose sessions to delete",
+    "ko": "Choose sessions to delete",
+    "vi": "Choose sessions to delete",
+    "es": "Choose sessions to delete",
+    "ar": "Choose sessions to delete",
+    "he": "Choose sessions to delete",
+    "de": "Choose sessions to delete",
+    "fr": "Choose sessions to delete",
+    "hi": "Choose sessions to delete"
   },
   "ui.7e9ef35f8b42efb249247516": {
     "en": "Choose sessions to publish",
@@ -1753,6 +1805,19 @@
     "de": "Wählen Sie, ob Tische, Slots oder Pokersitzungen exportiert werden sollen. Ältere Sitzungen ohne Spieltyp werden als Tischspiele behandelt.",
     "fr": "Choisissez si vous souhaitez exporter des sessions de table, de machines à sous ou de poker. Les sessions plus anciennes sans type de jeu sont traitées comme des jeux de table.",
     "hi": "चुनें कि टेबल, स्लॉट या पोकर सत्र निर्यात करना है या नहीं। खेल प्रकार के बिना पुराने सत्रों को टेबल गेम माना जाता है।"
+  },
+  "ui.6029066fbe16dfeba0ed4b23": {
+    "en": "Choose your plan",
+    "zh-Hans": "Choose your plan",
+    "ja": "Choose your plan",
+    "ko": "Choose your plan",
+    "vi": "Choose your plan",
+    "es": "Choose your plan",
+    "ar": "Choose your plan",
+    "he": "Choose your plan",
+    "de": "Choose your plan",
+    "fr": "Choose your plan",
+    "hi": "Choose your plan"
   },
   "ui.83b12c2216efb4fdc924e1de": {
     "en": "Clear",
@@ -1883,6 +1948,19 @@
     "de": "Community-Feed-Fehler oder leerer Feed",
     "fr": "Erreurs de flux de communauté ou flux vide",
     "hi": "सामुदायिक फ़ीड त्रुटियाँ या खाली फ़ीड"
+  },
+  "ui.50300f2633de23f4bbce2e2e": {
+    "en": "Comp amount",
+    "zh-Hans": "Comp amount",
+    "ja": "Comp amount",
+    "ko": "Comp amount",
+    "vi": "Comp amount",
+    "es": "Comp amount",
+    "ar": "Comp amount",
+    "he": "Comp amount",
+    "de": "Comp amount",
+    "fr": "Comp amount",
+    "hi": "Comp amount"
   },
   "ui.713e92dbc92e052a3902c2ef": {
     "en": "Comp details",
@@ -2066,6 +2144,19 @@
     "fr": "Connectez Supabase pour voir le flux de la communauté.",
     "hi": "सामुदायिक फ़ीड देखने के लिए सुपाबेस से कनेक्ट करें।"
   },
+  "ui.1aadca14711c88a57e1bcb3f": {
+    "en": "Continue with Tax Prep",
+    "zh-Hans": "Continue with Tax Prep",
+    "ja": "Continue with Tax Prep",
+    "ko": "Continue with Tax Prep",
+    "vi": "Continue with Tax Prep",
+    "es": "Continue with Tax Prep",
+    "ar": "Continue with Tax Prep",
+    "he": "Continue with Tax Prep",
+    "de": "Continue with Tax Prep",
+    "fr": "Continue with Tax Prep",
+    "hi": "Continue with Tax Prep"
+  },
   "ui.1ed1faf4843e18799789fd5a": {
     "en": "Continue without an account",
     "zh-Hans": "无需帐户即可继续",
@@ -2248,6 +2339,19 @@
     "fr": "Forfait actuel",
     "hi": "वर्तमान योजना"
   },
+  "ui.ca14527a34e1e345b5bfa101": {
+    "en": "Current tier",
+    "zh-Hans": "Current tier",
+    "ja": "Current tier",
+    "ko": "Current tier",
+    "vi": "Current tier",
+    "es": "Current tier",
+    "ar": "Current tier",
+    "he": "Current tier",
+    "de": "Current tier",
+    "fr": "Current tier",
+    "hi": "Current tier"
+  },
   "ui.5ff2b5b3d9517a8e6d5693d5": {
     "en": "Custom amount",
     "zh-Hans": "定制金额",
@@ -2365,6 +2469,58 @@
     "fr": "Supprimer la séance ?",
     "hi": "सत्र हटाएं?"
   },
+  "ui.3ff2c46e7a831a403f70fe96": {
+    "en": "Delete Sessions",
+    "zh-Hans": "Delete Sessions",
+    "ja": "Delete Sessions",
+    "ko": "Delete Sessions",
+    "vi": "Delete Sessions",
+    "es": "Delete Sessions",
+    "ar": "Delete Sessions",
+    "he": "Delete Sessions",
+    "de": "Delete Sessions",
+    "fr": "Delete Sessions",
+    "hi": "Delete Sessions"
+  },
+  "ui.d81dbac7e240ff8cf25adcf5": {
+    "en": "Delete card",
+    "zh-Hans": "Delete card",
+    "ja": "Delete card",
+    "ko": "Delete card",
+    "vi": "Delete card",
+    "es": "Delete card",
+    "ar": "Delete card",
+    "he": "Delete card",
+    "de": "Delete card",
+    "fr": "Delete card",
+    "hi": "Delete card"
+  },
+  "ui.02f0d3e9808026862a07ce60": {
+    "en": "Delete selected sessions?",
+    "zh-Hans": "Delete selected sessions?",
+    "ja": "Delete selected sessions?",
+    "ko": "Delete selected sessions?",
+    "vi": "Delete selected sessions?",
+    "es": "Delete selected sessions?",
+    "ar": "Delete selected sessions?",
+    "he": "Delete selected sessions?",
+    "de": "Delete selected sessions?",
+    "fr": "Delete selected sessions?",
+    "hi": "Delete selected sessions?"
+  },
+  "ui.8f15df4db8a1f66fd3210701": {
+    "en": "Delete this wallet card?",
+    "zh-Hans": "Delete this wallet card?",
+    "ja": "Delete this wallet card?",
+    "ko": "Delete this wallet card?",
+    "vi": "Delete this wallet card?",
+    "es": "Delete this wallet card?",
+    "ar": "Delete this wallet card?",
+    "he": "Delete this wallet card?",
+    "de": "Delete this wallet card?",
+    "fr": "Delete this wallet card?",
+    "hi": "Delete this wallet card?"
+  },
   "ui.2669895bedfa1ed74137483c": {
     "en": "Delete trip",
     "zh-Hans": "删除行程",
@@ -2442,19 +2598,6 @@
     "de": "Gerätepasscode",
     "fr": "Code d'accès de l'appareil",
     "hi": "डिवाइस पासकोड"
-  },
-  "ui.6528ee726d217ce408eda8a3": {
-    "en": "Dollars / credits",
-    "zh-Hans": "Dollars / credits",
-    "ja": "Dollars / credits",
-    "ko": "Dollars / credits",
-    "vi": "Dollars / credits",
-    "es": "Dollars / credits",
-    "ar": "Dollars / credits",
-    "he": "Dollars / credits",
-    "de": "Dollars / credits",
-    "fr": "Dollars / credits",
-    "hi": "Dollars / credits"
   },
   "ui.11a6767d5674c7e45f7e00dc": {
     "en": "Done",
@@ -2546,6 +2689,19 @@
     "de": "Sitzung bearbeiten",
     "fr": "Modifier la session",
     "hi": "सत्र संपादित करें"
+  },
+  "ui.42eb1e3f7227aa186300a05f": {
+    "en": "Edit card",
+    "zh-Hans": "Edit card",
+    "ja": "Edit card",
+    "ko": "Edit card",
+    "vi": "Edit card",
+    "es": "Edit card",
+    "ar": "Edit card",
+    "he": "Edit card",
+    "de": "Edit card",
+    "fr": "Edit card",
+    "hi": "Edit card"
   },
   "ui.3492c4595a21248beaf9b775": {
     "en": "Edit comp",
@@ -2768,6 +2924,19 @@
     "fr": "Montant exact",
     "hi": "सटीक मात्रा"
   },
+  "ui.d17d84a604994b722db37b35": {
+    "en": "Exit",
+    "zh-Hans": "Exit",
+    "ja": "Exit",
+    "ko": "Exit",
+    "vi": "Exit",
+    "es": "Exit",
+    "ar": "Exit",
+    "he": "Exit",
+    "de": "Exit",
+    "fr": "Exit",
+    "hi": "Exit"
+  },
   "ui.9a5e4d9513126f648a112642": {
     "en": "Export Failed",
     "zh-Hans": "导出失败",
@@ -2923,6 +3092,19 @@
     "de": "Favoriten",
     "fr": "Favoris",
     "hi": "पसंदीदा"
+  },
+  "ui.5e183fb7eddb2cd9af8587e1": {
+    "en": "Feature Coming Soon....",
+    "zh-Hans": "Feature Coming Soon....",
+    "ja": "Feature Coming Soon....",
+    "ko": "Feature Coming Soon....",
+    "vi": "Feature Coming Soon....",
+    "es": "Feature Coming Soon....",
+    "ar": "Feature Coming Soon....",
+    "he": "Feature Coming Soon....",
+    "de": "Feature Coming Soon....",
+    "fr": "Feature Coming Soon....",
+    "hi": "Feature Coming Soon...."
   },
   "ui.559bcf56c3c2aacdbdd24a85": {
     "en": "Filter by date range, game, location, tier verification state, or free-text search.",
@@ -3262,6 +3444,19 @@
     "fr": "Comment sauvegarder mes données ?",
     "hi": "मैं अपने डेटा का बैकअप कैसे ले सकता हूँ?"
   },
+  "ui.4dc8cd80713993ad7e4cf8bc": {
+    "en": "How do I update or remove a wallet card?",
+    "zh-Hans": "如何更新或删除钱包卡？",
+    "ja": "ウォレット カードを更新または削除するにはどうすればよいですか?",
+    "ko": "월렛 카드를 업데이트하거나 제거하려면 어떻게 해야 하나요?",
+    "vi": "Làm cách nào để cập nhật hoặc xóa thẻ wallet?",
+    "es": "¿Cómo actualizo o elimino una tarjeta de billetera?",
+    "ar": "كيف أقوم بتحديث أو إزالة بطاقة المحفظة؟",
+    "he": "כיצד אוכל לעדכן או להסיר כרטיס ארנק?",
+    "de": "Wie aktualisiere oder entferne ich eine Wallet-Karte?",
+    "fr": "Comment mettre à jour ou supprimer une carte portefeuille ?",
+    "hi": "मैं वॉलेट कार्ड को कैसे अपडेट या हटाऊं?"
+  },
   "ui.886fb2cd9e4e4e81a9313f2e": {
     "en": "How it's calculated",
     "zh-Hans": "计算方法",
@@ -3573,6 +3768,19 @@
     "de": "Bewahren Sie private Notizen auf, die während der Sitzung erhalten bleiben.",
     "fr": "Conservez des notes privées qui restent avec la session.",
     "hi": "निजी नोट्स रखें जो सत्र के साथ बने रहें।"
+  },
+  "ui.1bda77bb88996c275851776d": {
+    "en": "Keeps the current tier as a new baseline after reset.",
+    "zh-Hans": "Keeps the current tier as a new baseline after reset.",
+    "ja": "Keeps the current tier as a new baseline after reset.",
+    "ko": "Keeps the current tier as a new baseline after reset.",
+    "vi": "Keeps the current tier as a new baseline after reset.",
+    "es": "Keeps the current tier as a new baseline after reset.",
+    "ar": "Keeps the current tier as a new baseline after reset.",
+    "he": "Keeps the current tier as a new baseline after reset.",
+    "de": "Keeps the current tier as a new baseline after reset.",
+    "fr": "Keeps the current tier as a new baseline after reset.",
+    "hi": "Keeps the current tier as a new baseline after reset."
   },
   "ui.35e0d0360a0af6d115f9df30": {
     "en": "LIVE",
@@ -3899,6 +4107,45 @@
     "fr": "Gibier mixte (CHEVAL)",
     "hi": "मिश्रित खेल (H.O.R.S.E.)"
   },
+  "ui.8d3efc397417cfd071497259": {
+    "en": "New card",
+    "zh-Hans": "New card",
+    "ja": "New card",
+    "ko": "New card",
+    "vi": "New card",
+    "es": "New card",
+    "ar": "New card",
+    "he": "New card",
+    "de": "New card",
+    "fr": "New card",
+    "hi": "New card"
+  },
+  "ui.fde34ae34ee2c0f120d93351": {
+    "en": "New program",
+    "zh-Hans": "New program",
+    "ja": "New program",
+    "ko": "New program",
+    "vi": "New program",
+    "es": "New program",
+    "ar": "New program",
+    "he": "New program",
+    "de": "New program",
+    "fr": "New program",
+    "hi": "New program"
+  },
+  "ui.f64095fb757c7d56d8f07422": {
+    "en": "New program…",
+    "zh-Hans": "New program…",
+    "ja": "New program…",
+    "ko": "New program…",
+    "vi": "New program…",
+    "es": "New program…",
+    "ar": "New program…",
+    "he": "New program…",
+    "de": "New program…",
+    "fr": "New program…",
+    "hi": "New program…"
+  },
   "ui.4c54ca51df9131cd65e17753": {
     "en": "No Analytics Yet",
     "zh-Hans": "尚无分析",
@@ -3950,6 +4197,19 @@
     "de": "Noch keine Bankroll-Historie.",
     "fr": "Pas encore d’historique de bankroll.",
     "hi": "अभी तक कोई बैंकरोल इतिहास नहीं."
+  },
+  "ui.4e780de100f1bf96f082a05a": {
+    "en": "No cards yet",
+    "zh-Hans": "No cards yet",
+    "ja": "No cards yet",
+    "ko": "No cards yet",
+    "vi": "No cards yet",
+    "es": "No cards yet",
+    "ar": "No cards yet",
+    "he": "No cards yet",
+    "de": "No cards yet",
+    "fr": "No cards yet",
+    "hi": "No cards yet"
   },
   "ui.7bd2fc42f671569351452945": {
     "en": "No casino locations in these sessions.",
@@ -4094,6 +4354,19 @@
     "fr": "Aucun casino à proximité trouvé. Réessayez plus près d'un établissement ou vérifiez les emplacements enregistrés.",
     "hi": "आस-पास कोई कैसीनो नहीं मिला. किसी संपत्ति के करीब फिर से प्रयास करें या सहेजे गए स्थानों की जांच करें।"
   },
+  "ui.1a19185b45aec004f3f426ee": {
+    "en": "No plans loaded yet.",
+    "zh-Hans": "No plans loaded yet.",
+    "ja": "No plans loaded yet.",
+    "ko": "No plans loaded yet.",
+    "vi": "No plans loaded yet.",
+    "es": "No plans loaded yet.",
+    "ar": "No plans loaded yet.",
+    "he": "No plans loaded yet.",
+    "de": "No plans loaded yet.",
+    "fr": "No plans loaded yet.",
+    "hi": "No plans loaded yet."
+  },
   "ui.6222e10e4d9769b8f07610b4": {
     "en": "No session in progress",
     "zh-Hans": "没有正在进行的会话",
@@ -4119,6 +4392,19 @@
     "de": "Es wurden noch keine Sitzungsstimmungen aufgezeichnet. Aktivieren Sie „Nach Sitzungsstimmung fragen“ unter Einstellungen → Sitzungen und beenden Sie eine Sitzung, um aufzuzeichnen, wie sich jede Sitzung anfühlte.",
     "fr": "Aucune ambiance de session enregistrée pour le moment. Activez « Demander l'ambiance de la session » dans Paramètres → Sessions et terminez une session pour enregistrer ce que vous avez ressenti lors de chaque session.",
     "hi": "अभी तक कोई सत्र मूड रिकॉर्ड नहीं किया गया। सेटिंग्स → सत्र में \"सत्र मूड के लिए संकेत\" सक्षम करें और प्रत्येक सत्र कैसा लगा, इसे रिकॉर्ड करने के लिए एक सत्र समाप्त करें।"
+  },
+  "ui.d4f21ac72f8a1056cbec70c7": {
+    "en": "No sessions available to delete.",
+    "zh-Hans": "No sessions available to delete.",
+    "ja": "No sessions available to delete.",
+    "ko": "No sessions available to delete.",
+    "vi": "No sessions available to delete.",
+    "es": "No sessions available to delete.",
+    "ar": "No sessions available to delete.",
+    "he": "No sessions available to delete.",
+    "de": "No sessions available to delete.",
+    "fr": "No sessions available to delete.",
+    "hi": "No sessions available to delete."
   },
   "ui.f1e3df0c7bc1f8b63e83b7c5": {
     "en": "No sessions available to share.",
@@ -4210,6 +4496,19 @@
     "de": "Keine Textantwort von Gemini.",
     "fr": "Aucune réponse textuelle de Gemini.",
     "hi": "जेमिनी की ओर से कोई पाठ प्रतिक्रिया नहीं।"
+  },
+  "ui.ff9226f9b05b52c5c3ab4a22": {
+    "en": "No tier history yet.",
+    "zh-Hans": "No tier history yet.",
+    "ja": "No tier history yet.",
+    "ko": "No tier history yet.",
+    "vi": "No tier history yet.",
+    "es": "No tier history yet.",
+    "ar": "No tier history yet.",
+    "he": "No tier history yet.",
+    "de": "No tier history yet.",
+    "fr": "No tier history yet.",
+    "hi": "No tier history yet."
   },
   "ui.f2a10936eb7f95f65a7e5bf2": {
     "en": "No tier point data yet.",
@@ -4405,6 +4704,45 @@
     "de": "Öffnen Sie „Risk of Ruin“, um das Spiel mit Ihrem Guthaben und Ihren Zieldurchschnitten zu vergleichen (tabellenorientiert; Poker wird separat in Kopie in der App behandelt).",
     "fr": "Ouvrez Risk of Ruin pour comparer le jeu à votre bankroll et à vos moyennes cibles (axé sur les tables ; le poker est traité séparément en copie dans l'application).",
     "hi": "अपने बैंकरोल और लक्ष्य औसत (टेबल-केंद्रित; पोकर को ऐप के अंदर कॉपी में अलग से संभाला जाता है) के साथ खेल की तुलना करने के लिए बर्बाद होने का जोखिम खोलें।"
+  },
+  "ui.783d27155ef9aeebfc4458f3": {
+    "en": "Open TierTap Wallet from session flows (for card selection) or from app shortcuts where available.",
+    "zh-Hans": "从会话流（用于卡选择）或从可用的应用程序快捷方式打开 TierTap 钱包。",
+    "ja": "TierTap ウォレットは、セッション フロー (カード選択用) から、または利用可能な場合はアプリのショートカットから開きます。",
+    "ko": "세션 흐름(카드 선택용) 또는 가능한 경우 앱 바로가기에서 TierTap Wallet을 엽니다.",
+    "vi": "Mở Ví TierTap từ luồng phiên (để chọn thẻ) hoặc từ các phím tắt ứng dụng nếu có.",
+    "es": "Abra TierTap Wallet desde los flujos de sesión (para selección de tarjeta) o desde accesos directos a aplicaciones cuando estén disponibles.",
+    "ar": "افتح TierTap Wallet من تدفقات الجلسة (لتحديد البطاقة) أو من اختصارات التطبيق حيثما كان ذلك متاحًا.",
+    "he": "פתח את ארנק TierTap מתזרימי הפעלה (לבחירת כרטיסים) או מקיצורי דרך לאפליקציה היכן שזמינים.",
+    "de": "Öffnen Sie TierTap Wallet über Sitzungsabläufe (zur Kartenauswahl) oder über App-Verknüpfungen, sofern verfügbar.",
+    "fr": "Ouvrez TierTap Wallet à partir des flux de session (pour la sélection de cartes) ou à partir des raccourcis d'applications, le cas échéant.",
+    "hi": "सत्र प्रवाह (कार्ड चयन के लिए) या जहां उपलब्ध हो वहां ऐप शॉर्टकट से टियरटैप वॉलेट खोलें।"
+  },
+  "ui.4f0b71fe89991e6a04ce2a9f": {
+    "en": "Open TierTap Wallet, edit the card, and retake or replace the photo. Save changes to refresh what appears in selection and share views.",
+    "zh-Hans": "打开 TierTap Wallet，编辑卡片，然后重新拍摄或替换照片。保存更改以刷新选择和共享视图中显示的内容。",
+    "ja": "TierTap Wallet を開いてカードを編集し、写真を撮り直すか置き換えます。変更を保存して選択範囲に表示される内容を更新し、ビューを共有します。",
+    "ko": "TierTap Wallet을 열고 카드를 편집한 후 사진을 다시 찍거나 교체하세요. 선택 및 공유 보기에 나타나는 내용을 새로 고치려면 변경 사항을 저장하세요.",
+    "vi": "Mở Ví TierTap, chỉnh sửa thẻ và chụp lại hoặc thay thế ảnh. Lưu các thay đổi để làm mới những gì xuất hiện trong phần lựa chọn và chia sẻ chế độ xem.",
+    "es": "Abra TierTap Wallet, edite la tarjeta y vuelva a tomar o reemplazar la foto. Guarde los cambios para actualizar lo que aparece en la selección y compartir vistas.",
+    "ar": "افتح TierTap Wallet، وقم بتحرير البطاقة، وأعد التقاط الصورة أو استبدالها. احفظ التغييرات لتحديث ما يظهر في التحديد ومشاركة طرق العرض.",
+    "he": "פתח את TierTap Wallet, ערוך את הכרטיס וצלם מחדש או החלף את התמונה. שמור שינויים כדי לרענן את מה שמופיע בבחירה ולשתף תצוגות.",
+    "de": "Öffnen Sie TierTap Wallet, bearbeiten Sie die Karte und nehmen Sie das Foto erneut auf oder ersetzen Sie es. Speichern Sie die Änderungen, um die Anzeige in den Auswahl- und Freigabeansichten zu aktualisieren.",
+    "fr": "Ouvrez TierTap Wallet, modifiez la carte et reprenez ou remplacez la photo. Enregistrez les modifications pour actualiser ce qui apparaît dans les vues de sélection et de partage.",
+    "hi": "टियरटैप वॉलेट खोलें, कार्ड संपादित करें, और फ़ोटो दोबारा लें या बदलें। चयन में जो दिखाई देता है उसे ताज़ा करने और दृश्य साझा करने के लिए परिवर्तन सहेजें।"
+  },
+  "ui.c4cbfabdb066d610549eba17": {
+    "en": "Open TierTap Wallet, select the card, then use Edit card for details/photo updates or Delete card to remove it permanently.",
+    "zh-Hans": "打开 TierTap 钱包，选择卡，然后使用编辑卡获取详细信息/照片更新或删除卡将其永久删除。",
+    "ja": "TierTap ウォレットを開いてカードを選択し、詳細/写真の更新にはカードの編集を使用するか、カードを完全に削除するにはカードの削除を使用します。",
+    "ko": "TierTap Wallet을 열고 카드를 선택한 다음 세부 정보/사진 업데이트를 위해 카드 편집을 사용하거나 카드 삭제를 사용하여 영구적으로 제거하세요.",
+    "vi": "Mở Ví TierTap, chọn thẻ, sau đó sử dụng Chỉnh sửa thẻ để biết chi tiết/cập nhật ảnh hoặc Xóa thẻ để xóa thẻ vĩnh viễn.",
+    "es": "Abra TierTap Wallet, seleccione la tarjeta, luego use Editar tarjeta para obtener detalles/actualizaciones de fotos o Eliminar tarjeta para eliminarla permanentemente.",
+    "ar": "افتح TierTap Wallet، وحدد البطاقة، ثم استخدم تحرير البطاقة للحصول على التفاصيل/تحديثات الصور أو حذف البطاقة لإزالتها نهائيًا.",
+    "he": "פתח את ארנק TierTap, בחר את הכרטיס ולאחר מכן השתמש בכרטיס ערוך לפרטים/עדכוני תמונות או במחק כרטיס כדי להסיר אותו לצמיתות.",
+    "de": "Öffnen Sie TierTap Wallet, wählen Sie die Karte aus und verwenden Sie dann Karte bearbeiten für Details/Fotoaktualisierungen oder Karte löschen, um sie dauerhaft zu entfernen.",
+    "fr": "Ouvrez TierTap Wallet, sélectionnez la carte, puis utilisez Modifier la carte pour les détails/mises à jour des photos ou Supprimer la carte pour la supprimer définitivement.",
+    "hi": "टियरटैप वॉलेट खोलें, कार्ड चुनें, फिर विवरण/फोटो अपडेट के लिए एडिट कार्ड का उपयोग करें या इसे स्थायी रूप से हटाने के लिए कार्ड हटाएं।"
   },
   "ui.d9bcc09193ddf6ba1d9731fd": {
     "en": "Open a session for details, editing, sharing, or deletion.",
@@ -5082,6 +5420,45 @@
     "fr": "Réinitialiser la bankroll",
     "hi": "बैंकरोल रीसेट करें"
   },
+  "ui.896f6ebba99ecc276aa54176": {
+    "en": "Reset history",
+    "zh-Hans": "Reset history",
+    "ja": "Reset history",
+    "ko": "Reset history",
+    "vi": "Reset history",
+    "es": "Reset history",
+    "ar": "Reset history",
+    "he": "Reset history",
+    "de": "Reset history",
+    "fr": "Reset history",
+    "hi": "Reset history"
+  },
+  "ui.c38036c729ca348ff11a001e": {
+    "en": "Reset tier history",
+    "zh-Hans": "Reset tier history",
+    "ja": "Reset tier history",
+    "ko": "Reset tier history",
+    "vi": "Reset tier history",
+    "es": "Reset tier history",
+    "ar": "Reset tier history",
+    "he": "Reset tier history",
+    "de": "Reset tier history",
+    "fr": "Reset tier history",
+    "hi": "Reset tier history"
+  },
+  "ui.2985e2eb61d6b0c82fedefdd": {
+    "en": "Reset tier history?",
+    "zh-Hans": "Reset tier history?",
+    "ja": "Reset tier history?",
+    "ko": "Reset tier history?",
+    "vi": "Reset tier history?",
+    "es": "Reset tier history?",
+    "ar": "Reset tier history?",
+    "he": "Reset tier history?",
+    "de": "Reset tier history?",
+    "fr": "Reset tier history?",
+    "hi": "Reset tier history?"
+  },
   "ui.16351f9dfd78cef9e9ec70fd": {
     "en": "Restore Purchases",
     "zh-Hans": "恢复购买",
@@ -5134,6 +5511,32 @@
     "fr": "Reprendre existant",
     "hi": "मौजूदा फिर से शुरू करें"
   },
+  "ui.1c62f54c28ffaf9964655f13": {
+    "en": "Retake",
+    "zh-Hans": "Retake",
+    "ja": "Retake",
+    "ko": "Retake",
+    "vi": "Retake",
+    "es": "Retake",
+    "ar": "Retake",
+    "he": "Retake",
+    "de": "Retake",
+    "fr": "Retake",
+    "hi": "Retake"
+  },
+  "ui.942087cc2d41e01304b71955": {
+    "en": "Retry",
+    "zh-Hans": "Retry",
+    "ja": "Retry",
+    "ko": "Retry",
+    "vi": "Retry",
+    "es": "Retry",
+    "ar": "Retry",
+    "he": "Retry",
+    "de": "Retry",
+    "fr": "Retry",
+    "hi": "Retry"
+  },
   "ui.38211ee4973a68b6c1cea544": {
     "en": "Review buy-ins and comps, add more at any time, and open strategy or odds reference for your game.",
     "zh-Hans": "查看买入费和赔率，随时添加更多资金，并为您的游戏打开策略或赔率参考。",
@@ -5159,6 +5562,45 @@
     "de": "Überprüfen Sie jede Karte: Schalten Sie sie um, bearbeiten Sie sie oder tippen Sie auf Karte durchsuchen, um eine geeignete Ortsmarkierung zu finden. Die Zeitleisten entsprechen der Registerkarte „Reisen“ (bevorstehend, aktuell, historisch).",
     "fr": "Examinez chaque carte : activez, modifiez ou appuyez sur Rechercher sur la carte pour trouver un repère approprié. Les chronologies correspondent à l'onglet Voyages (à venir, en cours, historique).",
     "hi": "प्रत्येक कार्ड की समीक्षा करें: उचित स्थान पिन के लिए मानचित्र खोजें को टॉगल करें, संपादित करें या टैप करें। समय-सीमा यात्राएँ टैब (आगामी, वर्तमान, ऐतिहासिक) से मेल खाती है।"
+  },
+  "ui.412fde7f988d83fb8038881e": {
+    "en": "Review the suggested game name and notes, then adjust before continuing if needed.",
+    "zh-Hans": "查看建议的游戏名称和注释，然后根据需要进行调整，然后再继续。",
+    "ja": "提案されたゲーム名と注意事項を確認し、必要に応じて続行する前に調整します。",
+    "ko": "제안된 게임 이름과 메모를 검토한 다음 필요한 경우 계속하기 전에 조정하세요.",
+    "vi": "Xem lại tên trò chơi và ghi chú được đề xuất, sau đó điều chỉnh trước khi tiếp tục nếu cần.",
+    "es": "Revise el nombre del juego sugerido y las notas, luego ajústelos antes de continuar si es necesario.",
+    "ar": "قم بمراجعة اسم اللعبة المقترحة وملاحظاتها، ثم اضبطها قبل المتابعة إذا لزم الأمر.",
+    "he": "סקור את שם המשחק וההערות המוצעים, ולאחר מכן התאם לפני שתמשיך במידת הצורך.",
+    "de": "Überprüfen Sie den vorgeschlagenen Spielnamen und die Notizen und passen Sie sie bei Bedarf an, bevor Sie fortfahren.",
+    "fr": "Passez en revue le nom du jeu suggéré et les notes, puis ajustez avant de continuer si nécessaire.",
+    "hi": "सुझाए गए गेम नाम और नोट्स की समीक्षा करें, फिर यदि आवश्यक हो तो जारी रखने से पहले समायोजित करें।"
+  },
+  "ui.9f9be770dbd490d743866a60": {
+    "en": "Reward program",
+    "zh-Hans": "Reward program",
+    "ja": "Reward program",
+    "ko": "Reward program",
+    "vi": "Reward program",
+    "es": "Reward program",
+    "ar": "Reward program",
+    "he": "Reward program",
+    "de": "Reward program",
+    "fr": "Reward program",
+    "hi": "Reward program"
+  },
+  "ui.1030b5a876a6abdb1270f27e": {
+    "en": "Reward program presets",
+    "zh-Hans": "Reward program presets",
+    "ja": "Reward program presets",
+    "ko": "Reward program presets",
+    "vi": "Reward program presets",
+    "es": "Reward program presets",
+    "ar": "Reward program presets",
+    "he": "Reward program presets",
+    "de": "Reward program presets",
+    "fr": "Reward program presets",
+    "hi": "Reward program presets"
   },
   "ui.78c5ef9b864ed4a56ac39595": {
     "en": "Risk of Ruin",
@@ -5315,6 +5757,19 @@
     "de": "Gespeicherte Orte",
     "fr": "Emplacements enregistrés",
     "hi": "सहेजे गए स्थान"
+  },
+  "ui.13de1989541cc57d2d078b35": {
+    "en": "Scanning slot machine for game name…",
+    "zh-Hans": "Scanning slot machine for game name…",
+    "ja": "Scanning slot machine for game name…",
+    "ko": "Scanning slot machine for game name…",
+    "vi": "Scanning slot machine for game name…",
+    "es": "Scanning slot machine for game name…",
+    "ar": "Scanning slot machine for game name…",
+    "he": "Scanning slot machine for game name…",
+    "de": "Scanning slot machine for game name…",
+    "fr": "Scanning slot machine for game name…",
+    "hi": "Scanning slot machine for game name…"
   },
   "ui.8f6bb7910da2477f6df5adce": {
     "en": "Screen Name",
@@ -5536,19 +5991,6 @@
     "de": "Sitzungsdetails",
     "fr": "Détails de la session",
     "hi": "सत्र विवरण"
-  },
-  "ui.edeead3f1961f9b89e8555d2": {
-    "en": "Session History",
-    "zh-Hans": "会话历史记录",
-    "ja": "セッション履歴",
-    "ko": "세션 기록",
-    "vi": "Lịch sử phiên",
-    "es": "Historial de sesiones",
-    "ar": "تاريخ الجلسة",
-    "he": "היסטוריית הפעלות",
-    "de": "Sitzungsverlauf",
-    "fr": "Historique des sessions",
-    "hi": "सत्र इतिहास"
   },
   "ui.dbdf56708d65a423733cd810": {
     "en": "Session Map",
@@ -5784,6 +6226,19 @@
     "fr": "Partager des sessions",
     "hi": "सत्र साझा करें"
   },
+  "ui.61f1320c76773b91ced76bc7": {
+    "en": "Share card",
+    "zh-Hans": "Share card",
+    "ja": "Share card",
+    "ko": "Share card",
+    "vi": "Share card",
+    "es": "Share card",
+    "ar": "Share card",
+    "he": "Share card",
+    "de": "Share card",
+    "fr": "Share card",
+    "hi": "Share card"
+  },
   "ui.ffe7389c12093a484709edda": {
     "en": "Share details",
     "zh-Hans": "分享详情",
@@ -6005,6 +6460,71 @@
     "fr": "Connectez-vous avec un compte TierTap valide (e-mail, Apple ou Google).",
     "hi": "एक वैध टियरटैप खाते (ईमेल, ऐप्पल, या Google) के साथ साइन इन किया गया है।"
   },
+  "ui.2500eeb1051679ebf222ca72": {
+    "en": "Slot game photo",
+    "zh-Hans": "Slot game photo",
+    "ja": "Slot game photo",
+    "ko": "Slot game photo",
+    "vi": "Slot game photo",
+    "es": "Slot game photo",
+    "ar": "Slot game photo",
+    "he": "Slot game photo",
+    "de": "Slot game photo",
+    "fr": "Slot game photo",
+    "hi": "Slot game photo"
+  },
+  "ui.7beb5efc0f8ab9814ad2780c": {
+    "en": "Slot game reader",
+    "zh-Hans": "老虎机游戏阅读器",
+    "ja": "スロットゲームリーダー",
+    "ko": "슬롯 게임 리더",
+    "vi": "Đầu đọc trò chơi slot",
+    "es": "Lector de tragamonedas",
+    "ar": "قارئ ألعاب القمار",
+    "he": "קורא משחקי משבצות",
+    "de": "Spielautomaten-Lesegerät",
+    "fr": "Lecteur de jeux de machines à sous",
+    "hi": "स्लॉट गेम रीडर"
+  },
+  "ui.8cb276f1a930a42c5f7b46b6": {
+    "en": "Slot game scan",
+    "zh-Hans": "Slot game scan",
+    "ja": "Slot game scan",
+    "ko": "Slot game scan",
+    "vi": "Slot game scan",
+    "es": "Slot game scan",
+    "ar": "Slot game scan",
+    "he": "Slot game scan",
+    "de": "Slot game scan",
+    "fr": "Slot game scan",
+    "hi": "Slot game scan"
+  },
+  "ui.f3a3174d6665943bad2eb34d": {
+    "en": "Slot scanner can’t identify game name",
+    "zh-Hans": "老虎机扫描仪无法识别游戏名称",
+    "ja": "スロット スキャナーがゲーム名を識別できません",
+    "ko": "슬롯 스캐너가 게임 이름을 식별할 수 없습니다",
+    "vi": "Máy quét khe không thể xác định tên trò chơi",
+    "es": "El escáner de tragamonedas no puede identificar el nombre del juego",
+    "ar": "لا يستطيع الماسح الضوئي للفتحة تحديد اسم اللعبة",
+    "he": "סורק חריצים לא יכול לזהות את שם המשחק",
+    "de": "Der Slot-Scanner kann den Spielnamen nicht identifizieren",
+    "fr": "Le scanner de machines à sous ne parvient pas à identifier le nom du jeu",
+    "hi": "स्लॉट स्कैनर गेम के नाम की पहचान नहीं कर सकता"
+  },
+  "ui.128ab814b8f7041f0e591254": {
+    "en": "Slot scanning needs TierTap Pro, a signed-in account, and a clear machine photo. Try retaking the image with the title area in focus and less glare.",
+    "zh-Hans": "插槽扫描需要TierTap Pro、已登录的帐户和清晰的机器照片。尝试重新拍摄图像，使标题区域清晰对焦且眩光较少。",
+    "ja": "スロット スキャンには、TierTap Pro、サインインしたアカウント、鮮明なマシンの写真が必要です。タイトル領域に焦点を合わせ、ぎらつきを抑えて画像を撮り直してみてください。",
+    "ko": "슬롯 스캔에는 TierTap Pro, 로그인된 계정, 선명한 기계 사진이 필요합니다. 제목 영역에 초점을 맞추고 눈부심을 줄여 이미지를 다시 촬영해 보세요.",
+    "vi": "Quét khe cần có TierTap Pro, tài khoản đã đăng nhập và ảnh máy rõ ràng. Hãy thử chụp lại ảnh với vùng tiêu đề rõ ràng và ít chói hơn.",
+    "es": "El escaneo de tragamonedas necesita TierTap Pro, una cuenta iniciada y una foto clara de la máquina. Intente volver a tomar la imagen con el área del título enfocada y menos deslumbrante.",
+    "ar": "يحتاج مسح الفتحات إلى TierTap Pro، وحساب مسجل الدخول، وصورة واضحة للجهاز. حاول إعادة التقاط الصورة مع التركيز على منطقة العنوان وتقليل الوهج.",
+    "he": "סריקת משבצות דורשת TierTap Pro, חשבון מחובר ותמונת מכונה ברורה. נסה לצלם מחדש את התמונה עם אזור הכותרת בפוקוס ופחות בוהק.",
+    "de": "Für das Slot-Scannen sind TierTap Pro, ein angemeldetes Konto und ein klares Maschinenfoto erforderlich. Versuchen Sie, das Bild mit scharfem Titelbereich und weniger Blendung noch einmal aufzunehmen.",
+    "fr": "La numérisation des emplacements nécessite TierTap Pro, un compte connecté et une photo claire de la machine. Essayez de reprendre l'image avec la zone de titre nette et moins d'éblouissement.",
+    "hi": "स्लॉट स्कैनिंग के लिए टियरटैप प्रो, एक साइन-इन खाता और एक स्पष्ट मशीन फोटो की आवश्यकता होती है। शीर्षक क्षेत्र पर फोकस और कम चमक के साथ छवि को दोबारा लेने का प्रयास करें।"
+  },
   "ui.4b2bebbf33aeb7aea11cbab9": {
     "en": "Slow",
     "zh-Hans": "慢的",
@@ -6082,6 +6602,19 @@
     "de": "Start",
     "fr": "Commencer",
     "hi": "शुरू"
+  },
+  "ui.58ad8f0c9e224c2f84e6a3b8": {
+    "en": "Start a Slots check-in, then tap Scan slot game name.",
+    "zh-Hans": "开始老虎机签到，然后点击扫描老虎机游戏名称。",
+    "ja": "スロットのチェックインを開始し、「スロット ゲーム名をスキャン」をタップします。",
+    "ko": "슬롯 체크인을 시작한 다음 슬롯 게임 이름 스캔을 탭하세요.",
+    "vi": "Bắt đầu đăng ký Slots, sau đó nhấn Quét tên trò chơi slot.",
+    "es": "Inicie un registro de tragamonedas y luego toque Escanear el nombre del juego de tragamonedas.",
+    "ar": "ابدأ عملية تسجيل الوصول إلى Slots، ثم اضغط على \"Scan Slot\" لاسم اللعبة.",
+    "he": "התחל צ'ק-אין של חריצים, ולאחר מכן הקש על סרוק שם משחק חריץ.",
+    "de": "Starten Sie einen Slots-Check-in und tippen Sie dann auf Slot-Spielnamen scannen.",
+    "fr": "Démarrez un enregistrement de machine à sous, puis appuyez sur Rechercher le nom du jeu de machine à sous.",
+    "hi": "स्लॉट चेक-इन प्रारंभ करें, फिर स्लॉट गेम नाम स्कैन करें पर टैप करें।"
   },
   "ui.e613f27c9c0a8c47739ede59": {
     "en": "Start a session on your iPhone to control it from here",
@@ -6173,6 +6706,19 @@
     "de": "Startstapel",
     "fr": "Pile de départ",
     "hi": "आरंभिक ढेर"
+  },
+  "ui.a3b50c476732c7409d297c3d": {
+    "en": "State",
+    "zh-Hans": "State",
+    "ja": "State",
+    "ko": "State",
+    "vi": "State",
+    "es": "State",
+    "ar": "State",
+    "he": "State",
+    "de": "State",
+    "fr": "State",
+    "hi": "State"
   },
   "ui.08fd1de4b04df4a2fe763ac6": {
     "en": "Stay",
@@ -6317,6 +6863,32 @@
     "fr": "Soutien",
     "hi": "सहायता"
   },
+  "ui.6084e4ed59a614f912f6e8dc": {
+    "en": "Swipe the stack to choose a card, then tap Use this card.",
+    "zh-Hans": "Swipe the stack to choose a card, then tap Use this card.",
+    "ja": "Swipe the stack to choose a card, then tap Use this card.",
+    "ko": "Swipe the stack to choose a card, then tap Use this card.",
+    "vi": "Swipe the stack to choose a card, then tap Use this card.",
+    "es": "Swipe the stack to choose a card, then tap Use this card.",
+    "ar": "Swipe the stack to choose a card, then tap Use this card.",
+    "he": "Swipe the stack to choose a card, then tap Use this card.",
+    "de": "Swipe the stack to choose a card, then tap Use this card.",
+    "fr": "Swipe the stack to choose a card, then tap Use this card.",
+    "hi": "Swipe the stack to choose a card, then tap Use this card."
+  },
+  "ui.c5a17d183651e16a6e93a490": {
+    "en": "Swipe through cards in the stack, switch between stack and single-card view, and use share to export a card image.",
+    "zh-Hans": "滑动浏览堆栈中的卡片、在堆栈视图和单卡片视图之间切换，以及使用共享导出卡片图像。",
+    "ja": "スタック内のカードをスワイプし、スタック ビューと単一カード ビューを切り替え、共有を使用してカード イメージをエクスポートします。",
+    "ko": "스택의 카드를 스와이프하고, 스택과 단일 카드 보기 간에 전환하고, 공유를 사용하여 카드 이미지를 내보냅니다.",
+    "vi": "Vuốt qua các thẻ trong ngăn xếp, chuyển đổi giữa chế độ xem ngăn xếp và chế độ xem một thẻ, đồng thời sử dụng tính năng chia sẻ để xuất hình ảnh thẻ.",
+    "es": "Desliza las tarjetas en la pila, cambia entre la vista de pila y de una sola tarjeta y usa compartir para exportar la imagen de una tarjeta.",
+    "ar": "قم بالتمرير عبر البطاقات الموجودة في المكدس، وقم بالتبديل بين عرض المكدس وعرض البطاقة الفردية، واستخدم المشاركة لتصدير صورة البطاقة.",
+    "he": "החלק בין כרטיסים בערימה, עבור בין תצוגת ערימה לתצוגת קלף בודד, והשתמש בשיתוף כדי לייצא תמונת קלף.",
+    "de": "Wischen Sie durch die Karten im Stapel, wechseln Sie zwischen Stapel- und Einzelkartenansicht und verwenden Sie „Teilen“, um ein Kartenbild zu exportieren.",
+    "fr": "Faites défiler les cartes dans la pile, basculez entre l'affichage de la pile et l'affichage d'une seule carte et utilisez le partage pour exporter une image de carte.",
+    "hi": "स्टैक में कार्डों के माध्यम से स्वाइप करें, स्टैक और एकल-कार्ड दृश्य के बीच स्विच करें, और कार्ड छवि निर्यात करने के लिए शेयर का उपयोग करें।"
+  },
   "ui.4db965f36e2a13d0b772925a": {
     "en": "Sync your bankroll and session history safely across devices.",
     "zh-Hans": "跨设备安全地同步您的资金和会话历史记录。",
@@ -6343,6 +6915,19 @@
     "fr": "Synchronisez vos sessions et financez en toute sécurité sur tous les appareils.",
     "hi": "अपने सत्रों को सिंक करें और सभी डिवाइसों पर सुरक्षित रूप से बैंकरोल करें।"
   },
+  "ui.1ca36a90c342fa4fbb8d5c06": {
+    "en": "Take Photo",
+    "zh-Hans": "Take Photo",
+    "ja": "Take Photo",
+    "ko": "Take Photo",
+    "vi": "Take Photo",
+    "es": "Take Photo",
+    "ar": "Take Photo",
+    "he": "Take Photo",
+    "de": "Take Photo",
+    "fr": "Take Photo",
+    "hi": "Take Photo"
+  },
   "ui.7100ac9979a623d598684506": {
     "en": "Take photo",
     "zh-Hans": "拍照",
@@ -6355,6 +6940,32 @@
     "de": "Machen Sie ein Foto",
     "fr": "Prendre une photo",
     "hi": "फोटो लो"
+  },
+  "ui.cd814f7e42c7a980453500f7": {
+    "en": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "zh-Hans": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "ja": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "ko": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "vi": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "es": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "ar": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "he": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "de": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "fr": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+    "hi": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime."
+  },
+  "ui.febb53ea5370aa3a96b01202": {
+    "en": "Tap + to add a card from Camera or Photo Library, then enter reward program, current tier, expiration date, and notes.",
+    "zh-Hans": "点击 + 从相机或照片库添加卡，然后输入奖励计划、当前等级、到期日期和备注。",
+    "ja": "+ をタップしてカメラまたはフォト ライブラリからカードを追加し、特典プログラム、現在のレベル、有効期限、メモを入力します。",
+    "ko": "+를 눌러 카메라 또는 사진 라이브러리에서 카드를 추가한 다음 보상 프로그램, 현재 등급, 만료 날짜 및 메모를 입력하세요.",
+    "vi": "Nhấn vào + để thêm thẻ từ Máy ảnh hoặc Thư viện ảnh, sau đó nhập chương trình phần thưởng, cấp độ hiện tại, ngày hết hạn và ghi chú.",
+    "es": "Toque + para agregar una tarjeta desde la cámara o la biblioteca de fotos, luego ingrese el programa de recompensas, el nivel actual, la fecha de vencimiento y las notas.",
+    "ar": "اضغط على + لإضافة بطاقة من الكاميرا أو مكتبة الصور، ثم أدخل برنامج المكافآت، والمستوى الحالي، وتاريخ انتهاء الصلاحية، والملاحظات.",
+    "he": "הקש על + כדי להוסיף כרטיס מספריית המצלמה או התמונות, ואז היכנס לתוכנית התגמול, הרמה הנוכחית, תאריך התפוגה וההערות.",
+    "de": "Tippen Sie auf +, um eine Karte aus der Kamera oder Fotobibliothek hinzuzufügen, und geben Sie dann das Prämienprogramm, die aktuelle Stufe, das Ablaufdatum und Notizen ein.",
+    "fr": "Appuyez sur + pour ajouter une carte depuis l'appareil photo ou la photothèque, puis saisissez le programme de récompense, le niveau actuel, la date d'expiration et les notes.",
+    "hi": "कैमरा या फोटो लाइब्रेरी से कार्ड जोड़ने के लिए + टैप करें, फिर इनाम कार्यक्रम, वर्तमान स्तर, समाप्ति तिथि और नोट्स दर्ज करें।"
   },
   "ui.91b8e58e792c3a2e5172565e": {
     "en": "Tap Check In to pick game type (table games, slots, or poker), location, starting tier points, buy-in, and loyalty program details.",
@@ -6421,6 +7032,32 @@
     "fr": "Appuyez sur une ligne pour la modifier ou utilisez le menu pour la supprimer.",
     "hi": "संपादित करने के लिए किसी पंक्ति पर टैप करें, या हटाने के लिए मेनू का उपयोग करें।"
   },
+  "ui.f6c258bce74d76a0ff41a649": {
+    "en": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "zh-Hans": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "ja": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "ko": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "vi": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "es": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "ar": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "he": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "de": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "fr": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+    "hi": "Tap anywhere on the stack to enlarge · Swipe to move through cards"
+  },
+  "ui.8b759f96cc8d2071543e4ad2": {
+    "en": "Tap outside to close",
+    "zh-Hans": "Tap outside to close",
+    "ja": "Tap outside to close",
+    "ko": "Tap outside to close",
+    "vi": "Tap outside to close",
+    "es": "Tap outside to close",
+    "ar": "Tap outside to close",
+    "he": "Tap outside to close",
+    "de": "Tap outside to close",
+    "fr": "Tap outside to close",
+    "hi": "Tap outside to close"
+  },
   "ui.820e5a4016fc82d16198252c": {
     "en": "Target average",
     "zh-Hans": "目标平均值",
@@ -6433,6 +7070,45 @@
     "de": "Zieldurchschnitt",
     "fr": "Moyenne cible",
     "hi": "लक्ष्य औसत"
+  },
+  "ui.f49e00c08228f097180f1f47": {
+    "en": "Tax Prep",
+    "zh-Hans": "Tax Prep",
+    "ja": "Tax Prep",
+    "ko": "Tax Prep",
+    "vi": "Tax Prep",
+    "es": "Tax Prep",
+    "ar": "Tax Prep",
+    "he": "Tax Prep",
+    "de": "Tax Prep",
+    "fr": "Tax Prep",
+    "hi": "Tax Prep"
+  },
+  "ui.6f6026f2132ea8e6bb093d12": {
+    "en": "Tax Prep Filters",
+    "zh-Hans": "Tax Prep Filters",
+    "ja": "Tax Prep Filters",
+    "ko": "Tax Prep Filters",
+    "vi": "Tax Prep Filters",
+    "es": "Tax Prep Filters",
+    "ar": "Tax Prep Filters",
+    "he": "Tax Prep Filters",
+    "de": "Tax Prep Filters",
+    "fr": "Tax Prep Filters",
+    "hi": "Tax Prep Filters"
+  },
+  "ui.098b3bbc82e312fc5b83eb5a": {
+    "en": "Tax Year",
+    "zh-Hans": "Tax Year",
+    "ja": "Tax Year",
+    "ko": "Tax Year",
+    "vi": "Tax Year",
+    "es": "Tax Year",
+    "ar": "Tax Year",
+    "he": "Tax Year",
+    "de": "Tax Year",
+    "fr": "Tax Year",
+    "hi": "Tax Year"
   },
   "ui.069c9c49f64cddd45e628b59": {
     "en": "The app needs a game, a location, and at least one buy-in recorded for that session.",
@@ -6460,6 +7136,19 @@
     "fr": "Thème et couleurs",
     "hi": "थीम और रंग"
   },
+  "ui.efea83034f4c7003326a574e": {
+    "en": "This clears previous tier progression for this card. You cannot undo it.",
+    "zh-Hans": "This clears previous tier progression for this card. You cannot undo it.",
+    "ja": "This clears previous tier progression for this card. You cannot undo it.",
+    "ko": "This clears previous tier progression for this card. You cannot undo it.",
+    "vi": "This clears previous tier progression for this card. You cannot undo it.",
+    "es": "This clears previous tier progression for this card. You cannot undo it.",
+    "ar": "This clears previous tier progression for this card. You cannot undo it.",
+    "he": "This clears previous tier progression for this card. You cannot undo it.",
+    "de": "This clears previous tier progression for this card. You cannot undo it.",
+    "fr": "This clears previous tier progression for this card. You cannot undo it.",
+    "hi": "This clears previous tier progression for this card. You cannot undo it."
+  },
   "ui.663182b34f349dff4193e80a": {
     "en": "This flight leg was removed.",
     "zh-Hans": "该航段已被移除。",
@@ -6472,6 +7161,19 @@
     "de": "Dieser Flugabschnitt wurde entfernt.",
     "fr": "Cette étape de vol a été supprimée.",
     "hi": "इस फ्लाइट लेग को हटा दिया गया।"
+  },
+  "ui.a035792c3494e076ddcf30f1": {
+    "en": "This permanently removes the card photo, details, and tier history.",
+    "zh-Hans": "This permanently removes the card photo, details, and tier history.",
+    "ja": "This permanently removes the card photo, details, and tier history.",
+    "ko": "This permanently removes the card photo, details, and tier history.",
+    "vi": "This permanently removes the card photo, details, and tier history.",
+    "es": "This permanently removes the card photo, details, and tier history.",
+    "ar": "This permanently removes the card photo, details, and tier history.",
+    "he": "This permanently removes the card photo, details, and tier history.",
+    "de": "This permanently removes the card photo, details, and tier history.",
+    "fr": "This permanently removes the card photo, details, and tier history.",
+    "hi": "This permanently removes the card photo, details, and tier history."
   },
   "ui.fe0bc6a25938fbecb22d6d22": {
     "en": "This session will be permanently removed. This cannot be undone.",
@@ -6603,6 +7305,19 @@
     "fr": "Progression des niveaux au fil du temps",
     "hi": "समय के साथ स्तरीय प्रगति"
   },
+  "ui.984bd04f1fb9cfa116430667": {
+    "en": "Tier history",
+    "zh-Hans": "Tier history",
+    "ja": "Tier history",
+    "ko": "Tier history",
+    "vi": "Tier history",
+    "es": "Tier history",
+    "ar": "Tier history",
+    "he": "Tier history",
+    "de": "Tier history",
+    "fr": "Tier history",
+    "hi": "Tier history"
+  },
   "ui.b830e68ae5ae0ef361ed19e3": {
     "en": "Tier points",
     "zh-Hans": "等级积分",
@@ -6694,6 +7409,19 @@
     "fr": "TierTap Pro (remplacement du développeur)",
     "hi": "टियरटैप प्रो (डेवलपर ओवरराइड)"
   },
+  "ui.84061a796283da2d22a6a7d3": {
+    "en": "TierTap Pro is included on this TestFlight build.",
+    "zh-Hans": "TierTap Pro is included on this TestFlight build.",
+    "ja": "TierTap Pro is included on this TestFlight build.",
+    "ko": "TierTap Pro is included on this TestFlight build.",
+    "vi": "TierTap Pro is included on this TestFlight build.",
+    "es": "TierTap Pro is included on this TestFlight build.",
+    "ar": "TierTap Pro is included on this TestFlight build.",
+    "he": "TierTap Pro is included on this TestFlight build.",
+    "de": "TierTap Pro is included on this TestFlight build.",
+    "fr": "TierTap Pro is included on this TestFlight build.",
+    "hi": "TierTap Pro is included on this TestFlight build."
+  },
   "ui.705f7a3dedf5d778e9220750": {
     "en": "TierTap Pro — Monthly",
     "zh-Hans": "TierTap Pro — 每月",
@@ -6759,6 +7487,19 @@
     "fr": "Guide de l'utilisateur TierTap",
     "hi": "टियरटैप उपयोगकर्ता गाइड"
   },
+  "ui.411109538de32eeccba5206f": {
+    "en": "TierTap Wallet",
+    "zh-Hans": "TierTap 钱包",
+    "ja": "ティアタップウォレット",
+    "ko": "TierTap 지갑",
+    "vi": "Ví TierTap",
+    "es": "Monedero TierTap",
+    "ar": "محفظة TierTap",
+    "he": "ארנק TierTap",
+    "de": "TierTap-Geldbörse",
+    "fr": "Portefeuille TierTap",
+    "hi": "टियरटैप वॉलेट"
+  },
   "ui.d305cd65706f29eacbea87d8": {
     "en": "TierTap account",
     "zh-Hans": "TierTap 帐户",
@@ -6810,6 +7551,19 @@
     "de": "TierTap ist gesperrt",
     "fr": "TierTap est verrouillé",
     "hi": "टियरटैप लॉक है"
+  },
+  "ui.68fde20d2041aec2affdf662": {
+    "en": "TierTap tier points changed",
+    "zh-Hans": "TierTap tier points changed",
+    "ja": "TierTap tier points changed",
+    "ko": "TierTap tier points changed",
+    "vi": "TierTap tier points changed",
+    "es": "TierTap tier points changed",
+    "ar": "TierTap tier points changed",
+    "he": "TierTap tier points changed",
+    "de": "TierTap tier points changed",
+    "fr": "TierTap tier points changed",
+    "hi": "TierTap tier points changed"
   },
   "ui.3c40bcafcbd3dab070409f6a": {
     "en": "Timer running",
@@ -6863,6 +7617,19 @@
     "fr": "Conseils : effacez les filtres lorsque votre liste semble vide mais que vous savez que vous avez des sessions.",
     "hi": "युक्तियाँ: जब आपकी सूची खाली दिखे लेकिन आपको पता हो कि आपके पास सत्र हैं तो फ़िल्टर साफ़ करें।"
   },
+  "ui.1ca2f53ee4a1f7b780ee3d6f": {
+    "en": "Tips: Frame the top game title and avoid glare or motion blur for better recognition.",
+    "zh-Hans": "提示：将顶级游戏标题框起来，避免眩光或运动模糊，以便更好地识别。",
+    "ja": "ヒント: 認識しやすくするために、トップのゲーム タイトルをフレームに収め、グレアやモーション ブラーを避けてください。",
+    "ko": "팁: 더 나은 인식을 위해 상위 게임 타이틀의 프레임을 지정하고 눈부심이나 모션 블러를 피하세요.",
+    "vi": "Mẹo: Đóng khung tiêu đề trò chơi hàng đầu và tránh ánh sáng chói hoặc nhòe chuyển động để nhận dạng tốt hơn.",
+    "es": "Consejos: encuadre el título del juego superior y evite el deslumbramiento o el desenfoque de movimiento para un mejor reconocimiento.",
+    "ar": "نصائح: ضع إطارًا لعنوان اللعبة العلوي وتجنب الوهج أو ضبابية الحركة للتعرف عليه بشكل أفضل.",
+    "he": "טיפים: מסגרת את כותרת המשחק העליון והימנע מסנוור או טשטוש תנועה לזיהוי טוב יותר.",
+    "de": "Tipps: Rahmen Sie den Top-Spieltitel ein und vermeiden Sie Blendung oder Bewegungsunschärfe für eine bessere Erkennung.",
+    "fr": "Conseils : Cadrez le titre du jeu principal et évitez les reflets ou le flou de mouvement pour une meilleure reconnaissance.",
+    "hi": "टिप्स: शीर्ष गेम शीर्षक को फ़्रेम करें और बेहतर पहचान के लिए चकाचौंध या मोशन ब्लर से बचें।"
+  },
   "ui.40281905b158df5c7707488d": {
     "en": "Tips: If you indicate a difficult emotional outcome, the app may offer supportive resources you can open or dismiss.",
     "zh-Hans": "提示：如果您表示出现困难的情绪结果，该应用程序可能会提供您可以打开或关闭的支持资源。",
@@ -6888,6 +7655,19 @@
     "de": "Tipps: Halten Sie das Guthaben und die Einheitengröße in den Einstellungen auf dem neuesten Stand, damit die Risikoansichten aussagekräftig bleiben.",
     "fr": "Conseils : gardez à jour la bankroll et la taille des unités dans les paramètres afin que les vues sur les risques restent significatives.",
     "hi": "युक्तियाँ: सेटिंग्स में बैंकरोल और इकाई आकार को अद्यतन रखें ताकि जोखिम विचार सार्थक बने रहें।"
+  },
+  "ui.2514a8298907eee3aa21a734": {
+    "en": "Tips: Keep the reward program and current tier fields up to date so check-in and tier tracking stay accurate.",
+    "zh-Hans": "提示：保持奖励计划和当前等级字段处于最新状态，以便签到和等级跟踪保持准确。",
+    "ja": "ヒント: チェックインとティアの追跡が正確に行われるように、特典プログラムと現在のティアのフィールドを最新の状態に保ってください。",
+    "ko": "팁: 체크인 및 등급 추적이 정확하게 유지되도록 보상 프로그램과 현재 등급 필드를 최신 상태로 유지하세요.",
+    "vi": "Mẹo: Luôn cập nhật chương trình phần thưởng và các trường cấp độ hiện tại để việc đăng ký và theo dõi cấp độ luôn chính xác.",
+    "es": "Consejos: Mantenga actualizados el programa de recompensas y los campos de niveles actuales para que el registro y el seguimiento de niveles sean precisos.",
+    "ar": "نصائح: حافظ على تحديث برنامج المكافآت وحقول الطبقة الحالية حتى يظل تسجيل الوصول وتتبع الطبقة دقيقين.",
+    "he": "טיפים: עדכני את תוכנית התגמול ושדות השכבות הנוכחיות כדי שהצ'ק-אין ומעקב השכבות יישארו מדויקים.",
+    "de": "Tipps: Halten Sie das Prämienprogramm und die aktuellen Stufenfelder auf dem neuesten Stand, damit Check-in und Stufenverfolgung korrekt bleiben.",
+    "fr": "Conseils : Gardez le programme de récompense et les champs de niveau actuel à jour afin que l'enregistrement et le suivi des niveaux restent précis.",
+    "hi": "युक्तियाँ: इनाम कार्यक्रम और वर्तमान टियर फ़ील्ड को अद्यतित रखें ताकि चेक-इन और टियर ट्रैकिंग सटीक बनी रहे।"
   },
   "ui.3a134f98e027a22c7bd49542": {
     "en": "Tips: Keep the watch and phone in sync for the most reliable session state.",
@@ -7006,19 +7786,6 @@
     "fr": "À",
     "hi": "को"
   },
-  "ui.2baed11bc1efeb6d76e8863d": {
-    "en": "To change your subscription, choose a different plan below and tap \"Change plan\".",
-    "zh-Hans": "要更改您的订阅，请在下面选择不同的计划，然后点击“更改计划”。",
-    "ja": "サブスクリプションを変更するには、以下の別のプランを選択し、「プランを変更」をタップします。",
-    "ko": "구독을 변경하려면 아래에서 다른 요금제를 선택하고 '요금제 변경'을 탭하세요.",
-    "vi": "Để thay đổi đăng ký của bạn, hãy chọn gói khác bên dưới và nhấn \"Thay đổi gói\".",
-    "es": "Para cambiar su suscripción, elija un plan diferente a continuación y toque \"Cambiar plan\".",
-    "ar": "لتغيير اشتراكك، اختر خطة مختلفة أدناه وانقر على \"تغيير الخطة\".",
-    "he": "כדי לשנות את המנוי שלך, בחר תוכנית אחרת למטה והקש על \"שנה תוכנית\".",
-    "de": "Um Ihr Abonnement zu ändern, wählen Sie unten einen anderen Plan aus und tippen Sie auf „Plan ändern“.",
-    "fr": "Pour modifier votre abonnement, choisissez un autre forfait ci-dessous et appuyez sur « Changer de forfait ».",
-    "hi": "अपनी सदस्यता बदलने के लिए, नीचे एक अलग योजना चुनें और \"योजना बदलें\" पर टैप करें।"
-  },
   "ui.0e5c8694f0544c31f789636a": {
     "en": "To enable sign-in, add your Supabase keys. You can still use TierTap without an account.",
     "zh-Hans": "要启用登录，请添加您的 Supabase 密钥。即使没有帐户，您仍然可以使用 TierTap。",
@@ -7044,6 +7811,19 @@
     "de": "Tonfall",
     "fr": "Ton de voix",
     "hi": "आवाज का स्वर"
+  },
+  "ui.ea93d6a262ecb87a9fa4d09e": {
+    "en": "Tools",
+    "zh-Hans": "Tools",
+    "ja": "Tools",
+    "ko": "Tools",
+    "vi": "Tools",
+    "es": "Tools",
+    "ar": "Tools",
+    "he": "Tools",
+    "de": "Tools",
+    "fr": "Tools",
+    "hi": "Tools"
   },
   "ui.b34d8e6fca11f2ddec6174ee": {
     "en": "Total Buy-In",
@@ -7305,6 +8085,19 @@
     "fr": "Prochain",
     "hi": "आगामी"
   },
+  "ui.b9d8ea81454f73a72d849e38": {
+    "en": "Updating your wallet card to match this session.",
+    "zh-Hans": "Updating your wallet card to match this session.",
+    "ja": "Updating your wallet card to match this session.",
+    "ko": "Updating your wallet card to match this session.",
+    "vi": "Updating your wallet card to match this session.",
+    "es": "Updating your wallet card to match this session.",
+    "ar": "Updating your wallet card to match this session.",
+    "he": "Updating your wallet card to match this session.",
+    "de": "Updating your wallet card to match this session.",
+    "fr": "Updating your wallet card to match this session.",
+    "hi": "Updating your wallet card to match this session."
+  },
   "ui.27511c9571712ef9067d0808": {
     "en": "Use Export sessions as CSV in Settings to send a file to Files, email, or another app.",
     "zh-Hans": "使用“设置”中的“将会话导出为 CSV”将文件发送到“文件”、电子邮件或其他应用程序。",
@@ -7317,6 +8110,19 @@
     "de": "Verwenden Sie „Sitzungen als CSV exportieren“ in den Einstellungen, um eine Datei an Dateien, E-Mail oder eine andere App zu senden.",
     "fr": "Utilisez Exporter les sessions au format CSV dans Paramètres pour envoyer un fichier vers Fichiers, par courrier électronique ou vers une autre application.",
     "hi": "फ़ाइलों, ईमेल या किसी अन्य ऐप पर फ़ाइल भेजने के लिए सेटिंग्स में CSV के रूप में निर्यात सत्र का उपयोग करें।"
+  },
+  "ui.de0a37179b54dda93decf8a6": {
+    "en": "Use a tighter, well-lit photo of the machine title area and retry. If recognition still fails, enter the game manually and continue.",
+    "zh-Hans": "使用机器标题区域的更紧凑、光线充足的照片并重试。如果仍然识别失败，请手动进入游戏并继续。",
+    "ja": "マシンのタイトル領域がしっかりと写った明るい写真を使用して、再試行してください。それでも認識に失敗する場合は、手動でゲームに入って続行してください。",
+    "ko": "기계 제목 영역을 더 잘 보이고 조명이 밝은 사진을 사용하고 다시 시도하십시오. 그래도 인식이 실패하면 수동으로 게임에 들어가서 계속하세요.",
+    "vi": "Hãy sử dụng một bức ảnh chụp khu vực tiêu đề máy có độ sáng tốt hơn và chặt chẽ hơn và thử lại. Nếu vẫn không nhận dạng được, hãy vào trò chơi theo cách thủ công và tiếp tục.",
+    "es": "Utilice una fotografía más ajustada y bien iluminada del área del título de la máquina y vuelva a intentarlo. Si el reconocimiento aún falla, ingresa al juego manualmente y continúa.",
+    "ar": "استخدم صورة أكثر إحكامًا وجيدة الإضاءة لمنطقة عنوان الجهاز ثم أعد المحاولة. إذا استمر فشل التعرف، فأدخل اللعبة يدويًا وتابع.",
+    "he": "השתמש בתמונה הדוקה ומוארת יותר של אזור כותרת המכונה ונסה שוב. אם הזיהוי עדיין נכשל, היכנסו למשחק ידנית והמשיכו.",
+    "de": "Verwenden Sie ein engeres, gut beleuchtetes Foto des Maschinentitelbereichs und versuchen Sie es erneut. Wenn die Erkennung immer noch fehlschlägt, betreten Sie das Spiel manuell und fahren Sie fort.",
+    "fr": "Utilisez une photo plus serrée et bien éclairée de la zone du titre de la machine et réessayez. Si la reconnaissance échoue toujours, entrez dans le jeu manuellement et continuez.",
+    "hi": "मशीन शीर्षक क्षेत्र की एक सघन, अच्छी रोशनी वाली तस्वीर का उपयोग करें और पुनः प्रयास करें। यदि पहचान अभी भी विफल रहती है, तो गेम को मैन्युअल रूप से दर्ज करें और जारी रखें।"
   },
   "ui.773d765417bdfb680f62cf2d": {
     "en": "Use as cash-out amount",
@@ -7382,6 +8188,32 @@
     "de": "Wenn Sie Ihre Lieblingsspiele und -orte eingerichtet haben, verwenden Sie die Shortcut-Zeile, um mit nur einem Fingertipp zu starten.",
     "fr": "Utilisez la ligne de raccourcis pour démarrer en un seul clic lorsque vous avez configuré vos jeux et emplacements favoris.",
     "hi": "जब आप पसंदीदा गेम और स्थान सेट कर लें तो वन-टैप प्रारंभ के लिए शॉर्टकट पंक्ति का उपयोग करें।"
+  },
+  "ui.a0bb01243b1ff4a5230e4215": {
+    "en": "Use the tier-history control to view progression snapshots captured over time for that card.",
+    "zh-Hans": "使用层历史控件查看该卡随时间推移捕获的进度快照。",
+    "ja": "階層履歴コントロールを使用して、そのカードについて長期間にわたってキャプチャされた進行状況のスナップショットを表示します。",
+    "ko": "계층 기록 컨트롤을 사용하면 해당 카드에 대해 시간 경과에 따라 캡처된 진행 상황 스냅샷을 볼 수 있습니다.",
+    "vi": "Sử dụng tính năng kiểm soát lịch sử cấp độ để xem ảnh chụp nhanh tiến trình được ghi lại theo thời gian cho thẻ đó.",
+    "es": "Utilice el control del historial de niveles para ver instantáneas de progresión capturadas a lo largo del tiempo para esa tarjeta.",
+    "ar": "استخدم عنصر التحكم في محفوظات الطبقة لعرض لقطات التقدم التي تم التقاطها بمرور الوقت لتلك البطاقة.",
+    "he": "השתמש בפקד היסטוריית השכבות כדי להציג תמונות התקדמות שצולמו לאורך זמן עבור כרטיס זה.",
+    "de": "Verwenden Sie die Steuerung des Stufenverlaufs, um im Laufe der Zeit für diese Karte erfasste Fortschritts-Snapshots anzuzeigen.",
+    "fr": "Utilisez le contrôle de l'historique des niveaux pour afficher les instantanés de progression capturés au fil du temps pour cette carte.",
+    "hi": "उस कार्ड के लिए समय के साथ कैप्चर किए गए प्रगति स्नैपशॉट देखने के लिए टियर-इतिहास नियंत्रण का उपयोग करें।"
+  },
+  "ui.d1aa7bdaa238ee9227a66d4a": {
+    "en": "Use this card",
+    "zh-Hans": "Use this card",
+    "ja": "Use this card",
+    "ko": "Use this card",
+    "vi": "Use this card",
+    "es": "Use this card",
+    "ar": "Use this card",
+    "he": "Use this card",
+    "de": "Use this card",
+    "fr": "Use this card",
+    "hi": "Use this card"
   },
   "ui.562f1d9f3de24f92c3ec644c": {
     "en": "Use trip dates for filter",
@@ -7499,6 +8331,32 @@
     "de": "Warten auf Ihren Standort…",
     "fr": "En attendant votre position…",
     "hi": "आपके स्थान की प्रतीक्षा में..."
+  },
+  "ui.d1c9a01d57e900867b703695": {
+    "en": "Wallet",
+    "zh-Hans": "Wallet",
+    "ja": "Wallet",
+    "ko": "Wallet",
+    "vi": "Wallet",
+    "es": "Wallet",
+    "ar": "Wallet",
+    "he": "Wallet",
+    "de": "Wallet",
+    "fr": "Wallet",
+    "hi": "Wallet"
+  },
+  "ui.42a01c33ff07b5b8216718fc": {
+    "en": "Wallet card image or details are outdated",
+    "zh-Hans": "钱包卡图像或详细信息已过时",
+    "ja": "ウォレット カードの画像または詳細が古いです",
+    "ko": "월렛 카드 이미지 또는 세부정보가 오래되었습니다.",
+    "vi": "Hình ảnh hoặc chi tiết thẻ Wallet đã lỗi thời",
+    "es": "La imagen o los detalles de la tarjeta Wallet están desactualizados",
+    "ar": "صورة بطاقة المحفظة أو تفاصيلها قديمة",
+    "he": "תמונת כרטיס הארנק או הפרטים מיושנים",
+    "de": "Das Bild oder die Details der Wallet-Karte sind veraltet",
+    "fr": "L'image ou les détails de la carte Wallet sont obsolètes",
+    "hi": "वॉलेट कार्ड की छवि या विवरण पुराने हैं"
   },
   "ui.f878a70f3f93dbb9db8d6244": {
     "en": "We'll email a one-time sign-in link — no password.",
@@ -7669,6 +8527,19 @@
     "fr": "Ce qu'il fait : connectez-vous ou déconnectez-vous, gérez TierTap Pro et configurez le verrouillage d'application en option.",
     "hi": "यह क्या करता है: साइन इन या आउट करें, टियरटैप प्रो प्रबंधित करें और वैकल्पिक ऐप लॉक कॉन्फ़िगर करें।"
   },
+  "ui.9716bb8f7a5deca62d70d63e": {
+    "en": "What it does: Stores photos of your loyalty cards or status screens with quick card details and optional tier-history overlay.",
+    "zh-Hans": "它的作用：存储您的会员卡或状态屏幕的照片，以及快速卡详细信息和可选的等级历史记录叠加。",
+    "ja": "機能: ポイントカードまたはステータス画面の写真を、カードの詳細とオプションの階層履歴オーバーレイとともに保存します。",
+    "ko": "기능: 빠른 카드 세부 정보 및 선택적인 등급 기록 오버레이를 사용하여 로열티 카드 또는 상태 화면의 사진을 저장합니다.",
+    "vi": "Chức năng: Lưu trữ ảnh thẻ khách hàng thân thiết hoặc màn hình trạng thái của bạn với thông tin nhanh về thẻ và lớp phủ lịch sử cấp độ tùy chọn.",
+    "es": "Qué hace: almacena fotografías de sus tarjetas de fidelidad o pantallas de estado con detalles rápidos de la tarjeta y superposición opcional del historial de niveles.",
+    "ar": "ماذا يفعل: يقوم بتخزين صور بطاقات الولاء أو شاشات الحالة الخاصة بك مع تفاصيل البطاقة السريعة وتراكب سجل الطبقة الاختياري.",
+    "he": "מה זה עושה: מאחסן תמונות של כרטיסי הנאמנות או מסכי הסטטוס שלך עם פרטי כרטיסים מהירים ושכבת-על אופציונלית של היסטוריית שכבות.",
+    "de": "Was es macht: Speichert Fotos Ihrer Treuekarten oder Statusbildschirme mit schnellen Kartendetails und optionaler Einblendung des Statusverlaufs.",
+    "fr": "Ce qu'il fait : stocke des photos de vos cartes de fidélité ou des écrans de statut avec des détails rapides sur la carte et une superposition facultative de l'historique des niveaux.",
+    "hi": "यह क्या करता है: आपके लॉयल्टी कार्ड या स्टेटस स्क्रीन की तस्वीरें त्वरित कार्ड विवरण और वैकल्पिक टियर-इतिहास ओवरले के साथ संग्रहीत करता है।"
+  },
   "ui.2a5565f45ca9af56feb17d41": {
     "en": "What it does: Tracks bankroll-related views tied to your settings and play (alongside bankroll fields in Settings).",
     "zh-Hans": "它的作用：跟踪与您的设置和游戏相关的资金相关视图（以及“设置”中的资金字段）。",
@@ -7694,6 +8565,19 @@
     "de": "Was es macht: Verwandelt eine Live-Sitzung in eine gespeicherte Aufzeichnung mit Sieg/Niederlage, Stufenfortschritt und optionalen Foto- oder Chip-Tools.",
     "fr": "Ce qu'il fait : Transforme une session en direct en un enregistrement enregistré avec des gains/pertes, une progression de niveau et des outils de photo ou de puce en option.",
     "hi": "यह क्या करता है: लाइव सत्र को जीत/हार, स्तरीय प्रगति और वैकल्पिक फोटो या चिप टूल के साथ सहेजे गए रिकॉर्ड में बदल देता है।"
+  },
+  "ui.0e49ae2af2da644628065804": {
+    "en": "What it does: Uses TierTap AI to read a slot machine photo during check-in and suggest a game name with a short note.",
+    "zh-Hans": "功能：使用 TierTap AI 在签到期间读取老虎机照片，并建议带有简短说明的游戏名称。",
+    "ja": "機能: TierTap AI を使用して、チェックイン中にスロット マシンの写真を読み取り、短いメモとともにゲーム名を提案します。",
+    "ko": "기능: TierTap AI를 사용하여 체크인 중에 슬롯머신 사진을 읽고 짧은 메모와 함께 게임 이름을 제안합니다.",
+    "vi": "Công dụng: Sử dụng TierTap AI để đọc ảnh máy đánh bạc trong quá trình đăng ký và đề xuất tên trò chơi kèm theo một ghi chú ngắn.",
+    "es": "Qué hace: utiliza TierTap AI para leer la foto de una máquina tragamonedas durante el check-in y sugerir el nombre de un juego con una nota breve.",
+    "ar": "ماذا يفعل: يستخدم TierTap AI لقراءة صورة ماكينة القمار أثناء تسجيل الوصول واقتراح اسم لعبة مع ملاحظة قصيرة.",
+    "he": "מה זה עושה: משתמש ב-TierTap AI כדי לקרוא תמונה של מכונות מזל במהלך הצ'ק-אין ולהציע שם משחק עם הערה קצרה.",
+    "de": "Was es tut: Verwendet TierTap AI, um beim Check-in ein Spielautomatenfoto zu lesen und einen Spielnamen mit einer kurzen Notiz vorzuschlagen.",
+    "fr": "Ce qu'il fait : utilise TierTap AI pour lire une photo de machine à sous lors de l'enregistrement et suggérer un nom de jeu avec une courte note.",
+    "hi": "यह क्या करता है: चेक-इन के दौरान स्लॉट मशीन की तस्वीर पढ़ने और संक्षिप्त नोट के साथ गेम का नाम सुझाने के लिए टियरटैप एआई का उपयोग करता है।"
   },
   "ui.d5d5115f22a72fc9b4fc5cd0": {
     "en": "What it does: Your hub for starting sessions, seeing an active session at a glance, and opening bankroll, history, and related tools.",
@@ -7864,6 +8748,19 @@
     "fr": "Pourquoi créer un compte ?",
     "hi": "अकाउंट क्यों बनाया जाए?"
   },
+  "ui.a70e00dbf352d00d6b714162": {
+    "en": "Why did slot scanning fail?",
+    "zh-Hans": "为什么插槽扫描失败？",
+    "ja": "スロット スキャンが失敗したのはなぜですか?",
+    "ko": "슬롯 스캔이 실패한 이유는 무엇입니까?",
+    "vi": "Tại sao quét khe không thành công?",
+    "es": "¿Por qué falló el escaneo de ranuras?",
+    "ar": "لماذا فشل فحص الفتحة؟",
+    "he": "מדוע נכשלה סריקת החריצים?",
+    "de": "Warum ist das Slot-Scannen fehlgeschlagen?",
+    "fr": "Pourquoi l'analyse des emplacements a-t-elle échoué ?",
+    "hi": "स्लॉट स्कैनिंग विफल क्यों हुई?"
+  },
   "ui.8ca2ac6b2c9f0a3a2e02e078": {
     "en": "Why doesn’t Community or AI work?",
     "zh-Hans": "为什么社区或人工智能不起作用？",
@@ -8020,19 +8917,6 @@
     "fr": "Vous êtes peut-être déconnecté ou l'application propose peut-être la configuration d'un compte après le déverrouillage. Connectez-vous une fois ou rejetez si vous continuez sans les fonctionnalités du compte.",
     "hi": "हो सकता है कि आप साइन आउट हो गए हों, या ऐप अनलॉक के बाद खाता सेटअप की पेशकश कर रहा हो। यदि आप खाता सुविधाओं के बिना जारी रखेंगे तो एक बार साइन इन करें या खारिज कर दें।"
   },
-  "ui.038793ddc5f836490cc6a6e1": {
-    "en": "You're currently subscribed",
-    "zh-Hans": "您目前已订阅",
-    "ja": "現在購読中です",
-    "ko": "현재 구독 중입니다.",
-    "vi": "Bạn hiện đã đăng ký",
-    "es": "Actualmente estás suscrito",
-    "ar": "أنت مشترك حاليا",
-    "he": "אתה מנוי כרגע",
-    "de": "Sie sind derzeit abonniert",
-    "fr": "Vous êtes actuellement abonné",
-    "hi": "आपने वर्तमान में सदस्यता ले ली है"
-  },
   "ui.c23c46d95ca2c92cff66fe6a": {
     "en": "You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.",
     "zh-Hans": "您尚未登录。打开 **社区** 选项卡，使用 Apple、Google 或魔法链接电子邮件登录。",
@@ -8110,6 +8994,19 @@
     "de": "Ihr Fortschritt",
     "fr": "Votre progression",
     "hi": "आपकी प्रगति"
+  },
+  "ui.9c8b675c5ea3fb51249a524c": {
+    "en": "Your wallet now shows this TierTap balance.",
+    "zh-Hans": "Your wallet now shows this TierTap balance.",
+    "ja": "Your wallet now shows this TierTap balance.",
+    "ko": "Your wallet now shows this TierTap balance.",
+    "vi": "Your wallet now shows this TierTap balance.",
+    "es": "Your wallet now shows this TierTap balance.",
+    "ar": "Your wallet now shows this TierTap balance.",
+    "he": "Your wallet now shows this TierTap balance.",
+    "de": "Your wallet now shows this TierTap balance.",
+    "fr": "Your wallet now shows this TierTap balance.",
+    "hi": "Your wallet now shows this TierTap balance."
   },
   "ui.62ceef210417fa3483322226": {
     "en": "You’ll briefly see the splash screen, then land on the main tab bar.",

@@ -186,6 +186,23 @@ enum UserGuideContent {
             .paragraph(loc("How to use it: Open from the Sessions tab when you want a focused bankroll screen during or between trips.", language)),
             .paragraph(loc("Tips: Keep bankroll and unit size in Settings updated so risk views stay meaningful.", language)),
 
+            .h2(loc("TierTap Wallet", language)),
+            .paragraph(loc("What it does: Stores photos of your loyalty cards or status screens with quick card details and optional tier-history overlay.", language)),
+            .paragraph(loc("How to use it:", language)),
+            .bullet(loc("Open TierTap Wallet from session flows (for card selection) or from app shortcuts where available.", language)),
+            .bullet(loc("Tap + to add a card from Camera or Photo Library, then enter reward program, current tier, expiration date, and notes.", language)),
+            .bullet(loc("Swipe through cards in the stack, switch between stack and single-card view, and use share to export a card image.", language)),
+            .bullet(loc("Use the tier-history control to view progression snapshots captured over time for that card.", language)),
+            .paragraph(loc("Tips: Keep the reward program and current tier fields up to date so check-in and tier tracking stay accurate.", language)),
+
+            .h2(loc("Slot game reader", language)),
+            .paragraph(loc("What it does: Uses TierTap AI to read a slot machine photo during check-in and suggest a game name with a short note.", language)),
+            .paragraph(loc("How to use it:", language)),
+            .bullet(loc("Start a Slots check-in, then tap Scan slot game name.", language)),
+            .bullet(loc("Choose Camera or Photo Library and capture the machine title area as clearly as possible.", language)),
+            .bullet(loc("Review the suggested game name and notes, then adjust before continuing if needed.", language)),
+            .paragraph(loc("Tips: Frame the top game title and avoid glare or motion blur for better recognition.", language)),
+
             .h2(loc("Analytics", language)),
             .paragraph(loc("What it does: Charts and summaries of closed sessions, broken out by table games, slots, or poker where applicable.", language)),
             .paragraph(loc("How to use it:", language)),
@@ -236,6 +253,10 @@ enum UserGuideContent {
             .paragraph(loc("Use Export sessions as CSV in Settings to send a file to Files, email, or another app.", language)),
             .h2(loc("Can I change language or currency?", language)),
             .paragraph(loc("Yes—use App language and Currency in Settings under Bankroll & Localization.", language)),
+            .h2(loc("Why did slot scanning fail?", language)),
+            .paragraph(loc("Slot scanning needs TierTap Pro, a signed-in account, and a clear machine photo. Try retaking the image with the title area in focus and less glare.", language)),
+            .h2(loc("How do I update or remove a wallet card?", language)),
+            .paragraph(loc("Open TierTap Wallet, select the card, then use Edit card for details/photo updates or Delete card to remove it permanently.", language)),
         ]
     }
 
@@ -252,6 +273,10 @@ enum UserGuideContent {
             .paragraph(loc("Pick a game type that matches the sessions you’ve saved; older entries may default to table games.", language)),
             .h2(loc("Sign-in sheet keeps appearing", language)),
             .paragraph(loc("You may be signed out, or the app may be offering account setup after unlock. Sign in once or dismiss if you’ll continue without account features.", language)),
+            .h2(loc("Slot scanner can’t identify game name", language)),
+            .paragraph(loc("Use a tighter, well-lit photo of the machine title area and retry. If recognition still fails, enter the game manually and continue.", language)),
+            .h2(loc("Wallet card image or details are outdated", language)),
+            .paragraph(loc("Open TierTap Wallet, edit the card, and retake or replace the photo. Save changes to refresh what appears in selection and share views.", language)),
         ]
     }
 }
