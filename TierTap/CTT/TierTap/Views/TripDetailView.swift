@@ -7,6 +7,7 @@ struct TripDetailView: View {
     @EnvironmentObject var tripStore: TripStore
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
@@ -91,6 +92,7 @@ struct TripDetailView: View {
             SessionDetailView(session: session)
                 .environmentObject(sessionStore)
                 .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
         }

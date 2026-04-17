@@ -1116,7 +1116,7 @@ private struct SettingsSection<Content: View>: View {
                         .font(.headline)
                         .foregroundColor(.white)
                     Spacer()
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white.opacity(0.8))
                 }

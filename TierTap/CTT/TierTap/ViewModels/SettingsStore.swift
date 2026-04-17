@@ -15,6 +15,7 @@ private let keyUseEighteenX = "ctt_use_eighteen_x"
 private let keyFavoriteGames = "ctt_favorite_games"
 private let keyFavoriteSlotGames = "ctt_favorite_slot_games"
 private let keyFavoriteCasinos = "ctt_favorite_casinos"
+private let keyCustomRewardPrograms = "ctt_custom_reward_programs"
 private let keyPrimaryColorName = "ctt_primary_color_name"
 private let keySecondaryColorName = "ctt_secondary_color_name"
 private let keyPrimaryColorHex = "ctt_primary_color_hex"
@@ -247,6 +248,11 @@ final class SettingsStore: ObservableObject {
     /// User-favorited casino locations for quick selection.
     @Published var favoriteCasinos: [String] {
         didSet { UserDefaults.standard.set(favoriteCasinos, forKey: keyFavoriteCasinos) }
+    }
+
+    /// User-added reward program names (shared by check-in pickers and wallet card editors).
+    @Published var customRewardPrograms: [String] {
+        didSet { UserDefaults.standard.set(customRewardPrograms, forKey: keyCustomRewardPrograms) }
     }
 
     /// Default game category to show in game pickers and analytics (Table, Slots, or Poker).
@@ -553,6 +559,7 @@ final class SettingsStore: ObservableObject {
         self.favoriteGames = UserDefaults.standard.stringArray(forKey: keyFavoriteGames) ?? []
         self.favoriteSlotGames = UserDefaults.standard.stringArray(forKey: keyFavoriteSlotGames) ?? []
         self.favoriteCasinos = UserDefaults.standard.stringArray(forKey: keyFavoriteCasinos) ?? []
+        self.customRewardPrograms = UserDefaults.standard.stringArray(forKey: keyCustomRewardPrograms) ?? []
         if let raw = UserDefaults.standard.string(forKey: keyDefaultGameCategory),
            let cat = SessionGameCategory(rawValue: raw) {
             self.defaultGameCategory = cat
@@ -685,6 +692,17 @@ final class SettingsStore: ObservableObject {
         }
 
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.appLanguage.rawValue, forKey: keyAppLanguage)
+    }
+
+    /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).
+    func rememberRewardProgramName(_ raw: String) {
+        let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return }
+        let key = t.lowercased()
+        if customRewardPrograms.contains(where: { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == key }) {
+            return
+        }
+        customRewardPrograms.append(t)
     }
 
     // MARK: - AI usage helpers

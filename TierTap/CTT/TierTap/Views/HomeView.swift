@@ -14,6 +14,7 @@ struct HomeView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @State private var showCheckIn = false
     @State private var showLive = false
     @State private var showBuyInSheet = false
@@ -21,6 +22,7 @@ struct HomeView: View {
     @State private var showAddPast = false
     @State private var showHistory = false
     @State private var showBankroll = false
+    @State private var showWallet = false
     @State private var showSubscriptionPaywall = false
     @State private var showLevelUpCelebration = false
     @State private var levelUpReached: TapLevel?
@@ -85,14 +87,25 @@ struct HomeView: View {
                                         .foregroundColor(.white).cornerRadius(14).font(.subheadline)
                                 }
                             }
-                            Button { showBankroll = true } label: {
-                                LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(16)
-                                    .font(.title3.bold())
+                            HStack(spacing: 12) {
+                                Button { showBankroll = true } label: {
+                                    LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 20)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                        .font(.title3.bold())
+                                }
+                                Button { showWallet = true } label: {
+                                    LocalizedLabel(title: "Wallet", systemImage: "wallet.pass.fill")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 20)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                        .font(.title3.bold())
+                                }
                             }
                             Button { showLive = true } label: {
                                 LocalizedLabel(title: "Finish Live Session", systemImage: "play.circle.fill")
@@ -126,14 +139,25 @@ struct HomeView: View {
                                 }
                             }
                         } else {
-                            Button { showBankroll = true } label: {
-                                LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(16)
-                                    .font(.title3.bold())
+                            HStack(spacing: 12) {
+                                Button { showBankroll = true } label: {
+                                    LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 20)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                        .font(.title3.bold())
+                                }
+                                Button { showWallet = true } label: {
+                                    LocalizedLabel(title: "Wallet", systemImage: "wallet.pass.fill")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 20)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(16)
+                                        .font(.title3.bold())
+                                }
                             }
                         }
                         if store.liveSession == nil {
@@ -239,6 +263,7 @@ struct HomeView: View {
             CheckInView()
                 .environmentObject(store)
                 .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
                 .environmentObject(authStore)
                 .environmentObject(subscriptionStore)
         }
@@ -248,6 +273,7 @@ struct HomeView: View {
                 .environmentObject(settingsStore)
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
+                .environmentObject(rewardWalletStore)
         }
         .adaptiveSheet(isPresented: $showBuyInSheet) {
             BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
@@ -273,6 +299,7 @@ struct HomeView: View {
             AddPastSessionView()
                 .environmentObject(store)
                 .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
                 .environmentObject(authStore)
                 .environmentObject(subscriptionStore)
         }
@@ -284,6 +311,11 @@ struct HomeView: View {
                 .environmentObject(subscriptionStore)
         }
         .adaptiveSheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
+        .adaptiveSheet(isPresented: $showWallet) {
+            TierTapWalletView()
+                .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
+        }
         .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
             TierTapPaywallView()
                 .environmentObject(subscriptionStore)

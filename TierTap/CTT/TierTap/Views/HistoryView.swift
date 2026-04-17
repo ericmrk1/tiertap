@@ -7,9 +7,78 @@ enum SessionSharePhotoBase: Equatable, Hashable {
     case comp(UUID)
 }
 
+private enum HistoryPanelTab: String, CaseIterable {
+    case sessions
+    case tools
+}
+
+/// Tax prep geography: fixed US list + international; session matching uses the last ", XX" token when `XX` is two letters.
+private enum TaxPrepGeography {
+    static let allStatesLabel = "All States"
+    static let internationalLabel = "International"
+
+    /// USPS abbreviations for the 50 U.S. states (D.C. not included).
+    static let usStateNamesByCode: [String: String] = [
+        "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+        "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+        "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+        "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+        "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+        "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+        "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+        "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+        "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+        "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+    ]
+
+    static let usStateCodeSet: Set<String> = Set(usStateNamesByCode.keys)
+
+    static var sortedUSStatePickerRows: [(code: String, name: String)] {
+        usStateNamesByCode
+            .map { (code: $0.key, name: $0.value) }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+    }
+}
+
+/// Places three subviews as equal squares in one row using the full proposed width (iOS 16+ `Layout`).
+private struct ThreeEqualSquaresRow: Layout {
+    var spacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let count = subviews.count
+        guard count > 0 else { return .zero }
+        let totalSpacing = spacing * CGFloat(max(0, count - 1))
+        let width: CGFloat
+        if let w = proposal.width, w.isFinite, w < .greatestFiniteMagnitude {
+            width = w
+        } else {
+            let idealSum = subviews.reduce(CGFloat(0)) { $0 + $1.sizeThatFits(.unspecified).width }
+            width = idealSum + totalSpacing
+        }
+        let side = max(0, (width - totalSpacing) / CGFloat(count))
+        return CGSize(width: width, height: side)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let count = subviews.count
+        guard count > 0 else { return }
+        let totalSpacing = spacing * CGFloat(max(0, count - 1))
+        let side = max(0, (bounds.width - totalSpacing) / CGFloat(count))
+        var x = bounds.minX
+        for index in subviews.indices {
+            subviews[index].place(
+                at: CGPoint(x: x, y: bounds.minY),
+                proposal: ProposedViewSize(width: side, height: side)
+            )
+            x += side + spacing
+        }
+    }
+}
+
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
@@ -34,6 +103,14 @@ struct HistoryView: View {
     @State private var pendingShareItems: [Any]?
     /// Single choice below Filters; legacy sessions without stored verification count as verified.
     @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
+    @State private var selectedHistoryTab: HistoryPanelTab = .sessions
+    @State private var isTaxPrepFlowActive = false
+    @State private var selectedTaxYear: Int = Calendar.current.component(.year, from: Date())
+    @State private var selectedTaxState: String = TaxPrepGeography.allStatesLabel
+    @State private var isTaxPrepGenerating = false
+    @State private var taxPrepProgress: Double = 0
+    @State private var taxPrepStatusMessage: String?
+    @State private var taxPrepComingSoonVisible: Bool = false
 
     private var showDeleteAlert: Binding<Bool> {
         Binding(
@@ -42,7 +119,17 @@ struct HistoryView: View {
         )
     }
 
+    /// Sessions for the scrolling list: date, location, game, search, **tier-points segment**, and tax-prep filters when active.
     private var filteredSessions: [Session] {
+        sessionsApplyingHistoryFilters(includeTierPointsVerification: true)
+    }
+
+    /// Same as `filteredSessions` but without the tier-points filter — used for Tools and share so the tier segment (only on the Sessions tab) does not gray out actions while sessions still exist.
+    private var sessionsMatchingHistoryBulkFilters: [Session] {
+        sessionsApplyingHistoryFilters(includeTierPointsVerification: false)
+    }
+
+    private func sessionsApplyingHistoryFilters(includeTierPointsVerification: Bool) -> [Session] {
         var sessions = store.sessions
 
         if useDateRangeFilter {
@@ -67,7 +154,23 @@ struct HistoryView: View {
             }
         }
 
-        sessions = sessions.filter { $0.effectiveTierPointsVerification == historyTierPointsFilter }
+        if includeTierPointsVerification {
+            sessions = sessions.filter { $0.effectiveTierPointsVerification == historyTierPointsFilter }
+        }
+
+        if isTaxPrepFlowActive {
+            sessions = sessions.filter { session in
+                let yStart = Calendar.current.component(.year, from: session.startTime)
+                if yStart == selectedTaxYear { return true }
+                if let end = session.endTime {
+                    return Calendar.current.component(.year, from: end) == selectedTaxYear
+                }
+                return false
+            }
+            if selectedTaxState != TaxPrepGeography.allStatesLabel {
+                sessions = sessions.filter { sessionMatchesTaxStateFilter($0) }
+            }
+        }
 
         return sessions
     }
@@ -78,6 +181,23 @@ struct HistoryView: View {
 
     private var availableGames: [String] {
         Array(Set(store.sessions.map { $0.game })).sorted()
+    }
+
+    /// Every calendar year that appears on any session (start or end time).
+    private var sessionTaxYears: [Int] {
+        var years = Set<Int>()
+        for s in store.sessions {
+            years.insert(Calendar.current.component(.year, from: s.startTime))
+            if let end = s.endTime {
+                years.insert(Calendar.current.component(.year, from: end))
+            }
+        }
+        return years.sorted(by: >)
+    }
+
+    /// Stable token so we can re-clamp the tax year when session dates change without relying on `Session` equality.
+    private var sessionTaxYearChangeToken: String {
+        "\(store.sessions.count)-\(sessionTaxYears.map(String.init).joined(separator: ","))"
     }
 
     private var historyFiltersActive: Bool {
@@ -136,7 +256,7 @@ struct HistoryView: View {
                             .background(Color.green.opacity(0.2))
                             .clipShape(Capsule())
                     }
-                    Image(systemName: isFilterPanelExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isFilterPanelExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .foregroundColor(.white.opacity(0.8))
                 }
                 .padding(.horizontal, 14)
@@ -210,6 +330,17 @@ struct HistoryView: View {
         .padding(.top, 10)
     }
 
+    private var historyTabSegment: some View {
+        Picker("", selection: $selectedHistoryTab) {
+            Text("Sessions").tag(HistoryPanelTab.sessions)
+            Text("Tools").tag(HistoryPanelTab.tools)
+        }
+        .pickerStyle(.segmented)
+        .tint(.green)
+        .padding(.horizontal)
+        .padding(.top, 8)
+    }
+
     private var historyDateRangeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button {
@@ -225,7 +356,7 @@ struct HistoryView: View {
                             .font(.caption2)
                             .foregroundColor(.green)
                     }
-                    Image(systemName: isHistoryDateSectionExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isHistoryDateSectionExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -319,7 +450,7 @@ struct HistoryView: View {
                             .font(.caption2)
                             .foregroundColor(.green)
                     }
-                    Image(systemName: isHistoryGameSectionExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isHistoryGameSectionExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -369,7 +500,7 @@ struct HistoryView: View {
                             .font(.caption2)
                             .foregroundColor(.green)
                     }
-                    Image(systemName: isHistoryLocationSectionExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isHistoryLocationSectionExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -445,11 +576,246 @@ struct HistoryView: View {
 
     private var historyContentView: some View {
         VStack(spacing: 0) {
-            historyStickyFilterBubble
-            historyTierPointsVerificationSegment
-            sessionListContent
-                .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            historyTabSegment
+            if selectedHistoryTab == .sessions {
+                historyStickyFilterBubble
+                historyTierPointsVerificationSegment
+                if isTaxPrepFlowActive {
+                    taxPrepFilterPanel
+                }
+                sessionListContent
+                    .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            } else {
+                historyToolsContent
+            }
         }
+    }
+
+    private var historyToolsContent: some View {
+        VStack(spacing: 16) {
+            ThreeEqualSquaresRow(spacing: 6) {
+                historyToolButton(
+                    title: "Share Sessions",
+                    systemImage: "square.and.arrow.up",
+                    tint: .green,
+                    isDisabled: sessionsMatchingHistoryBulkFilters.isEmpty
+                ) {
+                    if settingsStore.enableCasinoFeedback {
+                        CelebrationPlayer.shared.playQuickChime()
+                    }
+                    isShareSelectorPresented = true
+                }
+
+                historyToolButton(
+                    title: "Delete Sessions",
+                    systemImage: "trash",
+                    tint: .red,
+                    isDisabled: store.sessions.isEmpty
+                ) {
+                    if settingsStore.enableCasinoFeedback {
+                        CelebrationPlayer.shared.playQuickChime()
+                    }
+                    isDeleteSelectorPresented = true
+                }
+
+                historyToolButton(
+                    title: "Tax Prep",
+                    systemImage: "doc.text.magnifyingglass",
+                    tint: .white,
+                    isDisabled: false
+                ) {
+                    if settingsStore.enableCasinoFeedback {
+                        CelebrationPlayer.shared.playQuickChime()
+                    }
+                    withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
+                        taxPrepComingSoonVisible = true
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            Spacer()
+        }
+        .padding(.horizontal, 0)
+        .padding(.top, 14)
+    }
+
+    private func dismissTaxPrepComingSoonOverlay() {
+        withAnimation(.easeOut(duration: 0.28)) {
+            taxPrepComingSoonVisible = false
+        }
+    }
+
+    /// Full-screen dimmed backdrop with a large centered “bubble” for the Tax Prep placeholder.
+    private var taxPrepComingSoonOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.52)
+                .ignoresSafeArea()
+                .onTapGesture { dismissTaxPrepComingSoonOverlay() }
+
+            VStack(spacing: 18) {
+                TimelineView(.animation(minimumInterval: 1 / 30, paused: false)) { timeline in
+                    let t = timeline.date.timeIntervalSinceReferenceDate
+                    let pulse = 0.62 + 0.38 * (0.5 + 0.5 * sin(t * 3.8))
+                    Text("Feature Coming Soon....")
+                        .font(.system(size: 32, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.white.opacity(pulse))
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.65)
+                        .lineLimit(3)
+                }
+
+                Text("Tap outside to close")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(.white.opacity(0.72))
+            }
+            .padding(.horizontal, 36)
+            .padding(.vertical, 44)
+            .frame(maxWidth: .infinity)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.34),
+                        Color.white.opacity(0.16)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 1.5)
+            )
+            .shadow(color: .black.opacity(0.45), radius: 28, x: 0, y: 14)
+            .padding(.horizontal, 22)
+        }
+        .transition(.scale(scale: 0.9).combined(with: .opacity))
+    }
+
+    private func historyToolButton(title: String, systemImage: String, tint: Color, isDisabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.title2.weight(.bold))
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.75)
+            }
+            .padding(6)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.26),
+                        Color.white.opacity(0.14)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .foregroundColor(isDisabled ? .gray : tint)
+            .cornerRadius(14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color.white.opacity(0.16), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.22), radius: 6, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+    }
+
+    private var taxPrepFilterPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                L10nText("Tax Prep Filters")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+                Button("Exit") {
+                    isTaxPrepFlowActive = false
+                    isTaxPrepGenerating = false
+                    taxPrepProgress = 0
+                    taxPrepStatusMessage = nil
+                }
+                .foregroundColor(.green)
+            }
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    L10nText("Tax Year")
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.85))
+                    Picker(selection: $selectedTaxYear) {
+                        ForEach(sessionTaxYears, id: \.self) { year in
+                            Text(verbatim: String(year)).tag(year)
+                        }
+                    } label: {
+                        Text(verbatim: String(selectedTaxYear))
+                            .foregroundColor(.white)
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.white)
+                    .accessibilityLabel("Tax Year")
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    L10nText("State")
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.85))
+                    Picker("State", selection: $selectedTaxState) {
+                        Text(TaxPrepGeography.allStatesLabel).tag(TaxPrepGeography.allStatesLabel)
+                        ForEach(TaxPrepGeography.sortedUSStatePickerRows, id: \.code) { row in
+                            Text("\(row.name) (\(row.code))").tag(row.code)
+                        }
+                        Text(TaxPrepGeography.internationalLabel).tag(TaxPrepGeography.internationalLabel)
+                    }
+                    .pickerStyle(.menu)
+                    .tint(.white)
+                }
+            }
+
+            Button {
+                startTaxPrepGeneration()
+            } label: {
+                Text("Continue with Tax Prep")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.green.opacity(0.9))
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+            }
+            .disabled(filteredSessions.isEmpty || isTaxPrepGenerating)
+
+            if isTaxPrepGenerating {
+                VStack(alignment: .leading, spacing: 8) {
+                    ProgressView(value: taxPrepProgress)
+                        .tint(.green)
+                    Text("Generating tax prep document... \(Int(taxPrepProgress * 100))%")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+            }
+
+            if let status = taxPrepStatusMessage {
+                Text(status)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.9))
+            }
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.26))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+        .padding(.horizontal)
+        .padding(.top, 10)
     }
 
     var body: some View {
@@ -461,8 +827,13 @@ struct HistoryView: View {
                 } else {
                     historyContentView
                 }
+
+                if taxPrepComingSoonVisible {
+                    taxPrepComingSoonOverlay
+                        .zIndex(2)
+                }
             }
-            .localizedNavigationTitle("Session History")
+            .localizedNavigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -474,70 +845,44 @@ struct HistoryView: View {
                     .foregroundColor(.green)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 8) {
-                        if !filteredSessions.isEmpty {
-                            Button {
-                                if settingsStore.enableCasinoFeedback {
-                                    CelebrationPlayer.shared.playQuickChime()
-                                }
-                                isDeleteSelectorPresented = true
-                            } label: {
-                                Image(systemName: "trash")
-                                    .foregroundColor(.red)
+                    Button {
+                        NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                    } label: {
+                        HStack(spacing: 6) {
+                            if authStore.isSignedIn,
+                               let uiImage = authStore.localProfilePhotoImage {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 24, height: 24)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                    )
+                            } else {
+                                Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
                             }
-                            .accessibilityLabel("Delete sessions")
-
-                            Button {
-                                if settingsStore.enableCasinoFeedback {
-                                    CelebrationPlayer.shared.playQuickChime()
-                                }
-                                isShareSelectorPresented = true
-                            } label: {
-                                Image(systemName: "square.and.arrow.up")
-                                    .foregroundColor(.green)
-                            }
-                            .accessibilityLabel("Share sessions")
-                        }
-
-                        Button {
-                            NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
-                        } label: {
-                            HStack(spacing: 6) {
-                                if authStore.isSignedIn,
-                                   let uiImage = authStore.localProfilePhotoImage {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 24, height: 24)
-                                        .clipShape(Circle())
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
-                                        )
-                                } else {
-                                    Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
-                                }
-                                if authStore.isSignedIn {
-                                    if authStore.localProfilePhotoImage == nil,
-                                       let emojis = authStore.userProfileEmojis,
-                                       !emojis.isEmpty {
-                                        Text(emojis)
-                                            .font(.caption)
-                                    }
-                                    Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
-                                        .lineLimit(1)
-                                        .font(.caption)
-                                } else {
-                                    L10nText("Account")
+                            if authStore.isSignedIn {
+                                if authStore.localProfilePhotoImage == nil,
+                                   let emojis = authStore.userProfileEmojis,
+                                   !emojis.isEmpty {
+                                    Text(emojis)
                                         .font(.caption)
                                 }
+                                Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
+                                    .lineLimit(1)
+                                    .font(.caption)
+                            } else {
+                                L10nText("Account")
+                                    .font(.caption)
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.18))
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
                         }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.18))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
                     }
                 }
             }
@@ -545,6 +890,7 @@ struct HistoryView: View {
                 SessionDetailView(session: $0)
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(rewardWalletStore)
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
             }
@@ -574,7 +920,7 @@ struct HistoryView: View {
             }
             .adaptiveSheet(isPresented: $isShareSelectorPresented) {
                 SessionShareSelectionView(
-                    sessions: filteredSessions,
+                    sessions: sessionsMatchingHistoryBulkFilters,
                     photoOptions: { sessionSharePhotoOptions(for: $0) }
                 ) { selected, shareAsPhoto, includeWinLosses, photoBase in
                     guard !selected.isEmpty else { return }
@@ -612,11 +958,70 @@ struct HistoryView: View {
                     pendingShareItems = nil
                 }
             }
+            .onAppear {
+                clampTaxYearSelectionIfNeeded()
+            }
+            .onChange(of: sessionTaxYearChangeToken) { _ in
+                clampTaxYearSelectionIfNeeded()
+            }
+        }
+    }
+
+    /// When a specific U.S. state is selected, match sessions whose trailing ", XX" parses to that code. International = non‑U.S. or unknown.
+    private func sessionMatchesTaxStateFilter(_ session: Session) -> Bool {
+        switch selectedTaxState {
+        case TaxPrepGeography.allStatesLabel:
+            return true
+        case TaxPrepGeography.internationalLabel:
+            guard let code = inferredTwoLetterStateCode(for: session) else { return true }
+            return !TaxPrepGeography.usStateCodeSet.contains(code)
+        default:
+            return inferredTwoLetterStateCode(for: session) == selectedTaxState
         }
     }
 }
 
 extension HistoryView {
+    fileprivate func inferredTwoLetterStateCode(for session: Session) -> String? {
+        let casino = session.casino.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !casino.isEmpty else { return nil }
+        let parts = casino.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        guard let last = parts.last, !last.isEmpty else { return nil }
+        if last.count == 2 {
+            return last.uppercased()
+        }
+        return nil
+    }
+
+    fileprivate func clampTaxYearSelectionIfNeeded() {
+        let years = sessionTaxYears
+        guard !years.isEmpty else { return }
+        if !years.contains(selectedTaxYear) {
+            selectedTaxYear = years[0]
+        }
+    }
+
+    fileprivate func startTaxPrepGeneration() {
+        guard !filteredSessions.isEmpty else { return }
+        isTaxPrepGenerating = true
+        taxPrepProgress = 0
+        taxPrepStatusMessage = nil
+
+        Task {
+            for step in 1...20 {
+                try? await Task.sleep(nanoseconds: 90_000_000)
+                await MainActor.run {
+                    taxPrepProgress = Double(step) / 20.0
+                }
+            }
+            await MainActor.run {
+                isTaxPrepGenerating = false
+                // Placeholder: actual tax document generation is intentionally left blank.
+                taxPrepStatusMessage = "Tax prep document generation is ready to implement."
+            }
+        }
+    }
+
     /// Labels and sources for shareable photos: session chip image plus any comp receipt images on disk.
     fileprivate func sessionSharePhotoOptions(for session: Session) -> [(label: String, base: SessionSharePhotoBase)] {
         var out: [(String, SessionSharePhotoBase)] = []

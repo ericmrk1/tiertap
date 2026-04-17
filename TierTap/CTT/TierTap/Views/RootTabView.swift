@@ -1735,7 +1735,7 @@ struct CommunityFeedFiltersView: View {
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }
-                    Image(systemName: isPanelExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isPanelExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.caption.weight(.semibold))
                         .foregroundColor(.white.opacity(0.8))
                 }

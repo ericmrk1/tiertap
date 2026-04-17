@@ -1,8 +1,11 @@
 import SwiftUI
+import UIKit
+import Supabase
 
 struct CheckInView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
@@ -12,6 +15,7 @@ struct CheckInView: View {
     @State private var startingTier = "0"
     @State private var initialBuyIn = ""
     @State private var selectedRewardsProgram = ""
+    @State private var linkedRewardWalletCardId: UUID?
     @State private var showGamePicker = false
     @State private var showExistingAlert = false
     @State private var showTierTrackingWarning = false
@@ -30,6 +34,11 @@ struct CheckInView: View {
     @State private var pokerStartingStackText: String = ""
     @State private var pokerTournamentCostText: String = "0"
     @State private var slotNotes: String = ""
+    @State private var showSlotGamePhotoOptions = false
+    @State private var slotGamePhotoSource: SlotGamePhotoSource?
+    @State private var isScanningSlotGameName = false
+    @State private var slotGameScanError: String?
+    @State private var showSubscriptionPaywall = false
     @State private var showCasinoLocationPicker = false
     @State private var casinoLatitude: Double?
     @State private var casinoLongitude: Double?
@@ -98,45 +107,6 @@ struct CheckInView: View {
         return selectedGame.isEmpty || list.contains(selectedGame)
     }
 
-    /// Known casino loyalty / rewards programs. For now this is hard-coded and
-    /// matched loosely against the selected casino name.
-    private let defaultRewardPrograms: [String] = [
-        "MGM Rewards",
-        "Caesars Rewards",
-        "Wynn Rewards",
-        "Grazie Rewards",
-        "Identity Rewards",
-        "B Connected",
-        "Club One",
-        "Club Serrano"
-    ]
-
-    private let casinoRewardPrograms: [String: [String]] = [
-        "MGM": ["MGM Rewards"],
-        "Bellagio": ["MGM Rewards"],
-        "Aria": ["MGM Rewards"],
-        "Cosmopolitan": ["Identity Rewards"],
-        "Caesars": ["Caesars Rewards"],
-        "Harrah": ["Caesars Rewards"],
-        "Paris": ["Caesars Rewards"],
-        "Wynn": ["Wynn Rewards"],
-        "Encore": ["Wynn Rewards"],
-        "Venetian": ["Grazie Rewards"],
-        "Palazzo": ["Grazie Rewards"],
-        "Palms": ["Club Serrano"],
-        "Boyd": ["B Connected"]
-    ]
-
-    private var availableRewardPrograms: [String] {
-        guard !casino.isEmpty else { return defaultRewardPrograms }
-        let matches = casinoRewardPrograms.compactMap { key, programs in
-            casino.localizedCaseInsensitiveContains(key) ? programs : nil
-        }
-        let flattened = matches.flatMap { $0 }
-        let unique = Array(Set(flattened))
-        return unique.isEmpty ? defaultRewardPrograms : unique
-    }
-
     var isValid: Bool {
         let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
         return hasGame && !casino.isEmpty && (Int(initialBuyIn) ?? 0) > 0
@@ -152,6 +122,19 @@ struct CheckInView: View {
 
     /// Discrete blind values used for SB / BB / Ante wheels and presets.
     private let blindPickerValues: [Int] = [0, 1, 2, 3, 5, 10, 20, 40, 80, 100, 200, 300, 400, 500, 600, 800, 1000]
+
+    private enum SlotGamePhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+
+        var id: Int { hashValue }
+    }
+
+    private var canUseSlotGameAI: Bool {
+        subscriptionStore.isPro
+            || settingsStore.isSubscriptionOverrideActive
+            || settingsStore.canUseAI()
+    }
 
     var body: some View {
         NavigationStack {
@@ -180,14 +163,57 @@ struct CheckInView: View {
                                         GameButton(title: g, isSelected: selectedGame == g) { selectedGame = g }
                                     }
                                 }
-                                GamePickerSelectorRow(
-                                    title: isGameInDisplayList && selectedGame.isEmpty
-                                        ? "More games..." : selectedGame,
-                                    accentHighlighted: !isGameInDisplayList,
-                                    isPlaceholder: isGameInDisplayList && selectedGame.isEmpty,
-                                    showSearchIcon: true
-                                ) { showGamePicker = true }
-                                    .environmentObject(settingsStore)
+                                if isScanningSlotGameName {
+                                    HStack(spacing: 8) {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .green))
+                                        Text("Scanning slot machine for game name…")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                if gameCategory == .slots {
+                                    HStack(alignment: .center, spacing: 10) {
+                                        GamePickerSelectorRow(
+                                            title: isGameInDisplayList && selectedGame.isEmpty
+                                                ? "More games..." : selectedGame,
+                                            accentHighlighted: !isGameInDisplayList,
+                                            isPlaceholder: isGameInDisplayList && selectedGame.isEmpty,
+                                            showSearchIcon: true
+                                        ) { showGamePicker = true }
+                                        .environmentObject(settingsStore)
+
+                                        Button {
+                                            if authStore.isSignedIn && canUseSlotGameAI {
+                                                showSlotGamePhotoOptions = true
+                                            } else if !authStore.isSignedIn {
+                                                slotGameScanError = "Sign in to use AI slot scanner."
+                                            } else {
+                                                showSubscriptionPaywall = true
+                                            }
+                                        } label: {
+                                            Image(systemName: "camera.viewfinder")
+                                                .font(.title2.bold())
+                                                .frame(width: 58, height: 58)
+                                                .background(Color.black.opacity(0.92))
+                                                .foregroundColor(.white)
+                                                .cornerRadius(16)
+                                                .shadow(radius: 4)
+                                        }
+                                        .accessibilityLabel("Scan slot game name")
+                                        .disabled(isScanningSlotGameName)
+                                    }
+                                } else {
+                                    GamePickerSelectorRow(
+                                        title: isGameInDisplayList && selectedGame.isEmpty
+                                            ? "More games..." : selectedGame,
+                                        accentHighlighted: !isGameInDisplayList,
+                                        isPlaceholder: isGameInDisplayList && selectedGame.isEmpty,
+                                        showSearchIcon: true
+                                    ) { showGamePicker = true }
+                                        .environmentObject(settingsStore)
+                                }
                                 if gameCategory == .slots {
                                     SlotSessionNotesOnlySection(slotNotes: $slotNotes)
                                 }
@@ -530,17 +556,14 @@ struct CheckInView: View {
                                 .font(.headline)
                                 .foregroundColor(.white)
                             Spacer()
-                            if !availableRewardPrograms.isEmpty {
-                                Picker("", selection: $selectedRewardsProgram) {
-                                    L10nText("Select Rewards").tag("").font(.caption)
-                                    ForEach(availableRewardPrograms, id: \.self) { program in
-                                        Text(program).tag(program)
-                                    }
-                                }
-                                .pickerStyle(.menu)
-                                .font(.caption) // smaller font for the selector
-                                .tint(.white)
-                            }
+                            RewardsProgramPickerRow(
+                                casino: casino,
+                                selectedProgram: $selectedRewardsProgram,
+                                tierPointsText: $startingTier,
+                                linkedWalletCardId: $linkedRewardWalletCardId
+                            )
+                            .environmentObject(settingsStore)
+                            .environmentObject(rewardWalletStore)
                         }
                         L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track.")
                             .font(.caption).foregroundColor(.gray)
@@ -571,12 +594,13 @@ struct CheckInView: View {
                             }
                             .frame(maxWidth: .infinity)
 
-                            // Right: typed value
-                            VStack(alignment: .leading, spacing: 8) {
-                                TextField("Exact amount", text: $initialBuyIn)
-                                    .textFieldStyle(DarkTextFieldStyle())
-                                    .keyboardType(.numberPad)
-                            }
+                            // Right: typed value + number pad sheet
+                            NumericEntryWithDialPad(
+                                placeholder: "Exact amount",
+                                text: $initialBuyIn,
+                                dialPadNavigationTitle: "Buy-In"
+                            )
+                            .environmentObject(settingsStore)
                             .frame(maxWidth: .infinity)
                         }
                         if settingsStore.unitSize > 0, (Int(initialBuyIn) ?? 0) > settingsStore.unitSize {
@@ -650,6 +674,87 @@ struct CheckInView: View {
                     .environmentObject(settingsStore)
                     .presentationDetents([.fraction(0.7), .large])
                     .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(isPresented: $showSlotGamePhotoOptions) {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("Slot game photo")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("Capture the slot machine title and TierTap will try to fill in the game name.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button {
+                            openSlotGamePhotoSource(.camera)
+                        } label: {
+                            LocalizedLabel(title: "Take photo", systemImage: "camera")
+                                .font(.subheadline.bold())
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(Color(.systemGray6).opacity(0.3))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                    }
+
+                    Button {
+                        openSlotGamePhotoSource(.photoLibrary)
+                    } label: {
+                        LocalizedLabel(title: "Choose from library", systemImage: "photo")
+                            .font(.subheadline.bold())
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemGray6).opacity(0.3))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Button("Cancel", role: .cancel) {
+                        showSlotGamePhotoOptions = false
+                    }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 2)
+                }
+                .padding(16)
+                .background(settingsStore.primaryGradient)
+                .presentationDetents([.fraction(0.33)])
+                .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(item: $slotGamePhotoSource) { source in
+                switch source {
+                case .camera:
+                    #if os(iOS)
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        scanSlotGameName(from: image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                case .photoLibrary:
+                    #if os(iOS)
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        scanSlotGameName(from: image)
+                    }
+                    #else
+                    EmptyView()
+                    #endif
+                }
+            }
+            .alert("Slot game scan", isPresented: Binding<Bool>(
+                get: { slotGameScanError != nil },
+                set: { if !$0 { slotGameScanError = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(slotGameScanError ?? "")
+            }
+            .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
             }
             .onChange(of: pokerSmallBlind) { newValue in
                 if newValue == 5 && pokerBigBlind != 10 {
@@ -777,7 +882,8 @@ struct CheckInView: View {
             game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy,
             rewardsProgramName: program.isEmpty ? nil : program,
             casinoLatitude: casinoLatitude,
-            casinoLongitude: casinoLongitude
+            casinoLongitude: casinoLongitude,
+            linkedRewardWalletCardId: linkedRewardWalletCardId
         )
         // Persist structured game metadata on the live session.
         let category: SessionGameCategory? = gameCategory
@@ -837,5 +943,163 @@ struct CheckInView: View {
             CelebrationPlayer.shared.playQuickChime()
         }
         dismiss()
+    }
+
+    private func scanSlotGameName(from image: UIImage) {
+        Task {
+            await analyzeSlotMachineImage(image)
+        }
+    }
+
+    private func openSlotGamePhotoSource(_ source: SlotGamePhotoSource) {
+        showSlotGamePhotoOptions = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            slotGamePhotoSource = source
+        }
+    }
+
+    private func analyzeSlotMachineImage(_ image: UIImage) async {
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run { slotGameScanError = "AI is not configured for this build." }
+            return
+        }
+        guard authStore.isSignedIn else {
+            await MainActor.run { slotGameScanError = "Sign in to use AI slot scanner." }
+            return
+        }
+        guard canUseSlotGameAI else {
+            await MainActor.run { showSubscriptionPaywall = true }
+            return
+        }
+
+        guard let imageData = image.jpegData(compressionQuality: 0.9)?.base64EncodedString() else {
+            await MainActor.run { slotGameScanError = "Unable to process image." }
+            return
+        }
+
+        await MainActor.run {
+            isScanningSlotGameName = true
+            slotGameScanError = nil
+        }
+
+        struct GeminiInlineData: Encodable {
+            let mime_type: String
+            let data: String
+            enum CodingKeys: String, CodingKey {
+                case mime_type = "mime_type"
+                case data
+            }
+        }
+        struct GeminiPartImage: Encodable {
+            let text: String?
+            let inline_data: GeminiInlineData?
+            enum CodingKeys: String, CodingKey {
+                case text
+                case inline_data = "inline_data"
+            }
+        }
+        struct GeminiContentImage: Encodable {
+            let role: String
+            let parts: [GeminiPartImage]
+        }
+        struct GeminiImageRequest: Encodable {
+            let contents: [GeminiContentImage]
+        }
+        struct GeminiPart: Decodable { let text: String? }
+        struct GeminiContent: Decodable { let parts: [GeminiPart]? }
+        struct GeminiCandidate: Decodable { let content: GeminiContent? }
+        struct GeminiRouterResponse: Decodable { let candidates: [GeminiCandidate]? }
+        struct SlotScanPayload: Decodable {
+            let game_name: String?
+            let details: String?
+        }
+
+        let prompt = """
+        Analyze this slot machine photo.
+        Determine:
+        1) The most likely slot game title shown on the machine.
+        2) One short note with useful slot details (theme, jackpot type, denomination hint, special feature, etc.).
+
+        Respond with ONLY valid JSON:
+        {"game_name":"...","details":"..."}
+
+        Rules:
+        - Keep details short and sweet: one brief sentence, max ~120 characters.
+        - If the exact game title is unclear, return the best guess from visible text.
+        - If no confident game name is visible, set game_name to "Video slots".
+        - Never include markdown fences or extra keys.
+        """
+
+        let innerRequest = GeminiImageRequest(
+            contents: [
+                .init(
+                    role: "user",
+                    parts: [
+                        .init(text: prompt, inline_data: nil),
+                        .init(
+                            text: nil,
+                            inline_data: GeminiInlineData(
+                                mime_type: "image/jpeg",
+                                data: imageData
+                            )
+                        )
+                    ]
+                )
+            ]
+        )
+        let routerBody = GeminiProxyBody(
+            contents: innerRequest.contents,
+            language: settingsStore.appLanguage
+        )
+
+        do {
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
+                await MainActor.run { settingsStore.registerAICall() }
+            }
+
+            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+                try await client.functions.invoke(
+                    "gemini-router",
+                    options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+
+            let text = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n") ?? ""
+
+            let jsonText = extractJSONObject(from: text) ?? text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let payload = try JSONDecoder().decode(SlotScanPayload.self, from: Data(jsonText.utf8))
+
+            let gameName = (payload.game_name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let details = (payload.details ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+
+            await MainActor.run {
+                isScanningSlotGameName = false
+                if gameName.isEmpty {
+                    slotGameScanError = "AI could not identify a slot game name. Try a clearer photo."
+                    return
+                }
+                selectedGame = gameName
+                if !details.isEmpty {
+                    slotNotes = String(details.prefix(120))
+                }
+            }
+        } catch {
+            await MainActor.run {
+                isScanningSlotGameName = false
+                slotGameScanError = error.localizedDescription
+            }
+        }
+    }
+
+    private func extractJSONObject(from text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let start = trimmed.firstIndex(of: "{"),
+              let end = trimmed.lastIndex(of: "}") else { return nil }
+        return String(trimmed[start...end])
     }
 }

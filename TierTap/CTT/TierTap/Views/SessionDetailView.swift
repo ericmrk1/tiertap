@@ -5,6 +5,7 @@ struct SessionDetailView: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
@@ -336,6 +337,7 @@ struct SessionDetailView: View {
             .adaptiveSheet(isPresented: $showCompleteSession) {
                 CompleteSessionView(session: displaySession)
                     .environmentObject(store)
+                    .environmentObject(rewardWalletStore)
                     .environmentObject(settingsStore)
             }
             .adaptiveSheet(isPresented: $showEditSession) {

@@ -240,6 +240,9 @@ struct AnalyticsView: View {
                     } label: {
                         Image(systemName: "wand.and.stars")
                             .imageScale(.medium)
+                            .padding(8)
+                            .background(Color.green)
+                            .clipShape(Circle())
                     }
                     .foregroundColor(.white)
                     .accessibilityLabel("AI analysis")
@@ -377,7 +380,7 @@ struct AnalyticsView: View {
                         .font(.subheadline.bold())
                         .foregroundColor(.white)
                     Spacer()
-                    Image(systemName: isFiltersExpanded ? "chevron.up" : "chevron.down")
+                    Image(systemName: isFiltersExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white.opacity(0.8))
                 }

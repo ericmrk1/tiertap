@@ -2422,6 +2422,12 @@ final class CelebrationPlayer {
         playSound(for: .quickChime)
     }
 
+    /// Slot-machine coin sound used when wallet tier points change.
+    func playTierChangeCoins() {
+        triggerHaptics()
+        playSound(for: .tierChangeCoins)
+    }
+
     private func triggerHaptics() {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
@@ -2431,6 +2437,7 @@ final class CelebrationPlayer {
     private enum Event {
         case quickChime
         case bigWin
+        case tierChangeCoins
     }
 
     private func currentProfile() -> SettingsStore.SoundProfile {
@@ -2452,6 +2459,8 @@ final class CelebrationPlayer {
 
         case (_, .bigWin):
             fileName = "victory_confetti"
+        case (_, .tierChangeCoins):
+            fileName = "coins_clinking"
         }
 
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "wav") else {

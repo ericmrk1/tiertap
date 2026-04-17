@@ -11,8 +11,7 @@ struct TierTapPaywallView: View {
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedProduct: Product?
-    @State private var isPurchasing = false
+    @State private var purchasingProductId: String?
     @State private var showConfetti = false
     @State private var showAccountSheet = false
     @State private var emailInput: String = ""
@@ -32,9 +31,7 @@ struct TierTapPaywallView: View {
                         headerSection
                         requirementsSection
                         benefitsSection
-                        currentPlanSection
                         productsSection
-                        purchaseSection
                         restoreSection
                         legalSection
 
@@ -65,10 +62,6 @@ struct TierTapPaywallView: View {
                     }
                     .foregroundColor(.white)
                 }
-            }
-            .onAppear {
-                // Try to select a sensible default on first appear.
-                selectDefaultProductIfNeeded()
             }
         }
         .navigationViewStyle(.stack)
@@ -169,6 +162,11 @@ struct TierTapPaywallView: View {
                     subtitle: "Estimate comps from a photo with AI."
                 )
                 ProBenefitRow(
+                    icon: "text.viewfinder",
+                    title: "Slot Reader",
+                    subtitle: "Read slot machine details from a photo with AI."
+                )
+                ProBenefitRow(
                     icon: "person.3.sequence.fill",
                     title: "Community Feed",
                     subtitle: "See and share real-world sessions from other players."
@@ -184,51 +182,6 @@ struct TierTapPaywallView: View {
         .padding(.horizontal, -16)
     }
 
-    private var currentProduct: Product? {
-        guard let id = subscriptionStore.purchasedProductIds.first else { return nil }
-        return subscriptionStore.products.first(where: { $0.id == id })
-    }
-
-    private func selectDefaultProductIfNeeded() {
-        guard selectedProduct == nil else { return }
-        guard !subscriptionStore.products.isEmpty else { return }
-
-        // Prefer yearly plan by default, otherwise fall back to first product.
-        if let yearly = subscriptionStore.products.first(where: { $0.id.contains("yearly") }) {
-            selectedProduct = yearly
-        } else {
-            selectedProduct = subscriptionStore.products.first
-        }
-    }
-
-    private func currentPlanLabel(for product: Product) -> String {
-        if product.id.contains("yearly") { return "Yearly plan" }
-        if product.id.contains("quarterly") { return "3‑month plan" }
-        return "Monthly plan"
-    }
-
-    private var currentPlanSection: some View {
-        Group {
-            if let product = currentProduct {
-                VStack(alignment: .leading, spacing: 6) {
-                    L10nText("You're currently subscribed")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundColor(.white)
-                    Text("\(currentPlanLabel(for: product)) • \(product.displayPrice)")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                    L10nText("To change your subscription, choose a different plan below and tap \"Change plan\".")
-                        .font(.caption2)
-                        .foregroundColor(.white.opacity(0.85))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding()
-                .background(Color.white.opacity(0.18))
-                .cornerRadius(14)
-            }
-        }
-    }
-
     private var productsSection: some View {
         Group {
             if subscriptionStore.isLoading && subscriptionStore.products.isEmpty {
@@ -240,69 +193,48 @@ struct TierTapPaywallView: View {
                 }
                 .padding()
             } else {
-                VStack(spacing: 8) {
-                    ForEach(subscriptionStore.products, id: \.id) { product in
-                        PaywallProductRow(
+                VStack(alignment: .leading, spacing: 10) {
+                    L10nText("Choose your plan")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white)
+
+                    HStack(alignment: .top, spacing: 8) {
+                        ForEach(sortedProducts, id: \.id) { product in
+                            PaywallPlanBox(
                             product: product,
-                            isSelected: selectedProduct?.id == product.id,
                             isCurrent: subscriptionStore.purchasedProductIds.contains(product.id),
+                            isPurchasing: purchasingProductId == product.id,
+                            isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
+                            hasProAccess: hasProAccess,
                             accentColor: settingsStore.primaryColor
                         ) {
-                            selectedProduct = product
+                            purchase(product)
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .top)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                // Extend product "bubbles" to the horizontal edges of the screen.
-                .padding(.horizontal, -16)
-                // When the products actually render, ensure we pick a default.
-                .onAppear {
-                    selectDefaultProductIfNeeded()
-                }
             }
         }
     }
 
-    private var purchaseButtonTitle: String {
-        guard let selected = selectedProduct else { return "Select a plan" }
-        if subscriptionStore.purchasedProductIds.contains(selected.id) {
-            return "Current plan"
+    private var sortedProducts: [Product] {
+        subscriptionStore.products.sorted { lhs, rhs in
+            productSortOrder(lhs.id) < productSortOrder(rhs.id)
         }
-        return hasProAccess ? "Change plan" : "Subscribe"
     }
 
-    private var isPurchaseDisabled: Bool {
-        if selectedProduct == nil { return true }
-        if isPurchasing || subscriptionStore.isLoading { return true }
-        if let selected = selectedProduct,
-           subscriptionStore.purchasedProductIds.contains(selected.id) {
-            return true
-        }
+    private func productSortOrder(_ id: String) -> Int {
+        if id.contains("monthly") { return 0 }
+        if id.contains("quarterly") { return 1 }
+        if id.contains("yearly") { return 2 }
+        return 3
+    }
+
+    private func isPurchaseDisabled(for product: Product) -> Bool {
+        if purchasingProductId != nil || subscriptionStore.isLoading { return true }
+        if subscriptionStore.purchasedProductIds.contains(product.id) { return true }
         return false
-    }
-
-    private var purchaseSection: some View {
-        Button(action: purchaseSelected) {
-            HStack {
-                if isPurchasing {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Text(purchaseButtonTitle)
-                        .font(.subheadline.weight(.semibold))
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(isPurchaseDisabled ? Color.gray : settingsStore.primaryColor)
-            .foregroundColor(.white)
-            .cornerRadius(12)
-        }
-        .buttonStyle(.plain)
-        .disabled(isPurchaseDisabled)
-        // Extend the subscribe button to the screen edges.
-        .padding(.horizontal, -16)
     }
 
     private var restoreSection: some View {
@@ -337,16 +269,13 @@ struct TierTapPaywallView: View {
         .cornerRadius(12)
     }
 
-    private func purchaseSelected() {
-        guard let product = selectedProduct else { return }
-        if subscriptionStore.purchasedProductIds.contains(product.id) {
-            return
-        }
-        isPurchasing = true
+    private func purchase(_ product: Product) {
+        guard !isPurchaseDisabled(for: product) else { return }
+        purchasingProductId = product.id
         Task {
             let success = await subscriptionStore.purchase(product)
             await MainActor.run {
-                isPurchasing = false
+                purchasingProductId = nil
                 if success {
                     showConfetti = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -381,10 +310,12 @@ private struct ProBenefitRow: View {
     }
 }
 
-private struct PaywallProductRow: View {
+private struct PaywallPlanBox: View {
     let product: Product
-    let isSelected: Bool
     let isCurrent: Bool
+    let isPurchasing: Bool
+    let isBusy: Bool
+    let hasProAccess: Bool
     let accentColor: Color
     let action: () -> Void
 
@@ -394,51 +325,59 @@ private struct PaywallProductRow: View {
         return "Monthly"
     }
 
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(periodLabel)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
-                    Text(product.displayPrice)
-                        .font(.footnote)
-                        .foregroundColor(.white.opacity(0.9))
+    private var actionTitle: String {
+        hasProAccess ? "Change plan" : "Subscribe"
+    }
 
-                    if isCurrent {
-                        L10nText("Current plan")
-                            .font(.caption2.weight(.semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.white.opacity(0.18))
-                            .foregroundColor(.white)
-                            .cornerRadius(6)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(periodLabel)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+            Text(product.displayPrice)
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.9))
+
+            Spacer(minLength: 0)
+
+            if isCurrent {
+                Text("Current plan")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(8)
+            } else {
+                Button(action: action) {
+                    HStack(spacing: 6) {
+                        if isPurchasing {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text(actionTitle)
+                                .font(.caption.weight(.semibold))
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.14))
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
                 }
-                Spacer()
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.headline)
-                    .foregroundColor(isSelected ? accentColor : .white.opacity(0.6))
+                .buttonStyle(.plain)
+                .disabled(isBusy)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
-            .background(
-                isSelected
-                ? accentColor.opacity(0.3)
-                : (isCurrent ? Color.white.opacity(0.12) : Color.white.opacity(0.15))
-            )
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(
-                        isCurrent ? Color.white : (isSelected ? accentColor : Color.clear),
-                        lineWidth: (isCurrent || isSelected) ? 1.5 : 0
-                    )
-            )
         }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 130, alignment: .topLeading)
+        .padding(10)
+        .background(isCurrent ? accentColor.opacity(0.34) : Color.white.opacity(0.15))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isCurrent ? accentColor : Color.white.opacity(0.2), lineWidth: isCurrent ? 2 : 1)
+        )
     }
 }
 

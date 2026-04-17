@@ -26,6 +26,7 @@ struct TripsView: View {
     @EnvironmentObject var tripStore: TripStore
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
 
@@ -260,7 +261,7 @@ struct TripsView: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                Image(systemName: expanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                     .font(.caption2.weight(.bold))
                     .foregroundColor(.white.opacity(0.72))
                     .frame(width: 7, alignment: .center)
@@ -293,7 +294,7 @@ struct TripsView: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                Image(systemName: expanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
                     .font(.caption2.weight(.bold))
                     .foregroundColor(.white.opacity(0.72))
                     .frame(width: 6, alignment: .center)
@@ -332,6 +333,9 @@ struct TripsView: View {
                 .environmentObject(tripStore)
                 .environmentObject(sessionStore)
                 .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
         } label: {
             tripRowLabel(trip)
         }

@@ -6,6 +6,8 @@ struct ProfilePhotoCaptureView: UIViewControllerRepresentable {
     @Environment(\.presentationMode) private var presentationMode
     @Binding var image: UIImage?
     var preferredSourceType: UIImagePickerController.SourceType = .camera
+    /// Called on the main thread after `image` is set and before the picker dismisses (e.g. to chain another sheet).
+    var onFinishedPicking: ((UIImage) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -36,6 +38,7 @@ struct ProfilePhotoCaptureView: UIViewControllerRepresentable {
             let key: UIImagePickerController.InfoKey = info[.editedImage] != nil ? .editedImage : .originalImage
             if let pickedImage = info[key] as? UIImage {
                 parent.image = pickedImage
+                parent.onFinishedPicking?(pickedImage)
             }
             parent.presentationMode.wrappedValue.dismiss()
         }

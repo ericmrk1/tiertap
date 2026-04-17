@@ -609,6 +609,7 @@ struct EditSessionView: View {
             sessionMood: session.sessionMood,
             privateNotes: privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes,
             rewardsProgramName: session.rewardsProgramName,
+            linkedRewardWalletCardId: session.linkedRewardWalletCardId,
             tierPointsVerification: tierPointsVerification,
             chipEstimatorImageFilename: chipPhotoFilename,
             gameCategory: gameCategory,

@@ -3,6 +3,7 @@ import SwiftUI
 struct LiveSessionView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) var dismiss
@@ -292,7 +293,14 @@ struct LiveSessionView: View {
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
             }
-            .adaptiveSheet(isPresented: $showCloseout) { CloseoutView().environmentObject(store).environmentObject(settingsStore) }
+            .adaptiveSheet(isPresented: $showCloseout) {
+                CloseoutView()
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(rewardWalletStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
+            }
             .adaptiveSheet(isPresented: $showStrategyOdds) {
                 StrategyOddsSheet(gameName: s.game)
                     .environmentObject(settingsStore)

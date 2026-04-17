@@ -21,10 +21,8 @@ struct ImagePicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                DispatchQueue.main.async {
-                    self.parent.selectedImage = uiImage
-                    self.parent.onImagePicked(uiImage)
-                }
+                parent.selectedImage = uiImage
+                parent.onImagePicked(uiImage)
             }
             parent.presentationMode.wrappedValue.dismiss()
         }
@@ -66,10 +64,8 @@ struct CameraPicker: UIViewControllerRepresentable {
 
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                DispatchQueue.main.async {
-                    self.parent.selectedImage = uiImage
-                    self.parent.onImagePicked(uiImage)
-                }
+                parent.selectedImage = uiImage
+                parent.onImagePicked(uiImage)
             }
             parent.presentationMode.wrappedValue.dismiss()
         }

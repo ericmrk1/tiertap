@@ -3,6 +3,7 @@ import SwiftUI
 struct AddPastSessionView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
@@ -65,43 +66,6 @@ struct AddPastSessionView: View {
     private var isGameInDisplayList: Bool {
         let list = gameCategory == .slots ? displaySlots : displayGames
         return selectedGame.isEmpty || list.contains(selectedGame)
-    }
-
-    private let defaultRewardPrograms: [String] = [
-        "MGM Rewards",
-        "Caesars Rewards",
-        "Wynn Rewards",
-        "Grazie Rewards",
-        "Identity Rewards",
-        "B Connected",
-        "Club One",
-        "Club Serrano"
-    ]
-
-    private let casinoRewardPrograms: [String: [String]] = [
-        "MGM": ["MGM Rewards"],
-        "Bellagio": ["MGM Rewards"],
-        "Aria": ["MGM Rewards"],
-        "Cosmopolitan": ["Identity Rewards"],
-        "Caesars": ["Caesars Rewards"],
-        "Harrah": ["Caesars Rewards"],
-        "Paris": ["Caesars Rewards"],
-        "Wynn": ["Wynn Rewards"],
-        "Encore": ["Wynn Rewards"],
-        "Venetian": ["Grazie Rewards"],
-        "Palazzo": ["Grazie Rewards"],
-        "Palms": ["Club Serrano"],
-        "Boyd": ["B Connected"]
-    ]
-
-    private var availableRewardPrograms: [String] {
-        guard !casino.isEmpty else { return defaultRewardPrograms }
-        let matches = casinoRewardPrograms.compactMap { key, programs in
-            casino.localizedCaseInsensitiveContains(key) ? programs : nil
-        }
-        let flattened = matches.flatMap { $0 }
-        let unique = Array(Set(flattened))
-        return unique.isEmpty ? defaultRewardPrograms : unique
     }
 
     var isValid: Bool {
@@ -504,17 +468,14 @@ struct AddPastSessionView: View {
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
-                if !availableRewardPrograms.isEmpty {
-                    Picker("", selection: $selectedRewardsProgram) {
-                        L10nText("Select Rewards").tag("").font(.caption)
-                        ForEach(availableRewardPrograms, id: \.self) { program in
-                            Text(program).tag(program)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .font(.caption)
-                    .tint(.white)
-                }
+                RewardsProgramPickerRow(
+                    casino: casino,
+                    selectedProgram: $selectedRewardsProgram,
+                    tierPointsText: $startingTier,
+                    linkedWalletCardId: .constant(nil)
+                )
+                .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
             }
             L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
                 .font(.caption).foregroundColor(.gray)

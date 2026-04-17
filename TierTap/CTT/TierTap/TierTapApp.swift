@@ -9,6 +9,7 @@ struct TierTapApp: App {
     @StateObject private var settingsStore = SettingsStore()
     @StateObject private var authStore = AuthStore()
     @StateObject private var subscriptionStore = SubscriptionStore()
+    @StateObject private var rewardWalletStore = RewardWalletStore()
 
     init() {
         BankrollDatabase.shared.open()
@@ -23,12 +24,14 @@ struct TierTapApp: App {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
                 .environmentObject(subscriptionStore)
+                .environmentObject(rewardWalletStore)
         }
     }
 }
 
 private struct TierTapAppRoot: View {
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var store: SessionStore
     @EnvironmentObject private var settingsStore: SettingsStore
     @EnvironmentObject private var authStore: AuthStore
     @EnvironmentObject private var subscriptionStore: SubscriptionStore
@@ -59,6 +62,17 @@ private struct TierTapAppRoot: View {
                 SplashScreen(gradient: settingsStore.primaryGradient)
                     .transition(.opacity)
                     .zIndex(2)
+            }
+
+            if let toast = store.walletTierCloseoutToast {
+                WalletTierCloseoutToastBanner(fromPoints: toast.fromPoints, toPoints: toast.toPoints)
+                    .zIndex(15)
+                    .transition(.opacity)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + WalletTierCloseoutTiming.totalAutoDismiss) {
+                            store.walletTierCloseoutToast = nil
+                        }
+                    }
             }
         }
         .environment(\.locale, settingsStore.appLanguage.locale)

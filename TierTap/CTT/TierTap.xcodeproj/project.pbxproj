@@ -53,6 +53,9 @@
 		CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */; };
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */; };
+		TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */; };
+		TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */; };
+		TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */; };
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
@@ -176,6 +179,9 @@
 		50E24F578992717D666E68F1 /* TierTap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TierTap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		528BE1A3C52FE346B3217D97 /* GamesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesList.swift; sourceTree = "<group>"; };
 		SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotsList.swift; sourceTree = "<group>"; };
+		TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardWalletCardModels.swift; sourceTree = "<group>"; };
+		TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWalletView.swift; sourceTree = "<group>"; };
+		TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardProgramPicker.swift; sourceTree = "<group>"; };
 		59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CasinoTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
@@ -315,6 +321,8 @@
 				STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */,
 				BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */,
 				BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */,
+				TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */,
+				TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
 				2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */,
 				EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */,
@@ -346,6 +354,7 @@
 				APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */,
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
 				2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */,
+				TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */,
 				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */,
@@ -723,9 +732,12 @@
 				STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */,
 				STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */,
 				BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */,
+				TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */,
+				TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */,
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */,
 				2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */,
+				TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
 				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,

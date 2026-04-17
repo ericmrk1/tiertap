@@ -5,6 +5,7 @@ import Supabase
 struct CloseoutView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
@@ -24,6 +25,8 @@ struct CloseoutView: View {
     @State private var showChipEstimatorSheet = false
     @State private var chipEstimatorError: String?
     @State private var showSubscriptionPaywall = false
+    @State private var showLinkedWalletFromCloseout = false
+    @State private var linkedWalletFocusCardId: UUID?
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
@@ -82,6 +85,43 @@ struct CloseoutView: View {
     }
 
     var timerStopped: Bool { s.endTime != nil }
+
+    private var endingTierPointsRow: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
+                Text("Ending Tier Points")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                #if os(iOS)
+                if s.linkedRewardWalletCardId != nil {
+                    Button {
+                        linkedWalletFocusCardId = s.linkedRewardWalletCardId
+                        showLinkedWalletFromCloseout = true
+                    } label: {
+                        Image(systemName: "wallet.pass.fill")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.green)
+                            .frame(width: 36, height: 36)
+                            .background(Color.green.opacity(0.22))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Open linked TierTap wallet card")
+                }
+                #endif
+                Spacer(minLength: 0)
+            }
+            NumericEntryWithDialPad(
+                placeholder: "Loyalty app now",
+                text: $endingTier,
+                dialPadNavigationTitle: "Tier points"
+            )
+            .environmentObject(settingsStore)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(12)
+    }
 
     var body: some View {
         NavigationStack {
@@ -243,7 +283,7 @@ struct CloseoutView: View {
                                     .cornerRadius(8)
                                 }
                             }
-                            InputRow(label: "Ending Tier Points", placeholder: "Loyalty app now", value: $endingTier, dialPadNavigationTitle: "Tier points")
+                            endingTierPointsRow
                             VStack(alignment: .leading, spacing: 8) {
                                 L10nText("Tier points")
                                     .font(.caption.bold())
@@ -498,9 +538,9 @@ struct CloseoutView: View {
                 if closedSessionId != nil, let co = Int(cashOut),
                    let et = Int(endingTier) {
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
-                    closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
+                    let walletToastDelay = closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
                     closedSessionId = nil
-                    dismiss()
+                    dismissAfterWalletTierToastIfNeeded(walletToastDelay)
                 }
             }) {
                 SessionMoodPickerView { mood in
@@ -554,6 +594,15 @@ struct CloseoutView: View {
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
             }
+            #if os(iOS)
+            .fullScreenCover(isPresented: $showLinkedWalletFromCloseout, onDismiss: {
+                linkedWalletFocusCardId = nil
+            }) {
+                TierTapWalletView(initialFocusedCardId: linkedWalletFocusCardId)
+                    .environmentObject(settingsStore)
+                    .environmentObject(rewardWalletStore)
+            }
+            #endif
         }
         .onAppear {
             privateNotes = s.privateNotes ?? ""
@@ -581,11 +630,34 @@ struct CloseoutView: View {
         }
     }
 
-    private func closeSessionPersistingLastGameDefaults(cashOut: Int, endingTier: Int, privateNotes: String?) {
-        if let live = store.liveSession {
-            settingsStore.recordLastPlayedGameChoices(from: live)
+    /// Ends the live session; if the session was linked to a wallet card and ending tier ≠ starting tier, updates the card and publishes `store.walletTierCloseoutToast`.
+    /// - Returns: seconds to delay calling `dismiss()` so the app-wide tier toast can play (or `nil` for no extra delay).
+    @discardableResult
+    private func closeSessionPersistingLastGameDefaults(cashOut: Int, endingTier: Int, privateNotes: String?) -> TimeInterval? {
+        guard let live = store.liveSession else { return nil }
+        let cardId = live.linkedRewardWalletCardId
+        let startTier = live.startingTierPoints
+        let shouldSyncWallet = cardId != nil && endingTier != startTier
+
+        if shouldSyncWallet, let id = cardId, var card = rewardWalletStore.cards.first(where: { $0.id == id }) {
+            card.currentTier = "\(endingTier)"
+            rewardWalletStore.updateCard(card, newImage: nil)
+            store.walletTierCloseoutToast = WalletTierCloseoutToast(fromPoints: startTier, toPoints: endingTier)
         }
+
+        settingsStore.recordLastPlayedGameChoices(from: live)
         store.closeSession(cashOut: cashOut, endingTier: endingTier, privateNotes: privateNotes)
+        return shouldSyncWallet ? WalletTierCloseoutTiming.totalAutoDismiss : nil
+    }
+
+    private func dismissAfterWalletTierToastIfNeeded(_ walletToastDelay: TimeInterval?) {
+        if let delay = walletToastDelay, delay > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                dismiss()
+            }
+        } else {
+            dismiss()
+        }
     }
 
     func save() {
@@ -601,12 +673,12 @@ struct CloseoutView: View {
                 }
                 showCelebration = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                    closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
-                    dismiss()
+                    let walletToastDelay = closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
+                    dismissAfterWalletTierToastIfNeeded(walletToastDelay)
                 }
             } else {
-                closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
-                dismiss()
+                let walletToastDelay = closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
+                dismissAfterWalletTierToastIfNeeded(walletToastDelay)
             }
             return
         }

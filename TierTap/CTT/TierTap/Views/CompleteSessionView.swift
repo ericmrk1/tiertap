@@ -5,6 +5,7 @@ import UIKit
 struct CompleteSessionView: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var cashOut: String = ""
@@ -277,6 +278,7 @@ struct CompleteSessionView: View {
                     updated.endingTierPoints = et
                     updated.status = .complete
                     updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    syncLinkedWalletTierAfterEndIfNeeded(endingTier: et)
                     store.updateSession(updated)
                     completedSessionId = nil
                     dismiss()
@@ -298,6 +300,7 @@ struct CompleteSessionView: View {
                     updated.status = .complete
                     updated.sessionMood = mood
                     updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
+                    syncLinkedWalletTierAfterEndIfNeeded(endingTier: et)
                     store.updateSession(updated)
                     completedSessionId = nil
                     let downswing = store.recentMoodDownswingDetected()
@@ -361,6 +364,7 @@ struct CompleteSessionView: View {
             updated.status = .complete
             updated.privateNotes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
             updated.chipEstimatorImageFilename = chipEstimatorImageFilename
+            syncLinkedWalletTierAfterEndIfNeeded(endingTier: et)
             store.updateSession(updated)
             if netPositive {
                 if settingsStore.enableCasinoFeedback {
@@ -396,5 +400,15 @@ struct CompleteSessionView: View {
             updated.chipEstimatorImageFilename = fileName
             store.updateSession(updated)
         }
+    }
+
+    /// When this session was started from a wallet card and ending tier differs from starting, update that card’s stored tier and show the app-wide toast.
+    private func syncLinkedWalletTierAfterEndIfNeeded(endingTier: Int) {
+        guard let id = session.linkedRewardWalletCardId else { return }
+        guard endingTier != session.startingTierPoints else { return }
+        guard var card = rewardWalletStore.cards.first(where: { $0.id == id }) else { return }
+        card.currentTier = "\(endingTier)"
+        rewardWalletStore.updateCard(card, newImage: nil)
+        store.walletTierCloseoutToast = WalletTierCloseoutToast(fromPoints: session.startingTierPoints, toPoints: endingTier)
     }
 }

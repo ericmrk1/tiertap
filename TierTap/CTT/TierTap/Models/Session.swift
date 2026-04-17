@@ -251,6 +251,8 @@ struct Session: Identifiable, Codable, Equatable {
     var privateNotes: String?
     /// Loyalty program name chosen at check-in (e.g. MGM Rewards), if any.
     var rewardsProgramName: String?
+    /// When the player picked a TierTap wallet card at check-in, the card id used to sync ending tier back to the wallet.
+    var linkedRewardWalletCardId: UUID?
     /// Confirmed vs provisional tier point totals. New sessions default to `.unverified`; `nil` is only for older persisted data.
     var tierPointsVerification: SessionTierPointsVerification?
     /// Optional filename for a locally stored chip estimator photo associated with this session.
@@ -292,7 +294,7 @@ struct Session: Identifiable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, tierPointsVerification
+        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
         case chipEstimatorImageFilename
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
@@ -320,6 +322,7 @@ struct Session: Identifiable, Codable, Equatable {
         sessionMood = try c.decodeIfPresent(SessionMood.self, forKey: .sessionMood)
         privateNotes = try c.decodeIfPresent(String.self, forKey: .privateNotes)
         rewardsProgramName = try c.decodeIfPresent(String.self, forKey: .rewardsProgramName)
+        linkedRewardWalletCardId = try c.decodeIfPresent(UUID.self, forKey: .linkedRewardWalletCardId)
         tierPointsVerification = try c.decodeIfPresent(SessionTierPointsVerification.self, forKey: .tierPointsVerification)
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
         gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
@@ -347,6 +350,7 @@ struct Session: Identifiable, Codable, Equatable {
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
          status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
          rewardsProgramName: String? = nil,
+         linkedRewardWalletCardId: UUID? = nil,
          tierPointsVerification: SessionTierPointsVerification? = .unverified,
          chipEstimatorImageFilename: String? = nil,
          gameCategory: SessionGameCategory? = nil,
@@ -384,6 +388,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.sessionMood = sessionMood
         self.privateNotes = privateNotes
         self.rewardsProgramName = rewardsProgramName
+        self.linkedRewardWalletCardId = linkedRewardWalletCardId
         self.tierPointsVerification = tierPointsVerification
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
         self.gameCategory = gameCategory
@@ -425,6 +430,7 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(sessionMood, forKey: .sessionMood)
         try c.encodeIfPresent(privateNotes, forKey: .privateNotes)
         try c.encodeIfPresent(rewardsProgramName, forKey: .rewardsProgramName)
+        try c.encodeIfPresent(linkedRewardWalletCardId, forKey: .linkedRewardWalletCardId)
         try c.encodeIfPresent(tierPointsVerification, forKey: .tierPointsVerification)
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
         try c.encodeIfPresent(gameCategory, forKey: .gameCategory)

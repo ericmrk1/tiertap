@@ -1,9 +1,27 @@
 import Foundation
 import Combine
 
+/// Shown app-wide after closeout when ending tier points changed for a session linked to a wallet card.
+struct WalletTierCloseoutToast: Equatable {
+    let fromPoints: Int
+    let toPoints: Int
+}
+
+/// Durations for `WalletTierCloseoutToastBanner` (count with ease-in-out motion, then hold on the final value).
+enum WalletTierCloseoutTiming {
+    /// Counting phase: eased so the value moves slowly, then quickly, then slowly to the target.
+    static let countDuration: TimeInterval = 2.5
+    /// After the count finishes, keep the final value on screen.
+    static let holdOnFinalDuration: TimeInterval = 1.5
+    static let dismissBuffer: TimeInterval = 0.12
+    static var totalAutoDismiss: TimeInterval { countDuration + holdOnFinalDuration + dismissBuffer }
+}
+
 class SessionStore: ObservableObject {
     @Published var sessions: [Session] = []
     @Published var liveSession: Session?
+    /// Brief full-screen toast; set before `closeSession` so it survives live-session dismissal.
+    @Published var walletTierCloseoutToast: WalletTierCloseoutToast?
 
     private let sessKey = "ctt_sessions_v2"
     private let liveKey = "ctt_live_v2"
@@ -89,7 +107,16 @@ class SessionStore: ObservableObject {
     }
 
     // MARK: Live
-    func startSession(game: String, casino: String, startingTier: Int, initialBuyIn: Int, rewardsProgramName: String? = nil, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil) {
+    func startSession(
+        game: String,
+        casino: String,
+        startingTier: Int,
+        initialBuyIn: Int,
+        rewardsProgramName: String? = nil,
+        casinoLatitude: Double? = nil,
+        casinoLongitude: Double? = nil,
+        linkedRewardWalletCardId: UUID? = nil
+    ) {
         #if os(watchOS)
         var p: [String: Any] = [
             "game": game, "casino": casino, "startingTier": startingTier, "initialBuyIn": initialBuyIn
@@ -101,9 +128,18 @@ class SessionStore: ObservableObject {
         return
         #endif
         let ev = BuyInEvent(amount: initialBuyIn, timestamp: Date())
-        let s = Session(game: game, casino: casino, casinoLatitude: casinoLatitude, casinoLongitude: casinoLongitude, startTime: Date(),
-                        startingTierPoints: startingTier, buyInEvents: [ev], isLive: true,
-                        rewardsProgramName: rewardsProgramName)
+        let s = Session(
+            game: game,
+            casino: casino,
+            casinoLatitude: casinoLatitude,
+            casinoLongitude: casinoLongitude,
+            startTime: Date(),
+            startingTierPoints: startingTier,
+            buyInEvents: [ev],
+            isLive: true,
+            rewardsProgramName: rewardsProgramName,
+            linkedRewardWalletCardId: linkedRewardWalletCardId
+        )
         liveSession = s
         saveLive()
         #if os(iOS)
