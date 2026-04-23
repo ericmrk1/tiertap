@@ -179,6 +179,16 @@ private enum SessionArtTextFont: String, CaseIterable, Identifiable {
     case rounded
     case serif
     case mono
+    case avenir
+    case avenirHeavy
+    case helveticaNeue
+    case futura
+    case georgia
+    case gillSans
+    case chalkboard
+    case noteworthy
+    case courierNew
+    case optima
 
     var id: String { rawValue }
 
@@ -188,6 +198,16 @@ private enum SessionArtTextFont: String, CaseIterable, Identifiable {
         case .rounded: return "Rounded"
         case .serif: return "Serif"
         case .mono: return "Mono"
+        case .avenir: return "Avenir"
+        case .avenirHeavy: return "Avenir Heavy"
+        case .helveticaNeue: return "Helvetica Neue"
+        case .futura: return "Futura"
+        case .georgia: return "Georgia"
+        case .gillSans: return "Gill Sans"
+        case .chalkboard: return "Chalkboard"
+        case .noteworthy: return "Noteworthy"
+        case .courierNew: return "Courier New"
+        case .optima: return "Optima"
         }
     }
 }
@@ -233,6 +253,63 @@ private enum SessionArtColorToken: String, CaseIterable, Identifiable {
     var color: Color { Color(uiColor) }
 }
 
+private enum SessionArtPickerGroup: String, CaseIterable, Identifiable {
+    case templates = "Templates"
+    case stickers = "Stickers"
+    case artDeco = "Art Deco"
+
+    var id: String { rawValue }
+}
+
+private enum SessionArtBorderStyle: Equatable {
+    case none
+    case vintagePaper
+    case matteFrame
+    case artDeco
+    case woodFrame
+}
+
+private enum SessionArtStickerOverlayStyle: Equatable {
+    case none
+    case circle
+    case triangle
+    case square
+    case suitSpade
+    case suitHeart
+    case suitDiamond
+    case suitClub
+    case aceSpades
+    case aceDiamonds
+    case aceHearts
+    case jackCard
+    case eightSpades
+    case nineSpades
+    case artDecoSlotMachine
+    case artDecoDice
+    case artDecoJoker
+    case artDecoMoneyBag
+    case artDecoGem
+    case artDecoCoin
+    case artDecoTicket
+    case artDecoCrown
+    case artDecoSparkles
+    case artDecoSpade
+    case artDecoHeart
+    case artDecoDiamond
+
+    var usesStickerMetricPlacements: Bool {
+        switch self {
+        case .none,
+             .artDecoSlotMachine, .artDecoDice, .artDecoJoker, .artDecoMoneyBag,
+             .artDecoGem, .artDecoCoin, .artDecoTicket, .artDecoCrown,
+             .artDecoSparkles, .artDecoSpade, .artDecoHeart, .artDecoDiamond:
+            return false
+        default:
+            return true
+        }
+    }
+}
+
 private struct SessionArtLayout: Equatable {
     var headerOrigin: CGPoint
     var lineOrigins: [MetricLineKey: CGPoint]
@@ -259,6 +336,10 @@ private struct SessionArtLayout: Equatable {
     var emphasizedMetric: MetricLineKey? = nil
     /// Additional multiplier for the featured metric line.
     var emphasisScale: CGFloat = 1.4
+    /// Decorative border overlaid on top of the rendered media.
+    var borderStyle: SessionArtBorderStyle = .none
+    /// Decorative sticker geometry for stat-group presets.
+    var stickerOverlayStyle: SessionArtStickerOverlayStyle = .none
 
     /// Stacked metric rows from top to bottom in `keys` order (same order as `activeLineKeys`).
     static func makeLineOriginsStacked(
@@ -342,7 +423,9 @@ private struct SessionArtLayout: Equatable {
             showBranding: showBranding,
             headerFocus: headerFocus,
             emphasizedMetric: emphasizedMetric,
-            emphasisScale: emphasisScale
+            emphasisScale: emphasisScale,
+            borderStyle: borderStyle,
+            stickerOverlayStyle: stickerOverlayStyle
         )
     }
 }
@@ -361,6 +444,35 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
     case noteStory
     case tierBlast
     case cashFlex
+    case vintageBorder
+    case pictureFrame
+    case artDecoBorder
+    case woodFrame
+    case statCircle
+    case statTriangle
+    case statSquare
+    case stickerSpade
+    case stickerHeart
+    case stickerDiamond
+    case stickerClub
+    case aceSpadesCard
+    case aceDiamondsCard
+    case aceHeartsCard
+    case jackCard
+    case eightSpadesCard
+    case nineSpadesCard
+    case decoSlotMachine
+    case decoDice
+    case decoJoker
+    case decoMoneyBag
+    case decoGem
+    case decoCoin
+    case decoTicket
+    case decoCrown
+    case decoSparkles
+    case decoSpade
+    case decoHeart
+    case decoDiamond
 
     var id: String { rawValue }
 
@@ -377,7 +489,140 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
         case .noteStory: return "Note story"
         case .tierBlast: return "Tier blast"
         case .cashFlex: return "Cash flex"
+        case .vintageBorder: return "Vintage"
+        case .pictureFrame: return "Picture frame"
+        case .artDecoBorder: return "Art deco"
+        case .woodFrame: return "Picture frame 2"
+        case .statCircle: return "Stat circle"
+        case .statTriangle: return "Stat triangle"
+        case .statSquare: return "Stat square"
+        case .stickerSpade: return "Spade"
+        case .stickerHeart: return "Heart"
+        case .stickerDiamond: return "Diamond"
+        case .stickerClub: return "Club"
+        case .aceSpadesCard: return "A♠ card"
+        case .aceDiamondsCard: return "A♦ card"
+        case .aceHeartsCard: return "A♥ card"
+        case .jackCard: return "J card"
+        case .eightSpadesCard: return "8♠ card"
+        case .nineSpadesCard: return "9♠ card"
+        case .decoSlotMachine: return "Slot machine"
+        case .decoDice: return "Dice"
+        case .decoJoker: return "Joker"
+        case .decoMoneyBag: return "Money bag"
+        case .decoGem: return "Gem"
+        case .decoCoin: return "Coin"
+        case .decoTicket: return "Ticket"
+        case .decoCrown: return "Crown"
+        case .decoSparkles: return "Sparkles"
+        case .decoSpade: return "Spade icon"
+        case .decoHeart: return "Heart icon"
+        case .decoDiamond: return "Diamond icon"
         }
+    }
+
+    var pickerGroup: SessionArtPickerGroup {
+        switch self {
+        case .statCircle, .statTriangle, .statSquare,
+             .stickerSpade, .stickerHeart, .stickerDiamond, .stickerClub,
+             .aceSpadesCard, .aceDiamondsCard, .aceHeartsCard, .jackCard, .eightSpadesCard, .nineSpadesCard:
+            return .stickers
+        case .decoSlotMachine, .decoDice, .decoJoker, .decoMoneyBag, .decoGem, .decoCoin,
+             .decoTicket, .decoCrown, .decoSparkles, .decoSpade, .decoHeart, .decoDiamond:
+            return .artDeco
+        default:
+            return .templates
+        }
+    }
+
+    private func ringLineOrigins(keys: [MetricLineKey], center: CGPoint, radius: CGFloat) -> [MetricLineKey: CGPoint] {
+        guard !keys.isEmpty else { return [:] }
+        let anchors: [CGPoint] = [
+            // Top arc
+            CGPoint(x: center.x - radius * 0.62, y: center.y - radius * 0.76),
+            CGPoint(x: center.x, y: center.y - radius * 0.90),
+            CGPoint(x: center.x + radius * 0.62, y: center.y - radius * 0.76),
+            // Bottom arc
+            CGPoint(x: center.x - radius * 0.58, y: center.y + radius * 0.78),
+            CGPoint(x: center.x + radius * 0.58, y: center.y + radius * 0.78),
+            // Side fallback
+            CGPoint(x: center.x - radius * 0.98, y: center.y),
+            CGPoint(x: center.x + radius * 0.98, y: center.y)
+        ]
+        var origins: [MetricLineKey: CGPoint] = [:]
+        for (index, key) in keys.enumerated() {
+            origins[key] = anchors[min(index, anchors.count - 1)]
+        }
+        return origins
+    }
+
+    private func triangleLineOrigins(keys: [MetricLineKey], in size: CGSize) -> [MetricLineKey: CGPoint] {
+        guard !keys.isEmpty else { return [:] }
+        let anchors: [CGPoint] = [
+            CGPoint(x: size.width * 0.5, y: size.height * 0.36),  // top compartment
+            CGPoint(x: size.width * 0.34, y: size.height * 0.64), // bottom-left
+            CGPoint(x: size.width * 0.66, y: size.height * 0.64), // bottom-right
+            CGPoint(x: size.width * 0.5, y: size.height * 0.52),  // center strip
+            CGPoint(x: size.width * 0.24, y: size.height * 0.56), // left edge
+            CGPoint(x: size.width * 0.76, y: size.height * 0.56)  // right edge
+        ]
+        var origins: [MetricLineKey: CGPoint] = [:]
+        for (index, key) in keys.enumerated() {
+            let anchor = anchors[min(index, anchors.count - 1)]
+            origins[key] = anchor
+        }
+        return origins
+    }
+
+    private func squareLineOrigins(keys: [MetricLineKey], in size: CGSize) -> [MetricLineKey: CGPoint] {
+        guard !keys.isEmpty else { return [:] }
+        let anchors: [CGPoint] = [
+            CGPoint(x: size.width * 0.58, y: size.height * 0.34),
+            CGPoint(x: size.width * 0.58, y: size.height * 0.45),
+            CGPoint(x: size.width * 0.58, y: size.height * 0.56),
+            CGPoint(x: size.width * 0.58, y: size.height * 0.67),
+            CGPoint(x: size.width * 0.36, y: size.height * 0.56),
+            CGPoint(x: size.width * 0.36, y: size.height * 0.69)
+        ]
+        var origins: [MetricLineKey: CGPoint] = [:]
+        for (index, key) in keys.enumerated() {
+            let anchor = anchors[min(index, anchors.count - 1)]
+            origins[key] = anchor
+        }
+        return origins
+    }
+
+    private func artDecoLayout(
+        overlayStyle: SessionArtStickerOverlayStyle,
+        keys: [MetricLineKey],
+        in size: CGSize
+    ) -> SessionArtLayout {
+        let w = size.width
+        let h = size.height
+        let s = max(1, w / sessionArtReferenceWidth)
+        return SessionArtLayout(
+            headerOrigin: CGPoint(x: w * 0.16, y: h * 0.09),
+            lineOrigins: SessionArtLayout.makeLineOriginsStacked(
+                keys: keys,
+                startY: h * 0.52,
+                rowStride: 122 * s,
+                leftPadding: w * 0.13
+            ),
+            footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+            headerScale: 0.9,
+            metricsScale: 0.88,
+            footerScale: 0.95,
+            brandingScale: 0.88,
+            brandingOffset: .zero,
+            underlayZoom: 1.02,
+            underlayPan: .zero,
+            showBranding: false,
+            headerFocus: .casino,
+            emphasizedMetric: .winLoss,
+            emphasisScale: 1.24,
+            borderStyle: .artDeco,
+            stickerOverlayStyle: overlayStyle
+        )
     }
 
     func makeLayout(
@@ -399,6 +644,14 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             publishBuyInCashOut: publishBuyInCashOut,
             publishCompDetails: publishCompDetails
         )
+        let stickerFallbackKeys = SessionArtLayout.activeLineKeys(
+            session: session,
+            publishTierPerHour: true,
+            publishWinLoss: true,
+            publishBuyInCashOut: true,
+            publishCompDetails: true
+        )
+        let layoutKeys = (pickerGroup == .stickers && keys.isEmpty) ? stickerFallbackKeys : keys
 
         switch self {
         case .balanced:
@@ -406,7 +659,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: pad),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.42,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -430,7 +683,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: pad),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.49,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -455,7 +708,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: xCol, y: pad),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.33,
                     rowStride: rowStride,
                     leftPadding: xCol
@@ -479,7 +732,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.06),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.56,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -503,7 +756,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: pad),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.36,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -527,7 +780,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.06),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.55,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -551,7 +804,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.05),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.45,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -575,7 +828,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.07),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.5,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -599,7 +852,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.05),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.34,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -623,7 +876,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.06),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.52,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -647,7 +900,7 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
             return SessionArtLayout(
                 headerOrigin: CGPoint(x: pad, y: h * 0.05),
                 lineOrigins: SessionArtLayout.makeLineOriginsStacked(
-                    keys: keys,
+                    keys: layoutKeys,
                     startY: h * 0.5,
                     rowStride: rowStride,
                     leftPadding: pad
@@ -664,6 +917,422 @@ private enum SessionArtTemplate: String, CaseIterable, Identifiable {
                 headerFocus: .game,
                 emphasizedMetric: .cashOut,
                 emphasisScale: 1.62
+            )
+
+        case .vintageBorder:
+            let rowStride = 122 * s
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.12, y: h * 0.08),
+                lineOrigins: SessionArtLayout.makeLineOriginsStacked(
+                    keys: layoutKeys,
+                    startY: h * 0.42,
+                    rowStride: rowStride,
+                    leftPadding: w * 0.14
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.90),
+                headerScale: 0.9,
+                metricsScale: 0.92,
+                footerScale: 1.0,
+                brandingScale: 0.9,
+                brandingOffset: .zero,
+                underlayZoom: 1.0,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .casino,
+                emphasizedMetric: .winLoss,
+                emphasisScale: 1.32,
+                borderStyle: .vintagePaper
+            )
+
+        case .pictureFrame:
+            let rowStride = 128 * s
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.09),
+                lineOrigins: SessionArtLayout.makeLineOriginsStacked(
+                    keys: layoutKeys,
+                    startY: h * 0.40,
+                    rowStride: rowStride,
+                    leftPadding: w * 0.19
+                ),
+                footerCenter: CGPoint(x: w * 0.68, y: h * 0.88),
+                headerScale: 0.84,
+                metricsScale: 0.92,
+                footerScale: 0.95,
+                brandingScale: 0.9,
+                brandingOffset: CGPoint(x: -w * 0.03, y: 0),
+                underlayZoom: 1.0,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .casino,
+                emphasizedMetric: .winRate,
+                emphasisScale: 1.25,
+                borderStyle: .matteFrame
+            )
+
+        case .artDecoBorder:
+            let rowStride = 120 * s
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.16, y: h * 0.10),
+                lineOrigins: SessionArtLayout.makeLineOriginsStacked(
+                    keys: layoutKeys,
+                    startY: h * 0.44,
+                    rowStride: rowStride,
+                    leftPadding: w * 0.18
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.86,
+                metricsScale: 0.9,
+                footerScale: 0.94,
+                brandingScale: 0.9,
+                brandingOffset: .zero,
+                underlayZoom: 1.0,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .casino,
+                emphasizedMetric: .cashOut,
+                emphasisScale: 1.3,
+                borderStyle: .artDeco
+            )
+
+        case .woodFrame:
+            let rowStride = 126 * s
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.09),
+                lineOrigins: SessionArtLayout.makeLineOriginsStacked(
+                    keys: keys,
+                    startY: h * 0.41,
+                    rowStride: rowStride,
+                    leftPadding: w * 0.19
+                ),
+                footerCenter: CGPoint(x: w * 0.68, y: h * 0.88),
+                headerScale: 0.84,
+                metricsScale: 0.9,
+                footerScale: 0.95,
+                brandingScale: 0.88,
+                brandingOffset: CGPoint(x: -w * 0.03, y: 0),
+                underlayZoom: 1.0,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .casino,
+                emphasizedMetric: .tiersPerHour,
+                emphasisScale: 1.24,
+                borderStyle: .woodFrame
+            )
+
+        case .decoSlotMachine:
+            return artDecoLayout(overlayStyle: .artDecoSlotMachine, keys: keys, in: canvasSize)
+        case .decoDice:
+            return artDecoLayout(overlayStyle: .artDecoDice, keys: keys, in: canvasSize)
+        case .decoJoker:
+            return artDecoLayout(overlayStyle: .artDecoJoker, keys: keys, in: canvasSize)
+        case .decoMoneyBag:
+            return artDecoLayout(overlayStyle: .artDecoMoneyBag, keys: keys, in: canvasSize)
+        case .decoGem:
+            return artDecoLayout(overlayStyle: .artDecoGem, keys: keys, in: canvasSize)
+        case .decoCoin:
+            return artDecoLayout(overlayStyle: .artDecoCoin, keys: keys, in: canvasSize)
+        case .decoTicket:
+            return artDecoLayout(overlayStyle: .artDecoTicket, keys: keys, in: canvasSize)
+        case .decoCrown:
+            return artDecoLayout(overlayStyle: .artDecoCrown, keys: keys, in: canvasSize)
+        case .decoSparkles:
+            return artDecoLayout(overlayStyle: .artDecoSparkles, keys: keys, in: canvasSize)
+        case .decoSpade:
+            return artDecoLayout(overlayStyle: .artDecoSpade, keys: keys, in: canvasSize)
+        case .decoHeart:
+            return artDecoLayout(overlayStyle: .artDecoHeart, keys: keys, in: canvasSize)
+        case .decoDiamond:
+            return artDecoLayout(overlayStyle: .artDecoDiamond, keys: keys, in: canvasSize)
+
+        case .statCircle:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.2, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.9,
+                metricsScale: 0.82,
+                footerScale: 0.9,
+                brandingScale: 0.85,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .circle
+            )
+
+        case .statTriangle:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: triangleLineOrigins(keys: layoutKeys, in: canvasSize),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.9,
+                metricsScale: 0.8,
+                footerScale: 0.9,
+                brandingScale: 0.82,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .triangle
+            )
+
+        case .statSquare:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: squareLineOrigins(keys: layoutKeys, in: canvasSize),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.9,
+                metricsScale: 0.8,
+                footerScale: 0.9,
+                brandingScale: 0.82,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .square
+            )
+
+        case .stickerSpade:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .suitSpade
+            )
+
+        case .stickerHeart:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .suitHeart
+            )
+
+        case .stickerDiamond:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .suitDiamond
+            )
+
+        case .stickerClub:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .suitClub
+            )
+
+        case .aceSpadesCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .aceSpades
+            )
+
+        case .aceDiamondsCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .aceDiamonds
+            )
+
+        case .aceHeartsCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .aceHearts
+            )
+
+        case .jackCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .jackCard
+            )
+
+        case .eightSpadesCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .eightSpades
+            )
+
+        case .nineSpadesCard:
+            return SessionArtLayout(
+                headerOrigin: CGPoint(x: w * 0.18, y: h * 0.08),
+                lineOrigins: ringLineOrigins(
+                    keys: layoutKeys,
+                    center: CGPoint(x: w * 0.5, y: h * 0.56),
+                    radius: min(w, h) * 0.24
+                ),
+                footerCenter: CGPoint(x: w * 0.5, y: h * 0.9),
+                headerScale: 0.88,
+                metricsScale: 0.8,
+                footerScale: 0.88,
+                brandingScale: 0.8,
+                brandingOffset: .zero,
+                underlayZoom: 1.03,
+                underlayPan: .zero,
+                showBranding: false,
+                headerFocus: .game,
+                emphasizedMetric: nil,
+                emphasisScale: 1,
+                stickerOverlayStyle: .nineSpades
             )
         }
     }
@@ -791,6 +1460,9 @@ private enum SessionArtRenderer {
         style: SessionArtTextFont
     ) -> UIFont {
         let base = UIFont.systemFont(ofSize: size, weight: weight)
+        func named(_ name: String) -> UIFont? {
+            UIFont(name: name, size: size)
+        }
         let desiredDesign: UIFontDescriptor.SystemDesign
         switch style {
         case .system:
@@ -801,6 +1473,26 @@ private enum SessionArtRenderer {
             desiredDesign = .serif
         case .mono:
             desiredDesign = .monospaced
+        case .avenir:
+            return named("AvenirNext-Regular") ?? base
+        case .avenirHeavy:
+            return named("AvenirNext-Heavy") ?? named("AvenirNext-DemiBold") ?? base
+        case .helveticaNeue:
+            return named("HelveticaNeue-Medium") ?? named("HelveticaNeue") ?? base
+        case .futura:
+            return named("Futura-Medium") ?? base
+        case .georgia:
+            return named("Georgia-Bold") ?? named("Georgia") ?? base
+        case .gillSans:
+            return named("GillSans-SemiBold") ?? named("GillSans") ?? base
+        case .chalkboard:
+            return named("ChalkboardSE-Bold") ?? named("ChalkboardSE-Regular") ?? base
+        case .noteworthy:
+            return named("Noteworthy-Bold") ?? named("Noteworthy-Light") ?? base
+        case .courierNew:
+            return named("CourierNewPS-BoldMT") ?? named("CourierNewPSMT") ?? base
+        case .optima:
+            return named("Optima-ExtraBlack") ?? named("Optima-Bold") ?? named("Optima-Regular") ?? base
         }
         if let descriptor = base.fontDescriptor.withDesign(desiredDesign) {
             return UIFont(descriptor: descriptor, size: size)
@@ -851,6 +1543,8 @@ private enum SessionArtRenderer {
                 cg.fill(CGRect(origin: .zero, size: canvas))
             }
 
+            drawStickerOverlay(style: layout.stickerOverlayStyle, in: canvas, cg: cg)
+
             if params.includeMetrics {
                 drawMetricsBlock(
                     params: params,
@@ -861,9 +1555,7 @@ private enum SessionArtRenderer {
             }
 
             drawHeader(params: params, layout: layout, in: canvas, cg: cg)
-            if layout.showBranding {
-                drawBranding(in: canvas, layout: layout, params: params, cg: cg)
-            }
+            drawBranding(in: canvas, layout: layout, params: params, cg: cg)
             drawFooterCaption(
                 params.footerCaption,
                 center: layout.footerCenter,
@@ -872,6 +1564,7 @@ private enum SessionArtRenderer {
                 in: canvas,
                 cg: cg
             )
+            drawBorderOverlay(style: layout.borderStyle, in: canvas, cg: cg)
         }
     }
 
@@ -895,6 +1588,9 @@ private enum SessionArtRenderer {
             if params.includeMetrics {
                 cg.setFillColor(UIColor.black.withAlphaComponent(0.42).cgColor)
                 cg.fill(CGRect(origin: .zero, size: canvas))
+            }
+            drawStickerOverlay(style: layout.stickerOverlayStyle, in: canvas, cg: cg)
+            if params.includeMetrics {
                 drawMetricsBlock(
                     params: params,
                     layout: layout,
@@ -904,9 +1600,7 @@ private enum SessionArtRenderer {
             }
 
             drawHeader(params: params, layout: layout, in: canvas, cg: cg)
-            if layout.showBranding {
-                drawBranding(in: canvas, layout: layout, params: params, cg: cg)
-            }
+            drawBranding(in: canvas, layout: layout, params: params, cg: cg)
             drawFooterCaption(
                 params.footerCaption,
                 center: layout.footerCenter,
@@ -915,12 +1609,275 @@ private enum SessionArtRenderer {
                 in: canvas,
                 cg: cg
             )
+            drawBorderOverlay(style: layout.borderStyle, in: canvas, cg: cg)
         }
     }
 
     private static func drawBackground(in size: CGSize, cg: CGContext) {
         cg.setFillColor(UIColor(red: 0.06, green: 0.12, blue: 0.08, alpha: 1).cgColor)
         cg.fill(CGRect(origin: .zero, size: size))
+    }
+
+    private static func drawBorderOverlay(style: SessionArtBorderStyle, in size: CGSize, cg: CGContext) {
+        guard style != .none else { return }
+        let s = layoutScale(forCanvasWidth: size.width)
+        let canvasRect = CGRect(origin: .zero, size: size)
+
+        switch style {
+        case .none:
+            return
+        case .vintagePaper:
+            let outerInset = 20 * s
+            let innerInset = 44 * s
+            let outer = canvasRect.insetBy(dx: outerInset, dy: outerInset)
+            let inner = canvasRect.insetBy(dx: innerInset, dy: innerInset)
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.95).cgColor)
+            cg.setLineWidth(14 * s)
+            cg.stroke(outer)
+            cg.setStrokeColor(UIColor(red: 0.84, green: 0.72, blue: 0.52, alpha: 0.95).cgColor)
+            cg.setLineWidth(3 * s)
+            cg.stroke(inner)
+        case .matteFrame:
+            let frame = canvasRect.insetBy(dx: 12 * s, dy: 12 * s)
+            let matte = canvasRect.insetBy(dx: 38 * s, dy: 38 * s)
+            cg.setStrokeColor(UIColor.black.withAlphaComponent(0.85).cgColor)
+            cg.setLineWidth(22 * s)
+            cg.stroke(frame)
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.97).cgColor)
+            cg.setLineWidth(14 * s)
+            cg.stroke(matte)
+        case .artDeco:
+            let inner = canvasRect.insetBy(dx: 34 * s, dy: 34 * s)
+            cg.setStrokeColor(UIColor(red: 0.86, green: 0.68, blue: 0.37, alpha: 0.98).cgColor)
+            cg.setLineWidth(5 * s)
+            cg.stroke(inner)
+
+            let corner = max(34 * s, size.width * 0.09)
+            cg.setStrokeColor(UIColor(red: 0.92, green: 0.82, blue: 0.61, alpha: 0.95).cgColor)
+            cg.setLineWidth(3 * s)
+            cg.strokeLineSegments(between: [
+                CGPoint(x: inner.minX, y: inner.minY + corner), CGPoint(x: inner.minX, y: inner.minY),
+                CGPoint(x: inner.minX, y: inner.minY), CGPoint(x: inner.minX + corner, y: inner.minY),
+                CGPoint(x: inner.maxX - corner, y: inner.minY), CGPoint(x: inner.maxX, y: inner.minY),
+                CGPoint(x: inner.maxX, y: inner.minY), CGPoint(x: inner.maxX, y: inner.minY + corner),
+                CGPoint(x: inner.minX, y: inner.maxY - corner), CGPoint(x: inner.minX, y: inner.maxY),
+                CGPoint(x: inner.minX, y: inner.maxY), CGPoint(x: inner.minX + corner, y: inner.maxY),
+                CGPoint(x: inner.maxX - corner, y: inner.maxY), CGPoint(x: inner.maxX, y: inner.maxY),
+                CGPoint(x: inner.maxX, y: inner.maxY - corner), CGPoint(x: inner.maxX, y: inner.maxY)
+            ])
+        case .woodFrame:
+            let frame = canvasRect.insetBy(dx: 14 * s, dy: 14 * s)
+            let matte = canvasRect.insetBy(dx: 44 * s, dy: 44 * s)
+            cg.setStrokeColor(UIColor(red: 0.74, green: 0.60, blue: 0.42, alpha: 0.98).cgColor)
+            cg.setLineWidth(26 * s)
+            cg.stroke(frame)
+            cg.setStrokeColor(UIColor(red: 0.86, green: 0.74, blue: 0.57, alpha: 0.85).cgColor)
+            cg.setLineWidth(8 * s)
+            cg.stroke(frame.insetBy(dx: 7 * s, dy: 7 * s))
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.97).cgColor)
+            cg.setLineWidth(12 * s)
+            cg.stroke(matte)
+        }
+    }
+
+    private static func drawStickerOverlay(style: SessionArtStickerOverlayStyle, in size: CGSize, cg: CGContext) {
+        guard style != .none else { return }
+        let s = layoutScale(forCanvasWidth: size.width)
+        let stroke = UIColor.white.withAlphaComponent(0.88).cgColor
+        let fill = UIColor.black.withAlphaComponent(0.28).cgColor
+        let suitRed = UIColor(red: 0.84, green: 0.16, blue: 0.24, alpha: 0.94)
+
+        func drawSuitCard(symbol: String, accent: UIColor) {
+            let card = CGRect(
+                x: size.width * 0.26,
+                y: size.height * 0.30,
+                width: size.width * 0.48,
+                height: size.height * 0.52
+            )
+            cg.setFillColor(UIColor.black.withAlphaComponent(0.38).cgColor)
+            cg.addPath(UIBezierPath(roundedRect: card, cornerRadius: 34 * s).cgPath)
+            cg.fillPath()
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.92).cgColor)
+            cg.setLineWidth(max(1.8 * s, 5))
+            cg.addPath(UIBezierPath(roundedRect: card, cornerRadius: 34 * s).cgPath)
+            cg.strokePath()
+
+            let font = styledFont(size: 210 * s, weight: .black, style: .serif)
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: accent
+            ]
+            let ns = symbol as NSString
+            let bounds = ns.size(withAttributes: attrs)
+            let point = CGPoint(
+                x: card.midX - bounds.width * 0.5,
+                y: card.midY - bounds.height * 0.52
+            )
+            ns.draw(at: point, withAttributes: attrs)
+        }
+
+        func drawRankCard(rank: String, suit: String, accent: UIColor) {
+            let card = CGRect(
+                x: size.width * 0.26,
+                y: size.height * 0.30,
+                width: size.width * 0.48,
+                height: size.height * 0.52
+            )
+            cg.setFillColor(UIColor.black.withAlphaComponent(0.36).cgColor)
+            cg.addPath(UIBezierPath(roundedRect: card, cornerRadius: 34 * s).cgPath)
+            cg.fillPath()
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.93).cgColor)
+            cg.setLineWidth(max(1.8 * s, 5))
+            cg.addPath(UIBezierPath(roundedRect: card, cornerRadius: 34 * s).cgPath)
+            cg.strokePath()
+
+            let cornerFont = styledFont(size: 68 * s, weight: .bold, style: .serif)
+            let cornerAttrs: [NSAttributedString.Key: Any] = [
+                .font: cornerFont,
+                .foregroundColor: accent
+            ]
+            let cornerText = "\(rank)\(suit)" as NSString
+            cornerText.draw(at: CGPoint(x: card.minX + 22 * s, y: card.minY + 18 * s), withAttributes: cornerAttrs)
+
+            let cornerSize = cornerText.size(withAttributes: cornerAttrs)
+            cornerText.draw(
+                at: CGPoint(
+                    x: card.maxX - cornerSize.width - 22 * s,
+                    y: card.maxY - cornerSize.height - 18 * s
+                ),
+                withAttributes: cornerAttrs
+            )
+
+            let centerFont = styledFont(size: 170 * s, weight: .black, style: .serif)
+            let centerAttrs: [NSAttributedString.Key: Any] = [
+                .font: centerFont,
+                .foregroundColor: accent
+            ]
+            let centerText = suit as NSString
+            let bounds = centerText.size(withAttributes: centerAttrs)
+            centerText.draw(
+                at: CGPoint(
+                    x: card.midX - bounds.width * 0.5,
+                    y: card.midY - bounds.height * 0.56
+                ),
+                withAttributes: centerAttrs
+            )
+        }
+
+        func drawArtDecoImage(named name: String) {
+            guard let image = UIImage(named: name) else { return }
+            let side = min(size.width, size.height) * 0.62
+            let rect = CGRect(
+                x: (size.width - side) * 0.5,
+                y: size.height * 0.23,
+                width: side,
+                height: side
+            )
+            cg.saveGState()
+            cg.setShadow(
+                offset: CGSize(width: 0, height: 8 * s),
+                blur: 18 * s,
+                color: UIColor.black.withAlphaComponent(0.58).cgColor
+            )
+            cg.setAlpha(0.9)
+            image.draw(in: rect)
+            cg.restoreGState()
+        }
+
+        cg.saveGState()
+        cg.setStrokeColor(stroke)
+        cg.setFillColor(fill)
+
+        switch style {
+        case .none:
+            break
+        case .circle:
+            let r = min(size.width, size.height) * 0.28
+            let c = CGPoint(x: size.width * 0.5, y: size.height * 0.56)
+            cg.setLineWidth(max(2 * s, 7))
+            cg.strokeEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+            cg.setLineWidth(max(1.2 * s, 4))
+            let innerR = r * 0.8
+            cg.strokeEllipse(in: CGRect(x: c.x - innerR, y: c.y - innerR, width: innerR * 2, height: innerR * 2))
+        case .triangle:
+            let top = CGPoint(x: size.width * 0.5, y: size.height * 0.28)
+            let left = CGPoint(x: size.width * 0.2, y: size.height * 0.72)
+            let right = CGPoint(x: size.width * 0.8, y: size.height * 0.72)
+            let midY = size.height * 0.52
+            let path = UIBezierPath()
+            path.move(to: top)
+            path.addLine(to: left)
+            path.addLine(to: right)
+            path.close()
+            cg.addPath(path.cgPath)
+            cg.setLineWidth(max(2 * s, 6))
+            cg.drawPath(using: .fillStroke)
+            cg.setStrokeColor(UIColor.white.withAlphaComponent(0.74).cgColor)
+            cg.setLineWidth(max(1.2 * s, 3.5))
+            cg.strokeLineSegments(between: [
+                CGPoint(x: size.width * 0.35, y: midY), CGPoint(x: size.width * 0.65, y: midY),
+                CGPoint(x: size.width * 0.35, y: midY), left,
+                CGPoint(x: size.width * 0.65, y: midY), right
+            ])
+        case .square:
+            let rect = CGRect(
+                x: size.width * 0.17,
+                y: size.height * 0.30,
+                width: size.width * 0.66,
+                height: size.width * 0.66
+            )
+            cg.setLineWidth(max(2 * s, 6))
+            cg.stroke(rect)
+            let inner = rect.insetBy(dx: rect.width * 0.08, dy: rect.height * 0.08)
+            cg.setLineWidth(max(1.4 * s, 3.5))
+            cg.stroke(inner)
+        case .suitSpade:
+            drawSuitCard(symbol: "♠", accent: .white)
+        case .suitHeart:
+            drawSuitCard(symbol: "♥", accent: suitRed)
+        case .suitDiamond:
+            drawSuitCard(symbol: "♦", accent: suitRed)
+        case .suitClub:
+            drawSuitCard(symbol: "♣", accent: .white)
+        case .aceSpades:
+            drawRankCard(rank: "A", suit: "♠", accent: .white)
+        case .aceDiamonds:
+            drawRankCard(rank: "A", suit: "♦", accent: suitRed)
+        case .aceHearts:
+            drawRankCard(rank: "A", suit: "♥", accent: suitRed)
+        case .jackCard:
+            drawRankCard(rank: "J", suit: "♠", accent: .white)
+        case .eightSpades:
+            drawRankCard(rank: "8", suit: "♠", accent: .white)
+        case .nineSpades:
+            drawRankCard(rank: "9", suit: "♠", accent: .white)
+        case .artDecoSlotMachine:
+            drawArtDecoImage(named: "SessionArtDecoSlotMachine")
+        case .artDecoDice:
+            drawArtDecoImage(named: "SessionArtDecoDice")
+        case .artDecoJoker:
+            drawArtDecoImage(named: "SessionArtDecoJoker")
+        case .artDecoMoneyBag:
+            drawArtDecoImage(named: "SessionArtDecoMoneyBag")
+        case .artDecoGem:
+            drawArtDecoImage(named: "SessionArtDecoGem")
+        case .artDecoCoin:
+            drawArtDecoImage(named: "SessionArtDecoCoin")
+        case .artDecoTicket:
+            drawArtDecoImage(named: "SessionArtDecoTicket")
+        case .artDecoCrown:
+            drawArtDecoImage(named: "SessionArtDecoCrown")
+        case .artDecoSparkles:
+            drawArtDecoImage(named: "SessionArtDecoSparkles")
+        case .artDecoSpade:
+            drawArtDecoImage(named: "SessionArtDecoSpade")
+        case .artDecoHeart:
+            drawArtDecoImage(named: "SessionArtDecoHeart")
+        case .artDecoDiamond:
+            drawArtDecoImage(named: "SessionArtDecoDiamond")
+        }
+
+        cg.restoreGState()
     }
 
     /// Uses UIKit drawing so photo orientation (EXIF) is respected. `zoom` scales above aspect-fill; `pan` shifts in canvas points.
@@ -1212,6 +2169,88 @@ private enum SessionArtRenderer {
         let metricTitleColor = textColor.withAlphaComponent(0.92)
         let metricValueColor = textColor
         let metricBackgroundColor = resolvedTextBackgroundColor(params)
+        let isStickerLayout = layout.stickerOverlayStyle.usesStickerMetricPlacements
+        let stickerCenter = CGPoint(x: size.width * 0.5, y: size.height * 0.56)
+        let primaryKey = keys.first
+
+        func stickerLabel(for key: MetricLineKey, defaultTitle: String) -> String {
+            switch key {
+            case .tierBump: return "TIER"
+            case .buyIn: return "BUY-IN"
+            case .cashOut: return "CASH OUT"
+            case .winLoss: return "WIN/LOSS"
+            case .winRate: return "RATE"
+            case .tiersPerHour: return "TPH"
+            case .comps: return "COMPS"
+            }
+        }
+
+        func stickerEdgePlacement(secondaryIndex: Int, total: Int) -> (point: CGPoint, angle: CGFloat) {
+            switch layout.stickerOverlayStyle {
+            case .circle:
+                let radius = min(size.width, size.height) * 0.345
+                let start = -CGFloat.pi * 0.70
+                let step = (CGFloat.pi * 1.4) / CGFloat(max(1, total - 1))
+                let theta = start + step * CGFloat(secondaryIndex)
+                let point = CGPoint(
+                    x: stickerCenter.x + cos(theta) * radius,
+                    y: stickerCenter.y + sin(theta) * radius
+                )
+                var tangent = theta + .pi / 2
+                if tangent > .pi / 2 { tangent -= .pi }
+                if tangent < -.pi / 2 { tangent += .pi }
+                return (point, tangent)
+            case .triangle:
+                let placements: [(CGPoint, CGFloat)] = [
+                    (CGPoint(x: size.width * 0.5, y: size.height * 0.23), 0),
+                    (CGPoint(x: size.width * 0.27, y: size.height * 0.54), -0.96),
+                    (CGPoint(x: size.width * 0.73, y: size.height * 0.54), 0.96)
+                ]
+                return placements[secondaryIndex % placements.count]
+            case .square:
+                let placements: [(CGPoint, CGFloat)] = [
+                    (CGPoint(x: size.width * 0.5, y: size.height * 0.24), 0),
+                    (CGPoint(x: size.width * 0.86, y: size.height * 0.56), .pi / 2),
+                    (CGPoint(x: size.width * 0.5, y: size.height * 0.82), 0),
+                    (CGPoint(x: size.width * 0.14, y: size.height * 0.56), -.pi / 2)
+                ]
+                return placements[secondaryIndex % placements.count]
+            case .suitSpade, .suitHeart, .suitDiamond, .suitClub,
+                 .aceSpades, .aceDiamonds, .aceHearts, .jackCard, .eightSpades, .nineSpades,
+                 .artDecoSlotMachine, .artDecoDice, .artDecoJoker, .artDecoMoneyBag,
+                 .artDecoGem, .artDecoCoin, .artDecoTicket, .artDecoCrown,
+                 .artDecoSparkles, .artDecoSpade, .artDecoHeart, .artDecoDiamond:
+                let placements: [(CGPoint, CGFloat)] = [
+                    (CGPoint(x: size.width * 0.5, y: size.height * 0.23), 0),
+                    (CGPoint(x: size.width * 0.84, y: size.height * 0.56), .pi / 2),
+                    (CGPoint(x: size.width * 0.5, y: size.height * 0.87), 0),
+                    (CGPoint(x: size.width * 0.16, y: size.height * 0.56), -.pi / 2)
+                ]
+                return placements[secondaryIndex % placements.count]
+            case .none:
+                return (CGPoint(x: size.width * 0.5, y: size.height * 0.5), 0)
+            }
+        }
+
+        func drawStickerEdgeMetric(_ text: String, at point: CGPoint, angle: CGFloat) {
+            let font = styledFont(size: max(16 * s, 20 * s * ms), weight: .bold, style: params.fontStyle)
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor.black.withAlphaComponent(0.62)
+            shadow.shadowOffset = CGSize(width: 0, height: 2 * s)
+            shadow.shadowBlurRadius = 4 * s
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: metricValueColor,
+                .shadow: shadow
+            ]
+            let ns = text as NSString
+            let bounds = ns.size(withAttributes: attrs)
+            cg.saveGState()
+            cg.translateBy(x: point.x, y: point.y)
+            cg.rotate(by: angle)
+            ns.draw(at: CGPoint(x: -bounds.width * 0.5, y: -bounds.height * 0.5), withAttributes: attrs)
+            cg.restoreGState()
+        }
 
         func paintMetricLine(title: String, value: String, key: MetricLineKey) {
             let origin = layout.lineOrigins[key] ?? CGPoint(x: 36 * s, y: size.height * 0.42)
@@ -1220,8 +2259,46 @@ private enum SessionArtRenderer {
             let valueFont: UIFont
             let titleX: CGFloat
             let valueX: CGFloat
+            let titleToDraw: String
 
-            if isEmphasized {
+            if isStickerLayout {
+                let metricIndex = keys.firstIndex(of: key) ?? 0
+                let isPrimary = key == primaryKey && metricIndex == 0
+                if !isPrimary {
+                    let secondaryIndex = max(0, metricIndex - 1)
+                    let placement = stickerEdgePlacement(secondaryIndex: secondaryIndex, total: max(1, keys.count - 1))
+                    let edgeText = "\(value) · \(stickerLabel(for: key, defaultTitle: title))"
+                    drawStickerEdgeMetric(edgeText, at: placement.point, angle: placement.angle)
+                    return
+                }
+                titleToDraw = stickerLabel(for: key, defaultTitle: title)
+                let titleSz = max(14 * s, 17 * s * ms)
+                let valueSz = max(38 * s, 54 * s * ms)
+                titleFont = styledFont(size: titleSz, weight: .semibold, style: params.fontStyle)
+                valueFont = styledFont(size: valueSz, weight: .heavy, style: params.fontStyle)
+                let titleWidth = (titleToDraw as NSString).size(withAttributes: [.font: titleFont]).width
+                let valueWidth = (value as NSString).size(withAttributes: [.font: valueFont]).width
+                let centerPoint: CGPoint
+                switch layout.stickerOverlayStyle {
+                case .circle:
+                    centerPoint = stickerCenter
+                case .triangle:
+                    centerPoint = CGPoint(x: size.width * 0.5, y: size.height * 0.36)
+                case .square:
+                    centerPoint = CGPoint(x: size.width * 0.58, y: size.height * 0.34)
+                case .suitSpade, .suitHeart, .suitDiamond, .suitClub,
+                     .aceSpades, .aceDiamonds, .aceHearts, .jackCard, .eightSpades, .nineSpades,
+                     .artDecoSlotMachine, .artDecoDice, .artDecoJoker, .artDecoMoneyBag,
+                     .artDecoGem, .artDecoCoin, .artDecoTicket, .artDecoCrown,
+                     .artDecoSparkles, .artDecoSpade, .artDecoHeart, .artDecoDiamond:
+                    centerPoint = CGPoint(x: size.width * 0.5, y: size.height * 0.35)
+                case .none:
+                    centerPoint = origin
+                }
+                titleX = centerPoint.x - titleWidth * 0.5
+                valueX = centerPoint.x - valueWidth * 0.5
+            } else if isEmphasized {
+                titleToDraw = title
                 // Hero metric should dominate ~80% of the canvas width.
                 let heroTargetWidth = size.width * 0.8
                 let titleSize = fittedFontSize(
@@ -1247,6 +2324,7 @@ private enum SessionArtRenderer {
                 titleX = max(safe.minX, min(safe.maxX - tw, (size.width - tw) * 0.5))
                 valueX = max(safe.minX, min(safe.maxX - vw, (size.width - vw) * 0.5))
             } else {
+                titleToDraw = title
                 titleFont = styledFont(size: 34 * s * ms, weight: .bold, style: params.fontStyle)
                 valueFont = styledFont(size: 52 * s * ms, weight: .heavy, style: params.fontStyle)
                 titleX = origin.x
@@ -1260,9 +2338,31 @@ private enum SessionArtRenderer {
                 .font: valueFont,
                 .foregroundColor: metricValueColor
             ]
-            let safeY = max(safe.minY, min(origin.y, safe.maxY - titleFont.lineHeight - valueFont.lineHeight - 24 * s))
-            let valueBaseline = safeY + titleFont.lineHeight + 10 * s * ms
-            let titleWidth = (title as NSString).size(withAttributes: ta).width
+            let yBase: CGFloat
+            if isStickerLayout {
+                switch layout.stickerOverlayStyle {
+                case .circle:
+                    yBase = stickerCenter.y - valueFont.lineHeight * 0.56
+                case .triangle:
+                    yBase = size.height * 0.30
+                case .square:
+                    yBase = size.height * 0.28
+                case .suitSpade, .suitHeart, .suitDiamond, .suitClub,
+                     .aceSpades, .aceDiamonds, .aceHearts, .jackCard, .eightSpades, .nineSpades,
+                     .artDecoSlotMachine, .artDecoDice, .artDecoJoker, .artDecoMoneyBag,
+                     .artDecoGem, .artDecoCoin, .artDecoTicket, .artDecoCrown,
+                     .artDecoSparkles, .artDecoSpade, .artDecoHeart, .artDecoDiamond:
+                    yBase = size.height * 0.29
+                case .none:
+                    yBase = origin.y
+                }
+            } else {
+                yBase = origin.y
+            }
+            let safeY = max(safe.minY, min(yBase, safe.maxY - titleFont.lineHeight - valueFont.lineHeight - 24 * s))
+            let lineGap = isStickerLayout ? (2 * s * ms) : (10 * s * ms)
+            let valueBaseline = safeY + titleFont.lineHeight + lineGap
+            let titleWidth = (titleToDraw as NSString).size(withAttributes: ta).width
             let valueWidth = (value as NSString).size(withAttributes: va).width
             let minX = min(titleX, valueX)
             let maxX = max(titleX + titleWidth, valueX + valueWidth)
@@ -1272,14 +2372,14 @@ private enum SessionArtRenderer {
                 width: (maxX - minX) + 28 * s,
                 height: (valueBaseline + valueFont.lineHeight - safeY) + 18 * s
             )
-            if params.textBackgroundOpacity > 0.01 {
+            if params.textBackgroundOpacity > 0.01 && !isStickerLayout {
                 cg.saveGState()
                 cg.setFillColor(metricBackgroundColor.cgColor)
                 cg.addPath(UIBezierPath(roundedRect: bgRect, cornerRadius: 12 * s).cgPath)
                 cg.fillPath()
                 cg.restoreGState()
             }
-            (title as NSString).draw(at: CGPoint(x: titleX, y: safeY), withAttributes: ta)
+            (titleToDraw as NSString).draw(at: CGPoint(x: titleX, y: safeY), withAttributes: ta)
             (value as NSString).draw(at: CGPoint(x: valueX, y: valueBaseline), withAttributes: va)
         }
 
@@ -1390,6 +2490,9 @@ private struct SessionArtPreviewSheet: View {
     @State private var templatesControlsExpanded = false
     @State private var fontsControlsExpanded = false
     @State private var colorsControlsExpanded = false
+    @State private var templatePickerGroup: SessionArtPickerGroup = .templates
+    @State private var templateThumbnailCache: [SessionArtTemplate: UIImage] = [:]
+    @State private var templateThumbnailTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -1421,19 +2524,29 @@ private struct SessionArtPreviewSheet: View {
                     .background(.ultraThinMaterial)
             }
             .onAppear {
+                templatePickerGroup = selectedTemplate.pickerGroup
                 configurePreviewVideoPlayerIfNeeded()
                 refreshPreviewImage()
+                warmTemplateThumbnails(for: templatePickerGroup)
             }
             .onDisappear {
                 previewProgressTask?.cancel()
                 previewProgressTask = nil
+                templateThumbnailTask?.cancel()
+                templateThumbnailTask = nil
                 tearDownPreviewVideoPlayer()
             }
             .onChange(of: videoUnderlayURL) { _ in
                 configurePreviewVideoPlayerIfNeeded()
                 refreshPreviewImage()
             }
-            .onChange(of: selectedTemplate) { _ in refreshPreviewImage() }
+            .onChange(of: selectedTemplate) { _ in
+                templatePickerGroup = selectedTemplate.pickerGroup
+                refreshPreviewImage()
+            }
+            .onChange(of: templatePickerGroup) { group in
+                warmTemplateThumbnails(for: group)
+            }
             .onChange(of: layout) { _ in refreshPreviewImage() }
             .onChange(of: includeMetrics) { _ in refreshPreviewImage() }
             .onChange(of: publishTierPerHour) { _ in refreshPreviewImage() }
@@ -1458,14 +2571,20 @@ private struct SessionArtPreviewSheet: View {
         case .image:
             VStack(alignment: .leading, spacing: 10) {
                 collapsibleControlsBubble(
-                    title: "Templates",
-                    subtitle: "\(selectedTemplate.shortTitle) selected",
+                    title: "Templates + Stickers + Art Deco",
+                    subtitle: "\(selectedTemplate.shortTitle) · \(selectedTemplate.pickerGroup.rawValue)",
                     icon: "photo.on.rectangle",
                     isExpanded: $templatesControlsExpanded
                 ) {
+                    Picker("Template group", selection: $templatePickerGroup) {
+                        ForEach(SessionArtPickerGroup.allCases) { group in
+                            Text(group.rawValue).tag(group)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(SessionArtTemplate.allCases) { template in
+                        LazyHStack(spacing: 12) {
+                            ForEach(filteredTemplates) { template in
                                 templateThumbnailButton(template)
                             }
                         }
@@ -1491,6 +2610,14 @@ private struct SessionArtPreviewSheet: View {
                 bottomActionBar
             }
         }
+    }
+
+    private var filteredTemplates: [SessionArtTemplate] {
+        SessionArtTemplate.allCases.filter { $0.pickerGroup == templatePickerGroup }
+    }
+
+    private var stickerModeActive: Bool {
+        selectedTemplate.pickerGroup == .stickers
     }
 
     private func collapsibleControlsBubble<Content: View>(
@@ -1545,12 +2672,36 @@ private struct SessionArtPreviewSheet: View {
 
     private var fontControlsRow: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Picker("Font", selection: $selectedTextFont) {
-                ForEach(SessionArtTextFont.allCases) { font in
-                    Text(font.label).tag(font)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Font")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(SessionArtTextFont.allCases) { font in
+                            Button {
+                                selectedTextFont = font
+                            } label: {
+                                Text(font.label)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(selectedTextFont == font ? Color.green.opacity(0.22) : Color.secondary.opacity(0.08))
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(selectedTextFont == font ? Color.green : Color.clear, lineWidth: 1.4)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                 }
             }
-            .pickerStyle(.segmented)
 
             HStack(spacing: 10) {
                 Text("Scale")
@@ -1750,38 +2901,34 @@ private struct SessionArtPreviewSheet: View {
 
     private func templateThumbnailButton(_ template: SessionArtTemplate) -> some View {
         let selected = template == selectedTemplate
+        let thumbnail = templateThumbnailCache[template]
         return Button {
             selectedTemplate = template
+            let stickerTemplate = template.pickerGroup == .stickers
             layout = template.makeLayout(
                 session: session,
-                publishTierPerHour: publishTierPerHour,
-                publishWinLoss: publishWinLoss,
-                publishBuyInCashOut: publishBuyInCashOut,
-                publishCompDetails: publishCompDetails,
+                publishTierPerHour: publishTierPerHour || stickerTemplate,
+                publishWinLoss: publishWinLoss || stickerTemplate,
+                publishBuyInCashOut: publishBuyInCashOut || stickerTemplate,
+                publishCompDetails: publishCompDetails || stickerTemplate,
                 canvasSize: designSize
             )
         } label: {
             VStack(spacing: 0) {
-                Image(
-                    uiImage: template.renderThumbnail(
-                        session: session,
-                        base: resolveUnderlay(),
-                        includeMetrics: includeMetrics,
-                        publishTierPerHour: publishTierPerHour,
-                        publishWinLoss: publishWinLoss,
-                        publishBuyInCashOut: publishBuyInCashOut,
-                        publishCompDetails: publishCompDetails,
-                        currencySymbol: currencySymbol,
-                        footerCaption: footerCaption,
-                        fontStyle: selectedTextFont,
-                        textScale: globalTextScale,
-                        textColorToken: selectedTextColor,
-                        textBackgroundColorToken: selectedTextBackgroundColor,
-                        textBackgroundOpacity: textBackgroundOpacity
-                    )
-                )
-                .resizable()
-                .interpolation(.high)
+                Group {
+                    if let thumbnail {
+                        Image(uiImage: thumbnail)
+                            .resizable()
+                            .interpolation(.high)
+                    } else {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white.opacity(0.08))
+                            .overlay {
+                                ProgressView()
+                                    .tint(.green)
+                            }
+                    }
+                }
                 .aspectRatio(designSize.width / designSize.height, contentMode: .fit)
                 .frame(width: 88, height: 156)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -1814,21 +2961,116 @@ private struct SessionArtPreviewSheet: View {
             .frame(width: 100)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(template.shortTitle) layout\(selected ? ", selected" : "")")
+        .accessibilityLabel("\(template.shortTitle) preset\(selected ? ", selected" : "")")
+    }
+
+    private func warmTemplateThumbnails(for group: SessionArtPickerGroup) {
+        templateThumbnailTask?.cancel()
+        let templates = SessionArtTemplate.allCases.filter { $0.pickerGroup == group }
+        let session = session
+        let includeMetrics = includeMetrics
+        let publishTierPerHour = publishTierPerHour
+        let publishWinLoss = publishWinLoss
+        let publishBuyInCashOut = publishBuyInCashOut
+        let publishCompDetails = publishCompDetails
+        let currencySymbol = currencySymbol
+        let footerCaption = footerCaption
+        let selectedTextFont = selectedTextFont
+        let globalTextScale = globalTextScale
+        let selectedTextColor = selectedTextColor
+        let selectedTextBackgroundColor = selectedTextBackgroundColor
+        let textBackgroundOpacity = textBackgroundOpacity
+        let designSize = designSize
+
+        templateThumbnailTask = Task(priority: .utility) {
+            for template in templates {
+                if Task.isCancelled { return }
+                let alreadyCached = await MainActor.run {
+                    templateThumbnailCache[template] != nil
+                }
+                if alreadyCached { continue }
+
+                let image = await Self.renderThumbnailOffMain(
+                    template: template,
+                    session: session,
+                    base: nil,
+                    includeMetrics: includeMetrics || template.pickerGroup == .stickers,
+                    publishTierPerHour: publishTierPerHour || template.pickerGroup == .stickers,
+                    publishWinLoss: publishWinLoss || template.pickerGroup == .stickers,
+                    publishBuyInCashOut: publishBuyInCashOut || template.pickerGroup == .stickers,
+                    publishCompDetails: publishCompDetails || template.pickerGroup == .stickers,
+                    currencySymbol: currencySymbol,
+                    footerCaption: footerCaption,
+                    fontStyle: selectedTextFont,
+                    textScale: globalTextScale,
+                    textColorToken: selectedTextColor,
+                    textBackgroundColorToken: selectedTextBackgroundColor,
+                    textBackgroundOpacity: textBackgroundOpacity,
+                    canvasSize: designSize
+                )
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    templateThumbnailCache[template] = image
+                }
+            }
+        }
+    }
+
+    private static func renderThumbnailOffMain(
+        template: SessionArtTemplate,
+        session: Session,
+        base: UIImage?,
+        includeMetrics: Bool,
+        publishTierPerHour: Bool,
+        publishWinLoss: Bool,
+        publishBuyInCashOut: Bool,
+        publishCompDetails: Bool,
+        currencySymbol: String,
+        footerCaption: String,
+        fontStyle: SessionArtTextFont,
+        textScale: CGFloat,
+        textColorToken: SessionArtColorToken,
+        textBackgroundColorToken: SessionArtColorToken,
+        textBackgroundOpacity: CGFloat,
+        canvasSize: CGSize
+    ) async -> UIImage {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let image = template.renderThumbnail(
+                    session: session,
+                    base: base,
+                    includeMetrics: includeMetrics,
+                    publishTierPerHour: publishTierPerHour,
+                    publishWinLoss: publishWinLoss,
+                    publishBuyInCashOut: publishBuyInCashOut,
+                    publishCompDetails: publishCompDetails,
+                    currencySymbol: currencySymbol,
+                    footerCaption: footerCaption,
+                    fontStyle: fontStyle,
+                    textScale: textScale,
+                    textColorToken: textColorToken,
+                    textBackgroundColorToken: textBackgroundColorToken,
+                    textBackgroundOpacity: textBackgroundOpacity,
+                    canvasSize: canvasSize
+                )
+                continuation.resume(returning: image)
+            }
+        }
     }
 
     private func refreshPreviewImage() {
         guard outputKind == .image else { return }
         let isVideoPreview = videoUnderlayURL != nil
+        let shouldIncludeMetrics = includeMetrics || stickerModeActive
         let params = SessionArtRenderer.RenderParams(
             base: isVideoPreview ? nil : resolveUnderlay(),
             session: session,
             currencySymbol: currencySymbol,
-            includeMetrics: includeMetrics,
-            publishTierPerHour: publishTierPerHour,
-            publishWinLoss: publishWinLoss,
-            publishBuyInCashOut: publishBuyInCashOut,
-            publishCompDetails: publishCompDetails,
+            includeMetrics: shouldIncludeMetrics,
+            publishTierPerHour: publishTierPerHour || stickerModeActive,
+            publishWinLoss: publishWinLoss || stickerModeActive,
+            publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+            publishCompDetails: publishCompDetails || stickerModeActive,
             metricsReach: 1,
             counterGlobalT: nil,
             fontStyle: selectedTextFont,
@@ -2077,7 +3319,7 @@ struct SessionArtGeneratorView: View {
                 SessionArtPreviewSheet(
                     session: session,
                     resolveUnderlay: { loadUnderlayImage() },
-                    includeMetrics: artStyle == .photoWithMetrics,
+                    includeMetrics: shouldRenderMetrics,
                     publishTierPerHour: publishTierPerHour,
                     publishWinLoss: publishWinLoss,
                     publishBuyInCashOut: publishBuyInCashOut,
@@ -2144,6 +3386,14 @@ struct SessionArtGeneratorView: View {
 
     private var sessionArtPreviewOutputKind: SessionArtPreviewOutputKind {
         outputKind == .text ? .text : .image
+    }
+
+    private var shouldRenderMetrics: Bool {
+        artStyle == .photoWithMetrics || selectedArtTemplate.pickerGroup == .stickers
+    }
+
+    private var stickerModeActive: Bool {
+        selectedArtTemplate.pickerGroup == .stickers
     }
 
     private var textShareOptionsSection: some View {
@@ -2555,12 +3805,13 @@ struct SessionArtGeneratorView: View {
                 includeWinLoss: publishWinLoss
             )
         } else {
+            let stickerTemplate = selectedArtTemplate.pickerGroup == .stickers
             previewLayout = selectedArtTemplate.makeLayout(
                 session: s,
-                publishTierPerHour: publishTierPerHour,
-                publishWinLoss: publishWinLoss,
-                publishBuyInCashOut: publishBuyInCashOut,
-                publishCompDetails: publishCompDetails,
+                publishTierPerHour: publishTierPerHour || stickerTemplate,
+                publishWinLoss: publishWinLoss || stickerTemplate,
+                publishBuyInCashOut: publishBuyInCashOut || stickerTemplate,
+                publishCompDetails: publishCompDetails || stickerTemplate,
                 canvasSize: designCanvas
             )
         }
@@ -2667,11 +3918,11 @@ struct SessionArtGeneratorView: View {
             base: base,
             session: session,
             currencySymbol: settingsStore.currencySymbol,
-            includeMetrics: artStyle == .photoWithMetrics,
-            publishTierPerHour: publishTierPerHour,
-            publishWinLoss: publishWinLoss,
-            publishBuyInCashOut: publishBuyInCashOut,
-            publishCompDetails: publishCompDetails,
+            includeMetrics: shouldRenderMetrics,
+            publishTierPerHour: publishTierPerHour || stickerModeActive,
+            publishWinLoss: publishWinLoss || stickerModeActive,
+            publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+            publishCompDetails: publishCompDetails || stickerModeActive,
             metricsReach: metricsReach,
             counterGlobalT: counterT,
             fontStyle: selectedTextFont,
@@ -2797,17 +4048,22 @@ struct SessionArtGeneratorView: View {
         )
         overlayParams.base = nil
         overlayParams.layout = previewLayout.scaledForCanvas(from: designCanvas, to: renderSize)
-        let overlayImage = SessionArtRenderer.renderOverlayImage(params: overlayParams)
-        guard let overlayCG = overlayImage.cgImage else {
-            isExportingImage = false
-            exportError = "Could not build overlay image for video export."
-            return
+        let animateStickerMetrics = stickerModeActive && shouldRenderMetrics
+        var staticOverlayCI: CIImage?
+        if !animateStickerMetrics {
+            let overlayImage = SessionArtRenderer.renderOverlayImage(params: overlayParams)
+            guard let overlayCG = overlayImage.cgImage else {
+                isExportingImage = false
+                exportError = "Could not build overlay image for video export."
+                return
+            }
+            staticOverlayCI = CIImage(cgImage: overlayCG)
         }
-        let overlayCI = CIImage(cgImage: overlayCG)
         let overlayExtent = CGRect(origin: .zero, size: renderSize)
         let orientationTransform = preferredTransform.concatenating(
             CGAffineTransform(translationX: -transformedRect.minX, y: -transformedRect.minY)
         )
+        let durationSeconds = max(duration.seconds, 0.001)
 
         // Use CI-based compositing for stability when exporting user-picked videos.
         let videoComposition = AVMutableVideoComposition(asset: sourceAsset) { request in
@@ -2820,6 +4076,21 @@ struct SessionArtGeneratorView: View {
                 y: renderSize.height / max(orientedSize.height, 1)
             ))
             .cropped(to: overlayExtent)
+
+            let overlayCI: CIImage
+            if animateStickerMetrics {
+                let t = min(1, max(0, request.compositionTime.seconds / durationSeconds))
+                var frameParams = overlayParams
+                frameParams.counterGlobalT = CGFloat(t)
+                let frameOverlay = SessionArtRenderer.renderOverlayImage(params: frameParams)
+                if let cg = frameOverlay.cgImage {
+                    overlayCI = CIImage(cgImage: cg)
+                } else {
+                    overlayCI = CIImage(color: .clear).cropped(to: overlayExtent)
+                }
+            } else {
+                overlayCI = staticOverlayCI ?? CIImage(color: .clear).cropped(to: overlayExtent)
+            }
 
             let out = overlayCI.composited(over: scaledBase).cropped(to: overlayExtent)
             request.finish(with: out, context: nil)
