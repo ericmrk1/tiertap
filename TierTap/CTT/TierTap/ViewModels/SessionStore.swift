@@ -22,6 +22,10 @@ class SessionStore: ObservableObject {
     @Published var liveSession: Session?
     /// Brief full-screen toast; set before `closeSession` so it survives live-session dismissal.
     @Published var walletTierCloseoutToast: WalletTierCloseoutToast?
+    #if os(iOS)
+    /// After a session is fully completed (live close-out or finishing a Watch cash-out), set briefly so the app can offer share / publish / session art.
+    @Published var postCloseoutSharePromptSessionId: UUID?
+    #endif
 
     private let sessKey = "ctt_sessions_v2"
     private let liveKey = "ctt_live_v2"
@@ -230,8 +234,27 @@ class SessionStore: ObservableObject {
         #if os(iOS)
         LiveActivityManager.shared.end()
         pushContext()
+        schedulePostCloseoutSharePrompt(sessionId: s.id)
         #endif
     }
+
+    #if os(iOS)
+    func clearPostCloseoutSharePrompt() {
+        postCloseoutSharePromptSessionId = nil
+    }
+
+    /// Presents the same post-closeout share flow (`PostCloseoutShareFlowView`) used after ending a live session — e.g. from History → Tools.
+    func presentPostCloseoutSharePrompt(sessionId: UUID) {
+        postCloseoutSharePromptSessionId = sessionId
+    }
+
+    private func schedulePostCloseoutSharePrompt(sessionId: UUID) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self] in
+            guard let self else { return }
+            self.postCloseoutSharePromptSessionId = sessionId
+        }
+    }
+    #endif
 
     /// Call from Watch (or quick cash-out): save session with only cash-out; status = requiringMoreInfo.
     func closeSessionCashOutOnly(cashOut: Int) {
@@ -382,10 +405,14 @@ class SessionStore: ObservableObject {
 
     func updateSession(_ session: Session) {
         guard let idx = sessions.firstIndex(where: { $0.id == session.id }) else { return }
+        let prev = sessions[idx]
         var s = session; s.isLive = false
         sessions[idx] = s
         saveSessions()
         #if os(iOS)
+        if prev.status == .requiringMoreInfo && s.status == .complete {
+            schedulePostCloseoutSharePrompt(sessionId: s.id)
+        }
         pushContext()
         #endif
     }

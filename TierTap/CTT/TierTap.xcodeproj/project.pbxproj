@@ -42,6 +42,8 @@
 		APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */; };
 		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
+		PCLOBLD02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */; };
+		SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */; };
 		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
 		APRT1E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */; };
 		ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */; };
@@ -213,6 +215,8 @@
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
 		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
 		F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseoutView.swift; sourceTree = "<group>"; };
+		PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCloseoutShareFlowView.swift; sourceTree = "<group>"; };
+		SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtGeneratorView.swift; sourceTree = "<group>"; };
 		FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRouteMapView.swift; sourceTree = "<group>"; };
 		GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASupportSheet.swift; sourceTree = "<group>"; };
 		GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiRouterThrottle.swift; sourceTree = "<group>"; };
@@ -318,6 +322,8 @@
 				FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */,
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
+				PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */,
+				SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */,
 				STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */,
 				BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */,
 				BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */,
@@ -728,6 +734,8 @@
 				FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */,
 				8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */,
 				8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */,
+				PCLOBLD02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift in Sources */,
+				SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */,
 				BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */,
 				STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */,
 				STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */,

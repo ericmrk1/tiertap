@@ -21,6 +21,20 @@ struct ShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+
+/// Bitmap scale / layout width for `ImageRenderer` and similar share exports (not session‑art CoreGraphics).
+enum ShareImageExportQuality {
+    /// Supersample share PNGs beyond default screen scale where the GPU can still raster cleanly.
+    @MainActor static var imageRendererScale: CGFloat {
+        min(4, max(3, UIScreen.main.nativeScale))
+    }
+
+    /// Logical width (points) for wide share cards before `imageRendererScale` is applied.
+    @MainActor static var wideCardWidthPoints: CGFloat {
+        let w = UIScreen.main.bounds.width
+        return min(960, max(440, w - 20)).rounded(.down)
+    }
+}
 #endif
 
 struct DarkTextFieldStyle: TextFieldStyle {

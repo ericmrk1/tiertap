@@ -59,9 +59,15 @@ private struct TierTapAppRoot: View {
             }
 
             if showSplash {
-                SplashScreen(gradient: settingsStore.primaryGradient)
-                    .transition(.opacity)
-                    .zIndex(2)
+                SplashScreen(gradient: settingsStore.primaryGradient) {
+                    showSplash = false
+                    if settingsStore.appLockEnabled {
+                        appSessionUnlocked = false
+                    }
+                    maybeShowWelcomeAfterUnlock()
+                }
+                .transition(.opacity)
+                .zIndex(2)
             }
 
             if let toast = store.walletTierCloseoutToast {
@@ -92,13 +98,6 @@ private struct TierTapAppRoot: View {
             if settingsStore.appLockEnabled {
                 appSessionUnlocked = false
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                showSplash = false
-                if settingsStore.appLockEnabled {
-                    appSessionUnlocked = false
-                }
-                maybeShowWelcomeAfterUnlock()
-            }
         }
         .onChange(of: scenePhase) { newPhase in
             if newPhase == .background && settingsStore.appLockEnabled {
@@ -126,6 +125,23 @@ private struct TierTapAppRoot: View {
             .environmentObject(subscriptionStore)
             .environment(\.appLanguage, settingsStore.appLanguage)
         }
+        .sheet(item: postCloseoutShareSheetBinding) { ref in
+            PostCloseoutShareFlowView(sessionId: ref.id)
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+    }
+
+    private var postCloseoutShareSheetBinding: Binding<PostCloseoutSessionRef?> {
+        Binding(
+            get: { store.postCloseoutSharePromptSessionId.map(PostCloseoutSessionRef.init(id:)) },
+            set: { newValue in
+                if newValue == nil {
+                    store.clearPostCloseoutSharePrompt()
+                }
+            }
+        )
     }
 
     private var shouldShowLockGate: Bool {
@@ -141,6 +157,10 @@ private struct TierTapAppRoot: View {
 
 struct SplashScreen: View {
     let gradient: LinearGradient
+    var onFinished: () -> Void
+
+    @State private var logoScale: CGFloat = 1
+    @State private var didScheduleSequence = false
 
     private var logoImage: Image {
         if let processed = TransparentLogoCache.image {
@@ -150,14 +170,47 @@ struct SplashScreen: View {
     }
 
     var body: some View {
-        gradient
-            .ignoresSafeArea()
-            .overlay {
-                logoImage
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 320)
-                    .padding(40)
+        GeometryReader { geo in
+            let padded = max(100, min(geo.size.width - 80, 320))
+            let minSide = min(geo.size.width, geo.size.height)
+            let peakScale = min(10, max(1.3, minSide * 1.22 / padded))
+            let collapseScale = max(1 / padded, 1e-4)
+
+            gradient
+                .ignoresSafeArea()
+                .overlay {
+                    logoImage
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 320)
+                        .padding(40)
+                        .scaleEffect(logoScale)
+                }
+                .onAppear {
+                    guard !didScheduleSequence, geo.size.width > 10 else { return }
+                    didScheduleSequence = true
+                    scheduleSplashAnimation(peakScale: peakScale, collapseScale: collapseScale)
+                }
+        }
+    }
+
+    private func scheduleSplashAnimation(peakScale: CGFloat, collapseScale: CGFloat) {
+        let growDuration: TimeInterval = 2
+        let shrinkDuration: TimeInterval = 0.10
+        let holdBeforeGrow: TimeInterval = 2
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + holdBeforeGrow) {
+            withAnimation(.easeInOut(duration: growDuration)) {
+                logoScale = peakScale
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + growDuration) {
+                withAnimation(.easeIn(duration: shrinkDuration)) {
+                    logoScale = collapseScale
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + shrinkDuration) {
+                    onFinished()
+                }
+            }
+        }
     }
 }

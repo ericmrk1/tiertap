@@ -718,14 +718,14 @@ struct TierTapWalletView: View {
 
     @MainActor
     private func renderShareImage(_ view: TierTapWalletShareCard) -> UIImage? {
-        let width: CGFloat = min(UIScreen.main.bounds.width, 420)
+        let width = ShareImageExportQuality.wideCardWidthPoints
         let height: CGFloat = width * 1.25
         let wrapped = view
             .frame(width: width, height: height)
             .background(Color.black)
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: wrapped)
-            renderer.scale = UIScreen.main.scale
+            renderer.scale = ShareImageExportQuality.imageRendererScale
             renderer.proposedSize = ProposedViewSize(width: width, height: height)
             return renderer.uiImage
         } else {

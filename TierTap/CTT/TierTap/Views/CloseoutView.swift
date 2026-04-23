@@ -527,6 +527,7 @@ struct CloseoutView: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
                 .environmentObject(subscriptionStore)
+                .environment(\.appLanguage, settingsStore.appLanguage)
             }
             .alert("Tier Points Decreased", isPresented: $showLowAlert) {
                 Button("Cancel", role: .cancel) {}
@@ -748,12 +749,18 @@ struct ChipEstimatorSheetView: View {
     @State private var isEstimating = false
     @State private var estimatedAmount: Int?
     @State private var errorMessage: String?
+    @State private var estimateTask: Task<Void, Never>?
 
     private enum ChipPhotoSource: Identifiable {
         case camera
         case photoLibrary
 
-        var id: Int { hashValue }
+        var id: String {
+            switch self {
+            case .camera: return "camera"
+            case .photoLibrary: return "photoLibrary"
+            }
+        }
     }
 
     @State private var chipPhotoSource: ChipPhotoSource?
@@ -848,7 +855,13 @@ struct ChipEstimatorSheetView: View {
                             }
 
                             Button {
-                                Task { await estimateAmount() }
+                                guard estimateTask == nil else { return }
+                                estimateTask = Task {
+                                    await estimateAmount()
+                                    await MainActor.run {
+                                        estimateTask = nil
+                                    }
+                                }
                             } label: {
                                 HStack {
                                     if isEstimating {
@@ -954,7 +967,7 @@ struct ChipEstimatorSheetView: View {
                 switch source {
                 case .camera:
                     #if os(iOS)
-                    CameraPicker(selectedImage: .constant(nil)) { image in
+                    CameraPicker(selectedImage: $selectedImage) { image in
                         selectedImage = image
                     }
                     #else
@@ -962,7 +975,7 @@ struct ChipEstimatorSheetView: View {
                     #endif
                 case .photoLibrary:
                     #if os(iOS)
-                    ImagePicker(selectedImage: .constant(nil)) { image in
+                    ImagePicker(selectedImage: $selectedImage) { image in
                         selectedImage = image
                     }
                     #else
@@ -987,29 +1000,29 @@ struct ChipEstimatorSheetView: View {
 
     // MARK: - Estimation
 
+    @MainActor
     private func estimateAmount() async {
+        guard !isEstimating else { return }
         guard let image = selectedImage else {
-            await MainActor.run { errorMessage = "Please add a photo first." }
+            errorMessage = "Please add a photo first."
             return
         }
         guard SupabaseConfig.isConfigured, let client = supabase else {
-            await MainActor.run { errorMessage = "AI is not configured for this build." }
+            errorMessage = "AI is not configured for this build."
             return
         }
         guard authStore.isSignedIn else {
-            await MainActor.run { errorMessage = "Chip Estimator is only available to signed-in users." }
+            errorMessage = "Chip Estimator is only available to signed-in users."
             return
         }
         if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive && !settingsStore.canUseAI() {
-            await MainActor.run { errorMessage = "You've reached today's free AI limit. Try again tomorrow." }
+            errorMessage = "You've reached today's free AI limit. Try again tomorrow."
             return
         }
 
-        await MainActor.run {
-            isEstimating = true
-            errorMessage = nil
-            estimatedAmount = nil
-        }
+        isEstimating = true
+        errorMessage = nil
+        estimatedAmount = nil
 
         struct GeminiInlineData: Encodable {
             let mime_type: String
@@ -1057,10 +1070,8 @@ struct ChipEstimatorSheetView: View {
         }
 
         guard let imageData = image.jpegData(compressionQuality: 0.9)?.base64EncodedString() else {
-            await MainActor.run {
-                isEstimating = false
-                errorMessage = "Unable to process image."
-            }
+            isEstimating = false
+            errorMessage = "Unable to process image."
             return
         }
 
@@ -1165,9 +1176,7 @@ struct ChipEstimatorSheetView: View {
 
         do {
             if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
-                await MainActor.run {
-                    settingsStore.registerAICall()
-                }
+                settingsStore.registerAICall()
             }
 
             let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
@@ -1186,34 +1195,28 @@ struct ChipEstimatorSheetView: View {
 
             // If the model indicates it cannot confidently estimate a chip/cash value.
             if trimmedText == "UNKNOWN" {
-                await MainActor.run {
-                    isEstimating = false
-                    errorMessage = "AI could not identify a clear chip or cash value from this photo. Make sure the image shows casino chips or cash clearly."
-                    recordChipEstimatorOutcome(accepted: false)
-                }
+                isEstimating = false
+                errorMessage = "AI could not identify a clear chip or cash value from this photo. Make sure the image shows casino chips or cash clearly."
+                recordChipEstimatorOutcome(accepted: false)
                 return
             }
 
             let digits = text.compactMap { $0.isNumber ? $0 : nil }
             let amount = Int(String(digits))
 
-            await MainActor.run {
-                isEstimating = false
-                if let amount {
-                    estimatedAmount = amount
+            isEstimating = false
+            if let amount {
+                estimatedAmount = amount
 
-                    if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: sessionID) {
-                        store.setChipEstimatorImageFilename(fileName)
-                    }
-                } else {
-                    errorMessage = "AI did not return a clear numeric estimate."
+                if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: sessionID) {
+                    store.setChipEstimatorImageFilename(fileName)
                 }
+            } else {
+                errorMessage = "AI did not return a clear numeric estimate."
             }
         } catch {
-            await MainActor.run {
-                isEstimating = false
-                errorMessage = error.localizedDescription
-            }
+            isEstimating = false
+            errorMessage = error.localizedDescription
         }
     }
 }

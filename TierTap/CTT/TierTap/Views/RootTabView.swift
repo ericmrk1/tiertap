@@ -2156,13 +2156,15 @@ enum CommunityPublishResult {
 
 struct CommunitySessionPublishSelectionView: View {
     let sessions: [Session]
+    /// When set (e.g. embedded in post-closeout flow), toolbar leading goes **Back** to this handler instead of dismissing the sheet.
+    let onBackFromSelection: (() -> Void)?
     let onFinished: (CommunityPublishResult) -> Void
 
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedSessionIDs: Set<UUID> = []
+    @State private var selectedSessionIDs: Set<UUID>
     @State private var isPublishing = false
     @State private var errorMessage: String?
     @State private var postComment: String = ""
@@ -2174,6 +2176,18 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var publishCompDetails = false
     /// When on, your Community screen name is stored on each post; when off, posts show as Anonymous.
     @State private var attachScreenName = true
+
+    init(
+        sessions: [Session],
+        initialSelectedSessionIDs: Set<UUID>? = nil,
+        onBackFromSelection: (() -> Void)? = nil,
+        onFinished: @escaping (CommunityPublishResult) -> Void
+    ) {
+        self.sessions = sessions
+        self.onBackFromSelection = onBackFromSelection
+        self.onFinished = onFinished
+        _selectedSessionIDs = State(initialValue: initialSelectedSessionIDs ?? [])
+    }
 
     private var sortedSessions: [Session] {
         sessions.sorted { $0.startTime > $1.startTime }
@@ -2293,10 +2307,17 @@ struct CommunitySessionPublishSelectionView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+                    if let onBackFromSelection {
+                        Button("Back") {
+                            onBackFromSelection()
+                        }
+                        .foregroundColor(.green)
+                    } else {
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                        .foregroundColor(.green)
                     }
-                    .foregroundColor(.green)
                 }
             }
             .safeAreaInset(edge: .bottom) {

@@ -14,6 +14,9 @@ struct LiveSessionView: View {
     @State private var showStrategyOdds = false
     @State private var showPrivateNotes = false
     @State private var showMissingInfoAlert = false
+    #if os(iOS)
+    @State private var liveSessionShareRef: PostCloseoutSessionRef?
+    #endif
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -77,6 +80,24 @@ struct LiveSessionView: View {
                                     .background(Color(.systemGray6).opacity(0.25))
                                     .cornerRadius(10)
                             }
+                            #if os(iOS)
+                            Button {
+                                liveSessionShareRef = PostCloseoutSessionRef(id: s.id)
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.subheadline.weight(.medium))
+                                    L10nText("Share")
+                                        .font(.subheadline.weight(.medium))
+                                }
+                                .foregroundColor(.green)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .cornerRadius(10)
+                            }
+                            .accessibilityLabel("Share session")
+                            #endif
                         }
                         .padding(.top, 4)
                     }
@@ -315,6 +336,14 @@ struct LiveSessionView: View {
                 )
                 .environmentObject(settingsStore)
             }
+            #if os(iOS)
+            .sheet(item: $liveSessionShareRef) { ref in
+                PostCloseoutShareFlowView(sessionId: ref.id)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+            }
+            #endif
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }
             .alert("Missing Information", isPresented: $showMissingInfoAlert) {
                 Button("OK", role: .cancel) {}

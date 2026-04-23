@@ -525,7 +525,7 @@ final class SettingsStore: ObservableObject {
 
     /// Remaining AI calls the user can make today on the free tier.
     var remainingAICallsToday: Int {
-        max(0, maxAICallsPerDay - aiCallsToday)
+        max(0, maxAICallsPerDay - effectiveAICallsToday())
     }
 
     /// True when the hard-coded override flag is on *and* the user-entered code matches the expected value.
@@ -707,6 +707,18 @@ final class SettingsStore: ObservableObject {
 
     // MARK: - AI usage helpers
 
+    /// Count toward today's AI limit, treating a new calendar day as zero **without** mutating
+    /// `@Published` state. Used from SwiftUI `body` (e.g. `ChipEstimatorSheetView.canEstimate`) where
+    /// calling `resetAICallCounterIfNeeded()` would publish during a view update and can crash.
+    private func effectiveAICallsToday(referenceDate: Date = Date()) -> Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: referenceDate)
+        if calendar.isDate(aiCallsDate, inSameDayAs: today) {
+            return aiCallsToday
+        }
+        return 0
+    }
+
     /// Reset the AI call counter if the stored date is not today.
     private func resetAICallCounterIfNeeded(referenceDate: Date = Date()) {
         let calendar = Calendar.current
@@ -726,8 +738,7 @@ final class SettingsStore: ObservableObject {
         // Do not enforce AI limits in the simulator so development is not blocked.
         return true
         #else
-        resetAICallCounterIfNeeded()
-        return aiCallsToday < maxAICallsPerDay
+        return effectiveAICallsToday() < maxAICallsPerDay
         #endif
     }
 

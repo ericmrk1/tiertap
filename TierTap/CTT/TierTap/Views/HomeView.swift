@@ -329,9 +329,13 @@ struct LiveNowCard: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
     @State private var elapsed: TimeInterval = 0
     @State private var showStrategyOdds = false
     @State private var showPrivateNotes = false
+    #if os(iOS)
+    @State private var liveSessionShareRef: PostCloseoutSessionRef?
+    #endif
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -363,7 +367,11 @@ struct LiveNowCard: View {
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 6) {
                 Text(Session.durationString(elapsed))
-                    .font(.system(.caption, design: .monospaced)).foregroundColor(.green)
+                    .font(.system(
+                        size: UIFont.preferredFont(forTextStyle: .caption1).pointSize * 2,
+                        design: .monospaced
+                    ))
+                    .foregroundColor(.green)
                 Spacer(minLength: 0)
                 HStack(spacing: 6) {
                     Button { showPrivateNotes = true } label: {
@@ -384,6 +392,24 @@ struct LiveNowCard: View {
                             .background(Color(.systemGray6).opacity(0.3))
                             .cornerRadius(8)
                     }
+                    #if os(iOS)
+                    Button {
+                        liveSessionShareRef = PostCloseoutSessionRef(id: session.id)
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.caption.weight(.medium))
+                            L10nText("Share")
+                                .font(.caption.weight(.medium))
+                        }
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .cornerRadius(8)
+                    }
+                    .accessibilityLabel("Share session")
+                    #endif
                 }
             }
             .frame(maxHeight: .infinity)
@@ -408,6 +434,14 @@ struct LiveNowCard: View {
             )
             .environmentObject(settingsStore)
         }
+        #if os(iOS)
+        .sheet(item: $liveSessionShareRef) { ref in
+            PostCloseoutShareFlowView(sessionId: ref.id)
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        #endif
     }
 }
 
@@ -518,13 +552,13 @@ struct TapLevelCard: View {
 
     @MainActor
     private func renderTapLevelCardToImage(_ view: TapLevelShareCard) -> UIImage? {
-        let width = UIScreen.main.bounds.width * 0.9
-        let height: CGFloat = 200
+        let width = ShareImageExportQuality.wideCardWidthPoints
+        let height: CGFloat = 220
         let wrapped = view
             .frame(width: width, height: height)
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: wrapped)
-            renderer.scale = UIScreen.main.scale
+            renderer.scale = ShareImageExportQuality.imageRendererScale
             renderer.proposedSize = ProposedViewSize(width: width, height: height)
             return renderer.uiImage
         } else {

@@ -1,16 +1,17 @@
 import SwiftUI
-import UIKit
-
-/// Which local image to use as the background when sharing a session as a photo with metrics overlaid.
-enum SessionSharePhotoBase: Equatable, Hashable {
-    case sessionChip
-    case comp(UUID)
-}
 
 private enum HistoryPanelTab: String, CaseIterable {
     case sessions
     case tools
 }
+
+#if os(iOS)
+/// Presents `PostCloseoutShareFlowView` from `HistoryView` (not from app root) so the sheet appears above the History modal.
+private struct HistoryToolsPostCloseoutItem: Identifiable, Hashable {
+    let sessionId: UUID
+    var id: UUID { sessionId }
+}
+#endif
 
 /// Tax prep geography: fixed US list + international; session matching uses the last ", XX" token when `XX` is two letters.
 private enum TaxPrepGeography {
@@ -40,41 +41,6 @@ private enum TaxPrepGeography {
     }
 }
 
-/// Places three subviews as equal squares in one row using the full proposed width (iOS 16+ `Layout`).
-private struct ThreeEqualSquaresRow: Layout {
-    var spacing: CGFloat = 6
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let count = subviews.count
-        guard count > 0 else { return .zero }
-        let totalSpacing = spacing * CGFloat(max(0, count - 1))
-        let width: CGFloat
-        if let w = proposal.width, w.isFinite, w < .greatestFiniteMagnitude {
-            width = w
-        } else {
-            let idealSum = subviews.reduce(CGFloat(0)) { $0 + $1.sizeThatFits(.unspecified).width }
-            width = idealSum + totalSpacing
-        }
-        let side = max(0, (width - totalSpacing) / CGFloat(count))
-        return CGSize(width: width, height: side)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let count = subviews.count
-        guard count > 0 else { return }
-        let totalSpacing = spacing * CGFloat(max(0, count - 1))
-        let side = max(0, (bounds.width - totalSpacing) / CGFloat(count))
-        var x = bounds.minX
-        for index in subviews.indices {
-            subviews[index].place(
-                at: CGPoint(x: x, y: bounds.minY),
-                proposal: ProposedViewSize(width: side, height: side)
-            )
-            x += side + spacing
-        }
-    }
-}
-
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
@@ -97,10 +63,12 @@ struct HistoryView: View {
     @State private var isHistoryDateSectionExpanded: Bool = false
     @State private var isHistoryGameSectionExpanded: Bool = false
     @State private var isHistoryLocationSectionExpanded: Bool = false
-    @State private var isShareSelectorPresented: Bool = false
-    @State private var isShareSheetPresented: Bool = false
-    @State private var shareItems: [Any] = []
-    @State private var pendingShareItems: [Any]?
+    @State private var isHistoryToolsSharePickerPresented: Bool = false
+    #if os(iOS)
+    /// Set when the user confirms a session in the Tools share picker; consumed when that sheet dismisses.
+    @State private var queuedPostCloseoutSessionIdFromTools: UUID?
+    @State private var presentedPostCloseoutFromTools: HistoryToolsPostCloseoutItem?
+    #endif
     /// Single choice below Filters; legacy sessions without stored verification count as verified.
     @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
     @State private var selectedHistoryTab: HistoryPanelTab = .sessions
@@ -587,25 +555,20 @@ struct HistoryView: View {
                     .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             } else {
                 historyToolsContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
 
     private var historyToolsContent: some View {
-        VStack(spacing: 16) {
-            ThreeEqualSquaresRow(spacing: 6) {
-                historyToolButton(
-                    title: "Share Sessions",
-                    systemImage: "square.and.arrow.up",
-                    tint: .green,
-                    isDisabled: sessionsMatchingHistoryBulkFilters.isEmpty
-                ) {
-                    if settingsStore.enableCasinoFeedback {
-                        CelebrationPlayer.shared.playQuickChime()
-                    }
-                    isShareSelectorPresented = true
-                }
+        GeometryReader { geo in
+            let horizontalPadding: CGFloat = 16
+            let verticalSpacing: CGFloat = 10
+            let rowCount: CGFloat = 3
+            let totalSpacing = verticalSpacing * (rowCount - 1)
+            let cellHeight = max(0, (geo.size.height - totalSpacing) / rowCount)
 
+            VStack(spacing: verticalSpacing) {
                 historyToolButton(
                     title: "Delete Sessions",
                     systemImage: "trash",
@@ -617,6 +580,8 @@ struct HistoryView: View {
                     }
                     isDeleteSelectorPresented = true
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: cellHeight)
 
                 historyToolButton(
                     title: "Tax Prep",
@@ -631,13 +596,30 @@ struct HistoryView: View {
                         taxPrepComingSoonVisible = true
                     }
                 }
-            }
-            .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity)
+                .frame(height: cellHeight)
 
-            Spacer()
+                historyToolButton(
+                    title: "Share Sessions",
+                    systemImage: "square.and.arrow.up",
+                    tint: .green,
+                    isDisabled: sessionsMatchingHistoryBulkFilters.isEmpty
+                ) {
+                    if settingsStore.enableCasinoFeedback {
+                        CelebrationPlayer.shared.playQuickChime()
+                    }
+                    #if os(iOS)
+                    isHistoryToolsSharePickerPresented = true
+                    #endif
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: cellHeight)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.top, 10)
         }
-        .padding(.horizontal, 0)
-        .padding(.top, 14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func dismissTaxPrepComingSoonOverlay() {
@@ -918,46 +900,30 @@ struct HistoryView: View {
             } message: {
                 L10nText("This session will be permanently removed. This cannot be undone.")
             }
-            .adaptiveSheet(isPresented: $isShareSelectorPresented) {
-                SessionShareSelectionView(
+            #if os(iOS)
+            .adaptiveSheet(isPresented: $isHistoryToolsSharePickerPresented) {
+                HistoryToolsSingleSessionShareSheet(
                     sessions: sessionsMatchingHistoryBulkFilters,
-                    photoOptions: { sessionSharePhotoOptions(for: $0) }
-                ) { selected, shareAsPhoto, includeWinLosses, photoBase in
-                    guard !selected.isEmpty else { return }
-                    pendingShareItems = createShareItems(
-                        for: selected,
-                        shareAsPhoto: shareAsPhoto,
-                        includeWinLosses: includeWinLosses,
-                        photoBase: photoBase
-                    )
-                }
+                    onPickSession: { sessionId in
+                        queuedPostCloseoutSessionIdFromTools = sessionId
+                    }
+                )
                 .environmentObject(settingsStore)
             }
-            .onChange(of: isShareSelectorPresented) { newValue in
-                if !newValue, let items = pendingShareItems, !items.isEmpty {
-                    shareItems = items
-                    #if os(iOS)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        isShareSheetPresented = true
-                    }
-                    #endif
+            .sheet(item: $presentedPostCloseoutFromTools) { item in
+                PostCloseoutShareFlowView(sessionId: item.sessionId)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+            }
+            .onChange(of: isHistoryToolsSharePickerPresented) { isShowingPicker in
+                guard !isShowingPicker, let sessionId = queuedPostCloseoutSessionIdFromTools else { return }
+                queuedPostCloseoutSessionIdFromTools = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    presentedPostCloseoutFromTools = HistoryToolsPostCloseoutItem(sessionId: sessionId)
                 }
             }
-            .adaptiveSheet(isPresented: $isShareSheetPresented) {
-                #if os(iOS)
-                if !shareItems.isEmpty {
-                    ShareSheet(items: shareItems)
-                } else {
-                    EmptyView()
-                }
-                #endif
-            }
-            .onChange(of: isShareSheetPresented) { newValue in
-                if !newValue {
-                    shareItems = []
-                    pendingShareItems = nil
-                }
-            }
+            #endif
             .onAppear {
                 clampTaxYearSelectionIfNeeded()
             }
@@ -1021,239 +987,116 @@ extension HistoryView {
             }
         }
     }
-
-    /// Labels and sources for shareable photos: session chip image plus any comp receipt images on disk.
-    fileprivate func sessionSharePhotoOptions(for session: Session) -> [(label: String, base: SessionSharePhotoBase)] {
-        var out: [(String, SessionSharePhotoBase)] = []
-        if let fileName = session.chipEstimatorImageFilename,
-           let url = ChipEstimatorPhotoStorage.url(for: fileName),
-           FileManager.default.fileExists(atPath: url.path) {
-            out.append(("Session photo", .sessionChip))
-        }
-        for ev in session.compEvents {
-            guard let url = CompPhotoStorage.url(for: ev.id),
-                  FileManager.default.fileExists(atPath: url.path) else { continue }
-            let kind = ev.kind.title
-            let amt = "\(settingsStore.currencySymbol)\(ev.amount)"
-            let time = ev.timestamp.formatted(date: .omitted, time: .shortened)
-            out.append(("Comp · \(kind) · \(amt) · \(time)", .comp(ev.id)))
-        }
-        return out
-    }
-
-    private func createShareItems(for sessions: [Session], shareAsPhoto: Bool, includeWinLosses: Bool, photoBase: SessionSharePhotoBase?) -> [Any] {
-        #if os(iOS)
-        if shareAsPhoto, let image = sharePhoto(for: sessions, includeWinLosses: includeWinLosses, photoBase: photoBase) {
-            return [image]
-        }
-        #endif
-
-        let message = SessionShareFormatter.combinedMessage(
-            for: sessions,
-            currencySymbol: settingsStore.currencySymbol,
-            includeWinLoss: includeWinLosses
-        )
-        return [message]
-    }
-
-    #if os(iOS)
-    /// When the user did not pick a specific image, prefer session chip in session order, then first comp photo on disk.
-    private func defaultSharePhotoBase(for sessions: [Session]) -> (session: Session, base: SessionSharePhotoBase)? {
-        for s in sessions {
-            if let fn = s.chipEstimatorImageFilename,
-               let url = ChipEstimatorPhotoStorage.url(for: fn),
-               FileManager.default.fileExists(atPath: url.path) {
-                return (s, .sessionChip)
-            }
-        }
-        for s in sessions {
-            for ev in s.compEvents {
-                guard let url = CompPhotoStorage.url(for: ev.id),
-                      FileManager.default.fileExists(atPath: url.path) else { continue }
-                return (s, .comp(ev.id))
-            }
-        }
-        return nil
-    }
-
-    private func loadShareBaseImage(session: Session, base: SessionSharePhotoBase) -> UIImage? {
-        switch base {
-        case .sessionChip:
-            guard let fileName = session.chipEstimatorImageFilename,
-                  let url = ChipEstimatorPhotoStorage.url(for: fileName) else { return nil }
-            return UIImage(contentsOfFile: url.path)
-        case .comp(let id):
-            guard let url = CompPhotoStorage.url(for: id) else { return nil }
-            return UIImage(contentsOfFile: url.path)
-        }
-    }
-
-    private func sharePhoto(for sessions: [Session], includeWinLosses: Bool, photoBase: SessionSharePhotoBase?) -> UIImage? {
-        let session: Session
-        let base: SessionSharePhotoBase
-
-        if let picked = photoBase, let s = sessions.first {
-            session = s
-            base = picked
-        } else if let pair = defaultSharePhotoBase(for: sessions) {
-            session = pair.session
-            base = pair.base
-        } else {
-            return nil
-        }
-
-        guard let baseImage = loadShareBaseImage(session: session, base: base) else {
-            return nil
-        }
-
-        let scale = baseImage.scale
-        let size = baseImage.size
-        let rendererFormat = UIGraphicsImageRendererFormat()
-        rendererFormat.scale = scale
-        rendererFormat.opaque = false
-
-        let renderer = UIGraphicsImageRenderer(size: size, format: rendererFormat)
-
-        let image = renderer.image { ctx in
-            // Draw base image
-            baseImage.draw(in: CGRect(origin: .zero, size: size))
-
-            // Overlay gradient at bottom
-            let overlayHeight = size.height * 0.32
-            let overlayRect = CGRect(
-                x: 0,
-                y: size.height - overlayHeight,
-                width: size.width,
-                height: overlayHeight
-            )
-
-            ctx.cgContext.setFillColor(UIColor.black.withAlphaComponent(0.6).cgColor)
-            ctx.cgContext.fill(overlayRect)
-
-            // Prepare text
-            let inset: CGFloat = size.width * 0.06
-            let textRect = overlayRect.insetBy(dx: inset, dy: inset * 0.7)
-
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = .left
-
-            let titleFont = UIFont.boldSystemFont(ofSize: min(size.width, size.height) * 0.065)
-            let subtitleFont = UIFont.systemFont(ofSize: min(size.width, size.height) * 0.045, weight: .medium)
-            let bodyFont = UIFont.systemFont(ofSize: min(size.width, size.height) * 0.04)
-
-            var lines: [NSAttributedString] = []
-
-            // Line 1: casino / game
-            let title = "\(session.casino) · \(session.game)"
-            lines.append(NSAttributedString(
-                string: title,
-                attributes: [
-                    .font: titleFont,
-                    .foregroundColor: UIColor.white,
-                    .paragraphStyle: paragraph
-                ]
-            ))
-
-            // Line 2: date & duration
-            let dateString = SessionShareFormatter.dateFormatter.string(from: session.startTime)
-            let durationString = Session.durationString(session.duration)
-            let subtitle = "\(dateString) • \(durationString)"
-            lines.append(NSAttributedString(
-                string: subtitle,
-                attributes: [
-                    .font: subtitleFont,
-                    .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
-                    .paragraphStyle: paragraph
-                ]
-            ))
-
-            // Line 3: primary stats (buy-in / cash / result / tier)
-            var statsParts: [String] = []
-
-            if includeWinLosses {
-                let buyInText = "\(settingsStore.currencySymbol)\(session.totalBuyIn)"
-                statsParts.append("Buy-In \(buyInText)")
-                if let cashOut = session.cashOut {
-                    let cashOutText = "\(settingsStore.currencySymbol)\(cashOut)"
-                    statsParts.append("Cash-Out \(cashOutText)")
-                }
-                if let wl = session.winLoss {
-                    let sign = wl >= 0 ? "+" : "-"
-                    let wlText = "\(settingsStore.currencySymbol)\(abs(wl))"
-                    statsParts.append("Result \(sign)\(wlText)")
-                }
-            }
-
-            if let points = session.tierPointsEarned {
-                let ptsText = "\(points >= 0 ? "+" : "")\(points) pts"
-                statsParts.append(ptsText)
-            }
-
-            if let tph = session.tiersPerHour {
-                let tphText = String(format: "%.1f pts/hr", tph)
-                statsParts.append(tphText)
-            }
-
-            if !statsParts.isEmpty {
-                let statsLine = statsParts.joined(separator: "   •   ")
-                lines.append(NSAttributedString(
-                    string: statsLine,
-                    attributes: [
-                        .font: bodyFont,
-                        .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
-                        .paragraphStyle: paragraph
-                    ]
-                ))
-            }
-
-            // Line 4: comps + EV on their own row so they are not clipped when the primary stats line is long.
-            var compsEvParts: [String] = []
-            if !session.compEvents.isEmpty {
-                if session.totalComp > 0 {
-                    let c = "\(settingsStore.currencySymbol)\(session.totalComp)"
-                    compsEvParts.append("Comps \(c)")
-                } else {
-                    let n = session.compEvents.count
-                    compsEvParts.append(n == 1 ? "1 comp" : "\(n) comps")
-                }
-            }
-            if includeWinLosses, session.totalComp > 0, let ev = session.expectedValue {
-                let sign = ev >= 0 ? "+" : "-"
-                let evText = "\(settingsStore.currencySymbol)\(abs(ev))"
-                compsEvParts.append("EV \(sign)\(evText)")
-            }
-
-            if !compsEvParts.isEmpty {
-                let compsEvLine = compsEvParts.joined(separator: "   •   ")
-                lines.append(NSAttributedString(
-                    string: compsEvLine,
-                    attributes: [
-                        .font: bodyFont,
-                        .foregroundColor: UIColor(white: 0.9, alpha: 1.0),
-                        .paragraphStyle: paragraph
-                    ]
-                ))
-            }
-
-            // Draw lines vertically
-            var currentY = textRect.minY
-            for (index, line) in lines.enumerated() {
-                let lineHeight = (index == 0 ? titleFont.lineHeight : bodyFont.lineHeight) * 1.1
-                let lineRect = CGRect(
-                    x: textRect.minX,
-                    y: currentY,
-                    width: textRect.width,
-                    height: lineHeight
-                )
-                line.draw(in: lineRect)
-                currentY += lineHeight
-            }
-        }
-
-        return image
-    }
-    #endif
 }
+
+#if os(iOS)
+/// One session at a time; continues into the app-wide post-closeout share flow (`PostCloseoutShareFlowView`).
+private struct HistoryToolsSingleSessionShareSheet: View {
+    let sessions: [Session]
+    let onPickSession: (UUID) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedSessionID: UUID?
+
+    private var sortedSessions: [Session] {
+        sessions.sorted { $0.startTime > $1.startTime }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                if sessions.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                        L10nText("No sessions available to share.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                } else {
+                    List {
+                        Section {
+                            L10nText("Choose one session, then Session Art or Community Publish (same as after a live close-out).")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.78))
+                                .listRowBackground(Color(.systemGray6).opacity(0.12))
+                        }
+
+                        Section(header: L10nText("Session").foregroundColor(.gray)) {
+                            ForEach(sortedSessions) { session in
+                                Button {
+                                    selectedSessionID = session.id
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: selectedSessionID == session.id ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(selectedSessionID == session.id ? .green : .gray)
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            HStack {
+                                                Text(session.casino)
+                                                    .font(.subheadline.bold())
+                                                    .foregroundColor(.white)
+                                                Spacer()
+                                                if let wl = session.winLoss {
+                                                    Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
+                                                        .font(.caption.bold())
+                                                        .foregroundColor(wl >= 0 ? .green : .red)
+                                                }
+                                            }
+                                            HStack(spacing: 6) {
+                                                Text(session.game)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                L10nText("•")
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                Text(session.startTime, style: .date)
+                                                    .font(.caption2)
+                                                    .foregroundColor(.gray)
+                                            }
+                                        }
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                                .buttonStyle(.plain)
+                                .listRowBackground(Color(.systemGray6).opacity(0.15))
+                            }
+                        }
+                    }
+                    .listStyle(.insetGrouped)
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .localizedNavigationTitle("Share Session")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Continue") {
+                        guard let id = selectedSessionID else { return }
+                        if settingsStore.enableCasinoFeedback {
+                            CelebrationPlayer.shared.playQuickChime()
+                        }
+                        onPickSession(id)
+                        dismiss()
+                    }
+                    .foregroundColor(selectedSessionID == nil ? .gray : .green)
+                    .disabled(selectedSessionID == nil)
+                }
+            }
+        }
+    }
+}
+#endif
 
 struct SessionRow: View {
     let session: Session
@@ -1308,301 +1151,6 @@ struct SessionRow: View {
             }
         }
         .padding(.vertical, 4)
-    }
-}
-
-struct SessionShareSelectionView: View {
-    let sessions: [Session]
-    /// Returns labeled share backgrounds for the session (session photo + comp receipt images on disk).
-    let photoOptions: (Session) -> [(label: String, base: SessionSharePhotoBase)]
-    let onShare: (_ sessions: [Session], _ shareAsPhoto: Bool, _ includeWinLosses: Bool, _ photoBase: SessionSharePhotoBase?) -> Void
-
-    @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedSessionIDs: Set<UUID> = []
-    @State private var shareAsPhoto: Bool = false
-    @State private var includeWinLosses: Bool = true
-    @State private var showPhotoBasePicker = false
-    @State private var photoPickerSession: Session?
-    @State private var photoPickerOptions: [(label: String, base: SessionSharePhotoBase)] = []
-
-    private var allSelected: Bool {
-        !sessions.isEmpty && selectedSessionIDs.count == sessions.count
-    }
-
-    private var sortedSessions: [Session] {
-        sessions.sorted { $0.startTime > $1.startTime }
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                if sessions.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 40))
-                            .foregroundColor(.gray)
-                        L10nText("No sessions available to share.")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                } else {
-                    List {
-                        Section {
-                            HStack {
-                                Button {
-                                    selectedSessionIDs = Set(sessions.map { $0.id })
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                        L10nText("Select All Sessions")
-                                            .foregroundColor(.white)
-                                    }
-                                }
-
-                                Spacer()
-
-                                Button {
-                                    selectedSessionIDs.removeAll()
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "xmark.circle")
-                                            .foregroundColor(.red)
-                                        L10nText("Clear All")
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .listRowBackground(Color(.systemGray6).opacity(0.2))
-                        }
-
-                        Section(header: L10nText("Choose sessions to share").foregroundColor(.gray)) {
-                            Toggle(isOn: $shareAsPhoto) {
-                                L10nText("Photo")
-                                    .foregroundColor(.white)
-                            }
-                            .toggleStyle(SwitchToggleStyle(tint: .green))
-                            .listRowBackground(Color(.systemGray6).opacity(0.15))
-
-                            Toggle(isOn: $includeWinLosses) {
-                                L10nText("Include win/losses")
-                                    .foregroundColor(.white)
-                            }
-                            .toggleStyle(SwitchToggleStyle(tint: .green))
-                            .listRowBackground(Color(.systemGray6).opacity(0.15))
-
-                            ForEach(sortedSessions) { session in
-                                SessionSelectableRow(
-                                    session: session,
-                                    isSelected: selectedSessionIDs.contains(session.id)
-                                ) {
-                                    toggleSelection(for: session)
-                                }
-                                .listRowBackground(Color(.systemGray6).opacity(0.15))
-                            }
-                        }
-                    }
-                    .listStyle(.insetGrouped)
-                    .scrollContentBackground(.hidden)
-                }
-            }
-            .localizedNavigationTitle("Share Sessions")
-            .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.green)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Share") {
-                        shareTapped()
-                    }
-                    .foregroundColor(selectedSessionIDs.isEmpty ? .gray : .green)
-                    .disabled(selectedSessionIDs.isEmpty)
-                }
-            }
-            .adaptiveSheet(isPresented: $showPhotoBasePicker) {
-                if let s = photoPickerSession {
-                    SessionSharePhotoBasePickerSheet(
-                        casinoLine: "\(s.casino) · \(s.game)",
-                        options: photoPickerOptions
-                    ) { base in
-                        if settingsStore.enableCasinoFeedback {
-                            CelebrationPlayer.shared.playQuickChime()
-                        }
-                        onShare([s], true, includeWinLosses, base)
-                        showPhotoBasePicker = false
-                        photoPickerSession = nil
-                        photoPickerOptions = []
-                        dismiss()
-                    }
-                    .environmentObject(settingsStore)
-                }
-            }
-            .onChange(of: showPhotoBasePicker) { isShowing in
-                if !isShowing {
-                    photoPickerSession = nil
-                    photoPickerOptions = []
-                }
-            }
-        }
-    }
-
-    private func shareTapped() {
-        let chosen = sortedSessions.filter { selectedSessionIDs.contains($0.id) }
-        guard !chosen.isEmpty else { return }
-
-        if !shareAsPhoto {
-            if settingsStore.enableCasinoFeedback {
-                CelebrationPlayer.shared.playQuickChime()
-            }
-            onShare(chosen, false, includeWinLosses, nil)
-            dismiss()
-            return
-        }
-
-        // Photo share: if exactly one session has multiple candidate images, pick which to use first.
-        if chosen.count == 1, let session = chosen.first {
-            let opts = photoOptions(session)
-            if opts.count > 1 {
-                photoPickerSession = session
-                photoPickerOptions = opts
-                showPhotoBasePicker = true
-                return
-            }
-            if settingsStore.enableCasinoFeedback {
-                CelebrationPlayer.shared.playQuickChime()
-            }
-            let singleBase = opts.first?.base
-            onShare(chosen, true, includeWinLosses, singleBase)
-            dismiss()
-            return
-        }
-
-        if settingsStore.enableCasinoFeedback {
-            CelebrationPlayer.shared.playQuickChime()
-        }
-        onShare(chosen, true, includeWinLosses, nil)
-        dismiss()
-    }
-
-    private func toggleSelection(for session: Session) {
-        if selectedSessionIDs.contains(session.id) {
-            selectedSessionIDs.remove(session.id)
-        } else {
-            selectedSessionIDs.insert(session.id)
-        }
-    }
-}
-
-/// Lets the user pick session chip vs. comp receipt when more than one image exists for the share overlay.
-private struct SessionSharePhotoBasePickerSheet: View {
-    let casinoLine: String
-    let options: [(label: String, base: SessionSharePhotoBase)]
-    let onPick: (SessionSharePhotoBase) -> Void
-
-    @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                List {
-                    Section {
-                        Text(casinoLine)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.white.opacity(0.95))
-                            .listRowBackground(Color(.systemGray6).opacity(0.12))
-                        L10nText("Metrics will be drawn on the image you choose.")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .listRowBackground(Color(.systemGray6).opacity(0.12))
-                    }
-
-                    Section(header: L10nText("Background image").foregroundColor(.gray)) {
-                        ForEach(Array(options.enumerated()), id: \.offset) { _, item in
-                            Button {
-                                onPick(item.base)
-                            } label: {
-                                HStack(alignment: .top) {
-                                    Text(item.label)
-                                        .foregroundColor(.white)
-                                        .multilineTextAlignment(.leading)
-                                    Spacer()
-                                    Image(systemName: "photo.on.rectangle.angled")
-                                        .foregroundColor(.green.opacity(0.85))
-                                }
-                            }
-                            .listRowBackground(Color(.systemGray6).opacity(0.15))
-                        }
-                    }
-                }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
-            }
-            .localizedNavigationTitle("Choose photo")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.green)
-                }
-            }
-        }
-    }
-}
-
-private struct SessionSelectableRow: View {
-    let session: Session
-    let isSelected: Bool
-    let onToggle: () -> Void
-
-    @EnvironmentObject var settingsStore: SettingsStore
-
-    var body: some View {
-        Button(action: onToggle) {
-            HStack(spacing: 12) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? .green : .gray)
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(session.casino)
-                            .font(.subheadline.bold())
-                            .foregroundColor(.white)
-                        Spacer()
-                        if let wl = session.winLoss {
-                            Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
-                                .font(.caption.bold())
-                                .foregroundColor(wl >= 0 ? .green : .red)
-                        }
-                    }
-                    HStack(spacing: 6) {
-                        Text(session.game)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        L10nText("•")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                        Text(session.startTime, style: .date)
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .padding(.vertical, 4)
-        }
     }
 }
 

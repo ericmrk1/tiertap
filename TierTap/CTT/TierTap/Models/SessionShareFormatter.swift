@@ -15,7 +15,8 @@ struct SessionShareFormatter {
     }
 
     static func sentiment(for session: Session) -> String {
-        isPositive(session) ? SessionSharePhrases.randomPositivePhrase() : SessionSharePhrases.randomNegativePhrase()
+        let phrase = isPositive(session) ? SessionSharePhrases.randomPositivePhrase() : SessionSharePhrases.randomNegativePhrase()
+        return firstPersonized(phrase)
     }
 
     // MARK: - Private helpers
@@ -25,31 +26,31 @@ struct SessionShareFormatter {
         let durationString = humanReadableDuration(session.duration)
 
         var parts: [String] = []
-        parts.append("On \(dateString) at \(session.casino), you played \(session.game) for \(durationString).")
+        parts.append("On \(dateString) at \(session.casino), I played \(session.game) for \(durationString).")
 
         if includeWinLoss {
-            parts.append("You bought in for \(currencySymbol)\(session.totalBuyIn).")
+            parts.append("I bought in for \(currencySymbol)\(session.totalBuyIn).")
 
             if let cashOut = session.cashOut, let winLoss = session.winLoss {
                 if winLoss > 0 {
-                    parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing with a profit of \(currencySymbol)\(winLoss).")
+                    parts.append("I cashed out with \(currencySymbol)\(cashOut), finishing with a profit of \(currencySymbol)\(winLoss).")
                 } else if winLoss < 0 {
-                    parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing with a loss of \(currencySymbol)\(abs(winLoss)).")
+                    parts.append("I cashed out with \(currencySymbol)\(cashOut), finishing with a loss of \(currencySymbol)\(abs(winLoss)).")
                 } else {
-                    parts.append("You cashed out with \(currencySymbol)\(cashOut), finishing even on the session.")
+                    parts.append("I cashed out with \(currencySymbol)\(cashOut), finishing even on the session.")
                 }
                 if session.totalComp > 0, let ev = session.expectedValue {
-                    parts.append("Including \(currencySymbol)\(session.totalComp) in comps, your expected value (EV) for the session was \(currencySymbol)\(ev).")
+                    parts.append("Including \(currencySymbol)\(session.totalComp) in comps, my expected value (EV) for the session was \(currencySymbol)\(ev).")
                 } else if session.totalComp > 0 {
-                    parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
+                    parts.append("I recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
                 }
             } else if let cashOut = session.cashOut {
-                parts.append("You cashed out with \(currencySymbol)\(cashOut).")
+                parts.append("I cashed out with \(currencySymbol)\(cashOut).")
                 if session.totalComp > 0 {
-                    parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
+                    parts.append("I recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
                 }
             } else if session.totalComp > 0 {
-                parts.append("You recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
+                parts.append("I recorded \(currencySymbol)\(session.totalComp) in comps for this session.")
             }
         }
 
@@ -59,11 +60,11 @@ struct SessionShareFormatter {
 
         if let points = session.tierPointsEarned {
             if points > 0 {
-                parts.append("You earned \(points) tier points along the way.")
+                parts.append("I earned \(points) tier points along the way.")
             } else if points < 0 {
-                parts.append("You finished with \(abs(points)) fewer tier points than you started with.")
+                parts.append("I finished with \(abs(points)) fewer tier points than I started with.")
             } else {
-                parts.append("You finished with the same number of tier points you started with.")
+                parts.append("I finished with the same number of tier points I started with.")
             }
         }
 
@@ -106,6 +107,36 @@ struct SessionShareFormatter {
             if points < 0 { return false }
         }
         return true
+    }
+
+    private static func firstPersonized(_ text: String) -> String {
+        var out = text
+
+        // Keep compound forms natural before generic pronoun swaps.
+        let replacements: [(pattern: String, replacement: String)] = [
+            (#"\bfuture-you\b"#, "future-me"),
+            (#"\bYourself\b"#, "Myself"),
+            (#"\byourself\b"#, "myself"),
+            (#"\bYou[’']re\b"#, "I'm"),
+            (#"\byou[’']re\b"#, "I'm"),
+            (#"\bYou[’']ve\b"#, "I've"),
+            (#"\byou[’']ve\b"#, "I've"),
+            (#"\bYou[’']ll\b"#, "I'll"),
+            (#"\byou[’']ll\b"#, "I'll"),
+            (#"\bYou[’']d\b"#, "I'd"),
+            (#"\byou[’']d\b"#, "I'd"),
+            (#"\bYour\b"#, "My"),
+            (#"\byour\b"#, "my"),
+            (#"\bYou\b"#, "I"),
+            (#"\byou\b"#, "I")
+        ]
+
+        for pair in replacements {
+            guard let regex = try? NSRegularExpression(pattern: pair.pattern) else { continue }
+            let fullRange = NSRange(out.startIndex..<out.endIndex, in: out)
+            out = regex.stringByReplacingMatches(in: out, options: [], range: fullRange, withTemplate: pair.replacement)
+        }
+        return out
     }
 
     private static func humanReadableDuration(_ interval: TimeInterval) -> String {

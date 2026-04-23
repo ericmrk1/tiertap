@@ -520,10 +520,7 @@ enum TripShareImageBuilder {
     /// Card width in points: slightly narrower than the screen so share-sheet and Messages previews don’t clip sides.
     @MainActor
     static var cardWidthPoints: CGFloat {
-        let w = UIScreen.main.bounds.width
-        let margin: CGFloat = 36
-        let capped = min(420, w - margin)
-        return max(300, capped).rounded(.down)
+        ShareImageExportQuality.wideCardWidthPoints
     }
 
     @MainActor
@@ -550,7 +547,7 @@ enum TripShareImageBuilder {
         )
         .environmentObject(settingsStore)
         let renderer = ImageRenderer(content: card)
-        renderer.scale = UIScreen.main.scale
+        renderer.scale = ShareImageExportQuality.imageRendererScale
         return renderer.uiImage
     }
 }

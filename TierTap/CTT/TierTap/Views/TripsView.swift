@@ -94,8 +94,11 @@ struct TripsView: View {
                     } label: {
                         Image(systemName: "wand.and.sparkles")
                             .imageScale(.medium)
+                            .padding(8)
+                            .background(Color.green)
+                            .clipShape(Circle())
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .accessibilityLabel("Suggest trips with AI")
                 }
                 ToolbarItem(placement: .topBarTrailing) {

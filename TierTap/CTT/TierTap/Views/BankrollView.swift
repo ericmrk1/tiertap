@@ -185,8 +185,8 @@ struct BankrollView: View {
 
     @MainActor
     private func renderBankrollCardToImage(_ view: BankrollGraphShareCard) -> UIImage? {
-        let width = UIScreen.main.bounds.width * 0.9
-        let height: CGFloat = 320
+        let width = ShareImageExportQuality.wideCardWidthPoints
+        let height: CGFloat = 360
         let wrapped = view
             .padding()
             .frame(width: width, height: height)
@@ -194,7 +194,7 @@ struct BankrollView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: wrapped)
-            renderer.scale = UIScreen.main.scale
+            renderer.scale = ShareImageExportQuality.imageRendererScale
             renderer.proposedSize = ProposedViewSize(width: width, height: height)
             return renderer.uiImage
         } else {

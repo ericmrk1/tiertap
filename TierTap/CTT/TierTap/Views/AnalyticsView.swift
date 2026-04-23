@@ -244,7 +244,7 @@ struct AnalyticsView: View {
                             .background(Color.green)
                             .clipShape(Circle())
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .accessibilityLabel("AI analysis")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -2427,8 +2427,8 @@ private func writeShareImagesToTempFiles(_ images: [UIImage]) -> [URL] {
 
 @MainActor
 private func renderAnalyticsCard<V: View>(_ view: V) -> UIImage? {
-    let width = UIScreen.main.bounds.width * 0.9
-    let height: CGFloat = 420
+    let width = ShareImageExportQuality.wideCardWidthPoints
+    let height: CGFloat = 480
 
     if #available(iOS 16.0, *) {
         let wrapped = view
@@ -2438,7 +2438,7 @@ private func renderAnalyticsCard<V: View>(_ view: V) -> UIImage? {
             .clipShape(RoundedRectangle(cornerRadius: 16))
 
         let renderer = ImageRenderer(content: wrapped)
-        renderer.scale = UIScreen.main.scale
+        renderer.scale = ShareImageExportQuality.imageRendererScale
         renderer.proposedSize = ProposedViewSize(width: width, height: height)
         return renderer.uiImage
     } else {
