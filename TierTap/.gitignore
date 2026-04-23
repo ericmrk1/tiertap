@@ -3,3 +3,6 @@ CTT/TierTap/SupabaseKeys.plist
 
 # Profanity word list - populated by Scripts/download_profanity_list.sh
 CTT/TierTap/ProfanityWords.txt
+
+# Xcode local build graph / fingerprints (regenerated each build)
+CTT/build/XCBuildData/
