@@ -249,9 +249,13 @@ class SessionStore: ObservableObject {
     }
 
     private func schedulePostCloseoutSharePrompt(sessionId: UUID) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self] in
-            guard let self else { return }
-            self.postCloseoutSharePromptSessionId = sessionId
+        // Wait until after nested sheets (close-out, mood picker, live session) finish dismissing;
+        // presenting the root share sheet too soon often fails silently when `liveSession` clears.
+        DispatchQueue.main.async { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) { [weak self] in
+                guard let self else { return }
+                self.postCloseoutSharePromptSessionId = sessionId
+            }
         }
     }
     #endif

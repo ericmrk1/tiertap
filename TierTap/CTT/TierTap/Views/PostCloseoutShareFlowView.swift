@@ -32,22 +32,23 @@ struct PostCloseoutShareFlowView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                switch step {
-                case .pickAction:
-                    pickActionPanel
-                        .toolbar(.hidden, for: .navigationBar)
-                case .communityPublish:
-                    CommunitySessionPublishSelectionView(
-                        sessions: sessionsForCommunityPublish,
-                        initialSelectedSessionIDs: Set([sessionId]),
-                        onBackFromSelection: { step = .pickAction },
-                        onFinished: { _ in dismiss() }
-                    )
-                    .environmentObject(settingsStore)
-                    .environmentObject(authStore)
-                case .sessionArt:
+        Group {
+            switch step {
+            case .pickAction:
+                // Avoid wrapping the compact “pick action” UI in `NavigationStack`; that often
+                // causes the system to ignore `.fraction` detents and present near full height.
+                pickActionPanel
+            case .communityPublish:
+                CommunitySessionPublishSelectionView(
+                    sessions: sessionsForCommunityPublish,
+                    initialSelectedSessionIDs: Set([sessionId]),
+                    onBackFromSelection: { step = .pickAction },
+                    onFinished: { _ in dismiss() }
+                )
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+            case .sessionArt:
+                NavigationStack {
                     SessionArtGeneratorView(sessionId: sessionId) {
                         step = .pickAction
                     }
@@ -55,8 +56,8 @@ struct PostCloseoutShareFlowView: View {
                     .environmentObject(settingsStore)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .presentationDetents(step == .pickAction ? [.fraction(0.33)] : [.large])
         .presentationDragIndicator(.visible)
     }
