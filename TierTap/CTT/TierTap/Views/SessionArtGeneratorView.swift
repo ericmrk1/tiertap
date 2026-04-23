@@ -19,6 +19,101 @@ private struct SessionArtShareMediaItem: Identifiable {
     let activityItems: [Any]
 }
 
+private enum SessionArtPickerKind: Identifiable {
+    case image
+    case video
+
+    var id: String {
+        switch self {
+        case .image: return "image"
+        case .video: return "video"
+        }
+    }
+}
+
+private struct SessionArtMediaPickerSheet: UIViewControllerRepresentable {
+    let kind: SessionArtPickerKind
+    let onPick: (UIImage?, URL?) -> Void
+
+    final class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        let parent: SessionArtMediaPickerSheet
+
+        init(parent: SessionArtMediaPickerSheet) {
+            self.parent = parent
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            guard let result = results.first else {
+                parent.onPick(nil, nil)
+                return
+            }
+            let provider = result.itemProvider
+
+            switch parent.kind {
+            case .image:
+                if provider.canLoadObject(ofClass: UIImage.self) {
+                    provider.loadObject(ofClass: UIImage.self) { object, _ in
+                        DispatchQueue.main.async {
+                            self.parent.onPick(object as? UIImage, nil)
+                        }
+                    }
+                    return
+                }
+                if provider.hasItemConformingToTypeIdentifier("public.image") {
+                    provider.loadFileRepresentation(forTypeIdentifier: "public.image") { url, _ in
+                        let image = url.flatMap { UIImage(contentsOfFile: $0.path) }
+                        DispatchQueue.main.async {
+                            self.parent.onPick(image, nil)
+                        }
+                    }
+                    return
+                }
+                parent.onPick(nil, nil)
+
+            case .video:
+                if provider.hasItemConformingToTypeIdentifier("public.movie") {
+                    provider.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, _ in
+                        DispatchQueue.main.async {
+                            self.parent.onPick(nil, url)
+                        }
+                    }
+                    return
+                }
+                if provider.hasItemConformingToTypeIdentifier("public.video") {
+                    provider.loadFileRepresentation(forTypeIdentifier: "public.video") { url, _ in
+                        DispatchQueue.main.async {
+                            self.parent.onPick(nil, url)
+                        }
+                    }
+                    return
+                }
+                parent.onPick(nil, nil)
+            }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.selectionLimit = 1
+        config.preferredAssetRepresentationMode = .current
+        switch kind {
+        case .image:
+            config.filter = .images
+        case .video:
+            config.filter = .videos
+        }
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+}
+
 private let keySessionArtSharePreset = "ctt_session_art_share_preset_v1"
 
 private struct SessionArtSharePreset: Codable {
@@ -39,11 +134,13 @@ private struct SessionArtSharePreset: Codable {
 // MARK: - Underlay source
 
 private enum SessionUnderlaySource: Hashable, Identifiable {
+    case uploaded
     case chipEstimator
     case compPhoto(UUID)
 
     var id: String {
         switch self {
+        case .uploaded: return "uploaded"
         case .chipEstimator: return "chip"
         case .compPhoto(let u): return u.uuidString
         }
@@ -51,6 +148,7 @@ private enum SessionUnderlaySource: Hashable, Identifiable {
 
     var label: String {
         switch self {
+        case .uploaded: return "Uploaded photo"
         case .chipEstimator: return "Session chip photo"
         case .compPhoto: return "Comp receipt"
         }
@@ -1289,9 +1387,9 @@ private struct SessionArtPreviewSheet: View {
     @State private var previewProgressTask: Task<Void, Never>?
     @State private var previewVideoPlayer: AVPlayer?
     @State private var previewVideoLoopObserver: NSObjectProtocol?
-    @State private var templatesControlsExpanded = true
-    @State private var fontsControlsExpanded = true
-    @State private var colorsControlsExpanded = true
+    @State private var templatesControlsExpanded = false
+    @State private var fontsControlsExpanded = false
+    @State private var colorsControlsExpanded = false
 
     var body: some View {
         NavigationStack {
@@ -1832,8 +1930,8 @@ struct SessionArtGeneratorView: View {
 
     @State private var selectedUnderlay: SessionUnderlaySource?
     @State private var customUnderlay: UIImage?
-    @State private var photoPickerItem: PhotosPickerItem?
-    @State private var videoPickerItem: PhotosPickerItem?
+    @State private var showImagePickerSheet = false
+    @State private var showVideoPickerSheet = false
     @State private var selectedShareVideoURL: URL?
 
     @State private var shareMediaItem: SessionArtShareMediaItem?
@@ -1887,7 +1985,9 @@ struct SessionArtGeneratorView: View {
                                 metricsOptionsBubble
                             }
                             underlaySection
-                            currentUnderlayPreview
+                            if selectedShareVideoURL == nil {
+                                currentUnderlayPreview
+                            }
                             shareVideoSection
                         }
                         previewButton
@@ -1948,6 +2048,30 @@ struct SessionArtGeneratorView: View {
         .sheet(item: $shareTextItem, onDismiss: { dismiss() }) { item in
             ShareSheet(items: [item.text])
         }
+        .fullScreenCover(isPresented: $showImagePickerSheet, onDismiss: {
+            showImagePickerSheet = false
+        }) {
+            SessionArtMediaPickerSheet(kind: .image) { image, _ in
+                showImagePickerSheet = false
+                if let image {
+                    customUnderlay = image
+                    chooseUnderlay(.uploaded)
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showVideoPickerSheet, onDismiss: {
+            showVideoPickerSheet = false
+        }) {
+            SessionArtMediaPickerSheet(kind: .video) { _, pickedVideoURL in
+                showVideoPickerSheet = false
+                guard let pickedVideoURL else { return }
+                if let copied = copyVideoForShare(from: pickedVideoURL) {
+                    selectedShareVideoURL = copied
+                } else {
+                    exportError = "Couldn't load the selected video."
+                }
+            }
+        }
         .sheet(isPresented: $showPreviewSheet) {
             if let session = resolvedSession {
                 SessionArtPreviewSheet(
@@ -1990,7 +2114,6 @@ struct SessionArtGeneratorView: View {
         }
         .onAppear {
             applySavedSharePresetIfNeeded()
-            pickDefaultUnderlayIfNeeded()
         }
         .onDisappear {
             cancelMediaExport()
@@ -2010,10 +2133,10 @@ struct SessionArtGeneratorView: View {
         if let videoURL = selectedShareVideoURL {
             return "video-\(videoURL.absoluteString)"
         }
-        if let c = customUnderlay {
-            return "custom-\(ObjectIdentifier(c))"
-        }
         if let sel = selectedUnderlay {
+            if sel == .uploaded, let c = customUnderlay {
+                return "custom-\(ObjectIdentifier(c))"
+            }
             return sel.id
         }
         return "none"
@@ -2159,10 +2282,9 @@ struct SessionArtGeneratorView: View {
                         underlayThumb(
                             title: "Uploaded",
                             image: custom,
-                            selected: customUnderlay != nil && selectedShareVideoURL == nil
+                            selected: selectedUnderlay == .uploaded && selectedShareVideoURL == nil
                         ) {
-                            selectedUnderlay = nil
-                            selectedShareVideoURL = nil
+                            chooseUnderlay(.uploaded)
                         }
                     }
                     if let s = resolvedSession,
@@ -2172,11 +2294,9 @@ struct SessionArtGeneratorView: View {
                         underlayThumb(
                             title: "Chip / table",
                             image: chipImage,
-                            selected: selectedUnderlay == .chipEstimator && customUnderlay == nil
+                            selected: selectedUnderlay == .chipEstimator
                         ) {
-                            customUnderlay = nil
-                            selectedUnderlay = .chipEstimator
-                            selectedShareVideoURL = nil
+                            chooseUnderlay(.chipEstimator)
                         }
                     }
                     if let s = resolvedSession {
@@ -2186,17 +2306,20 @@ struct SessionArtGeneratorView: View {
                             underlayThumb(
                                 title: "Comp",
                                 image: compImage,
-                                selected: selectedUnderlay == .compPhoto(ev.id) && customUnderlay == nil
+                                selected: selectedUnderlay == .compPhoto(ev.id)
                             ) {
-                                customUnderlay = nil
-                                selectedUnderlay = .compPhoto(ev.id)
-                                selectedShareVideoURL = nil
+                                chooseUnderlay(.compPhoto(ev.id))
                             }
                         }
                     }
                 }
             }
-            PhotosPicker(selection: $photoPickerItem, matching: .images, photoLibrary: .shared()) {
+            Button {
+                showImagePickerSheet = false
+                DispatchQueue.main.async {
+                    showImagePickerSheet = true
+                }
+            } label: {
                 Label("Upload a picture", systemImage: "photo.badge.plus")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
@@ -2205,34 +2328,30 @@ struct SessionArtGeneratorView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
-            .onChange(of: photoPickerItem) { newItem in
-                guard let newItem else { return }
-                photoPickerItem = nil
-                Task {
-                    let img = await loadUIImageFromPickerItem(newItem)
-                    await MainActor.run {
-                        if let img {
-                            customUnderlay = img
-                            selectedUnderlay = nil
-                            selectedShareVideoURL = nil
-                        } else {
-                            exportError = "Couldn't load the selected picture."
-                        }
-                    }
-                }
-            }
+            .buttonStyle(.plain)
             if customUnderlay != nil {
-                Button(role: .destructive) {
-                    customUnderlay = nil
-                    pickDefaultUnderlayIfNeeded()
+                Button {
+                    removeUploadedUnderlay()
                 } label: {
                     Label("Remove uploaded picture", systemImage: "trash")
                         .font(.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.bordered)
+                .tint(.red)
+            }
+            if selectedUnderlay != nil {
+                Button {
+                    clearSelectedUnderlay()
+                } label: {
+                    Label("Clear selected underlay", systemImage: "xmark.circle")
+                        .font(.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.gray)
             }
         }
-        .onChange(of: store.sessions) { _ in pickDefaultUnderlayIfNeeded() }
     }
 
     private var currentUnderlayPreview: some View {
@@ -2275,7 +2394,12 @@ struct SessionArtGeneratorView: View {
             Text("Share media (image or video)")
                 .font(.caption.bold())
                 .foregroundColor(.gray)
-            PhotosPicker(selection: $videoPickerItem, matching: .videos, photoLibrary: .shared()) {
+            Button {
+                showVideoPickerSheet = false
+                DispatchQueue.main.async {
+                    showVideoPickerSheet = true
+                }
+            } label: {
                 Label(selectedShareVideoURL == nil ? "Use a video instead of image" : "Replace selected video", systemImage: "video.badge.plus")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
@@ -2284,20 +2408,7 @@ struct SessionArtGeneratorView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
-            .onChange(of: videoPickerItem) { newItem in
-                guard let newItem else { return }
-                videoPickerItem = nil
-                Task {
-                    let url = await loadShareVideoURLFromPickerItem(newItem)
-                    await MainActor.run {
-                        if let url {
-                            selectedShareVideoURL = url
-                        } else {
-                            exportError = "Couldn't load the selected video."
-                        }
-                    }
-                }
-            }
+            .buttonStyle(.plain)
             if let shareVideoURL = selectedShareVideoURL {
                 HStack(spacing: 8) {
                     Image(systemName: "video.fill")
@@ -2362,7 +2473,7 @@ struct SessionArtGeneratorView: View {
         Button {
             openPreview()
         } label: {
-            Text(outputKind == .text ? "Preview & edit text" : "Preview & adjust")
+            Text(previewButtonTitle)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -2373,6 +2484,14 @@ struct SessionArtGeneratorView: View {
         .buttonStyle(.plain)
         .disabled(resolvedSession == nil)
         .opacity(resolvedSession == nil ? 0.5 : 1)
+    }
+
+    private var previewButtonTitle: String {
+        if outputKind == .text {
+            return "Preview & edit text (Text)"
+        }
+        let mediaType = selectedShareVideoURL == nil ? "Image" : "Video"
+        return "Preview & adjust (\(mediaType))"
     }
 
     private func applySavedSharePresetIfNeeded() {
@@ -2448,16 +2567,26 @@ struct SessionArtGeneratorView: View {
         showPreviewSheet = true
     }
 
-    private func pickDefaultUnderlayIfNeeded() {
-        guard selectedUnderlay == nil, customUnderlay == nil, let s = resolvedSession else { return }
-        if s.chipEstimatorImageFilename != nil,
-           let fn = s.chipEstimatorImageFilename,
-           ChipEstimatorPhotoStorage.url(for: fn) != nil {
-            selectedUnderlay = .chipEstimator
-            return
-        }
-        if let ev = s.compEvents.first(where: { CompPhotoStorage.url(for: $0.id) != nil }) {
-            selectedUnderlay = .compPhoto(ev.id)
+    private func chooseUnderlay(_ source: SessionUnderlaySource) {
+        showImagePickerSheet = false
+        showVideoPickerSheet = false
+        selectedShareVideoURL = nil
+        selectedUnderlay = source
+    }
+
+    private func clearSelectedUnderlay() {
+        showImagePickerSheet = false
+        showVideoPickerSheet = false
+        selectedUnderlay = nil
+        selectedShareVideoURL = nil
+    }
+
+    private func removeUploadedUnderlay() {
+        showImagePickerSheet = false
+        showVideoPickerSheet = false
+        customUnderlay = nil
+        if selectedUnderlay == .uploaded {
+            selectedUnderlay = nil
         }
     }
 
@@ -2512,9 +2641,11 @@ struct SessionArtGeneratorView: View {
     }
 
     private func loadUnderlayImage() -> UIImage? {
-        if let customUnderlay { return customUnderlay }
-        guard let s = resolvedSession, let sel = selectedUnderlay else { return nil }
+        guard let s = resolvedSession else { return nil }
+        guard let sel = selectedUnderlay else { return nil }
         switch sel {
+        case .uploaded:
+            return customUnderlay
         case .chipEstimator:
             guard let fn = s.chipEstimatorImageFilename,
                   let url = ChipEstimatorPhotoStorage.url(for: fn) else { return nil }
