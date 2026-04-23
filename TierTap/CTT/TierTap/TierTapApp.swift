@@ -195,7 +195,7 @@ struct SplashScreen: View {
     }
 
     private func scheduleSplashAnimation(peakScale: CGFloat, collapseScale: CGFloat) {
-        let growDuration: TimeInterval = 2
+        let growDuration: TimeInterval = 1.2
         let shrinkDuration: TimeInterval = 0.10
         let holdBeforeGrow: TimeInterval = 2
 

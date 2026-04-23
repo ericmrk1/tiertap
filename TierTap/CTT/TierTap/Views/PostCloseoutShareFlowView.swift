@@ -57,7 +57,7 @@ struct PostCloseoutShareFlowView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .presentationDetents(step == .pickAction ? [.fraction(0.25)] : [.large])
+        .presentationDetents(step == .pickAction ? [.fraction(0.33)] : [.large])
         .presentationDragIndicator(.visible)
     }
 
@@ -100,12 +100,19 @@ struct PostCloseoutShareFlowView: View {
                         }
                         .buttonStyle(.plain)
 
-                        Button("Not now", role: .cancel) {
+                        Button(role: .cancel) {
                             dismiss()
+                        } label: {
+                            Text("Not now")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.white.opacity(0.18))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
                         }
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.white.opacity(0.85))
-                        .padding(.top, 2)
+                        .buttonStyle(.plain)
+                        .padding(.top, 10)
                     }
                     .padding(.horizontal, 16)
                     .padding(.bottom, 6)

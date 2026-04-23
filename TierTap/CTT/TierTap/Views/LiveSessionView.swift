@@ -71,33 +71,35 @@ struct LiveSessionView: View {
                                     .cornerRadius(10)
                             }
                             .accessibilityLabel("Private notes")
-                            Button { showStrategyOdds = true } label: {
-                                L10nText("Strategy/Odds")
-                                    .font(.subheadline.weight(.medium))
+                            VStack(spacing: 8) {
+                                Button { showStrategyOdds = true } label: {
+                                    L10nText("Info")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundColor(.green)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .cornerRadius(10)
+                                }
+                            #if os(iOS)
+                                Button {
+                                    liveSessionShareRef = PostCloseoutSessionRef(id: s.id)
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .font(.subheadline.weight(.medium))
+                                        L10nText("Share")
+                                            .font(.subheadline.weight(.medium))
+                                    }
                                     .foregroundColor(.green)
-                                    .padding(.horizontal, 16)
+                                    .padding(.horizontal, 14)
                                     .padding(.vertical, 8)
                                     .background(Color(.systemGray6).opacity(0.25))
                                     .cornerRadius(10)
-                            }
-                            #if os(iOS)
-                            Button {
-                                liveSessionShareRef = PostCloseoutSessionRef(id: s.id)
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.subheadline.weight(.medium))
-                                    L10nText("Share")
-                                        .font(.subheadline.weight(.medium))
                                 }
-                                .foregroundColor(.green)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .cornerRadius(10)
-                            }
-                            .accessibilityLabel("Share session")
+                                .accessibilityLabel("Share session")
                             #endif
+                            }
                         }
                         .padding(.top, 4)
                     }

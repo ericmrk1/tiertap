@@ -42,6 +42,35 @@ private struct SessionArtMediaPickerSheet: UIViewControllerRepresentable {
             self.parent = parent
         }
 
+        /// `loadFileRepresentation` URLs are short-lived, so we copy immediately while still inside the callback.
+        private static func persistPickedVideo(_ sourceURL: URL) -> URL? {
+            let fileExtension = sourceURL.pathExtension.isEmpty ? "mov" : sourceURL.pathExtension
+            let destination = FileManager.default.temporaryDirectory
+                .appendingPathComponent("session-share-\(UUID().uuidString).\(fileExtension)")
+
+            let granted = sourceURL.startAccessingSecurityScopedResource()
+            defer {
+                if granted {
+                    sourceURL.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            do {
+                try FileManager.default.copyItem(at: sourceURL, to: destination)
+                return destination
+            } catch {
+                guard let data = try? Data(contentsOf: sourceURL), !data.isEmpty else {
+                    return nil
+                }
+                do {
+                    try data.write(to: destination, options: .atomic)
+                    return destination
+                } catch {
+                    return nil
+                }
+            }
+        }
+
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             guard let result = results.first else {
                 parent.onPick(nil, nil)
@@ -73,16 +102,18 @@ private struct SessionArtMediaPickerSheet: UIViewControllerRepresentable {
             case .video:
                 if provider.hasItemConformingToTypeIdentifier("public.movie") {
                     provider.loadFileRepresentation(forTypeIdentifier: "public.movie") { url, _ in
+                        let persistedURL = url.flatMap { Self.persistPickedVideo($0) }
                         DispatchQueue.main.async {
-                            self.parent.onPick(nil, url)
+                            self.parent.onPick(nil, persistedURL)
                         }
                     }
                     return
                 }
                 if provider.hasItemConformingToTypeIdentifier("public.video") {
                     provider.loadFileRepresentation(forTypeIdentifier: "public.video") { url, _ in
+                        let persistedURL = url.flatMap { Self.persistPickedVideo($0) }
                         DispatchQueue.main.async {
-                            self.parent.onPick(nil, url)
+                            self.parent.onPick(nil, persistedURL)
                         }
                     }
                     return
@@ -99,12 +130,14 @@ private struct SessionArtMediaPickerSheet: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> PHPickerViewController {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.selectionLimit = 1
-        config.preferredAssetRepresentationMode = .current
         switch kind {
         case .image:
             config.filter = .images
+            config.preferredAssetRepresentationMode = .current
         case .video:
             config.filter = .videos
+            // Ask Photos for a broadly compatible export format for downstream AVAsset pipelines.
+            config.preferredAssetRepresentationMode = .compatible
         }
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -124,6 +157,9 @@ private struct SessionArtSharePreset: Codable {
     var publishBuyInCashOut: Bool
     var publishCompDetails: Bool
     var selectedTemplateRaw: String
+    var selectedBaseTemplateRaw: String?
+    var selectedStickerTemplateRaw: String?
+    var selectedArtDecoTemplateRaw: String?
     var selectedTextFontRaw: String
     var globalTextScale: Double
     var selectedTextColorRaw: String
@@ -340,6 +376,8 @@ private struct SessionArtLayout: Equatable {
     var borderStyle: SessionArtBorderStyle = .none
     /// Decorative sticker geometry for stat-group presets.
     var stickerOverlayStyle: SessionArtStickerOverlayStyle = .none
+    /// Optional second decorative pass (used to stack Art Deco with stickers).
+    var secondaryOverlayStyle: SessionArtStickerOverlayStyle = .none
 
     /// Stacked metric rows from top to bottom in `keys` order (same order as `activeLineKeys`).
     static func makeLineOriginsStacked(
@@ -425,7 +463,8 @@ private struct SessionArtLayout: Equatable {
             emphasizedMetric: emphasizedMetric,
             emphasisScale: emphasisScale,
             borderStyle: borderStyle,
-            stickerOverlayStyle: stickerOverlayStyle
+            stickerOverlayStyle: stickerOverlayStyle,
+            secondaryOverlayStyle: secondaryOverlayStyle
         )
     }
 }
@@ -1544,6 +1583,7 @@ private enum SessionArtRenderer {
             }
 
             drawStickerOverlay(style: layout.stickerOverlayStyle, in: canvas, cg: cg)
+            drawStickerOverlay(style: layout.secondaryOverlayStyle, in: canvas, cg: cg)
 
             if params.includeMetrics {
                 drawMetricsBlock(
@@ -1590,6 +1630,7 @@ private enum SessionArtRenderer {
                 cg.fill(CGRect(origin: .zero, size: canvas))
             }
             drawStickerOverlay(style: layout.stickerOverlayStyle, in: canvas, cg: cg)
+            drawStickerOverlay(style: layout.secondaryOverlayStyle, in: canvas, cg: cg)
             if params.includeMetrics {
                 drawMetricsBlock(
                     params: params,
@@ -2467,7 +2508,9 @@ private struct SessionArtPreviewSheet: View {
     let videoUnderlayURL: URL?
 
     @Binding var layout: SessionArtLayout
-    @Binding var selectedTemplate: SessionArtTemplate
+    @Binding var selectedBaseTemplate: SessionArtTemplate
+    @Binding var selectedStickerTemplate: SessionArtTemplate?
+    @Binding var selectedArtDecoTemplate: SessionArtTemplate?
     @Binding var selectedTextFont: SessionArtTextFont
     @Binding var globalTextScale: CGFloat
     @Binding var selectedTextColor: SessionArtColorToken
@@ -2520,11 +2563,11 @@ private struct SessionArtPreviewSheet: View {
             .safeAreaInset(edge: .bottom) {
                 imagePreviewChrome
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 6)
                     .background(.ultraThinMaterial)
             }
             .onAppear {
-                templatePickerGroup = selectedTemplate.pickerGroup
+                templatePickerGroup = .templates
                 configurePreviewVideoPlayerIfNeeded()
                 refreshPreviewImage()
                 warmTemplateThumbnails(for: templatePickerGroup)
@@ -2540,8 +2583,13 @@ private struct SessionArtPreviewSheet: View {
                 configurePreviewVideoPlayerIfNeeded()
                 refreshPreviewImage()
             }
-            .onChange(of: selectedTemplate) { _ in
-                templatePickerGroup = selectedTemplate.pickerGroup
+            .onChange(of: selectedBaseTemplate) { _ in
+                refreshPreviewImage()
+            }
+            .onChange(of: selectedStickerTemplate) { _ in
+                refreshPreviewImage()
+            }
+            .onChange(of: selectedArtDecoTemplate) { _ in
                 refreshPreviewImage()
             }
             .onChange(of: templatePickerGroup) { group in
@@ -2569,10 +2617,10 @@ private struct SessionArtPreviewSheet: View {
         case .text:
             bottomActionBar
         case .image:
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 collapsibleControlsBubble(
                     title: "Templates + Stickers + Art Deco",
-                    subtitle: "\(selectedTemplate.shortTitle) · \(selectedTemplate.pickerGroup.rawValue)",
+                    subtitle: selectionSubtitle,
                     icon: "photo.on.rectangle",
                     isExpanded: $templatesControlsExpanded
                 ) {
@@ -2588,8 +2636,8 @@ private struct SessionArtPreviewSheet: View {
                                 templateThumbnailButton(template)
                             }
                         }
-                        .padding(.vertical, 2)
                     }
+                    .frame(height: 170)
                 }
                 collapsibleControlsBubble(
                     title: "Fonts + size",
@@ -2617,7 +2665,16 @@ private struct SessionArtPreviewSheet: View {
     }
 
     private var stickerModeActive: Bool {
-        selectedTemplate.pickerGroup == .stickers
+        selectedStickerTemplate != nil
+    }
+
+    private var selectionSubtitle: String {
+        let parts: [String] = [
+            selectedBaseTemplate.shortTitle,
+            selectedStickerTemplate?.shortTitle ?? "No sticker",
+            selectedArtDecoTemplate?.shortTitle ?? "No art deco"
+        ]
+        return parts.joined(separator: " · ")
     }
 
     private func collapsibleControlsBubble<Content: View>(
@@ -2650,16 +2707,16 @@ private struct SessionArtPreviewSheet: View {
                         .foregroundColor(.secondary)
                         .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
                 }
-                .padding(12)
+                .padding(10)
             }
             .buttonStyle(.plain)
 
             if isExpanded.wrappedValue {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 8) {
                     content()
                 }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 12)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 8)
             }
         }
         .background(Color(.systemGray6).opacity(0.18))
@@ -2900,19 +2957,13 @@ private struct SessionArtPreviewSheet: View {
     }
 
     private func templateThumbnailButton(_ template: SessionArtTemplate) -> some View {
-        let selected = template == selectedTemplate
+        let selected = isTemplateSelected(template)
         let thumbnail = templateThumbnailCache[template]
         return Button {
-            selectedTemplate = template
-            let stickerTemplate = template.pickerGroup == .stickers
-            layout = template.makeLayout(
-                session: session,
-                publishTierPerHour: publishTierPerHour || stickerTemplate,
-                publishWinLoss: publishWinLoss || stickerTemplate,
-                publishBuyInCashOut: publishBuyInCashOut || stickerTemplate,
-                publishCompDetails: publishCompDetails || stickerTemplate,
-                canvasSize: designSize
-            )
+            withAnimation(.spring(response: 0.46, dampingFraction: 0.82, blendDuration: 0.12)) {
+                applyTemplateSelectionToggle(template)
+                layout = composedLayout()
+            }
         } label: {
             VStack(spacing: 0) {
                 Group {
@@ -2959,9 +3010,80 @@ private struct SessionArtPreviewSheet: View {
                 )
             }
             .frame(width: 100)
+            .offset(y: selected ? -8 : 0)
+            .animation(.spring(response: 0.46, dampingFraction: 0.82, blendDuration: 0.12), value: selected)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(template.shortTitle) preset\(selected ? ", selected" : "")")
+    }
+
+    private func isTemplateSelected(_ template: SessionArtTemplate) -> Bool {
+        switch template.pickerGroup {
+        case .templates:
+            return selectedBaseTemplate == template
+        case .stickers:
+            return selectedStickerTemplate == template
+        case .artDeco:
+            return selectedArtDecoTemplate == template
+        }
+    }
+
+    private func applyTemplateSelectionToggle(_ template: SessionArtTemplate) {
+        switch template.pickerGroup {
+        case .templates:
+            selectedBaseTemplate = template
+        case .stickers:
+            selectedStickerTemplate = (selectedStickerTemplate == template) ? nil : template
+        case .artDeco:
+            selectedArtDecoTemplate = (selectedArtDecoTemplate == template) ? nil : template
+        }
+    }
+
+    private func composedLayout() -> SessionArtLayout {
+        var composed = selectedBaseTemplate.makeLayout(
+            session: session,
+            publishTierPerHour: publishTierPerHour || stickerModeActive,
+            publishWinLoss: publishWinLoss || stickerModeActive,
+            publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+            publishCompDetails: publishCompDetails || stickerModeActive,
+            canvasSize: designSize
+        )
+
+        if let stickerTemplate = selectedStickerTemplate {
+            let stickerLayout = stickerTemplate.makeLayout(
+                session: session,
+                publishTierPerHour: true,
+                publishWinLoss: true,
+                publishBuyInCashOut: true,
+                publishCompDetails: true,
+                canvasSize: designSize
+            )
+            composed.stickerOverlayStyle = stickerLayout.stickerOverlayStyle
+            if stickerLayout.borderStyle != .none {
+                composed.borderStyle = stickerLayout.borderStyle
+            }
+        } else {
+            composed.stickerOverlayStyle = .none
+        }
+
+        if let decoTemplate = selectedArtDecoTemplate {
+            let decoLayout = decoTemplate.makeLayout(
+                session: session,
+                publishTierPerHour: publishTierPerHour || stickerModeActive,
+                publishWinLoss: publishWinLoss || stickerModeActive,
+                publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+                publishCompDetails: publishCompDetails || stickerModeActive,
+                canvasSize: designSize
+            )
+            if decoLayout.borderStyle != .none {
+                composed.borderStyle = decoLayout.borderStyle
+            }
+            composed.secondaryOverlayStyle = decoLayout.stickerOverlayStyle
+        } else {
+            composed.secondaryOverlayStyle = .none
+        }
+
+        return composed
     }
 
     private func warmTemplateThumbnails(for group: SessionArtPickerGroup) {
@@ -3162,7 +3284,9 @@ struct SessionArtGeneratorView: View {
     @State private var publishBuyInCashOut = true
     @State private var publishCompDetails = false
     @State private var metricsBubbleExpanded = false
-    @State private var selectedArtTemplate: SessionArtTemplate = .balanced
+    @State private var selectedBaseTemplate: SessionArtTemplate = .balanced
+    @State private var selectedStickerTemplate: SessionArtTemplate?
+    @State private var selectedArtDecoTemplate: SessionArtTemplate?
     @State private var selectedTextFont: SessionArtTextFont = .system
     @State private var globalTextScale: CGFloat = 1.0
     @State private var selectedTextColor: SessionArtColorToken = .white
@@ -3306,12 +3430,11 @@ struct SessionArtGeneratorView: View {
         }) {
             SessionArtMediaPickerSheet(kind: .video) { _, pickedVideoURL in
                 showVideoPickerSheet = false
-                guard let pickedVideoURL else { return }
-                if let copied = copyVideoForShare(from: pickedVideoURL) {
-                    selectedShareVideoURL = copied
-                } else {
+                guard let pickedVideoURL else {
                     exportError = "Couldn't load the selected video."
+                    return
                 }
+                selectedShareVideoURL = pickedVideoURL
             }
         }
         .sheet(isPresented: $showPreviewSheet) {
@@ -3328,7 +3451,9 @@ struct SessionArtGeneratorView: View {
                     designSize: designCanvas,
                     videoUnderlayURL: selectedShareVideoURL,
                     layout: $previewLayout,
-                    selectedTemplate: $selectedArtTemplate,
+                    selectedBaseTemplate: $selectedBaseTemplate,
+                    selectedStickerTemplate: $selectedStickerTemplate,
+                    selectedArtDecoTemplate: $selectedArtDecoTemplate,
                     selectedTextFont: $selectedTextFont,
                     globalTextScale: $globalTextScale,
                     selectedTextColor: $selectedTextColor,
@@ -3389,11 +3514,11 @@ struct SessionArtGeneratorView: View {
     }
 
     private var shouldRenderMetrics: Bool {
-        artStyle == .photoWithMetrics || selectedArtTemplate.pickerGroup == .stickers
+        artStyle == .photoWithMetrics || stickerModeActive
     }
 
     private var stickerModeActive: Bool {
-        selectedArtTemplate.pickerGroup == .stickers
+        selectedStickerTemplate != nil
     }
 
     private var textShareOptionsSection: some View {
@@ -3761,8 +3886,29 @@ struct SessionArtGeneratorView: View {
         publishWinLoss = preset.publishWinLoss
         publishBuyInCashOut = preset.publishBuyInCashOut
         publishCompDetails = preset.publishCompDetails
-        if let template = SessionArtTemplate(rawValue: preset.selectedTemplateRaw) {
-            selectedArtTemplate = template
+        if let baseRaw = preset.selectedBaseTemplateRaw,
+           let baseTemplate = SessionArtTemplate(rawValue: baseRaw),
+           baseTemplate.pickerGroup == .templates {
+            selectedBaseTemplate = baseTemplate
+        } else if let legacy = SessionArtTemplate(rawValue: preset.selectedTemplateRaw) {
+            switch legacy.pickerGroup {
+            case .templates:
+                selectedBaseTemplate = legacy
+            case .stickers:
+                selectedStickerTemplate = legacy
+            case .artDeco:
+                selectedArtDecoTemplate = legacy
+            }
+        }
+        if let stickerRaw = preset.selectedStickerTemplateRaw,
+           let stickerTemplate = SessionArtTemplate(rawValue: stickerRaw),
+           stickerTemplate.pickerGroup == .stickers {
+            selectedStickerTemplate = stickerTemplate
+        }
+        if let decoRaw = preset.selectedArtDecoTemplateRaw,
+           let decoTemplate = SessionArtTemplate(rawValue: decoRaw),
+           decoTemplate.pickerGroup == .artDeco {
+            selectedArtDecoTemplate = decoTemplate
         }
         if let textFont = SessionArtTextFont(rawValue: preset.selectedTextFontRaw) {
             selectedTextFont = textFont
@@ -3785,7 +3931,10 @@ struct SessionArtGeneratorView: View {
             publishWinLoss: publishWinLoss,
             publishBuyInCashOut: publishBuyInCashOut,
             publishCompDetails: publishCompDetails,
-            selectedTemplateRaw: selectedArtTemplate.rawValue,
+            selectedTemplateRaw: selectedBaseTemplate.rawValue,
+            selectedBaseTemplateRaw: selectedBaseTemplate.rawValue,
+            selectedStickerTemplateRaw: selectedStickerTemplate?.rawValue,
+            selectedArtDecoTemplateRaw: selectedArtDecoTemplate?.rawValue,
             selectedTextFontRaw: selectedTextFont.rawValue,
             globalTextScale: Double(globalTextScale),
             selectedTextColorRaw: selectedTextColor.rawValue,
@@ -3805,15 +3954,7 @@ struct SessionArtGeneratorView: View {
                 includeWinLoss: publishWinLoss
             )
         } else {
-            let stickerTemplate = selectedArtTemplate.pickerGroup == .stickers
-            previewLayout = selectedArtTemplate.makeLayout(
-                session: s,
-                publishTierPerHour: publishTierPerHour || stickerTemplate,
-                publishWinLoss: publishWinLoss || stickerTemplate,
-                publishBuyInCashOut: publishBuyInCashOut || stickerTemplate,
-                publishCompDetails: publishCompDetails || stickerTemplate,
-                canvasSize: designCanvas
-            )
+            previewLayout = composedLayout(for: s, canvasSize: designCanvas)
         }
         showPreviewSheet = true
     }
@@ -3934,6 +4075,53 @@ struct SessionArtGeneratorView: View {
             layout: previewLayout,
             footerCaption: previewFooterCaption
         )
+    }
+
+    private func composedLayout(for session: Session, canvasSize: CGSize) -> SessionArtLayout {
+        var composed = selectedBaseTemplate.makeLayout(
+            session: session,
+            publishTierPerHour: publishTierPerHour || stickerModeActive,
+            publishWinLoss: publishWinLoss || stickerModeActive,
+            publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+            publishCompDetails: publishCompDetails || stickerModeActive,
+            canvasSize: canvasSize
+        )
+
+        if let stickerTemplate = selectedStickerTemplate {
+            let stickerLayout = stickerTemplate.makeLayout(
+                session: session,
+                publishTierPerHour: true,
+                publishWinLoss: true,
+                publishBuyInCashOut: true,
+                publishCompDetails: true,
+                canvasSize: canvasSize
+            )
+            composed.stickerOverlayStyle = stickerLayout.stickerOverlayStyle
+            if stickerLayout.borderStyle != .none {
+                composed.borderStyle = stickerLayout.borderStyle
+            }
+        } else {
+            composed.stickerOverlayStyle = .none
+        }
+
+        if let decoTemplate = selectedArtDecoTemplate {
+            let decoLayout = decoTemplate.makeLayout(
+                session: session,
+                publishTierPerHour: publishTierPerHour || stickerModeActive,
+                publishWinLoss: publishWinLoss || stickerModeActive,
+                publishBuyInCashOut: publishBuyInCashOut || stickerModeActive,
+                publishCompDetails: publishCompDetails || stickerModeActive,
+                canvasSize: canvasSize
+            )
+            if decoLayout.borderStyle != .none {
+                composed.borderStyle = decoLayout.borderStyle
+            }
+            composed.secondaryOverlayStyle = decoLayout.stickerOverlayStyle
+        } else {
+            composed.secondaryOverlayStyle = .none
+        }
+
+        return composed
     }
 
     private func exportMediaAfterPreview(session: Session) {

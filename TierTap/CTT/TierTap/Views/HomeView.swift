@@ -384,7 +384,7 @@ struct LiveNowCard: View {
                     }
                     .accessibilityLabel("Private notes")
                     Button { showStrategyOdds = true } label: {
-                        L10nText("Strategy/Odds")
+                        Image(systemName: "info.circle")
                             .font(.caption.weight(.medium))
                             .foregroundColor(.green)
                             .padding(.horizontal, 12)
