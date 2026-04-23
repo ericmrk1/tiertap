@@ -4248,16 +4248,21 @@ struct SessionArtGeneratorView: View {
             staticOverlayCI = CIImage(cgImage: overlayCG)
         }
         let overlayExtent = CGRect(origin: .zero, size: renderSize)
-        let orientationTransform = preferredTransform.concatenating(
-            CGAffineTransform(translationX: -transformedRect.minX, y: -transformedRect.minY)
-        )
         let durationSeconds = max(duration.seconds, 0.001)
+
+        /// For Core Image video compositions, `request.sourceImage` is documented to already include the
+        /// track’s display transform (same idea as `AVAsynchronousCIImageFilteringRequest`). Applying
+        /// `preferredTransform` again breaks portrait (double 90°) and landscape with 180° metadata
+        /// (video upside down while overlays stay correct).
+        func uprightSourceImage(_ src: CIImage) -> CIImage {
+            let ext = src.extent
+            return src.transformed(by: CGAffineTransform(translationX: -ext.minX, y: -ext.minY))
+                .cropped(to: CGRect(origin: .zero, size: orientedSize))
+        }
 
         // Use CI-based compositing for stability when exporting user-picked videos.
         let videoComposition = AVMutableVideoComposition(asset: sourceAsset) { request in
-            let oriented = request.sourceImage
-                .transformed(by: orientationTransform)
-                .cropped(to: CGRect(origin: .zero, size: orientedSize))
+            let oriented = uprightSourceImage(request.sourceImage)
 
             let scaledBase = oriented.transformed(by: CGAffineTransform(
                 scaleX: renderSize.width / max(orientedSize.width, 1),
