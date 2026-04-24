@@ -356,7 +356,7 @@ private struct SessionArtLayout: Equatable {
     var metricsScale: CGFloat = 1
     /// Multiplier on optional footer caption text.
     var footerScale: CGFloat = 1
-    /// Multiplier on bottom-right app-icon branding.
+    /// Multiplier on bottom-right logo branding.
     var brandingScale: CGFloat = 1
     /// Nudges branding from its default bottom-trailing anchor (design space).
     var brandingOffset: CGPoint = .zero
@@ -1441,6 +1441,15 @@ private enum SessionArtRenderer {
         )
     }
 
+    private static func pixelAlignedCGRect(_ rect: CGRect) -> CGRect {
+        CGRect(
+            x: floor(rect.origin.x),
+            y: floor(rect.origin.y),
+            width: ceil(rect.size.width),
+            height: ceil(rect.size.height)
+        )
+    }
+
     /// Find the largest readable font size that fits within the target width.
     private static func fittedFontSize(
         text: String,
@@ -2090,12 +2099,14 @@ private enum SessionArtRenderer {
             max(44 * s, (size.width * 0.115) * brandingScale)
         )
         let pad = max(14 * s, iconSide * 0.24)
-        let iconRect = CGRect(
-            x: size.width - iconSide - pad + layout.brandingOffset.x,
-            y: size.height - iconSide - pad + layout.brandingOffset.y,
-            width: iconSide,
-            height: iconSide
-        ).integral
+        let iconRect = pixelAlignedCGRect(
+            CGRect(
+                x: size.width - iconSide - pad + layout.brandingOffset.x,
+                y: size.height - iconSide - pad + layout.brandingOffset.y,
+                width: iconSide,
+                height: iconSide
+            )
+        )
 
         if params.textBackgroundOpacity > 0.01 {
             let backgroundColor = resolvedTextBackgroundColor(params)
@@ -2112,10 +2123,10 @@ private enum SessionArtRenderer {
         let imageSize = logoImage.size
         let imageAspect = imageSize.width / max(imageSize.height, 0.001)
         let boxAspect = iconRect.width / max(iconRect.height, 0.001)
-        let drawRect: CGRect
+        let drawRectRaw: CGRect
         if imageAspect > boxAspect {
             let drawHeight = iconRect.width / max(imageAspect, 0.001)
-            drawRect = CGRect(
+            drawRectRaw = CGRect(
                 x: iconRect.minX,
                 y: iconRect.midY - (drawHeight * 0.5),
                 width: iconRect.width,
@@ -2123,13 +2134,14 @@ private enum SessionArtRenderer {
             )
         } else {
             let drawWidth = iconRect.height * imageAspect
-            drawRect = CGRect(
+            drawRectRaw = CGRect(
                 x: iconRect.midX - (drawWidth * 0.5),
                 y: iconRect.minY,
                 width: drawWidth,
                 height: iconRect.height
             )
-        }.integral
+        }
+        let drawRect = pixelAlignedCGRect(drawRectRaw)
 
         cg.saveGState()
         cg.addPath(UIBezierPath(roundedRect: iconRect, cornerRadius: corner).cgPath)
