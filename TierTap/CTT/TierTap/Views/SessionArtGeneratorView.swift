@@ -356,7 +356,7 @@ private struct SessionArtLayout: Equatable {
     var metricsScale: CGFloat = 1
     /// Multiplier on optional footer caption text.
     var footerScale: CGFloat = 1
-    /// Multiplier on “by TierTap” branding.
+    /// Multiplier on bottom-right app-icon branding.
     var brandingScale: CGFloat = 1
     /// Nudges branding from its default bottom-trailing anchor (design space).
     var brandingOffset: CGPoint = .zero
@@ -364,7 +364,7 @@ private struct SessionArtLayout: Equatable {
     var underlayZoom: CGFloat = 1
     /// Pans the underlay in design space (pixels) after zoom.
     var underlayPan: CGPoint = .zero
-    /// When false, the “by TierTap” chip is omitted (some templates hide it).
+    /// When false, bottom-right branding is omitted (some templates hide it).
     var showBranding: Bool = true
     /// Which session label should be the large title in the header.
     var headerFocus: SessionArtHeaderFocus = .casino
@@ -2081,39 +2081,72 @@ private enum SessionArtRenderer {
     }
 
     private static func drawBranding(in size: CGSize, layout: SessionArtLayout, params: RenderParams, cg: CGContext) {
-        let text = "by TierTap" as NSString
+        guard layout.showBranding, let logoImage = tierTapLogoImage() else { return }
         let s = layoutScale(forCanvasWidth: size.width)
         let textScale = min(2.2, max(0.7, params.textScale))
-        let fontSize = fittedFontSize(
-            text: "by TierTap",
-            weight: .heavy,
-            targetWidth: size.width * 0.34,
-            minSize: 24 * s,
-            preferredSize: 44 * s * min(3, max(0.35, layout.brandingScale * textScale)),
-            maxSize: 120 * s
+        let brandingScale = min(3, max(0.35, layout.brandingScale * textScale))
+        let iconSide = min(
+            size.width * 0.2,
+            max(44 * s, (size.width * 0.115) * brandingScale)
         )
-        let font = styledFont(size: fontSize, weight: .semibold, style: params.fontStyle)
-        let textColor = resolvedTextColor(params)
-        let backgroundColor = resolvedTextBackgroundColor(params)
-        let attrs: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: textColor
-        ]
-        let tw = text.size(withAttributes: attrs).width
-        let pad: CGFloat = max(24, fontSize * 1.1)
-        let point = CGPoint(
-            x: size.width - tw - pad + layout.brandingOffset.x,
-            y: size.height - font.lineHeight - pad + layout.brandingOffset.y
-        )
-        let bgRect = CGRect(x: point.x - 12, y: point.y - 8, width: tw + 24, height: font.lineHeight + 16)
+        let pad = max(14 * s, iconSide * 0.24)
+        let iconRect = CGRect(
+            x: size.width - iconSide - pad + layout.brandingOffset.x,
+            y: size.height - iconSide - pad + layout.brandingOffset.y,
+            width: iconSide,
+            height: iconSide
+        ).integral
+
         if params.textBackgroundOpacity > 0.01 {
+            let backgroundColor = resolvedTextBackgroundColor(params)
+            let bgInset = max(5 * s, iconSide * 0.08)
+            let bgRect = iconRect.insetBy(dx: -bgInset, dy: -bgInset)
             cg.saveGState()
             cg.setFillColor(backgroundColor.cgColor)
-            cg.addPath(UIBezierPath(roundedRect: bgRect, cornerRadius: 10 * s).cgPath)
+            cg.addPath(UIBezierPath(roundedRect: bgRect, cornerRadius: iconSide * 0.22).cgPath)
             cg.fillPath()
             cg.restoreGState()
         }
-        text.draw(at: point, withAttributes: attrs)
+
+        let corner = iconSide * 0.22
+        let imageSize = logoImage.size
+        let imageAspect = imageSize.width / max(imageSize.height, 0.001)
+        let boxAspect = iconRect.width / max(iconRect.height, 0.001)
+        let drawRect: CGRect
+        if imageAspect > boxAspect {
+            let drawHeight = iconRect.width / max(imageAspect, 0.001)
+            drawRect = CGRect(
+                x: iconRect.minX,
+                y: iconRect.midY - (drawHeight * 0.5),
+                width: iconRect.width,
+                height: drawHeight
+            )
+        } else {
+            let drawWidth = iconRect.height * imageAspect
+            drawRect = CGRect(
+                x: iconRect.midX - (drawWidth * 0.5),
+                y: iconRect.minY,
+                width: drawWidth,
+                height: iconRect.height
+            )
+        }.integral
+
+        cg.saveGState()
+        cg.addPath(UIBezierPath(roundedRect: iconRect, cornerRadius: corner).cgPath)
+        cg.clip()
+        logoImage.draw(in: drawRect)
+        cg.restoreGState()
+    }
+
+    private static var cachedBrandingLogoImage: UIImage?
+
+    private static func tierTapLogoImage() -> UIImage? {
+        if let cachedBrandingLogoImage {
+            return cachedBrandingLogoImage
+        }
+        guard let image = UIImage(named: "TierTapLogo") else { return nil }
+        cachedBrandingLogoImage = image
+        return image
     }
 
     private static func drawFooterCaption(
