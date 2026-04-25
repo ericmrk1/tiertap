@@ -374,42 +374,51 @@ struct LiveNowCard: View {
                     .foregroundColor(.green)
                 Spacer(minLength: 0)
                 HStack(spacing: 6) {
-                    Button { showPrivateNotes = true } label: {
-                        Image(systemName: "note.text")
-                            .font(.caption.weight(.medium))
+                    VStack
+                    {
+                        HStack
+                        {
+                            Button { showPrivateNotes = true } label: {
+                                Image(systemName: "note.text")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundColor(.green)
+                                    .frame(width: 32, height: 28)
+                                    .background(Color(.systemGray6).opacity(0.3))
+                                    .cornerRadius(8)
+                            }
+                            .accessibilityLabel("Private notes")
+                            Button { showStrategyOdds = true } label: {
+                                Image(systemName: "info.circle")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundColor(.green)
+                                    .frame(width: 32, height: 28)
+                                    .background(Color(.systemGray6).opacity(0.3))
+                                    .cornerRadius(8)
+                            }
+                        }
+
+                        #if os(iOS)
+                        Button {
+                            liveSessionShareRef = PostCloseoutSessionRef(id: session.id)
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.caption.weight(.medium))
+                                L10nText("Share")
+                                    .font(.caption.weight(.medium))
+                            }
                             .foregroundColor(.green)
-                            .frame(width: 32, height: 28)
-                            .background(Color(.systemGray6).opacity(0.3))
-                            .cornerRadius(8)
-                    }
-                    .accessibilityLabel("Private notes")
-                    Button { showStrategyOdds = true } label: {
-                        Image(systemName: "info.circle")
-                            .font(.caption.weight(.medium))
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(Color(.systemGray6).opacity(0.3))
                             .cornerRadius(8)
-                    }
-                    #if os(iOS)
-                    Button {
-                        liveSessionShareRef = PostCloseoutSessionRef(id: session.id)
-                    } label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.caption.weight(.medium))
-                            L10nText("Share")
-                                .font(.caption.weight(.medium))
                         }
-                        .foregroundColor(.green)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color(.systemGray6).opacity(0.3))
-                        .cornerRadius(8)
+                        .accessibilityLabel("Share session")
+                        #endif
+                        
+                        
                     }
-                    .accessibilityLabel("Share session")
-                    #endif
+
                 }
             }
             .frame(maxHeight: .infinity)

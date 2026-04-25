@@ -62,16 +62,17 @@ struct LiveSessionView: View {
                             .padding(.vertical, 4)
 
                         HStack(spacing: 10) {
-                            Button { showPrivateNotes = true } label: {
-                                Image(systemName: "note.text")
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundColor(.green)
-                                    .frame(width: 44, height: 36)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .cornerRadius(10)
-                            }
-                            .accessibilityLabel("Private notes")
                             VStack(spacing: 8) {
+                                Button { showPrivateNotes = true } label: {
+                                    Image(systemName: "note.text")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundColor(.green)
+                                        .frame(width: 44, height: 36)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .cornerRadius(10)
+                                }
+                                .accessibilityLabel("Private notes")
+
                                 Button { showStrategyOdds = true } label: {
                                     L10nText("Info")
                                         .font(.subheadline.weight(.medium))

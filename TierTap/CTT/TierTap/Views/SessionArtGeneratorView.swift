@@ -1604,7 +1604,7 @@ private enum SessionArtRenderer {
             }
 
             drawHeader(params: params, layout: layout, in: canvas, cg: cg)
-            drawBranding(in: canvas, layout: layout, params: params, cg: cg)
+            drawBranding(in: canvas, layout: layout, params: params, cg: cg, sizeMultiplier: 2)
             drawFooterCaption(
                 params.footerCaption,
                 center: layout.footerCenter,
@@ -2089,11 +2089,17 @@ private enum SessionArtRenderer {
         }
     }
 
-    private static func drawBranding(in size: CGSize, layout: SessionArtLayout, params: RenderParams, cg: CGContext) {
+    private static func drawBranding(
+        in size: CGSize,
+        layout: SessionArtLayout,
+        params: RenderParams,
+        cg: CGContext,
+        sizeMultiplier: CGFloat = 1
+    ) {
         guard layout.showBranding, let logoImage = tierTapLogoImage() else { return }
         let s = layoutScale(forCanvasWidth: size.width)
         let textScale = min(2.2, max(0.7, params.textScale))
-        let brandingScale = min(3, max(0.35, layout.brandingScale * textScale))
+        let brandingScale = min(6, max(0.35, layout.brandingScale * textScale * sizeMultiplier))
         let iconSide = min(
             size.width * 0.2,
             max(44 * s, (size.width * 0.115) * brandingScale)
