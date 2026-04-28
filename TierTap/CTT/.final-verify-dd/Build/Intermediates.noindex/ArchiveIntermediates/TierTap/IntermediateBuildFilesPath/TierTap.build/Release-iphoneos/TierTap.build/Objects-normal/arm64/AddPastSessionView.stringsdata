@@ -1,0 +1,192 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AddPastSessionView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type of Game",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 257
+        }
+      },
+      {
+        "comment": "",
+        "key": "SB",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 308
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 310
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 310
+        }
+      },
+      {
+        "comment": "",
+        "key": "BB",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 323
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 323
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ante",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 336
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 336
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter casino name",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 431
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 448
+        }
+      },
+      {
+        "comment": "",
+        "key": "Public",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 451
+        }
+      },
+      {
+        "comment": "",
+        "key": "End",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 454
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose cash",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 498
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 498
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in (%@%@) exceeds your unit size (%@%lld). Consider lowering to stay within bankroll target.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 522
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 637
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld cash out",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 653
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash out or bet exceeds unit size (%@%lld). Set unit in Settings to match your bankroll plan.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 677
+        }
+      }
+    ]
+  },
+  "version": 1
+}

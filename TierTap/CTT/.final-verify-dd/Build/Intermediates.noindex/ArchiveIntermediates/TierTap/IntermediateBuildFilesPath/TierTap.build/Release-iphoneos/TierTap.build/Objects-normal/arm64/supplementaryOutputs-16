@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/TierTapApp.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap.swiftsourceinfo"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/Presence.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Presence.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Presence.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Presence.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Presence.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Presence.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/Push.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Push.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Push.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Push.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Push.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/Push.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/SourcePackages/checkouts/supabase-swift/Sources/Realtime/Deprecated/RealtimeChannel.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/RealtimeChannel.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/RealtimeChannel.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/RealtimeChannel.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/RealtimeChannel.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/Supabase.build/Debug-iphonesimulator/Realtime.build/Objects-normal/arm64/RealtimeChannel.swiftdeps"
+  }
+}

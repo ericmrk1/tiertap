@@ -18,19 +18,15 @@
 		2E255D4D2F61FAF900CAF0D7 /* cat_star_collect.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D472F61FAF900CAF0D7 /* cat_star_collect.wav */; };
 		2E255D4E2F61FAF900CAF0D7 /* boodoodaloop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */; };
 		2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */; };
-		2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */; };
 		2E9D7B8C2F621216004015F4 /* PhotoHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */; };
 		2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */; };
 		2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */; };
 		2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */; };
+		2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
-		UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */; };
-		UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */; };
-		UGPDFBUILD01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */; };
-		FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */; };
 		5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282155DBCB51F96C8840E98B /* SessionDetailView.swift */; };
 		667E48382A9F58F593FD6471 /* CasinoTimerWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */; };
@@ -38,13 +34,10 @@
 		821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89A89EFB8A3238E20A9044B /* SharedComponents.swift */; };
 		8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AACDC5094128715EAA64A9 /* LiveSessionView.swift */; };
 		8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692681C1D425214EB9F4B3A2 /* TierTapApp.swift */; };
-		APPLOCKSVC01B2C3D4E5F6A7B8C9D0 /* AppLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */; };
-		APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */; };
-		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
-		PCLOBLD02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */; };
-		SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */; };
 		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
+		APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */; };
+		APPLOCKSVC01B2C3D4E5F6A7B8C9D0 /* AppLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */; };
 		APRT1E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */; };
 		ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */; };
 		ARPTJ2E2F3A4B5C6D7E8F9A0B1 /* Airports.json in Resources */ = {isa = PBXBuildFile; fileRef = ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */; };
@@ -54,10 +47,6 @@
 		C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
 		CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */; };
 		CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
-		SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */; };
-		TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */; };
-		TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */; };
-		TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */; };
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
@@ -65,6 +54,7 @@
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
+		FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */; };
 		FMAP1E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */; };
 		GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */; };
 		GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */; };
@@ -75,6 +65,7 @@
 		L10NB4E2F3A4B5C6D7E8F9A0B1 /* Strings.json in Resources */ = {isa = PBXBuildFile; fileRef = L10NJS1E2F3A4B5C6D7E8F9A0B1 /* Strings.json */; };
 		LOC1E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */; };
 		MPCK1E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */; };
+		PCLOBLD02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */; };
 		PPCV1E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */; };
 		PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */; };
 		PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */; };
@@ -83,7 +74,9 @@
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
+		SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */; };
 		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
+		SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */; };
 		SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */; };
 		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
 		STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */; };
@@ -100,7 +93,14 @@
 		TRIPB1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */; };
 		TSCD1E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */; };
 		TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */; };
+		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
+		TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */; };
+		TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */; };
+		TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */; };
 		TWND2E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */; };
+		UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */; };
+		UGPDFBUILD01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */; };
+		UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */; };
 		VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */; };
 		WCH2E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */; };
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
@@ -110,7 +110,6 @@
 		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
-		WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -142,17 +141,6 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		WCHH1B2C3D4E5F6A7B8C9D0 /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-				WCHD1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -160,6 +148,10 @@
 		225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerLiveActivity.swift; sourceTree = "<group>"; };
 		282155DBCB51F96C8840E98B /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2E1876422F9FF5EC009D42A3 /* CasinoTimerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CasinoTimerWidget.entitlements; sourceTree = "<group>"; };
+		2E1876432FA0035C009D42A3 /* TierTap Watch AppRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch AppRelease.entitlements"; sourceTree = "<group>"; };
+		2E1876442FA00363009D42A3 /* CasinoTimerWidgetRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CasinoTimerWidgetRelease.entitlements; sourceTree = "<group>"; };
+		2E1876452FA0036A009D42A3 /* TierTapRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapRelease.entitlements; sourceTree = "<group>"; };
 		2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTap.entitlements; sourceTree = "<group>"; };
 		2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch App.entitlements"; sourceTree = "<group>"; };
 		2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCalendarView.swift; sourceTree = "<group>"; };
@@ -170,34 +162,25 @@
 		2E255D482F61FAF900CAF0D7 /* coins_clinking.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = coins_clinking.wav; sourceTree = "<group>"; };
 		2E255D492F61FAF900CAF0D7 /* victory_confetti.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory_confetti.wav; sourceTree = "<group>"; };
 		2E9D7B892F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChipEstimatorPhotoStorage.swift; sourceTree = "<group>"; };
-		2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompPhotoStorage.swift; sourceTree = "<group>"; };
 		2E9D7B8B2F621216004015F4 /* PhotoHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHelpers.swift; sourceTree = "<group>"; };
 		2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TierTapPaywallView 2.swift"; sourceTree = "<group>"; };
 		2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionStore 2.swift"; sourceTree = "<group>"; };
 		2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TierTapStoreKitConfig.storekit; sourceTree = "<group>"; };
+		2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompPhotoStorage.swift; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50E24F578992717D666E68F1 /* TierTap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TierTap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		528BE1A3C52FE346B3217D97 /* GamesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamesList.swift; sourceTree = "<group>"; };
-		SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotsList.swift; sourceTree = "<group>"; };
-		TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardWalletCardModels.swift; sourceTree = "<group>"; };
-		TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWalletView.swift; sourceTree = "<group>"; };
-		TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardProgramPicker.swift; sourceTree = "<group>"; };
 		59530A4B162B6150C3F88C1F /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CasinoTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
-		APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
-		APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockGateView.swift; sourceTree = "<group>"; };
-		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideContent.swift; sourceTree = "<group>"; };
-		UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideView.swift; sourceTree = "<group>"; };
-		UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuidePDFExporter.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
-		FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastCheckInBar.swift; sourceTree = "<group>"; };
 		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockGateView.swift; sourceTree = "<group>"; };
+		APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
 		APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportCatalog.swift; sourceTree = "<group>"; };
 		ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirlineCatalog.swift; sourceTree = "<group>"; };
 		ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Airports.json; sourceTree = "<group>"; };
@@ -215,8 +198,7 @@
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
 		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
 		F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseoutView.swift; sourceTree = "<group>"; };
-		PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCloseoutShareFlowView.swift; sourceTree = "<group>"; };
-		SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtGeneratorView.swift; sourceTree = "<group>"; };
+		FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastCheckInBar.swift; sourceTree = "<group>"; };
 		FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRouteMapView.swift; sourceTree = "<group>"; };
 		GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASupportSheet.swift; sourceTree = "<group>"; };
 		GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiRouterThrottle.swift; sourceTree = "<group>"; };
@@ -225,6 +207,7 @@
 		L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapLocalization.swift; sourceTree = "<group>"; };
 		LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPlacePickerView.swift; sourceTree = "<group>"; };
+		PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCloseoutShareFlowView.swift; sourceTree = "<group>"; };
 		PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoCaptureView.swift; sourceTree = "<group>"; };
 		PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfanityChecker.swift; sourceTree = "<group>"; };
 		PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ProfanityWords.txt; sourceTree = "<group>"; };
@@ -233,7 +216,9 @@
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
 		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtGeneratorView.swift; sourceTree = "<group>"; };
 		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
+		SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotsList.swift; sourceTree = "<group>"; };
 		SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMoodPickerView.swift; sourceTree = "<group>"; };
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyDatabase.swift; sourceTree = "<group>"; };
@@ -249,7 +234,14 @@
 		TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripsView.swift; sourceTree = "<group>"; };
 		TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareCardView.swift; sourceTree = "<group>"; };
 		TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripStore.swift; sourceTree = "<group>"; };
+		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
+		TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWalletView.swift; sourceTree = "<group>"; };
+		TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardWalletCardModels.swift; sourceTree = "<group>"; };
+		TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardProgramPicker.swift; sourceTree = "<group>"; };
 		TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMagicWandView.swift; sourceTree = "<group>"; };
+		UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideContent.swift; sourceTree = "<group>"; };
+		UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuidePDFExporter.swift; sourceTree = "<group>"; };
+		UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideView.swift; sourceTree = "<group>"; };
 		VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AdaptiveSheet.swift"; sourceTree = "<group>"; };
 		WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchApp.swift; sourceTree = "<group>"; };
 		WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
@@ -405,6 +397,8 @@
 		884F94035CBDFFAC738CD223 /* CasinoTimerWidget */ = {
 			isa = PBXGroup;
 			children = (
+				2E1876442FA00363009D42A3 /* CasinoTimerWidgetRelease.entitlements */,
+				2E1876422F9FF5EC009D42A3 /* CasinoTimerWidget.entitlements */,
 				E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */,
 				225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */,
 				4E7914876B5DF969011894CE /* Assets.xcassets */,
@@ -445,18 +439,10 @@
 			path = LiveActivity;
 			sourceTree = "<group>";
 		};
-		L10NGRP1E2F3A4B5C6D7E8F9A0B1 /* Localization */ = {
-			isa = PBXGroup;
-			children = (
-				L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */,
-				L10NJS1E2F3A4B5C6D7E8F9A0B1 /* Strings.json */,
-			);
-			path = Localization;
-			sourceTree = "<group>";
-		};
 		F83566B140DB1139A064E7D0 /* TierTap */ = {
 			isa = PBXGroup;
 			children = (
+				2E1876452FA0036A009D42A3 /* TierTapRelease.entitlements */,
 				L10NGRP1E2F3A4B5C6D7E8F9A0B1 /* Localization */,
 				2E255D112F5FC59400CAF0D7 /* Supabase Functions */,
 				2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */,
@@ -481,6 +467,15 @@
 			path = TierTap;
 			sourceTree = "<group>";
 		};
+		L10NGRP1E2F3A4B5C6D7E8F9A0B1 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */,
+				L10NJS1E2F3A4B5C6D7E8F9A0B1 /* Strings.json */,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
 		SYNC4E2F3A4B5C6D7E8F9A0B1 /* WatchConnectivity */ = {
 			isa = PBXGroup;
 			children = (
@@ -492,6 +487,7 @@
 		WCHF1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				2E1876432FA0035C009D42A3 /* TierTap Watch AppRelease.entitlements */,
 				2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */,
 				WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */,
 				WCH1E2F3A4B5C6D7E8F9A0B1 /* TierTapWatchApp.swift */,
@@ -538,7 +534,7 @@
 				07A8B920A559CAD0F825EFF2 /* Frameworks */,
 				06C4B56600D303C57A08BF3C /* Resources */,
 				5D476A1E66DB4661A15CD0C4 /* Embed Foundation Extensions */,
-				WCHH1B2C3D4E5F6A7B8C9D0 /* Embed Watch Content */,
+				E5BED00102C3D4E5F67890AB /* Copy Watch App into Watch folder */,
 				ICON1A2B3C4D5E6F7A8B9C0D1E2F /* Inject CFBundleIconName */,
 			);
 			buildRules = (
@@ -665,6 +661,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		E5BED00102C3D4E5F67890AB /* Copy Watch App into Watch folder */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/../$(CONFIGURATION)-watchos/TierTap Watch App.app/Info.plist",
+			);
+			name = "Copy Watch App into Watch folder";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)/Watch/TierTap Watch App.app/Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n# App Store Connect requires TierTap.app/Watch/<name>.app (not PlugIns).\nHOST=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\nDEST=\"${HOST}/Watch\"\nif [ \"${PLATFORM_NAME}\" != \"iphoneos\" ]; then\n  # Keep simulator installs valid: remove any placeholder/stale Watch payload.\n  rm -rf \"${DEST}\"\n  exit 0\nfi\nPRODUCTS_ROOT=\"$(dirname \"${CONFIGURATION_BUILD_DIR}\")\"\nWATCH_SRC=\"${PRODUCTS_ROOT}/${CONFIGURATION}-watchos/TierTap Watch App.app\"\nif [ ! -d \"${WATCH_SRC}\" ]; then\n  echo \"error: Watch app not found at ${WATCH_SRC}\" >&2\n  exit 1\nfi\nmkdir -p \"${DEST}\"\nrm -rf \"${DEST}/TierTap Watch App.app\"\nditto \"${WATCH_SRC}\" \"${DEST}/TierTap Watch App.app\"\n";
+		};
 		ICON1A2B3C4D5E6F7A8B9C0D1E2F /* Inject CFBundleIconName */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -863,13 +879,14 @@
 		7020EA4632D367D3B9FEC0D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CasinoTimerWidget/CasinoTimerWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CasinoTimerWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTapWidget;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.CasinoTimerWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -892,10 +909,11 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSET_CATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSET_CATALOG_COMPILER_OPTIMIZATION = space;
-				CODE_SIGN_ENTITLEMENTS = TierTap/TierTap.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TierTap/TierTapRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TierTap/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTap;
@@ -986,13 +1004,14 @@
 		B6595FEB3DD1557C76FCF2B2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CasinoTimerWidget/CasinoTimerWidgetRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CasinoTimerWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTapWidget;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.CasinoTimerWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1020,6 +1039,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TierTap/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = TierTap;
@@ -1063,7 +1083,7 @@
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.app.tiertap;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1079,7 +1099,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "TierTap Watch App/TierTap Watch App.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "TierTap Watch App/TierTap Watch AppRelease.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1089,7 +1109,7 @@
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.app.tiertap;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

@@ -1,0 +1,24 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CasinoLocationPickerView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 56
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. 89109 or 123 Main St",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 79
+        }
+      }
+    ]
+  },
+  "version": 1
+}

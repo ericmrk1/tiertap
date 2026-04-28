@@ -42,6 +42,17 @@ private let keyAppLanguage = "ctt_app_language"
 private let keyAppLockEnabled = "ctt_app_lock_enabled"
 private let keyAppLockAuthMethod = "ctt_app_lock_auth_method"
 private let keyAppLockPinModeLegacy = "ctt_app_lock_pin_mode"
+private let keySessionRemindersEnabled = "ctt_session_reminders_enabled"
+private let keySessionReminderFrequencyMinutes = "ctt_session_reminder_frequency_minutes"
+private let keySessionReminderMessagePreset = "ctt_session_reminder_message_preset"
+private let keySessionReminderCustomMessage = "ctt_session_reminder_custom_message"
+private let keySessionReminderIncludeSessionStats = "ctt_session_reminder_include_session_stats"
+private let keyWatchHapticsEnabled = "ctt_watch_haptics_enabled"
+private let keyWatchHapticProfile = "ctt_watch_haptic_profile"
+private let keyWatchSessionPulseEnabled = "ctt_watch_session_pulse_enabled"
+private let keyWatchSessionPulseMinutes = "ctt_watch_session_pulse_minutes"
+private let keyWatchWristRaiseSummaryEnabled = "ctt_watch_wrist_raise_summary_enabled"
+private let keyWatchQuickAction = "ctt_watch_quick_action"
 private let appGroupSuiteName = "group.com.app.tiertap"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
@@ -194,6 +205,15 @@ struct BankrollResetEvent: Codable, Equatable {
 }
 
 final class SettingsStore: ObservableObject {
+    static let sessionReminderMessageOptions: [String] = [
+        "Take a break.",
+        "Quit while you're ahead.",
+        "Protect your bankroll.",
+        "Stick to your unit size.",
+        "Stay disciplined and avoid tilt.",
+        "Set a stop-loss and honor it."
+    ]
+
     @Published var bankroll: Int {
         didSet { UserDefaults.standard.set(bankroll, forKey: keyBankroll) }
     }
@@ -514,6 +534,120 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(appLockAuthMethod.rawValue, forKey: keyAppLockAuthMethod) }
     }
 
+    /// When true, local notifications are sent at a fixed cadence during active live sessions.
+    @Published var sessionRemindersEnabled: Bool {
+        didSet { UserDefaults.standard.set(sessionRemindersEnabled, forKey: keySessionRemindersEnabled) }
+    }
+
+    /// Reminder cadence in minutes for live-session notifications (minimum 1 minute).
+    @Published var sessionReminderFrequencyMinutes: Int {
+        didSet {
+            let clamped = max(1, sessionReminderFrequencyMinutes)
+            if clamped != sessionReminderFrequencyMinutes {
+                sessionReminderFrequencyMinutes = clamped
+                return
+            }
+            UserDefaults.standard.set(clamped, forKey: keySessionReminderFrequencyMinutes)
+        }
+    }
+
+    /// Selected canned line appended to Play Reminder notifications.
+    @Published var sessionReminderMessagePreset: String {
+        didSet {
+            let value = sessionReminderMessagePreset.trimmingCharacters(in: .whitespacesAndNewlines)
+            let fallback = Self.sessionReminderMessageOptions.first ?? "Take a break."
+            let normalized = Self.sessionReminderMessageOptions.contains(value) ? value : fallback
+            if normalized != sessionReminderMessagePreset {
+                sessionReminderMessagePreset = normalized
+                return
+            }
+            UserDefaults.standard.set(normalized, forKey: keySessionReminderMessagePreset)
+        }
+    }
+
+    /// Optional freeform line appended after the selected reminder message.
+    @Published var sessionReminderCustomMessage: String {
+        didSet {
+            let trimmed = sessionReminderCustomMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed != sessionReminderCustomMessage {
+                sessionReminderCustomMessage = trimmed
+                return
+            }
+            if trimmed.isEmpty {
+                UserDefaults.standard.removeObject(forKey: keySessionReminderCustomMessage)
+            } else {
+                UserDefaults.standard.set(trimmed, forKey: keySessionReminderCustomMessage)
+            }
+        }
+    }
+
+    /// When true, reminder notifications append live-session stats (buy-in, comps, tier, etc.).
+    @Published var sessionReminderIncludeSessionStats: Bool {
+        didSet { UserDefaults.standard.set(sessionReminderIncludeSessionStats, forKey: keySessionReminderIncludeSessionStats) }
+    }
+
+    enum WatchHapticProfile: String, CaseIterable, Identifiable, Codable {
+        case classic
+        case subtle
+        case assertive
+        var id: String { rawValue }
+    }
+
+    enum WatchQuickAction: String, CaseIterable, Identifiable, Codable {
+        case addBuyIn
+        case addComp
+        case updateTier
+        case stopSession
+        var id: String { rawValue }
+    }
+
+    @Published var watchHapticsEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
+        }
+    }
+
+    @Published var watchHapticProfile: WatchHapticProfile {
+        didSet {
+            UserDefaults.standard.set(watchHapticProfile.rawValue, forKey: keyWatchHapticProfile)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchHapticProfile.rawValue, forKey: keyWatchHapticProfile)
+        }
+    }
+
+    @Published var watchSessionPulseEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(watchSessionPulseEnabled, forKey: keyWatchSessionPulseEnabled)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchSessionPulseEnabled, forKey: keyWatchSessionPulseEnabled)
+        }
+    }
+
+    @Published var watchSessionPulseMinutes: Int {
+        didSet {
+            let clamped = max(1, watchSessionPulseMinutes)
+            if clamped != watchSessionPulseMinutes {
+                watchSessionPulseMinutes = clamped
+                return
+            }
+            UserDefaults.standard.set(clamped, forKey: keyWatchSessionPulseMinutes)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(clamped, forKey: keyWatchSessionPulseMinutes)
+        }
+    }
+
+    @Published var watchWristRaiseSummaryEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
+        }
+    }
+
+    @Published var watchQuickAction: WatchQuickAction {
+        didSet {
+            UserDefaults.standard.set(watchQuickAction.rawValue, forKey: keyWatchQuickAction)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchQuickAction.rawValue, forKey: keyWatchQuickAction)
+        }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -651,6 +785,56 @@ final class SettingsStore: ObservableObject {
         } else {
             self.appLockAuthMethod = .faceID
         }
+        if UserDefaults.standard.object(forKey: keySessionRemindersEnabled) != nil {
+            self.sessionRemindersEnabled = UserDefaults.standard.bool(forKey: keySessionRemindersEnabled)
+        } else {
+            self.sessionRemindersEnabled = false
+        }
+        let storedReminderFrequency = UserDefaults.standard.integer(forKey: keySessionReminderFrequencyMinutes)
+        self.sessionReminderFrequencyMinutes = max(1, storedReminderFrequency > 0 ? storedReminderFrequency : 30)
+        let storedReminderPreset = UserDefaults.standard.string(forKey: keySessionReminderMessagePreset)
+        let fallbackReminderPreset = Self.sessionReminderMessageOptions.first ?? "Take a break."
+        if let storedReminderPreset, Self.sessionReminderMessageOptions.contains(storedReminderPreset) {
+            self.sessionReminderMessagePreset = storedReminderPreset
+        } else {
+            self.sessionReminderMessagePreset = fallbackReminderPreset
+        }
+        self.sessionReminderCustomMessage = UserDefaults.standard.string(forKey: keySessionReminderCustomMessage)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if UserDefaults.standard.object(forKey: keySessionReminderIncludeSessionStats) != nil {
+            self.sessionReminderIncludeSessionStats = UserDefaults.standard.bool(forKey: keySessionReminderIncludeSessionStats)
+        } else {
+            self.sessionReminderIncludeSessionStats = true
+        }
+        if UserDefaults.standard.object(forKey: keyWatchHapticsEnabled) != nil {
+            self.watchHapticsEnabled = UserDefaults.standard.bool(forKey: keyWatchHapticsEnabled)
+        } else {
+            self.watchHapticsEnabled = true
+        }
+        if let raw = UserDefaults.standard.string(forKey: keyWatchHapticProfile),
+           let profile = WatchHapticProfile(rawValue: raw) {
+            self.watchHapticProfile = profile
+        } else {
+            self.watchHapticProfile = .classic
+        }
+        if UserDefaults.standard.object(forKey: keyWatchSessionPulseEnabled) != nil {
+            self.watchSessionPulseEnabled = UserDefaults.standard.bool(forKey: keyWatchSessionPulseEnabled)
+        } else {
+            self.watchSessionPulseEnabled = true
+        }
+        let storedPulseMinutes = UserDefaults.standard.integer(forKey: keyWatchSessionPulseMinutes)
+        self.watchSessionPulseMinutes = max(1, storedPulseMinutes > 0 ? storedPulseMinutes : 20)
+        if UserDefaults.standard.object(forKey: keyWatchWristRaiseSummaryEnabled) != nil {
+            self.watchWristRaiseSummaryEnabled = UserDefaults.standard.bool(forKey: keyWatchWristRaiseSummaryEnabled)
+        } else {
+            self.watchWristRaiseSummaryEnabled = true
+        }
+        if let raw = UserDefaults.standard.string(forKey: keyWatchQuickAction),
+           let quick = WatchQuickAction(rawValue: raw) {
+            self.watchQuickAction = quick
+        } else {
+            self.watchQuickAction = .addBuyIn
+        }
         if UserDefaults.standard.object(forKey: keyAppLockPinModeLegacy) != nil {
             AppLockPINLegacy.clearFromKeychain()
             UserDefaults.standard.removeObject(forKey: keyAppLockPinModeLegacy)
@@ -692,6 +876,12 @@ final class SettingsStore: ObservableObject {
         }
 
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.appLanguage.rawValue, forKey: keyAppLanguage)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticProfile.rawValue, forKey: keyWatchHapticProfile)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseEnabled, forKey: keyWatchSessionPulseEnabled)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseMinutes, forKey: keyWatchSessionPulseMinutes)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchQuickAction.rawValue, forKey: keyWatchQuickAction)
     }
 
     /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).

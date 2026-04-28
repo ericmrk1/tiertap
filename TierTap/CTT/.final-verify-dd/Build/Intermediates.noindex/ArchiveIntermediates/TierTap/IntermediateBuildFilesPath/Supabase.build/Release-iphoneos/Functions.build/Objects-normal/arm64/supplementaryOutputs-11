@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/SourcePackages/checkouts/supabase-swift/Sources/Functions/Exports.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Functions.build/Objects-normal/arm64/Functions.swiftsourceinfo"
+  }
+}

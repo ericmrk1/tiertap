@@ -33,6 +33,19 @@ class LiveActivityManager {
         Task { await a.update(ActivityContent(state: state, staleDate: nil)) }
     }
 
+    func update(for session: Session) {
+        guard let a = currentActivity else { return }
+        let state = TimerActivityAttributes.ContentState(
+            startTime: session.startTime,
+            casino: session.casino,
+            game: session.game,
+            totalBuyIn: session.totalBuyIn,
+            startingTierPoints: session.startingTierPoints,
+            rewardsProgramName: session.rewardsProgramName
+        )
+        Task { await a.update(ActivityContent(state: state, staleDate: nil)) }
+    }
+
     func end() {
         Task { await currentActivity?.end(dismissalPolicy: .immediate); currentActivity = nil }
     }

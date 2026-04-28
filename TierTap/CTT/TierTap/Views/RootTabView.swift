@@ -56,6 +56,9 @@ struct RootTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .sessionMoodDownswingNeedsGASupport)) { _ in
             showGASupportFromMoodDownswing = true
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSessionsTabFromDeepLink"))) { _ in
+            selectedTab = .sessions
+        }
         #if os(iOS)
         .adaptiveSheet(isPresented: $showGASupportFromMoodDownswing) {
             GASupportSheet(onDismiss: {

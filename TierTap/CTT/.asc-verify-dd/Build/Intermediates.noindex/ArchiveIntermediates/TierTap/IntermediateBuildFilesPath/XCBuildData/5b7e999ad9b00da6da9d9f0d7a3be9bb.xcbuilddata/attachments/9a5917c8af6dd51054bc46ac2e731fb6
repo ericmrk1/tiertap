@@ -1,0 +1,51 @@
+{
+  "" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.dia",
+    "emit-module-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary-emit-module.dia",
+    "pch" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/AnyClock.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/AnyClock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/AnyClock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/AnyClock.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/ImmediateClock.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/ImmediateClock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/ImmediateClock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/ImmediateClock.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/Internal/Lock.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Lock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Lock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Lock.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/Internal/_AsyncTimerSequence.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/_AsyncTimerSequence.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/_AsyncTimerSequence.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/_AsyncTimerSequence.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/SwiftUI.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/SwiftUI.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/SwiftUI.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/SwiftUI.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/TestClock.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/TestClock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/TestClock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/TestClock.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/Timer.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Timer.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Timer.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Timer.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/UnimplementedClock.swift" : {
+    "index-unit-output-path" : "/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/UnimplementedClock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/UnimplementedClock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/UnimplementedClock.o"
+  }
+}

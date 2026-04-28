@@ -1,0 +1,56 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/CasinoTimerWidget/CasinoTimerLiveActivity.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Starting tier %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total buy-in $%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "LIVE SESSION",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 22
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "In $%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap · live",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 94
+        }
+      }
+    ]
+  },
+  "version": 1
+}

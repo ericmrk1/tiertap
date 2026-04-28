@@ -1,0 +1,344 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchLiveView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Fast close out session?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Last sync %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 173
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 188
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will end the live session immediately using default close-out values.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 195
+        }
+      },
+      {
+        "comment": "",
+        "key": "+",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start session?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 347
+        }
+      },
+      {
+        "comment": "",
+        "key": "Options execute on iPhone history; unavailable categories are ignored.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "Confirm fast start using your most recent template for this game category.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add buy-in?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current total: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 432
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 435
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed total: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 437
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom amount",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 448
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Buy-In",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 453
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 496
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 469
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 470
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add $%lld buy-in? New total will be $%lld.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 480
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add comp?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 584
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current comps: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 547
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 550
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed comps: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 552
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom comp",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 563
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details (optional)",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 568
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Comp",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 569
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 614
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 585
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 586
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add $%lld comp? New comp total will be $%lld.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 598
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update tier points?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 700
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current tier: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 664
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add points: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 667
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed tier: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 669
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom points",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 680
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update Tier",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 685
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 731
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 701
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 702
+        }
+      },
+      {
+        "comment": "",
+        "key": "Set current tier points to %lld?",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 712
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,400 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionArtGeneratorView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Preview text",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 2606
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preview",
+        "location": {
+          "startingColumn": 69,
+          "startingLine": 2606
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2610
+        }
+      },
+      {
+        "comment": "",
+        "key": "Template group",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2678
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ preset%@",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 3068
+        }
+      },
+      {
+        "comment": "",
+        "key": "Font",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2784
+        }
+      },
+      {
+        "comment": "",
+        "key": "Scale",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2815
+        }
+      },
+      {
+        "comment": "",
+        "key": "Applies to text background only",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 2849
+        }
+      },
+      {
+        "comment": "",
+        "key": "Font background opacity",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2839
+        }
+      },
+      {
+        "comment": "",
+        "key": "Same story as Share in History (Tools): edit before sending.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2904
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share text",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 2928
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share media",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 2940
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 2995
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating overlay...",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 2988
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating image...",
+        "location": {
+          "startingColumn": 73,
+          "startingLine": 2988
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session Art",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 3446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 3454
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session not found.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 3393
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 3427
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel render",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 3430
+        }
+      },
+      {
+        "comment": "",
+        "key": "Back",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 3450
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3458
+        }
+      },
+      {
+        "comment": "",
+        "key": "Story text matches History → Tools → Share sessions (plain text).",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3577
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include buy-in, cash-out, and result lines",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3580
+        }
+      },
+      {
+        "comment": "",
+        "key": "Output",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3591
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3594
+        }
+      },
+      {
+        "comment": "",
+        "key": "Style",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3605
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3608
+        }
+      },
+      {
+        "comment": "",
+        "key": "Metrics & optional footnote",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 3628
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose what appears on session art (tap to expand)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 3631
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include on the image",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3663
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier / hour",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3666
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in & cash-out",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3669
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish wins / losses",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3672
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp details",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 3675
+        }
+      },
+      {
+        "comment": "",
+        "key": "Extra footnote on the image",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3687
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. 🔥 heater · booked win",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 3690
+        }
+      },
+      {
+        "comment": "",
+        "key": "Underlay photo",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3702
+        }
+      },
+      {
+        "comment": "",
+        "key": "Upload a picture",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 3749
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove uploaded picture",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 3762
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear selected underlay",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 3773
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo used for image export",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3785
+        }
+      },
+      {
+        "comment": "",
+        "key": "No underlay selected yet.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 3804
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share media (image or video)",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 3820
+        }
+      },
+      {
+        "comment": "",
+        "key": "No video selected. Share will export a single image.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 3860
+        }
+      },
+      {
+        "comment": "",
+        "key": "Video mode is active. Share will export a new video with your selected template, fonts, and metrics overlaid.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 3856
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use a video instead of image",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 3829
+        }
+      },
+      {
+        "comment": "",
+        "key": "Replace selected video",
+        "location": {
+          "startingColumn": 87,
+          "startingLine": 3829
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 3847
+        }
+      }
+    ]
+  },
+  "version": 1
+}

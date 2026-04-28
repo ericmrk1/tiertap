@@ -1,0 +1,61 @@
+{
+  "" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.dia",
+    "emit-module-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary-emit-module.dia",
+    "pch" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GeneratedAssetSymbols.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GeneratedAssetSymbols.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/TierTapWatchApp.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapWatchApp.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapWatchApp.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapWatchApp.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchContentView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchContentView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchContentView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchContentView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchLiveView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchLiveView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchLiveView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchLiveView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchStartView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchStartView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchStartView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/WatchStartView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Localization/TierTapLocalization.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapLocalization.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapLocalization.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTapLocalization.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/GamesList.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GamesList.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GamesList.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/GamesList.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/Session.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/Session.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/Session.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/Session.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/SessionStore.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionStore.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionStore.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionStore.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/WatchConnectivity/SessionSyncManager.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionSyncManager.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionSyncManager.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/SessionSyncManager.o"
+  }
+}

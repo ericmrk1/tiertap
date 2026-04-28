@@ -1,0 +1,360 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CheckInView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Slot game scan",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 745
+        }
+      },
+      {
+        "comment": "",
+        "key": "Active Session",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 769
+        }
+      },
+      {
+        "comment": "",
+        "key": "Scanning slot machine for game name…",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 170
+        }
+      },
+      {
+        "comment": "",
+        "key": "Scan slot game name",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type of Game",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 234
+        }
+      },
+      {
+        "comment": "",
+        "key": "SB",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 286
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 288
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 288
+        }
+      },
+      {
+        "comment": "",
+        "key": "BB",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 299
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 301
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 301
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ante",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "-",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 314
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 81,
+          "startingLine": 314
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$2",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 325
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$3",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 337
+        }
+      },
+      {
+        "comment": "",
+        "key": "$2/$5",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "$5/$10",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 361
+        }
+      },
+      {
+        "comment": "",
+        "key": "$10/$20",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 373
+        }
+      },
+      {
+        "comment": "",
+        "key": "$20/$40",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 385
+        }
+      },
+      {
+        "comment": "",
+        "key": "$40/$80",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 397
+        }
+      },
+      {
+        "comment": "",
+        "key": "$100/$200",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 409
+        }
+      },
+      {
+        "comment": "",
+        "key": "$200/$400",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 421
+        }
+      },
+      {
+        "comment": "",
+        "key": "$300/$600",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 433
+        }
+      },
+      {
+        "comment": "",
+        "key": "$400/$800",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 445
+        }
+      },
+      {
+        "comment": "",
+        "key": "$500/$1000",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 457
+        }
+      },
+      {
+        "comment": "",
+        "key": "$1/$3/$5",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 469
+        }
+      },
+      {
+        "comment": "",
+        "key": "Level mins",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 485
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting stack",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 488
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cost",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 491
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter casino name",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 530
+        }
+      },
+      {
+        "comment": "",
+        "key": "Public",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private",
+        "location": {
+          "startingColumn": 70,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose cash",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 586
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@",
+        "location": {
+          "startingColumn": 77,
+          "startingLine": 586
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in (%@%@) exceeds your unit size (%@%lld). Consider lowering to stay within bankroll target.",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 610
+        }
+      },
+      {
+        "comment": "",
+        "key": "Slot game photo",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 680
+        }
+      },
+      {
+        "comment": "",
+        "key": "Capture the slot machine title and TierTap will try to fill in the game name.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 683
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 713
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 749
+        }
+      },
+      {
+        "comment": "",
+        "key": "Resume Existing",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 770
+        }
+      },
+      {
+        "comment": "",
+        "key": "End & Start New",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 771
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 782
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start anyway",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 783
+        }
+      }
+    ]
+  },
+  "version": 1
+}

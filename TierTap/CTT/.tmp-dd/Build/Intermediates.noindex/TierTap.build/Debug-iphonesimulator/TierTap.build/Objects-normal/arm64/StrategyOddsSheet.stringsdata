@@ -1,0 +1,48 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StrategyOddsSheet.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Strategy / Odds",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ — Strategy / Odds",
+        "location": {
+          "startingColumn": 69,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "No strategy summary is available for \"%@\" in this app. For rules, strategy, and current odds, search for your game in strategy guides, books, or reputable gambling-research sources.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wikipedia: %@",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 61
+        }
+      }
+    ]
+  },
+  "version": 1
+}

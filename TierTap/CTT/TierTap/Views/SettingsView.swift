@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var isSessionsExpanded: Bool = false
     @State private var isFavoritesExpanded: Bool = false
     @State private var isThemeExpanded: Bool = false
+    @State private var isWatchExperienceExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
     @State private var isTierTapAIExpanded: Bool = false
@@ -36,6 +37,7 @@ struct SettingsView: View {
     @State private var exportGameCategory: SessionGameCategory = .table
     @State private var showDenominationDialPad = false
     @State private var denominationDialPadDraft = ""
+    @State private var showSessionReminderSettings = false
 
     var body: some View {
         NavigationStack {
@@ -50,6 +52,7 @@ struct SettingsView: View {
                         favoritesSection
                         sessionsSection
                         themeSection
+                        watchExperienceSection
                         tierTapAISection
                         dataExportSection
                     }
@@ -135,6 +138,11 @@ struct SettingsView: View {
                     .environmentObject(subscriptionStore)
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
+            }
+            .adaptiveSheet(isPresented: $showSessionReminderSettings) {
+                SessionReminderSettingsSheet()
+                    .environmentObject(settingsStore)
+                    .environmentObject(sessionStore)
             }
         }
     }
@@ -244,6 +252,40 @@ struct SettingsView: View {
                     .tint(.green)
                 L10nText("When on, after saving a session you’ll see a grid to pick how the session felt (e.g. Great, Tilt). When off, the mood step is skipped.")
                     .font(.caption)
+                    .foregroundColor(.gray)
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                Button {
+                    showSessionReminderSettings = true
+                } label: {
+                    HStack {
+                        Image(systemName: "bell.fill")
+                        L10nText("Play Reminders")
+                            .font(.subheadline.bold())
+                        Spacer()
+                        if settingsStore.sessionRemindersEnabled {
+                            Text("Every \(settingsStore.sessionReminderFrequencyMinutes)m")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        } else {
+                            L10nText("Off")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+                L10nText("Play Reminders are scheduled when a live session starts, resumes, and while syncing state.")
+                    .font(.caption2)
                     .foregroundColor(.gray)
             }
         }
@@ -771,6 +813,59 @@ struct SettingsView: View {
         }
     }
 
+    private var watchExperienceSection: some View {
+        SettingsSection(
+            title: "Watch Experience",
+            systemImage: "applewatch",
+            isExpanded: $isWatchExperienceExpanded
+        ) {
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle("Watch haptics", isOn: $settingsStore.watchHapticsEnabled)
+                    .tint(.green)
+                Picker("Haptic profile", selection: $settingsStore.watchHapticProfile) {
+                    Text("Classic").tag(SettingsStore.WatchHapticProfile.classic)
+                    Text("Subtle").tag(SettingsStore.WatchHapticProfile.subtle)
+                    Text("Assertive").tag(SettingsStore.WatchHapticProfile.assertive)
+                }
+                .pickerStyle(.segmented)
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                Toggle("Session pulse reminders (watch)", isOn: $settingsStore.watchSessionPulseEnabled)
+                    .tint(.green)
+                InputRow(
+                    label: "Pulse every minutes",
+                    placeholder: "20",
+                    value: Binding(
+                        get: { "\(settingsStore.watchSessionPulseMinutes)" },
+                        set: { new in
+                            let value = Int(new.filter { $0.isNumber }) ?? 20
+                            settingsStore.watchSessionPulseMinutes = max(1, value)
+                        }
+                    ),
+                    dialPadNavigationTitle: "Pulse frequency"
+                )
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                Toggle("Wrist-raise live summary", isOn: $settingsStore.watchWristRaiseSummaryEnabled)
+                    .tint(.green)
+
+                Picker("Default quick action tile", selection: $settingsStore.watchQuickAction) {
+                    Text("Add Buy-In").tag(SettingsStore.WatchQuickAction.addBuyIn)
+                    Text("Add Comp").tag(SettingsStore.WatchQuickAction.addComp)
+                    Text("Update Tier").tag(SettingsStore.WatchQuickAction.updateTier)
+                    Text("Stop Session").tag(SettingsStore.WatchQuickAction.stopSession)
+                }
+                .pickerStyle(.menu)
+
+                Text("These controls sync to Apple Watch and customize haptics, pulse nudges, wrist-raise summary cards, and quick action defaults.")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+
     // MARK: - Theme presets helpers
 
     private func applyThemePreset(_ preset: ThemePreset) {
@@ -1131,6 +1226,110 @@ private struct SettingsSection<Content: View>: View {
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(16)
+    }
+}
+
+struct SessionReminderSettingsSheet: View {
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var sessionStore: SessionStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var reminderMinutesText: String = ""
+    @State private var customReminderMessageText: String = ""
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(alignment: .leading, spacing: 16) {
+                    Toggle(isOn: $settingsStore.sessionRemindersEnabled) {
+                        L10nText("Play Reminders")
+                    }
+                    .tint(.green)
+                    .onChange(of: settingsStore.sessionRemindersEnabled) { newValue in
+                        if newValue {
+                            SessionReminderScheduler.shared.primeAuthorizationWhenRemindersEnabled()
+                        }
+                        SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+                    }
+
+                    L10nText("Reminder frequency (minutes)")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    NumericEntryWithDialPad(
+                        placeholder: "30",
+                        text: $reminderMinutesText,
+                        dialPadNavigationTitle: "Reminder frequency"
+                    )
+                    .onChange(of: reminderMinutesText) { new in
+                        let digits = new.filter { $0.isNumber }
+                        if digits != new {
+                            reminderMinutesText = digits
+                            return
+                        }
+                        let value = Int(digits) ?? 0
+                        settingsStore.sessionReminderFrequencyMinutes = max(1, value)
+                        SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+                    }
+
+                    L10nText("Reminder message")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    Picker("Reminder message", selection: $settingsStore.sessionReminderMessagePreset) {
+                        ForEach(SettingsStore.sessionReminderMessageOptions, id: \.self) { option in
+                            Text(option).tag(option)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: settingsStore.sessionReminderMessagePreset) { _ in
+                        SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+                    }
+
+                    Toggle(isOn: $settingsStore.sessionReminderIncludeSessionStats) {
+                        L10nText("Include session stats")
+                    }
+                    .tint(.green)
+                    .onChange(of: settingsStore.sessionReminderIncludeSessionStats) { _ in
+                        SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+                    }
+
+                    TextField("Optional custom reminder message", text: $customReminderMessageText)
+                        .textFieldStyle(DarkTextFieldStyle())
+                    .onChange(of: customReminderMessageText) { new in
+                        settingsStore.sessionReminderCustomMessage = new
+                        SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+                    }
+
+                    L10nText("When enabled, TierTap sends local notifications every set interval while a live session is running (e.g. 20, 40, 60 minutes).")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+
+                    L10nText("Turn Play Reminders on once and allow notifications so TierTap appears under **Settings → Notifications** (Simulator may hide apps until permission is requested).")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+
+                    Spacer()
+                }
+                .padding()
+            }
+            .localizedNavigationTitle("Play Reminders")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(.green)
+                }
+            }
+            .onAppear {
+                reminderMinutesText = "\(settingsStore.sessionReminderFrequencyMinutes)"
+                customReminderMessageText = settingsStore.sessionReminderCustomMessage
+                SessionReminderScheduler.shared.primeAuthorizationWhenRemindersEnabled()
+                SessionReminderScheduler.shared.refresh(liveSession: sessionStore.liveSession)
+            }
+        }
     }
 }
 

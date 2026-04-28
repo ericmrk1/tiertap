@@ -1,0 +1,44 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/ChipEstimatorPhotoStorage.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/CompPhotoStorage.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CompPhotoStorage.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CompPhotoStorage.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CompPhotoStorage.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CompPhotoStorage.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CompPhotoStorage.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AddPastSessionView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AddPastSessionView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AddPastSessionView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AddPastSessionView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AddPastSessionView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AddPastSessionView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/BankrollView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/BankrollView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/BankrollView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/BankrollView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/BankrollView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/BankrollView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RewardProgramPicker.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardProgramPicker.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardProgramPicker.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardProgramPicker.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardProgramPicker.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardProgramPicker.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapWalletView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.swiftdeps"
+  }
+}

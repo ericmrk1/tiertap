@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/supabase-swift/Sources/Realtime/CallbackManager.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/Realtime.build/Objects-normal/arm64/Realtime.swiftsourceinfo"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripMagicWandView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start over",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 196
+        }
+      },
+      {
+        "comment": "",
+        "key": "Working…",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 305
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generate trip ideas",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 305
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include when saving",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trip title (optional)",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 429
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ – %@",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 394
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 465
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 474
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary place name",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 504
+        }
+      },
+      {
+        "comment": "",
+        "key": "City or venue (or use Search map)",
+        "location": {
+          "startingColumn": 64,
+          "startingLine": 504
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld session%@",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 543
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%lld more",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 568
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add %lld trip%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 586
+        }
+      }
+    ]
+  },
+  "version": 1
+}

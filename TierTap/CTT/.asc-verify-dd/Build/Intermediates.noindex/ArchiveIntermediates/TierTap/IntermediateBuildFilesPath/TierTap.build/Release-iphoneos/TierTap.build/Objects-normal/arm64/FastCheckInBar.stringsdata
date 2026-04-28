@@ -1,0 +1,56 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/FastCheckInBar.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Active Session",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 398
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 377
+        }
+      },
+      {
+        "comment": "",
+        "key": "Resume Existing",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 399
+        }
+      },
+      {
+        "comment": "",
+        "key": "End & Start New",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 402
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start anyway",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 418
+        }
+      }
+    ]
+  },
+  "version": 1
+}

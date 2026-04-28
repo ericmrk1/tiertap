@@ -1,0 +1,104 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Delete this trip?",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 138
+        }
+      },
+      {
+        "comment": "",
+        "key": "New trip",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 178
+        }
+      },
+      {
+        "comment": "",
+        "key": "Suggest trips with AI",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 145
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "“%@” will be removed. Trip photos stored on this device will be deleted.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 156
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ trips",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 282
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collapse section",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 283
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expand section",
+        "location": {
+          "startingColumn": 60,
+          "startingLine": 283
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trips ending %@",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 326
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collapse month",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 327
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expand month",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 327
+        }
+      }
+    ]
+  },
+  "version": 1
+}

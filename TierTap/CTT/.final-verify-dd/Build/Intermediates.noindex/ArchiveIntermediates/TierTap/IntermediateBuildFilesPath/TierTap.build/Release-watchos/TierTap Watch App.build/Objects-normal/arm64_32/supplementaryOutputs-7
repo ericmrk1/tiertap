@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/TierTapWatchApp.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap_Watch_App.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap Watch App-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap_Watch_App-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap_Watch_App.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap_Watch_App.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-watchos/TierTap Watch App.build/Objects-normal/arm64_32/TierTap_Watch_App.swiftsourceinfo"
+  }
+}

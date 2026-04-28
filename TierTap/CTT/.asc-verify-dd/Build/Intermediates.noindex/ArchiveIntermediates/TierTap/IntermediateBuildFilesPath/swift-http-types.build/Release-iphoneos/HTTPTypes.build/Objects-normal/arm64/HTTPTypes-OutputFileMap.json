@@ -1,0 +1,56 @@
+{
+  "" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary.dia",
+    "emit-module-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary-emit-module.dia",
+    "pch" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPTypes-primary.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPField.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPField.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPField.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPField.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPFieldName.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFieldName.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFieldName.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFieldName.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPFields.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFields.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFields.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPFields.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPParsedFields.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPParsedFields.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPParsedFields.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPParsedFields.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPRequest+URL.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest+URL.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest+URL.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest+URL.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPRequest.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPRequest.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/HTTPResponse.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPResponse.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPResponse.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/HTTPResponse.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/ISOLatin1String.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/ISOLatin1String.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/ISOLatin1String.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/ISOLatin1String.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-http-types/Sources/HTTPTypes/NIOLock.swift" : {
+    "index-unit-output-path" : "/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/NIOLock.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/NIOLock.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-http-types.build/Release-iphoneos/HTTPTypes.build/Objects-normal/arm64/NIOLock.o"
+  }
+}

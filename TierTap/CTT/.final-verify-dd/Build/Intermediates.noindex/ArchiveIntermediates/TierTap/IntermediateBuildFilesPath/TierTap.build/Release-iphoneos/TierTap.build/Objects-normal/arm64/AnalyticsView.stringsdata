@@ -1,0 +1,328 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AnalyticsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "AI analysis",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 248
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 456
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 478
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of Ruin",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 627
+        }
+      },
+      {
+        "comment": "",
+        "key": "Overall estimated risk of ruin %@",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 628
+        }
+      },
+      {
+        "comment": "",
+        "key": "Results use EV (cash net + logged comps).",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 572
+        }
+      },
+      {
+        "comment": "",
+        "key": "Results use cash net (comps excluded).",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 573
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 579
+        }
+      },
+      {
+        "comment": "",
+        "key": "Graph style",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 644
+        }
+      },
+      {
+        "comment": "",
+        "key": "Results basis",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 760
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 766
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win rate and dollar totals reflect table, slots, and poker cash only; comps are ignored.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 767
+        }
+      },
+      {
+        "comment": "",
+        "key": "Asking TierTap AI…",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1150
+        }
+      },
+      {
+        "comment": "",
+        "key": "Results basis",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1224
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1643
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1693
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld of %lld sessions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1708
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1753
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1766
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1777
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1817
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1847
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1892
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1965
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2022
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2002
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2091
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lldx",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2071
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date range: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2195
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld pts",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 2175
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bet Rating vs Actual",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2548
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win vs. Tier Gain (Venn)",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2549
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win/Loss Distribution",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2550
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Progress Over Time",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2551
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions by Game",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2553
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points by Loyalty Program",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2554
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session moods",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2556
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2576
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2582
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>6825E749-4629-4A65-B45B-483798A7E6A8</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>6825E749-4629-4A65-B45B-483798A7E6A8.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>59</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>TierTap project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>TierTap</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Archiving project TierTap with scheme TierTap</string>
+			<key>timeStartedRecording</key>
+			<real>799033711.53532302</real>
+			<key>timeStoppedRecording</key>
+			<real>799033840.59263504</real>
+			<key>title</key>
+			<string>Archiving project TierTap with scheme TierTap</string>
+			<key>uniqueIdentifier</key>
+			<string>6825E749-4629-4A65-B45B-483798A7E6A8</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

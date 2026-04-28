@@ -1,0 +1,128 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripShareCardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "• %@: %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "(%@)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ → %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 272
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photos (%lld)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 284
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions (%lld)",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 307
+        }
+      },
+      {
+        "comment": "",
+        "key": "…and %lld more",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 322
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 316
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total comps %@%@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 346
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@: %@%@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 350
+        }
+      },
+      {
+        "comment": "",
+        "key": "• %@: %@%@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 355
+        }
+      },
+      {
+        "comment": "",
+        "key": "…and %lld more",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 383
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@%@",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 369
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 372
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld×",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 415
+        }
+      }
+    ]
+  },
+  "version": 1
+}

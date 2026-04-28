@@ -1,5 +1,8 @@
 import Foundation
 import Combine
+#if os(iOS) || os(watchOS)
+import UserNotifications
+#endif
 
 /// Shown app-wide after closeout when ending tier points changed for a session linked to a wallet card.
 struct WalletTierCloseoutToast: Equatable {
@@ -35,8 +38,37 @@ class SessionStore: ObservableObject {
     }
 
     init() {
+        #if os(watchOS)
+        // Activate WCSession and assign delegate before any other init work so
+        // `didReceiveApplicationContext` is never dropped, and wire state before
+        // hydrating from `receivedApplicationContext` / follow-up requests.
+        let sync = SessionSyncManager.shared
         load()
+        sync.onContextReceived = { [weak self] sessions, liveSession in
+            guard let self else { return }
+            // Main thread: SessionSyncManager dispatches before invoking this.
+            self.applySyncedState(sessions: sessions, liveSession: liveSession)
+        }
+        sync.requestContext { [weak self] sessions, liveSession in
+            guard let self else { return }
+            guard !sessions.isEmpty || liveSession != nil else { return }
+            DispatchQueue.main.async {
+                self.applySyncedState(sessions: sessions, liveSession: liveSession)
+            }
+        }
+        #else
+        load()
+        #endif
+        #if os(iOS)
+        SessionSyncManager.shared.stateSnapshotProvider = { [weak self] in
+            guard let self else { return (sessions: [], liveSession: nil) }
+            return (sessions: self.sessions, liveSession: self.liveSession)
+        }
+        #endif
         setupSync()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
     }
 
     /// Apply state received from iPhone (Watch only) or after a sent action. Updates UI and persists locally.
@@ -46,6 +78,9 @@ class SessionStore: ObservableObject {
         saveSessions()
         if liveSession != nil { saveLive() }
         else { clearLive() }
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: self.liveSession)
+        #endif
     }
 
     private func setupSync() {
@@ -61,6 +96,11 @@ class SessionStore: ObservableObject {
                       let st = params["startingTier"] as? Int, let bi = params["initialBuyIn"] as? Int else { return nil }
                 let program = params["rewardsProgramName"] as? String
                 self.startSession(game: game, casino: casino, startingTier: st, initialBuyIn: bi, rewardsProgramName: program)
+                return (self.sessions, self.liveSession)
+            case "fastStartSession":
+                guard let raw = params["category"] as? String,
+                      let category = SessionGameCategory(rawValue: raw) else { return nil }
+                self.fastStartSession(category: category)
                 return (self.sessions, self.liveSession)
             case "addBuyIn":
                 guard let amount = params["amount"] as? Int else { return nil }
@@ -82,25 +122,24 @@ class SessionStore: ObservableObject {
                 guard let cashOut = params["cashOut"] as? Int else { return nil }
                 self.closeSessionCashOutOnly(cashOut: cashOut)
                 return (self.sessions, self.liveSession)
+            case "fastCloseOut":
+                self.fastCloseSessionWithDefaultsUnverified()
+                return (self.sessions, self.liveSession)
+            case "pauseSession":
+                self.stopLiveSessionTimer()
+                return (self.sessions, self.liveSession)
+            case "resumeSession":
+                self.resumeLiveSessionTimer()
+                return (self.sessions, self.liveSession)
+            case "updateTier":
+                guard let points = params["points"] as? Int else { return nil }
+                self.updateLiveSessionStartingTier(points)
+                return (self.sessions, self.liveSession)
             default:
                 return nil
             }
         }
         pushContext()
-        #elseif os(watchOS)
-        SessionSyncManager.shared.onContextReceived = { [weak self] sessions, liveSession in
-            DispatchQueue.main.async {
-                self?.applySyncedState(sessions: sessions, liveSession: liveSession)
-            }
-        }
-        // Request latest state when Watch app becomes active (in case we missed a push)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            SessionSyncManager.shared.requestContext { sessions, liveSession in
-                DispatchQueue.main.async {
-                    self?.applySyncedState(sessions: sessions, liveSession: liveSession)
-                }
-            }
-        }
         #endif
     }
 
@@ -131,6 +170,7 @@ class SessionStore: ObservableObject {
         }
         return
         #endif
+        guard liveSession == nil else { return }
         let ev = BuyInEvent(amount: initialBuyIn, timestamp: Date())
         let s = Session(
             game: game,
@@ -146,6 +186,9 @@ class SessionStore: ObservableObject {
         )
         liveSession = s
         saveLive()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
         LiveActivityManager.shared.start(session: s)
         pushContext()
@@ -166,6 +209,55 @@ class SessionStore: ObservableObject {
         LiveActivityManager.shared.update(totalBuyIn: s.totalBuyIn)
         pushContext()
         #endif
+    }
+
+    func fastStartSession(category: SessionGameCategory) {
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("fastStartSession", params: ["category": category.rawValue]) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard liveSession == nil else { return }
+        guard let template = mostRecentSession(forGameCategory: category) else { return }
+        let gameName = template.game.isEmpty ? category.pickerTitle : template.game
+        let initialBuyIn = template.initialBuyIn.flatMap { $0 > 0 ? $0 : nil } ?? 1
+        startSession(
+            game: gameName,
+            casino: template.casino,
+            startingTier: template.startingTierPoints,
+            initialBuyIn: initialBuyIn,
+            rewardsProgramName: template.rewardsProgramName,
+            casinoLatitude: template.casinoLatitude,
+            casinoLongitude: template.casinoLongitude,
+            linkedRewardWalletCardId: template.linkedRewardWalletCardId
+        )
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: template.gameCategory,
+            format: template.slotFormat,
+            formatOther: template.slotFormatOther ?? "",
+            feature: template.slotFeature,
+            featureOther: template.slotFeatureOther ?? "",
+            notes: template.slotNotes ?? ""
+        )
+        updateLiveSessionGameMetadata(
+            gameCategory: template.gameCategory ?? category,
+            pokerGameKind: template.pokerGameKind,
+            pokerAllowsRebuy: template.pokerAllowsRebuy,
+            pokerAllowsAddOn: template.pokerAllowsAddOn,
+            pokerHasFreeOut: template.pokerHasFreeOut,
+            pokerVariant: template.pokerVariant,
+            pokerSmallBlind: template.pokerSmallBlind,
+            pokerBigBlind: template.pokerBigBlind,
+            pokerAnte: template.pokerAnte,
+            pokerLevelMinutes: template.pokerLevelMinutes,
+            pokerStartingStack: template.pokerStartingStack,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
+        )
     }
 
     /// `photoJPEG` is optional JPEG bytes for a comp receipt; stored on disk only (not in session JSON).
@@ -205,6 +297,12 @@ class SessionStore: ObservableObject {
     /// cash out = total buy-in, ending tier = starting tier (or recent history for this casino, else 0).
     /// Marks tier point figures as **unverified** so W/L and tier gains stay provisional.
     func fastCloseSessionWithDefaultsUnverified() {
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("fastCloseOut", params: [:]) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
         guard var s = liveSession else { return }
         let cashOut = s.totalBuyIn
         let endingTier: Int
@@ -230,7 +328,10 @@ class SessionStore: ObservableObject {
         s.endTime = s.endTime ?? Date(); s.isLive = false; s.status = .complete
         sessions.insert(s, at: 0)
         liveSession = nil
-        saveSessions(); clearLive()
+        clearLive(); saveSessions()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
         LiveActivityManager.shared.end()
         pushContext()
@@ -275,7 +376,10 @@ class SessionStore: ObservableObject {
         s.status = .requiringMoreInfo
         sessions.insert(s, at: 0)
         liveSession = nil
-        saveSessions(); clearLive()
+        clearLive(); saveSessions()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
         LiveActivityManager.shared.end()
         pushContext()
@@ -343,6 +447,9 @@ class SessionStore: ObservableObject {
         }
         #endif
         liveSession = nil; clearLive()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
         LiveActivityManager.shared.end()
         pushContext()
@@ -351,23 +458,61 @@ class SessionStore: ObservableObject {
 
     /// Freeze the live session end time so duration stops increasing (e.g. while user fills closeout form).
     func stopLiveSessionTimer() {
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("pauseSession", params: [:]) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
         guard var s = liveSession, s.endTime == nil else { return }
         s.endTime = Date()
         liveSession = s
         saveLive()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
-        LiveActivityManager.shared.end()
+        LiveActivityManager.shared.update(for: s)
         pushContext()
         #endif
     }
 
     /// Un-freeze the live session timer so duration resumes increasing.
     func resumeLiveSessionTimer() {
-        guard var s = liveSession, s.endTime != nil else { return }
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("resumeSession", params: [:]) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard var s = liveSession, let pausedAt = s.endTime else { return }
+        let pausedDuration = max(0, Date().timeIntervalSince(pausedAt))
+        s.startTime = s.startTime.addingTimeInterval(pausedDuration)
         s.endTime = nil
         liveSession = s
         saveLive()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: liveSession)
+        #endif
         #if os(iOS)
+        LiveActivityManager.shared.update(for: s)
+        pushContext()
+        #endif
+    }
+
+    func updateLiveSessionStartingTier(_ points: Int) {
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("updateTier", params: ["points": points]) { [weak self] sessions, liveSession in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard var s = liveSession else { return }
+        s.startingTierPoints = points
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        LiveActivityManager.shared.update(for: s)
         pushContext()
         #endif
     }
@@ -479,9 +624,15 @@ class SessionStore: ObservableObject {
     }
     private func saveSessions() {
         if let d = try? JSONEncoder().encode(sessions) { defaults.set(d, forKey: sessKey) }
+        #if os(iOS)
+        SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
+        #endif
     }
     private func saveLive() {
         if let d = try? JSONEncoder().encode(liveSession) { defaults.set(d, forKey: liveKey) }
+        #if os(iOS)
+        SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
+        #endif
     }
     private func clearLive() { defaults.removeObject(forKey: liveKey) }
 
@@ -567,3 +718,186 @@ class SessionStore: ObservableObject {
         }
     }
 }
+
+#if os(iOS) || os(watchOS)
+/// Schedules local notifications for active session time checkpoints.
+final class SessionReminderScheduler {
+    static let shared = SessionReminderScheduler()
+    /// Keep reminder presets local to avoid cross-target type dependencies (e.g. watch target missing `SettingsStore`).
+    private static let reminderMessageOptions: [String] = [
+        "Take a break.",
+        "Quit while you're ahead.",
+        "Protect your bankroll.",
+        "Stop if your plan says stop.",
+        "Hydrate and reset.",
+        "Stay disciplined."
+    ]
+
+    private let reminderEnabledKey = "ctt_session_reminders_enabled"
+    private let reminderFrequencyMinutesKey = "ctt_session_reminder_frequency_minutes"
+    private let reminderMessagePresetKey = "ctt_session_reminder_message_preset"
+    private let reminderCustomMessageKey = "ctt_session_reminder_custom_message"
+    private let reminderIncludeStatsKey = "ctt_session_reminder_include_session_stats"
+    private let requestPrefix = "ctt.session.reminder."
+    /// iOS/watchOS allow a limited number of pending notifications; keep below system cap.
+    private let maxScheduledReminders = 60
+    private var lastScheduleSignature: String?
+
+    private init() {}
+
+    func refresh(liveSession: Session?) {
+        guard remindersEnabled else {
+            clearPendingSessionReminders()
+            lastScheduleSignature = nil
+            return
+        }
+        guard let session = liveSession, session.isLive, session.endTime == nil else {
+            clearPendingSessionReminders()
+            lastScheduleSignature = nil
+            return
+        }
+        let signature = scheduleSignature(for: session, intervalMinutes: reminderFrequencyMinutes)
+        guard signature != lastScheduleSignature else { return }
+        lastScheduleSignature = signature
+        ensureAuthorizationThenSchedule(session: session, intervalMinutes: reminderFrequencyMinutes)
+    }
+
+    /// Registers the app for notifications when Play Reminders are on so **Settings → Notifications** can list TierTap.
+    /// (Otherwise authorization may never run until a live session exists — common on Simulator.)
+    func primeAuthorizationWhenRemindersEnabled() {
+        guard remindersEnabled else { return }
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            guard settings.authorizationStatus == .notDetermined else { return }
+            center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+        }
+    }
+
+    private var remindersEnabled: Bool {
+        UserDefaults.standard.bool(forKey: reminderEnabledKey)
+    }
+
+    private var reminderFrequencyMinutes: Int {
+        let stored = UserDefaults.standard.integer(forKey: reminderFrequencyMinutesKey)
+        return max(1, stored > 0 ? stored : 30)
+    }
+
+    private var reminderMessagePreset: String {
+        let fallback = Self.reminderMessageOptions.first ?? "Take a break."
+        let stored = UserDefaults.standard.string(forKey: reminderMessagePresetKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return Self.reminderMessageOptions.contains(stored) ? stored : fallback
+    }
+
+    private var reminderCustomMessage: String {
+        UserDefaults.standard.string(forKey: reminderCustomMessageKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
+    private var reminderIncludeSessionStats: Bool {
+        if UserDefaults.standard.object(forKey: reminderIncludeStatsKey) == nil { return true }
+        return UserDefaults.standard.bool(forKey: reminderIncludeStatsKey)
+    }
+
+    private func ensureAuthorizationThenSchedule(session: Session, intervalMinutes: Int) {
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                self.scheduleReminders(for: session, intervalMinutes: intervalMinutes)
+            case .notDetermined:
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                    guard granted else {
+                        self.lastScheduleSignature = nil
+                        return
+                    }
+                    self.scheduleReminders(for: session, intervalMinutes: intervalMinutes)
+                }
+            case .denied:
+                self.clearPendingSessionReminders()
+                self.lastScheduleSignature = nil
+            @unknown default:
+                self.clearPendingSessionReminders()
+                self.lastScheduleSignature = nil
+            }
+        }
+    }
+
+    private func clearPendingSessionReminders() {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let ids = requests
+                .map(\.identifier)
+                .filter { $0.hasPrefix(self.requestPrefix) }
+            guard !ids.isEmpty else { return }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+        }
+    }
+
+    private func scheduleSignature(for session: Session, intervalMinutes: Int) -> String {
+        let custom = reminderCustomMessage
+        return "\(session.id.uuidString)|\(Int(session.startTime.timeIntervalSince1970))|\(intervalMinutes)|\(reminderMessagePreset)|\(custom)|\(reminderIncludeSessionStats)"
+    }
+
+    private func scheduleReminders(for session: Session, intervalMinutes: Int) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { [weak self] requests in
+            guard let self else { return }
+            let existingIds = requests
+                .map(\.identifier)
+                .filter { $0.hasPrefix(self.requestPrefix) }
+            if !existingIds.isEmpty {
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: existingIds)
+            }
+
+            let now = Date()
+            let intervalSeconds = TimeInterval(intervalMinutes * 60)
+            let elapsed = max(0, now.timeIntervalSince(session.startTime))
+            let nextTick = Int(floor(elapsed / intervalSeconds)) + 1
+
+            for index in nextTick..<(nextTick + self.maxScheduledReminders) {
+                let reminderMinutes = index * intervalMinutes
+                let fireDate = session.startTime.addingTimeInterval(TimeInterval(reminderMinutes * 60))
+                let timeUntilFire = fireDate.timeIntervalSince(now)
+                if timeUntilFire <= 0 { continue }
+
+                let content = UNMutableNotificationContent()
+                content.title = "Play Reminder"
+                content.body = self.reminderBody(for: session, reminderMinutes: reminderMinutes)
+                content.sound = .default
+
+                let trigger = UNTimeIntervalNotificationTrigger(
+                    timeInterval: max(1, timeUntilFire),
+                    repeats: false
+                )
+                let identifier = "\(self.requestPrefix)\(session.id.uuidString).\(reminderMinutes)"
+                let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                UNUserNotificationCenter.current().add(request)
+            }
+        }
+    }
+
+    private func reminderBody(for session: Session, reminderMinutes: Int) -> String {
+        var lines: [String] = []
+        lines.append("You've been playing this session for \(reminderMinutes) minutes.")
+        lines.append(reminderMessagePreset)
+        if !reminderCustomMessage.isEmpty {
+            lines.append(reminderCustomMessage)
+        }
+
+        if reminderIncludeSessionStats {
+            let buyIn = session.totalBuyIn.formatted(.number.grouping(.automatic))
+            let comps = session.totalComp.formatted(.number.grouping(.automatic))
+            let tier = session.startingTierPoints.formatted(.number.grouping(.automatic))
+            let wlText: String
+            if let winLoss = session.winLoss {
+                let prefix = winLoss >= 0 ? "+" : ""
+                wlText = "W/L: \(prefix)\(winLoss.formatted(.number.grouping(.automatic)))"
+            } else {
+                wlText = "W/L: pending close-out"
+            }
+            lines.append("Session stats - Buy-in: \(buyIn), Comps: \(comps), Tier: \(tier), \(wlText)")
+        }
+
+        return lines.joined(separator: "\n")
+    }
+}
+#endif

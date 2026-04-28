@@ -62,7 +62,7 @@ struct LiveSessionView: View {
                             .padding(.vertical, 4)
 
                         HStack(spacing: 10) {
-                            VStack(spacing: 8) {
+                            
                                 Button { showPrivateNotes = true } label: {
                                     Image(systemName: "note.text")
                                         .font(.subheadline.weight(.medium))
@@ -100,7 +100,7 @@ struct LiveSessionView: View {
                                 }
                                 .accessibilityLabel("Share session")
                             #endif
-                            }
+                            
                         }
                         .padding(.top, 4)
                     }
@@ -207,6 +207,24 @@ struct LiveSessionView: View {
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(16)
 
+                            Button {
+                                if hasMissingInfo {
+                                    showMissingInfoAlert = true
+                                } else {
+                                    if let live = store.liveSession {
+                                        settingsStore.recordLastPlayedGameChoices(from: live)
+                                    }
+                                    store.fastCloseSessionWithDefaultsUnverified()
+                                }
+                            } label: {
+                                LocalizedLabel(title: "Fast Close Out", systemImage: "bolt.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 16)
+                                    .background(Color.orange.opacity(0.9))
+                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
+                            }
+
                             HStack(spacing: 12) {
                                 StatMini(title: "Hours", value: String(format: "%.1f", s.hoursPlayed))
                                 StatMini(title: "Start Pts", value: "\(s.startingTierPoints)")
@@ -229,24 +247,6 @@ struct LiveSessionView: View {
                             .padding()
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(16)
-
-                            Button {
-                                if hasMissingInfo {
-                                    showMissingInfoAlert = true
-                                } else {
-                                    if let live = store.liveSession {
-                                        settingsStore.recordLastPlayedGameChoices(from: live)
-                                    }
-                                    store.fastCloseSessionWithDefaultsUnverified()
-                                }
-                            } label: {
-                                LocalizedLabel(title: "Fast Close Out", systemImage: "bolt.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 16)
-                                    .background(Color.orange.opacity(0.9))
-                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
-                            }
 
                             Button {
                                 if hasMissingInfo {
@@ -295,8 +295,8 @@ struct LiveSessionView: View {
                     Button("Back") { dismiss() }.foregroundColor(.green)
                 }
             }
-            .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(s.startTime) }
-            .onAppear { elapsed = Date().timeIntervalSince(s.startTime) }
+            .onReceive(ticker) { _ in elapsed = s.duration }
+            .onAppear { elapsed = s.duration }
             .adaptiveSheet(isPresented: $showBuyInSheet) {
                 BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
                     store.addBuyIn(amount)

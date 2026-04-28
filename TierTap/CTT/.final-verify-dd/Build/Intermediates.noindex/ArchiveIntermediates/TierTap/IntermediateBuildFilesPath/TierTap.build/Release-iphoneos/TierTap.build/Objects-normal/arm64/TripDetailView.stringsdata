@@ -1,0 +1,144 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Delete this trip?",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share trip summary",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 302
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ → %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Seat %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 342
+        }
+      },
+      {
+        "comment": "",
+        "key": "(%@)",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions linked yet. Tap Add to pick completed sessions, or edit the trip for full options.",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 411
+        }
+      },
+      {
+        "comment": "",
+        "key": "No sessions linked. Edit the trip to attach sessions.",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions (%lld)",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 393
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add sessions to this trip",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 406
+        }
+      },
+      {
+        "comment": "",
+        "key": "EV +%@%lld",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 431
+        }
+      },
+      {
+        "comment": "",
+        "key": "EV -%@%lld",
+        "location": {
+          "startingColumn": 93,
+          "startingLine": 431
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 435
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 90,
+          "startingLine": 435
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 496
+        }
+      }
+    ]
+  },
+  "version": 1
+}

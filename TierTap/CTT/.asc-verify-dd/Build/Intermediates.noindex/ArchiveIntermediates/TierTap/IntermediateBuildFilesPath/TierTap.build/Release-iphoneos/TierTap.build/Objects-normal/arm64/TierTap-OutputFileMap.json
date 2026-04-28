@@ -1,0 +1,386 @@
+{
+  "" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.dia",
+    "emit-module-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary-emit-module.dia",
+    "pch" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTap-primary.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/ChipEstimatorPhotoStorage.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ChipEstimatorPhotoStorage.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/PhotoHelpers.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PhotoHelpers.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/AppLockService.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockService.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockService.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockService.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/CommunityPublisher.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CommunityPublisher.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CommunityPublisher.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CommunityPublisher.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Data/BankrollDatabase.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollDatabase.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollDatabase.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollDatabase.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Data/Sensitive.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Sensitive.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Sensitive.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Sensitive.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Data/StrategyDatabase.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyDatabase.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyDatabase.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyDatabase.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/GeminiRouterThrottle.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeminiRouterThrottle.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeminiRouterThrottle.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GeminiRouterThrottle.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/LiveActivity/LiveActivityManager.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveActivityManager.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/LiveActivity/TimerActivityAttributes.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TimerActivityAttributes.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TimerActivityAttributes.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TimerActivityAttributes.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Localization/TierTapLocalization.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapLocalization.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapLocalization.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapLocalization.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/AirlineCatalog.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirlineCatalog.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirlineCatalog.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirlineCatalog.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/AirportCatalog.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirportCatalog.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirportCatalog.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AirportCatalog.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/CompPhotoStorage.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompPhotoStorage.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompPhotoStorage.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompPhotoStorage.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/GamesList.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GamesList.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/RewardWalletCardModels.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardWalletCardModels.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardWalletCardModels.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardWalletCardModels.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/RiskOfRuin.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuin.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuin.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuin.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/Session.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Session.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Session.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Session.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/SessionShareFormatter.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionShareFormatter.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionShareFormatter.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionShareFormatter.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/SessionSharePhrasesGenerated.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSharePhrasesGenerated.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSharePhrasesGenerated.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSharePhrasesGenerated.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/SlotsList.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SlotsList.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SlotsList.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SlotsList.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/TapLevel.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TapLevel.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TapLevel.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TapLevel.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/Trip.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Trip.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Trip.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/Trip.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ProfanityChecker.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfanityChecker.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfanityChecker.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfanityChecker.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/SupabaseClient.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SupabaseClient.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SupabaseClient.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SupabaseClient.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/TierTapApp.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapApp.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapApp.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapApp.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/AuthStore.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AuthStore.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AuthStore.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AuthStore.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/LocationManager.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LocationManager.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/SessionStore.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionStore.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionStore.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionStore.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/SettingsStore.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsStore.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/SubscriptionStore 2.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SubscriptionStore 2.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SubscriptionStore 2.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SubscriptionStore 2.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/TripStore.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripStore.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripStore.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripStore.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AddPastSessionView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AddPastSessionView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AddPastSessionView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AddPastSessionView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AnalyticsView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AnalyticsView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AnalyticsView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AnalyticsView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/AppLockGateView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockGateView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockGateView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/AppLockGateView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/BankrollView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/BankrollView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CasinoLocationPickerView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CasinoLocationPickerView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CheckInView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CheckInView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CheckInView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CheckInView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CloseoutView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CloseoutView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CloseoutView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CompleteSessionView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompleteSessionView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompleteSessionView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/CompleteSessionView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/EditSessionView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/EditSessionView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/FastCheckInBar.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FastCheckInBar.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FastCheckInBar.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FastCheckInBar.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/FlightRouteMapView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FlightRouteMapView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FlightRouteMapView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/FlightRouteMapView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/GASupportSheet.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GASupportSheet.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GASupportSheet.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/GASupportSheet.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HistoryView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HomeView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HomeView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HomeView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/HomeView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/LiveSessionView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveSessionView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveSessionView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/LiveSessionView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/MapPlacePickerView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/MapPlacePickerView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/MapPlacePickerView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/MapPlacePickerView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/PostCloseoutShareFlowView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PostCloseoutShareFlowView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PostCloseoutShareFlowView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/PostCloseoutShareFlowView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/ProfilePhotoCaptureView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfilePhotoCaptureView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfilePhotoCaptureView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/ProfilePhotoCaptureView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RewardProgramPicker.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardProgramPicker.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardProgramPicker.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RewardProgramPicker.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RiskOfRuinView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RiskOfRuinView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RootTabView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RootTabView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RootTabView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/RootTabView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionArtGeneratorView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionArtGeneratorView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionArtGeneratorView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionArtGeneratorView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionCalendarView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionCalendarView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionDetailView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionDetailView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionMoodPickerView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionMoodPickerView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionMoodPickerView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionMoodPickerView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SettingsView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SettingsView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SharedComponents.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SharedComponents.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SharedComponents.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SharedComponents.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StrategyOddsSheet.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapAccountView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapAccountView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapAccountView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapAccountView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPaywallView 2.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapWalletView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapWalletView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapWalletView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TierTapWalletView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripDetailView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripDetailView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripDetailView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripDetailView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripEditorView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripEditorView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripEditorView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripEditorView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripLinkSessionsSheet.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripLinkSessionsSheet.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripLinkSessionsSheet.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripLinkSessionsSheet.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripMagicWandView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripMagicWandView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripMagicWandView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripMagicWandView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripShareCardView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripShareCardView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripShareCardView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripShareCardView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripsView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripsView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripsView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/TripsView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideContent.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideContent.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideContent.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideContent.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuidePDFExporter.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideView.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/UserGuideView.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/View+AdaptiveSheet.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/View+AdaptiveSheet.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/View+AdaptiveSheet.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/View+AdaptiveSheet.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/WatchConnectivity/SessionSyncManager.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSyncManager.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSyncManager.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/TierTap.build/Objects-normal/arm64/SessionSyncManager.o"
+  }
+}

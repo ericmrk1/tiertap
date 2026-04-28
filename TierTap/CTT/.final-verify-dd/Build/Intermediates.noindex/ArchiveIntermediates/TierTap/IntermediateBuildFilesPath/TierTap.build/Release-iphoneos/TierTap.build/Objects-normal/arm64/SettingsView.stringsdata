@@ -1,0 +1,144 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Export Failed",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 178
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@ — %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 181
+        }
+      },
+      {
+        "comment": "",
+        "key": "App language",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "Every %lldm",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 266
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tone of voice",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 302
+        }
+      },
+      {
+        "comment": "",
+        "key": "Manage TierTap Pro",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 365
+        }
+      },
+      {
+        "comment": "",
+        "key": "Upgrade to TierTap Pro",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 365
+        }
+      },
+      {
+        "comment": "",
+        "key": "When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for %@18-style bets.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 675
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use %@18 increment mode",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 673
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. 20, 100, 500, 1000, 10000",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 643
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casino chimes & haptics",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 683
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sound profile",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 688
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary color",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 776
+        }
+      },
+      {
+        "comment": "",
+        "key": "Secondary color",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 786
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1237
+        }
+      }
+    ]
+  },
+  "version": 1
+}

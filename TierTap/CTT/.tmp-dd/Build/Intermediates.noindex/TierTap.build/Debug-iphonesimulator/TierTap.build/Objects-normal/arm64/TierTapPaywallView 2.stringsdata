@@ -1,0 +1,64 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPaywallView 2.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Restore Purchases",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 284
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Account",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 63
+        }
+      },
+      {
+        "comment": "",
+        "key": "Retry",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 223
+        }
+      },
+      {
+        "comment": "",
+        "key": "Apple EULA",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 302
+        }
+      },
+      {
+        "comment": "",
+        "key": "Privacy Policy",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 305
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current plan",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 387
+        }
+      }
+    ]
+  },
+  "version": 1
+}

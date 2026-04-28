@@ -1,9 +1,11 @@
 import SwiftUI
 import UIKit
 import StoreKit
+import UserNotifications
 
 @main
 struct TierTapApp: App {
+    @UIApplicationDelegateAdaptor(TierTapAppDelegate.self) private var appDelegate
     @StateObject private var store = SessionStore()
     @StateObject private var tripStore = TripStore()
     @StateObject private var settingsStore = SettingsStore()
@@ -14,6 +16,7 @@ struct TierTapApp: App {
     init() {
         BankrollDatabase.shared.open()
         AirportCatalog.preloadAtLaunch()
+        UNUserNotificationCenter.current().delegate = ForegroundNotificationDelegate.shared
     }
 
     var body: some Scene {
@@ -26,6 +29,20 @@ struct TierTapApp: App {
                 .environmentObject(subscriptionStore)
                 .environmentObject(rewardWalletStore)
         }
+    }
+}
+
+final class TierTapAppDelegate: NSObject, UIApplicationDelegate {}
+
+private final class ForegroundNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = ForegroundNotificationDelegate()
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound, .badge, .list])
     }
 }
 
@@ -103,6 +120,13 @@ private struct TierTapAppRoot: View {
             if newPhase == .background && settingsStore.appLockEnabled {
                 appSessionUnlocked = false
             }
+            if newPhase == .active {
+                // Ensure watch receives a fresh bootstrap snapshot whenever iPhone foregrounds.
+                SessionSyncManager.shared.pushContext(
+                    sessions: store.sessions,
+                    liveSession: store.liveSession
+                )
+            }
         }
         .onChange(of: settingsStore.appLockEnabled) { enabled in
             if enabled {
@@ -114,6 +138,12 @@ private struct TierTapAppRoot: View {
         }
         .onOpenURL { url in
             authStore.handleOpenURL(url)
+            guard let scheme = url.scheme?.lowercased(), scheme == "com.app.tiertap" else { return }
+            let host = (url.host ?? "").lowercased()
+            let path = url.path.lowercased()
+            if host == "watch", path == "/live" {
+                NotificationCenter.default.post(name: NSNotification.Name("OpenSessionsTabFromDeepLink"), object: nil)
+            }
         }
         .adaptiveSheet(isPresented: $showWelcome) {
             CommunityAuthSheet(
@@ -162,6 +192,12 @@ struct SplashScreen: View {
     @State private var logoScale: CGFloat = 1
     @State private var didScheduleSequence = false
 
+    private static let holdBeforeZoom: TimeInterval = 0.85
+    private static let blowUpDuration: TimeInterval = 0.6
+    private static let collapseDuration: TimeInterval = 0.28
+    private static let blowUpTargetScale: CGFloat = 50
+    private static let collapseTargetScale: CGFloat = 0.01
+
     private var logoImage: Image {
         if let processed = TransparentLogoCache.image {
             return Image(uiImage: processed)
@@ -171,11 +207,6 @@ struct SplashScreen: View {
 
     var body: some View {
         GeometryReader { geo in
-            let padded = max(100, min(geo.size.width - 80, 320))
-            let minSide = min(geo.size.width, geo.size.height)
-            let peakScale = min(10, max(1.3, minSide * 1.22 / padded))
-            let collapseScale = max(1 / padded, 1e-4)
-
             gradient
                 .ignoresSafeArea()
                 .overlay {
@@ -189,28 +220,27 @@ struct SplashScreen: View {
                 .onAppear {
                     guard !didScheduleSequence, geo.size.width > 10 else { return }
                     didScheduleSequence = true
-                    scheduleSplashAnimation(peakScale: peakScale, collapseScale: collapseScale)
+                    scheduleSplashAnimation()
                 }
         }
     }
 
-    private func scheduleSplashAnimation(peakScale: CGFloat, collapseScale: CGFloat) {
-        let growDuration: TimeInterval = 1.2
-        let shrinkDuration: TimeInterval = 0.10
-        let holdBeforeGrow: TimeInterval = 2
+    private func scheduleSplashAnimation() {
+        let afterZoom = Self.holdBeforeZoom + Self.blowUpDuration
+        let afterCollapse = afterZoom + Self.collapseDuration
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + holdBeforeGrow) {
-            withAnimation(.easeInOut(duration: growDuration)) {
-                logoScale = peakScale
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.holdBeforeZoom) {
+            withAnimation(.easeIn(duration: Self.blowUpDuration)) {
+                logoScale = Self.blowUpTargetScale
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + growDuration) {
-                withAnimation(.easeIn(duration: shrinkDuration)) {
-                    logoScale = collapseScale
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + shrinkDuration) {
-                    onFinished()
-                }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + afterZoom) {
+            withAnimation(.easeOut(duration: Self.collapseDuration)) {
+                logoScale = Self.collapseTargetScale
             }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + afterCollapse) {
+            onFinished()
         }
     }
 }

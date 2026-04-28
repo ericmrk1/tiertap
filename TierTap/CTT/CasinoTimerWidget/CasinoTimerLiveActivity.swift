@@ -3,6 +3,12 @@ import WidgetKit
 import SwiftUI
 
 struct CasinoTimerLiveActivity: Widget {
+    private func shortCode(_ value: String) -> String {
+        let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleaned.isEmpty else { return "TT" }
+        return String(cleaned.prefix(3)).uppercased()
+    }
+
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TimerActivityAttributes.self) { context in
             // Lock Screen / Notification Banner View
@@ -52,6 +58,7 @@ struct CasinoTimerLiveActivity: Widget {
                 }
                 .padding(.horizontal, 18).padding(.vertical, 12)
             }
+            .widgetURL(URL(string: "com.app.tiertap://watch/live"))
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -89,8 +96,9 @@ struct CasinoTimerLiveActivity: Widget {
                     }
                 }
             } compactLeading: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .foregroundColor(.green).font(.caption)
+                Text(shortCode(context.state.casino))
+                    .font(.system(.caption2, design: .rounded).bold())
+                    .foregroundColor(.green)
             } compactTrailing: {
                 Text(context.state.startTime, style: .timer)
                     .font(.system(.caption2, design: .monospaced))
@@ -98,8 +106,9 @@ struct CasinoTimerLiveActivity: Widget {
                     .monospacedDigit()
                     .frame(width: 44)
             } minimal: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .foregroundColor(.green).font(.caption)
+                Text(shortCode(context.state.game))
+                    .font(.system(.caption2, design: .rounded).bold())
+                    .foregroundColor(.green)
             }
         }
     }

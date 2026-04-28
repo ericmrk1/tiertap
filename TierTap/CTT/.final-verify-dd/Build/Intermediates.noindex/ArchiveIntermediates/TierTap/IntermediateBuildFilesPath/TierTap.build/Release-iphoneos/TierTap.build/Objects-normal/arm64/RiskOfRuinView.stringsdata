@@ -1,0 +1,48 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RiskOfRuinView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "risk of ruin — based on table‑game sessions (poker excluded), using EV (cash net plus logged comps) for win/loss per session, with your bankroll/unit settings.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings, using cash net per session.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 107
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your current buy-in or average bet is above your set unit size (%@%lld). Consider lowering bet size to stay within bankroll management target.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 194
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings. Match “Results basis” on Analytics.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 221
+        }
+      },
+      {
+        "comment": "",
+        "key": "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 222
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/supabase-swift/Sources/PostgREST/Defaults.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/Supabase.build/Release-iphoneos/PostgREST.build/Objects-normal/arm64/PostgREST.swiftsourceinfo"
+  }
+}

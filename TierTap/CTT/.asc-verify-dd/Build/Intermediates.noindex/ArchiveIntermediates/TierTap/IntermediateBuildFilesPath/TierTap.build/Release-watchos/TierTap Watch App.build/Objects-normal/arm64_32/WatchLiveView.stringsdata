@@ -1,0 +1,264 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchLiveView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Current tier %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Last sync %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 79
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total buy-in $%@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total comps $%@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Options execute on iPhone history; unavailable categories are ignored.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add buy-in?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 373
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current total: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 337
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 340
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed total: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 342
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom amount",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 353
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Buy-In",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 358
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 374
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 375
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add $%lld buy-in? New total will be $%lld.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 385
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add comp?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current comps: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 452
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 455
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed comps: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 457
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom comp",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details (optional)",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 473
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Comp",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 474
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 519
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 490
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 491
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add $%lld comp? New comp total will be $%lld.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 503
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current tier: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 568
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add points: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 571
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed tier: %lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 573
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom points",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 584
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update Tier",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 589
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 627
+        }
+      }
+    ]
+  },
+  "version": 1
+}

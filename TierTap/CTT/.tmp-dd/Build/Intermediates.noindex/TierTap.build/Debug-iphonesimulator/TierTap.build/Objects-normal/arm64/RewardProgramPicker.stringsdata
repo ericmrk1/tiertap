@@ -1,0 +1,112 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RewardProgramPicker.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "New program",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Program name",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose from wallet",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "New program…",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reward program",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 270
+        }
+      },
+      {
+        "comment": "",
+        "key": "New program…",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 257
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reward program presets",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap tier points changed",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 307
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@ pts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Updating your wallet card to match this session.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 319
+        }
+      },
+      {
+        "comment": "",
+        "key": "Your wallet now shows this TierTap balance.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 323
+        }
+      }
+    ]
+  },
+  "version": 1
+}

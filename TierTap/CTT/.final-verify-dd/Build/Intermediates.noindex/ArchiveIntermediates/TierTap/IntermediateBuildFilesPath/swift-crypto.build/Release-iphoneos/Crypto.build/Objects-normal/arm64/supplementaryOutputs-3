@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-crypto.build/Release-iphoneos/Crypto.build/Objects-normal/arm64/Crypto.swiftsourceinfo"
+  }
+}

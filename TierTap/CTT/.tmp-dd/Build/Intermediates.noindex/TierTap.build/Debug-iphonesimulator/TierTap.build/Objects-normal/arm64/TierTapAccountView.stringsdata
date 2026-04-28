@@ -1,0 +1,80 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapAccountView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Lock",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 13
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 17
+        }
+      },
+      {
+        "comment": "",
+        "key": "🔒",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "🔓",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unlock method",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign out of TierTap?",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign out",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 140
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 143
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign out",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 185
+        }
+      }
+    ]
+  },
+  "version": 1
+}

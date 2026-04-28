@@ -1,0 +1,44 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CheckInView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CheckInView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CheckInView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CheckInView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CheckInView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/CheckInView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/FastCheckInBar.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FastCheckInBar.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FastCheckInBar.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FastCheckInBar.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FastCheckInBar.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FastCheckInBar.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/LiveSessionView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/LiveSessionView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/LiveSessionView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/LiveSessionView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/LiveSessionView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/LiveSessionView.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideContent.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuidePDFExporter.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuidePDFExporter.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.dia",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.swiftdeps"
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RootTabView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Loading community sessions…",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show session locations on map",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 316
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 553
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saving…",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 679
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save profile",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 679
+        }
+      },
+      {
+        "comment": "",
+        "key": "Log out",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 801
+        }
+      },
+      {
+        "comment": "",
+        "key": "you@example.com",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 873
+        }
+      },
+      {
+        "comment": "",
+        "key": "Magic link sent",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 907
+        }
+      },
+      {
+        "comment": "",
+        "key": "Send magic link",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 907
+        }
+      },
+      {
+        "comment": "",
+        "key": "Posted %@",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 1469
+        }
+      },
+      {
+        "comment": "",
+        "key": "Screen Name %@",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1441
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show %@ on map",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 1424
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld pts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1562
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net +%@%lld",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1475
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net -%@%lld",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 1475
+        }
+      },
+      {
+        "comment": "",
+        "key": "Net result %@ %lld",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1484
+        }
+      },
+      {
+        "comment": "",
+        "key": "EV +%@%lld",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1489
+        }
+      },
+      {
+        "comment": "",
+        "key": "EV -%@%lld",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 1489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expected value %@ %lld, including comps",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1498
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rating diff %lld percent",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 1547
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@%lld est.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1506
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld comps, estimated total value %@%lld",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 1520
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld comps",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 1521
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 1772
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 1781
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 1802
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 1811
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1832
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1872
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1911
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2111
+        }
+      },
+      {
+        "comment": "",
+        "key": "One line in the feed. %lld/%lld characters",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 2220
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. Great run today",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 2223
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2319
+        }
+      },
+      {
+        "comment": "",
+        "key": "Back",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2314
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 2512
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 2512
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,192 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HomeView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "Play Reminders",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 210
+        }
+      },
+      {
+        "comment": "",
+        "key": "User guide",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 220
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap Pro subscription",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "PRO",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "Starting tier %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total buy-in %@%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 380
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total comps %@%@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 384
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share session",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private notes",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 411
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 496
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions · %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 502
+        }
+      },
+      {
+        "comment": "",
+        "key": "Levels explained",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 515
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share level",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 524
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 623
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 668
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions · %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 674
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions logged",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 710
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current batch: %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 713
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld sessions",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 731
+        }
+      },
+      {
+        "comment": "",
+        "key": "Levels %lld–%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 750
+        }
+      },
+      {
+        "comment": "",
+        "key": "· %@",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 753
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 774
+        }
+      }
+    ]
+  },
+  "version": 1
+}

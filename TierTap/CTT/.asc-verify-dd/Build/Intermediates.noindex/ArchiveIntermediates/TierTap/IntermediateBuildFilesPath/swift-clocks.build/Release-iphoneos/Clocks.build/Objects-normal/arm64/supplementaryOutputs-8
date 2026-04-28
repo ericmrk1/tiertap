@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/swift-clocks/Sources/Clocks/AnyClock.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/swift-clocks.build/Release-iphoneos/Clocks.build/Objects-normal/arm64/Clocks.swiftsourceinfo"
+  }
+}

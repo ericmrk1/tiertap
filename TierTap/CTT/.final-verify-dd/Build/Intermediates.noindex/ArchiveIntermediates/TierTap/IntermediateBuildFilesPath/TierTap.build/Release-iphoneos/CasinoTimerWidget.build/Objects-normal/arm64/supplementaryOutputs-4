@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/LiveActivity/TimerActivityAttributes.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget.swiftsourceinfo"
+  }
+}

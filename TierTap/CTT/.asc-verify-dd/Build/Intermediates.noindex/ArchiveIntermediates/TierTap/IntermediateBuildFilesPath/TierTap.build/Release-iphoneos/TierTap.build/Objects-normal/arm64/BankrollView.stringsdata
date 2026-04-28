@@ -1,0 +1,56 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/BankrollView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share bankroll graph",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 217
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 242
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bankroll after: %@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 315
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current: %@%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 352
+        }
+      }
+    ]
+  },
+  "version": 1
+}

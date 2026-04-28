@@ -1,0 +1,192 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/EditSessionView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Poker Type",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Casino name",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 190
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 193
+        }
+      },
+      {
+        "comment": "",
+        "key": "End",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 194
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 210
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unverified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total: %@%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 227
+        }
+      },
+      {
+        "comment": "",
+        "key": "· %@",
+        "location": {
+          "startingColumn": 66,
+          "startingLine": 252
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 256
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 278
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 279
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ · %@%lld",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 390
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 441
+        }
+      },
+      {
+        "comment": "",
+        "key": "Food & beverage",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 800
+        }
+      },
+      {
+        "comment": "",
+        "key": "Describe (e.g. buffet)",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 809
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date & time",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 823
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount (%@)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 779
+        }
+      },
+      {
+        "comment": "",
+        "key": "Host name, promo…",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 818
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo removed",
+        "location": {
+          "startingColumn": 67,
+          "startingLine": 843
+        }
+      },
+      {
+        "comment": "",
+        "key": "No photo",
+        "location": {
+          "startingColumn": 85,
+          "startingLine": 843
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 908
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/SourcePackages/checkouts/xctest-dynamic-overlay/Sources/IssueReporting/ErrorReporting.swift" : {
+    "abi-baseline-json" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting.abi.json",
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting-primary.dia",
+    "objc-header" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting-Swift.h",
+    "swiftdoc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting.swiftdoc",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting.swiftmodule",
+    "swiftsourceinfo" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.asc-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/xctest-dynamic-overlay.build/Release-iphoneos/IssueReporting.build/Objects-normal/arm64/IssueReporting.swiftsourceinfo"
+  }
+}

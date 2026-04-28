@@ -1,0 +1,264 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/CloseoutView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Ending Tier Points",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open linked TierTap wallet card",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chip estimator error",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 511
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier Points Decreased",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 532
+        }
+      },
+      {
+        "comment": "",
+        "key": "Resume Timer",
+        "location": {
+          "startingColumn": 58,
+          "startingLine": 145
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop Timer",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 145
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open Uber",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 163
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open OpenTable",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 171
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 189
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash Out (%@)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 199
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount leaving with",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 225
+        }
+      },
+      {
+        "comment": "",
+        "key": "−%@%lld",
+        "location": {
+          "startingColumn": 52,
+          "startingLine": 241
+        }
+      },
+      {
+        "comment": "",
+        "key": "Lost everything",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 255
+        }
+      },
+      {
+        "comment": "",
+        "key": "Double or nothing",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 265
+        }
+      },
+      {
+        "comment": "",
+        "key": "Triple",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 291
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 295
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unverified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 296
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exceeds unit %@%lld.",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 306
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 98,
+          "startingLine": 321
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 328
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@%lld",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 515
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 533
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Anyway",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 534
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ending tier (%@) is lower than starting tier (%lld). Save anyway?",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 536
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimating…",
+        "location": {
+          "startingColumn": 57,
+          "startingLine": 873
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimate with AI",
+        "location": {
+          "startingColumn": 75,
+          "startingLine": 873
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 889
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 962
+        }
+      }
+    ]
+  },
+  "version": 1
+}

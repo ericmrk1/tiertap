@@ -1,0 +1,31 @@
+{
+  "" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.dia",
+    "emit-module-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary-emit-module.dia",
+    "pch" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidget-primary.swiftdeps"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/CasinoTimerWidget/CasinoTimerLiveActivity.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerLiveActivity.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerLiveActivity.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerLiveActivity.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/CasinoTimerWidget/CasinoTimerWidgetBundle.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidgetBundle.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidgetBundle.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/CasinoTimerWidgetBundle.o"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/LiveActivity/TimerActivityAttributes.swift" : {
+    "index-unit-output-path" : "/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/TimerActivityAttributes.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/TimerActivityAttributes.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.final-verify-dd/Build/Intermediates.noindex/ArchiveIntermediates/TierTap/IntermediateBuildFilesPath/TierTap.build/Release-iphoneos/CasinoTimerWidget.build/Objects-normal/arm64/TimerActivityAttributes.o"
+  }
+}

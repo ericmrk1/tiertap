@@ -1,0 +1,64 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Comp receipt · %@%lld · %@",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tiers per 100 %@ metric requires rated avg bet ≥ 100",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 185
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 186
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unverified",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 187
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit session information",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 331
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 334
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -6,7 +6,7 @@ struct WatchStartView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Image("TierTapLogo")
+            Image("TierTap_C_PokerChip")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 48, height: 48)

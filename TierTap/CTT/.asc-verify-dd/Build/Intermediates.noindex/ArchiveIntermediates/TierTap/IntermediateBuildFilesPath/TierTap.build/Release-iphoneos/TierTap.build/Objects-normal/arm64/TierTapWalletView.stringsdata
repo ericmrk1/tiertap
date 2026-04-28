@@ -1,0 +1,464 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapWalletView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "TierTap Wallet",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 88
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show single card view",
+        "location": {
+          "startingColumn": 72,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show stacked card view",
+        "location": {
+          "startingColumn": 98,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share card",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 121
+        }
+      },
+      {
+        "comment": "",
+        "key": "Card",
+        "location": {
+          "startingColumn": 62,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stack",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add card",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 293
+        }
+      },
+      {
+        "comment": "",
+        "key": "No cards yet",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap + below to add a photo of a tier card or status screen. You can edit details anytime.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Take Photo",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 272
+        }
+      },
+      {
+        "comment": "",
+        "key": "Photo Library",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 279
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show stacked cards",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 497
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap anywhere on the stack to enlarge · Swipe to move through cards",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 632
+        }
+      },
+      {
+        "comment": "",
+        "key": "Swipe the stack to choose a card, then tap Use this card.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 671
+        }
+      },
+      {
+        "comment": "",
+        "key": "Use this card",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 660
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exp. %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 833
+        }
+      },
+      {
+        "comment": "",
+        "key": "No tier history yet.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 944
+        }
+      },
+      {
+        "comment": "",
+        "key": "Only one saved tier point (%@).",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 940
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier history",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 913
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share card",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1028
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share options",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 1024
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include tier history overlay",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1025
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1032
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1035
+        }
+      },
+      {
+        "comment": "",
+        "key": "Card details",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1100
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reward program",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1148
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1162
+        }
+      },
+      {
+        "comment": "",
+        "key": "New card",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1229
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 1214
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expiration date",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1221
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expires",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1223
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1225
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1233
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1239
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset tier history?",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1384
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete this wallet card?",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Details",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 1306
+        }
+      },
+      {
+        "comment": "",
+        "key": "Retake",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1300
+        }
+      },
+      {
+        "comment": "",
+        "key": "Choose photo",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 1302
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expiration date",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1313
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expires",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1315
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1317
+        }
+      },
+      {
+        "comment": "",
+        "key": "Keeps the current tier as a new baseline after reset.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1324
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset tier history",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1321
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete card",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1329
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit card",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1343
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1349
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1385
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset history",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1386
+        }
+      },
+      {
+        "comment": "",
+        "key": "This clears previous tier progression for this card. You cannot undo it.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1390
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1393
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete card",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1394
+        }
+      },
+      {
+        "comment": "",
+        "key": "This permanently removes the card photo, details, and tier history.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1400
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,352 @@
+{
+  "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Showing filtered sessions",
+        "location": {
+          "startingColumn": 53,
+          "startingLine": 213
+        }
+      },
+      {
+        "comment": "",
+        "key": "All sessions",
+        "location": {
+          "startingColumn": 83,
+          "startingLine": 213
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search by casino or game",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 244
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Verified",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 291
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unverified",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 292
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 302
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sessions",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 303
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tools",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 304
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 350
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 359
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 380
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 389
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld selected",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 467
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap outside to close",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 650
+        }
+      },
+      {
+        "comment": "",
+        "key": "Feature Coming Soon....",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 642
+        }
+      },
+      {
+        "comment": "",
+        "key": "Exit",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 720
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tax Year",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 744
+        }
+      },
+      {
+        "comment": "",
+        "key": "State",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 751
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ (%@)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 754
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue with Tax Prep",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 766
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating tax prep document... %lld%%",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 780
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Session?",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 892
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 824
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 893
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 894
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 68,
+          "startingLine": 1043
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 110,
+          "startingLine": 1043
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1078
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1084
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unverified",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1118
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld pts",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1128
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 1147
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 78,
+          "startingLine": 1147
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete selected sessions?",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1254
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1241
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1247
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1255
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1256
+        }
+      },
+      {
+        "comment": "",
+        "key": "You are about to permanently delete %lld session%@. This cannot be undone.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1263
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 1296
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 86,
+          "startingLine": 1296
+        }
+      }
+    ]
+  },
+  "version": 1
+}

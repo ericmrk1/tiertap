@@ -24,6 +24,7 @@ struct HomeView: View {
     @State private var showBankroll = false
     @State private var showWallet = false
     @State private var showSubscriptionPaywall = false
+    @State private var showSessionReminderSettings = false
     @State private var showLevelUpCelebration = false
     @State private var levelUpReached: TapLevel?
     /// In-memory last computed level; popup only when level increases from this (not on first load).
@@ -198,15 +199,26 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    NavigationLink {
-                        UserGuideView()
-                            .environmentObject(settingsStore)
-                    } label: {
-                        Image(systemName: "info.circle")
-                            .font(.body.weight(.medium))
-                            .foregroundColor(.white)
+                    HStack(spacing: 14) {
+                        Button {
+                            showSessionReminderSettings = true
+                        } label: {
+                            Image(systemName: settingsStore.sessionRemindersEnabled ? "bell.fill" : "bell")
+                                .font(.body.weight(.medium))
+                                .foregroundColor(.white)
+                        }
+                        .accessibilityLabel("Play Reminders")
+
+                        NavigationLink {
+                            UserGuideView()
+                                .environmentObject(settingsStore)
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.body.weight(.medium))
+                                .foregroundColor(.white)
+                        }
+                        .accessibilityLabel("User guide")
                     }
-                    .accessibilityLabel("User guide")
                 }
                 if hasProAccess {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -322,6 +334,11 @@ struct HomeView: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
         }
+        .adaptiveSheet(isPresented: $showSessionReminderSettings) {
+            SessionReminderSettingsSheet()
+                .environmentObject(settingsStore)
+                .environmentObject(store)
+        }
     }
 }
 
@@ -337,6 +354,11 @@ struct LiveNowCard: View {
     @State private var liveSessionShareRef: PostCloseoutSessionRef?
     #endif
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    /// Use freshest live session from store so watch-originated updates appear immediately.
+    private var currentSession: Session {
+        store.liveSession ?? session
+    }
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
@@ -344,22 +366,22 @@ struct LiveNowCard: View {
                     Circle().fill(Color.red).frame(width: 8, height: 8)
                     L10nText("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
                 }
-                Text(session.casino).font(.subheadline.weight(.semibold)).foregroundColor(.white)
-                Text(session.game).font(.caption).foregroundColor(.gray)
-                Text("Starting tier \(session.startingTierPoints.formatted(.number.grouping(.automatic)))")
+                Text(currentSession.casino).font(.subheadline.weight(.semibold)).foregroundColor(.white)
+                Text(currentSession.game).font(.caption).foregroundColor(.gray)
+                Text("Starting tier \(currentSession.startingTierPoints.formatted(.number.grouping(.automatic)))")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.85))
-                if let prog = session.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
+                if let prog = currentSession.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
                     Text(prog)
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.7))
                         .lineLimit(2)
                 }
-                Text("Total buy-in \(settingsStore.currencySymbol)\(session.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                Text("Total buy-in \(settingsStore.currencySymbol)\(currentSession.totalBuyIn.formatted(.number.grouping(.automatic)))")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.75))
-                if session.totalComp > 0 {
-                    Text("Total comps \(settingsStore.currencySymbol)\(session.totalComp.formatted(.number.grouping(.automatic)))")
+                if currentSession.totalComp > 0 {
+                    Text("Total comps \(settingsStore.currencySymbol)\(currentSession.totalComp.formatted(.number.grouping(.automatic)))")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.75))
                 }
@@ -399,7 +421,7 @@ struct LiveNowCard: View {
 
                         #if os(iOS)
                         Button {
-                            liveSessionShareRef = PostCloseoutSessionRef(id: session.id)
+                            liveSessionShareRef = PostCloseoutSessionRef(id: currentSession.id)
                         } label: {
                             HStack(spacing: 5) {
                                 Image(systemName: "square.and.arrow.up")
@@ -427,10 +449,10 @@ struct LiveNowCard: View {
         .background(Color(.systemGray6).opacity(0.2))
         .cornerRadius(16)
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.red.opacity(0.4), lineWidth: 1))
-        .onReceive(ticker) { _ in elapsed = Date().timeIntervalSince(session.startTime) }
-        .onAppear { elapsed = Date().timeIntervalSince(session.startTime) }
+        .onReceive(ticker) { _ in elapsed = currentSession.duration }
+        .onAppear { elapsed = currentSession.duration }
         .adaptiveSheet(isPresented: $showStrategyOdds) {
-            StrategyOddsSheet(gameName: session.game)
+            StrategyOddsSheet(gameName: currentSession.game)
                 .environmentObject(settingsStore)
         }
         .halfScreenSheet(isPresented: $showPrivateNotes) {
