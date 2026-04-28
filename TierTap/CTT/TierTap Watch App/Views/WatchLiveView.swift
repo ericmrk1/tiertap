@@ -89,8 +89,10 @@ struct WatchLiveView: View {
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, minHeight: 72)
+                    .background(Color.green)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 }
 
                 LazyVGrid(columns: metricColumns, spacing: 8) {
@@ -98,7 +100,12 @@ struct WatchLiveView: View {
                         WatchAddBuyInSheet()
                             .environmentObject(store)
                     } label: {
-                        metricButton(title: "Buy-In", value: "$\((s?.totalBuyIn ?? 0).formatted(.number.grouping(.automatic)))", accent: .blue)
+                        metricButton(
+                            title: "Buy-In",
+                            value: "$\((s?.totalBuyIn ?? 0).formatted(.number.grouping(.automatic)))",
+                            icon: "plus.circle.fill",
+                            accent: .blue
+                        )
                     }
                     .buttonStyle(.plain)
 
@@ -106,7 +113,12 @@ struct WatchLiveView: View {
                         WatchAddCompSheet()
                             .environmentObject(store)
                     } label: {
-                        metricButton(title: "Comps", value: "$\((s?.totalComp ?? 0).formatted(.number.grouping(.automatic)))", accent: .cyan)
+                        metricButton(
+                            title: "Comps",
+                            value: "$\((s?.totalComp ?? 0).formatted(.number.grouping(.automatic)))",
+                            icon: "gift.fill",
+                            accent: .cyan
+                        )
                     }
                     .buttonStyle(.plain)
 
@@ -114,7 +126,12 @@ struct WatchLiveView: View {
                         WatchUpdateTierSheet()
                             .environmentObject(store)
                     } label: {
-                        metricButton(title: "Tier", value: (s?.startingTierPoints ?? 0).formatted(.number.grouping(.automatic)), accent: .purple)
+                        metricButton(
+                            title: "Tier",
+                            value: (s?.startingTierPoints ?? 0).formatted(.number.grouping(.automatic)),
+                            icon: "chart.bar.fill",
+                            accent: .purple
+                        )
                     }
                     .buttonStyle(.plain)
 
@@ -261,25 +278,25 @@ struct WatchLiveView: View {
             NavigationLink {
                 WatchAddCompSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Add Comp", accent: .cyan)
+                metricButton(title: "Quick", value: "Add Comp", icon: "gift.fill", accent: .cyan)
             }
         case "updateTier":
             NavigationLink {
                 WatchUpdateTierSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Update Tier", accent: .purple)
+                metricButton(title: "Quick", value: "Update Tier", icon: "chart.bar.fill", accent: .purple)
             }
         case "stopSession":
             Button {
                 showConfirmFastCloseOut = true
             } label: {
-                metricButton(title: "Quick", value: "Stop", accent: .red)
+                metricButton(title: "Quick", value: "Stop", icon: "stop.circle.fill", accent: .red)
             }
         default:
             NavigationLink {
                 WatchAddBuyInSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Add Buy-In", accent: .blue)
+                metricButton(title: "Quick", value: "Add Buy-In", icon: "plus.circle.fill", accent: .blue)
             }
         }
     }
@@ -300,12 +317,17 @@ struct WatchLiveView: View {
         }
     }
 
-    private func metricButton(title: String, value: String, accent: Color) -> some View {
+    private func metricButton(title: String, value: String, icon: String, accent: Color) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
+            Label {
+                Text(title)
+                    .font(.caption2)
+                    .lineLimit(1)
+            } icon: {
+                Image(systemName: icon)
+                    .font(.caption2)
+            }
+            .foregroundColor(.secondary)
             Text(value)
                 .font(.footnote.monospacedDigit().bold())
                 .foregroundColor(accent)
@@ -447,13 +469,25 @@ private struct WatchFastStartSheet: View {
                     .foregroundColor(statusColor)
             }
             if let pokerTemplate {
-                Button(fastStartLabel(for: .poker, template: pokerTemplate)) { requestFastStartConfirmation(.poker) }
+                Button {
+                    requestFastStartConfirmation(.poker)
+                } label: {
+                    Label(fastStartLabel(for: .poker, template: pokerTemplate), systemImage: iconName(for: .poker))
+                }
             }
             if let tableTemplate {
-                Button(fastStartLabel(for: .table, template: tableTemplate)) { requestFastStartConfirmation(.table) }
+                Button {
+                    requestFastStartConfirmation(.table)
+                } label: {
+                    Label(fastStartLabel(for: .table, template: tableTemplate), systemImage: iconName(for: .table))
+                }
             }
             if let slotsTemplate {
-                Button(fastStartLabel(for: .slots, template: slotsTemplate)) { requestFastStartConfirmation(.slots) }
+                Button {
+                    requestFastStartConfirmation(.slots)
+                } label: {
+                    Label(fastStartLabel(for: .slots, template: slotsTemplate), systemImage: iconName(for: .slots))
+                }
             }
             if !hasAnyTemplate {
                 Text("No fast start templates available yet. Start a session on iPhone first.")
@@ -490,6 +524,17 @@ private struct WatchFastStartSheet: View {
     private func requestFastStartConfirmation(_ category: SessionGameCategory) {
         pendingFastStartCategory = category
         showConfirmFastStart = true
+    }
+
+    private func iconName(for category: SessionGameCategory) -> String {
+        switch category {
+        case .poker:
+            return "suit.spade.fill"
+        case .table:
+            return "dice.fill"
+        case .slots:
+            return "7.circle.fill"
+        }
     }
 
     private func triggerFastStart(_ category: SessionGameCategory) {
