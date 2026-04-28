@@ -6,3 +6,15 @@ CTT/TierTap/ProfanityWords.txt
 
 # Xcode local build graph / fingerprints (regenerated each build)
 CTT/build/XCBuildData/
+
+# Local/intermediate build outputs (never commit)
+CTT/.tmp-dd/
+CTT/.asc-verify-dd/
+CTT/.final-verify-dd/
+CTT/.derivedData/
+CTT/build/
+CTT/**/*.xcarchive/
+CTT/**/*.dSYM/
+CTT/**/*.pcm
+CTT/**/*.pack
+CTT/**/*.idx
