@@ -4,6 +4,8 @@ import PhotosUI
 import AVFoundation
 import AVKit
 import CoreImage
+import CoreLocation
+import Supabase
 
 #if os(iOS)
 
@@ -17,6 +19,122 @@ private struct SessionArtShareTextItem: Identifiable {
 private struct SessionArtShareMediaItem: Identifiable {
     let id = UUID()
     let activityItems: [Any]
+}
+
+private struct SessionAIGeneratedImageReviewSheet: View {
+    let image: UIImage
+    let onClose: () -> Void
+    let onShare: () -> Void
+
+    @EnvironmentObject private var settingsStore: SettingsStore
+    @State private var saveMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        Text("Review AI image")
+                            .font(.headline.weight(.semibold))
+                            .foregroundColor(.white)
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                        if let saveMessage {
+                            Text(saveMessage)
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
+                        Button {
+                            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                            saveMessage = "Saved to Photos."
+                        } label: {
+                            Label("Save to Photos", systemImage: "square.and.arrow.down")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.blue.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            onShare()
+                        } label: {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.green.opacity(0.9))
+                                .foregroundColor(.black)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("TierTap AI Image")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close", action: onClose)
+                        .foregroundColor(.white)
+                }
+            }
+        }
+    }
+}
+
+private enum AIImageEmphasis: String, CaseIterable, Identifiable {
+    case player = "Player"
+    case money = "Money"
+    case game = "Game"
+    case metrics = "Metrics"
+    case comps = "Comps"
+    case location = "Location"
+    case atmosphere = "Atmosphere"
+
+    var id: String { rawValue }
+
+    var promptDirective: String {
+        switch self {
+        case .player: return "Emphasize the player's presence and posture."
+        case .money: return "Emphasize money/chips and bankroll energy."
+        case .game: return "Emphasize table gameplay and cards/chips action."
+        case .metrics: return "Emphasize clean metric readability as primary visual focus."
+        case .comps: return "Emphasize comps value and perks earned from gameplay."
+        case .location: return "Emphasize the casino location character and sense of place."
+        case .atmosphere: return "Emphasize casino ambiance and cinematic environment."
+        }
+    }
+}
+
+private let keySessionArtAIPlayerTraits = "ctt_session_art_ai_player_traits_v1"
+
+private enum AIPlayerTrait: String, CaseIterable, Identifiable {
+    case middleAgedMale = "Middle-age male"
+    case middleAgedFemale = "Middle-age female"
+    case youngerAdultMale = "Younger adult male"
+    case youngerAdultFemale = "Younger adult female"
+    case glasses = "Glasses"
+    case beard = "Beard"
+    case cleanShaven = "Clean-shaven"
+    case suit = "Suit"
+    case casual = "Casual outfit"
+    case hoodie = "Hoodie"
+    case cap = "Baseball cap"
+    case confident = "Confident posture"
+    case focused = "Focused expression"
+    case smiling = "Smiling"
+
+    var id: String { rawValue }
 }
 
 private enum SessionArtPickerKind: Identifiable {
@@ -3326,6 +3444,8 @@ struct SessionArtGeneratorView: View {
 
     @EnvironmentObject private var store: SessionStore
     @EnvironmentObject private var settingsStore: SettingsStore
+    @EnvironmentObject private var authStore: AuthStore
+    @EnvironmentObject private var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var outputKind: OutputKind = .image
@@ -3353,6 +3473,12 @@ struct SessionArtGeneratorView: View {
 
     @State private var shareMediaItem: SessionArtShareMediaItem?
     @State private var shareTextItem: SessionArtShareTextItem?
+    @State private var aiGeneratedImage: UIImage?
+    @State private var showAIReviewSheet = false
+    @State private var showPaywall = false
+    @State private var aiImageEmphasis: AIImageEmphasis = .metrics
+    @State private var includeScreenNameInAIImage = true
+    @State private var selectedAIPlayerTraits: Set<AIPlayerTrait> = []
 
     @State private var exportError: String?
 
@@ -3377,6 +3503,7 @@ struct SessionArtGeneratorView: View {
     private enum OutputKind: String, CaseIterable {
         case image = "Image"
         case text = "Text"
+        case tierTapAI = "TierTap AI"
     }
 
     private enum ArtStyle: String, CaseIterable {
@@ -3396,6 +3523,9 @@ struct SessionArtGeneratorView: View {
                         outputKindPicker
                         if outputKind == .text {
                             textShareOptionsSection
+                        } else if outputKind == .tierTapAI {
+                            metricsOptionsBubble
+                            aiGenerationSection
                         } else {
                             artStylePicker
                             if artStyle == .photoWithMetrics {
@@ -3407,7 +3537,9 @@ struct SessionArtGeneratorView: View {
                             }
                             shareVideoSection
                         }
-                        previewButton
+                        if outputKind != .tierTapAI {
+                            previewButton
+                        }
                     }
                 }
                 .padding()
@@ -3464,6 +3596,25 @@ struct SessionArtGeneratorView: View {
         }
         .sheet(item: $shareTextItem, onDismiss: { dismiss() }) { item in
             ShareSheet(items: [item.text])
+        }
+        .adaptiveSheet(isPresented: $showAIReviewSheet) {
+            if let image = aiGeneratedImage {
+                SessionAIGeneratedImageReviewSheet(
+                    image: image,
+                    onClose: { showAIReviewSheet = false },
+                    onShare: {
+                        showAIReviewSheet = false
+                        shareMediaItem = SessionArtShareMediaItem(activityItems: [image])
+                    }
+                )
+                .environmentObject(settingsStore)
+            }
+        }
+        .adaptiveSheet(isPresented: $showPaywall) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
         }
         .fullScreenCover(isPresented: $showImagePickerSheet, onDismiss: {
             showImagePickerSheet = false
@@ -3532,6 +3683,7 @@ struct SessionArtGeneratorView: View {
         }
         .onAppear {
             applySavedSharePresetIfNeeded()
+            loadAIPlayerTraitsSelection()
         }
         .onDisappear {
             cancelMediaExport()
@@ -3912,6 +4064,120 @@ struct SessionArtGeneratorView: View {
         .opacity(resolvedSession == nil ? 0.5 : 1)
     }
 
+    private var aiGenerationSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("TierTap AI Image")
+                .font(.caption.bold())
+                .foregroundColor(.gray)
+            Text("Generate one custom image from this session using your selected metrics.")
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.82))
+            if let remaining = remainingTierTapAIImagesToday {
+                Text("Daily images remaining: \(remaining)")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundColor(remaining > 0 ? .green.opacity(0.95) : .orange)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Emphasis")
+                    .font(.caption.bold())
+                    .foregroundColor(.gray)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(AIImageEmphasis.allCases) { emphasis in
+                            Button {
+                                aiImageEmphasis = emphasis
+                            } label: {
+                                Text(emphasis.rawValue)
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        aiImageEmphasis == emphasis
+                                        ? Color.green.opacity(0.92)
+                                        : Color.white.opacity(0.14)
+                                    )
+                                    .foregroundColor(aiImageEmphasis == emphasis ? .black : .white)
+                                    .cornerRadius(10)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            if let displayName = authStore.userDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !displayName.isEmpty {
+                Toggle("Include screen name (\(displayName))", isOn: $includeScreenNameInAIImage)
+                    .tint(.green)
+                    .foregroundColor(.white)
+            }
+            if aiImageEmphasis == .player {
+                aiPlayerTraitsSection
+            }
+            Button {
+                Task { await generateTierTapAIImage() }
+            } label: {
+                Text("Go")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.green.opacity(0.9))
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+            }
+            .buttonStyle(.plain)
+            .disabled(isExportingImage || resolvedSession == nil)
+            .opacity((isExportingImage || resolvedSession == nil) ? 0.55 : 1)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(12)
+    }
+
+    private var aiPlayerTraitsSection: some View {
+        let columns: [GridItem] = [
+            GridItem(.adaptive(minimum: 140), spacing: 8, alignment: .leading)
+        ]
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("Player traits (saved)")
+                .font(.caption.bold())
+                .foregroundColor(.gray)
+            Text("Pick default traits to guide player-focused images.")
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.75))
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
+                ForEach(AIPlayerTrait.allCases) { trait in
+                    let selected = selectedAIPlayerTraits.contains(trait)
+                    Button {
+                        if selected {
+                            selectedAIPlayerTraits.remove(trait)
+                        } else {
+                            selectedAIPlayerTraits.insert(trait)
+                        }
+                        saveAIPlayerTraitsSelection()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: selected ? "checkmark.square.fill" : "square")
+                            Text(trait.rawValue)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                        }
+                        .font(.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(selected ? Color.green.opacity(0.92) : Color.white.opacity(0.14))
+                        .foregroundColor(selected ? .black : .white)
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color(.systemGray6).opacity(0.12))
+        .cornerRadius(10)
+    }
+
     private var previewButtonTitle: String {
         if outputKind == .text {
             return "Preview & edit text (Text)"
@@ -4008,6 +4274,310 @@ struct SessionArtGeneratorView: View {
             previewLayout = composedLayout(for: s, canvasSize: designCanvas)
         }
         showPreviewSheet = true
+    }
+
+    private var canBypassTierTapAIImageLimits: Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return SupabaseConfig.isTestFlight
+        #endif
+    }
+
+    private var tierTapAIImageQuotaKey: String {
+        if let userId = authStore.session?.user.id.uuidString {
+            return "ctt_tiertap_ai_image_quota_\(userId)"
+        }
+        return "ctt_tiertap_ai_image_quota_anon"
+    }
+
+    private var remainingTierTapAIImagesToday: Int? {
+        guard !canBypassTierTapAIImageLimits else { return nil }
+        let used = Self.imagesGeneratedToday(for: tierTapAIImageQuotaKey)
+        return max(0, 2 - used)
+    }
+
+    private static func imagesGeneratedToday(for key: String) -> Int {
+        let defaults = UserDefaults.standard
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let dayKey = "\(key)_day"
+        let countKey = "\(key)_count"
+        let savedDay = defaults.object(forKey: dayKey) as? Date
+        if let savedDay, cal.isDate(savedDay, inSameDayAs: today) {
+            return max(0, defaults.integer(forKey: countKey))
+        }
+        defaults.set(today, forKey: dayKey)
+        defaults.set(0, forKey: countKey)
+        return 0
+    }
+
+    private static func registerImageGeneration(for key: String) {
+        let defaults = UserDefaults.standard
+        let used = imagesGeneratedToday(for: key)
+        let countKey = "\(key)_count"
+        defaults.set(used + 1, forKey: countKey)
+    }
+
+    private func buildTierTapAIImagePrompt(for session: Session, geoTraits: String?) -> String {
+        var metricLines: [String] = []
+        if publishTierPerHour, let tierRate = session.tiersPerHour {
+            metricLines.append("Tier per hour: \(String(format: "%.2f", tierRate))")
+        }
+        if publishBuyInCashOut {
+            metricLines.append("Total buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)")
+            if let cashOut = session.cashOut {
+                metricLines.append("Cash out: \(settingsStore.currencySymbol)\(cashOut)")
+            }
+        }
+        if publishWinLoss, let wl = session.winLoss {
+            metricLines.append("Win/Loss: \(wl >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(wl))")
+            if let wr = session.winRatePerHour {
+                metricLines.append("Win rate per hour: \(String(format: "%.2f", wr))")
+            }
+        }
+        if publishCompDetails, !session.compEvents.isEmpty {
+            metricLines.append("Comps total: \(settingsStore.currencySymbol)\(session.totalComp)")
+        }
+        if let tier = session.tierPointsEarned {
+            metricLines.append("Tier points earned: \(tier)")
+        }
+        let metricBlock = metricLines.isEmpty ? "- none selected" : metricLines.map { "- \($0)" }.joined(separator: "\n")
+        let displayName = authStore.userDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let screenNameLine = (includeScreenNameInAIImage && !displayName.isEmpty)
+            ? "- screen_name: \(displayName)"
+            : "- screen_name: not included"
+        let playerTraitsLine: String
+        if aiImageEmphasis == .player && !selectedAIPlayerTraits.isEmpty {
+            let joined = selectedAIPlayerTraits.map(\.rawValue).sorted().joined(separator: ", ")
+            playerTraitsLine = "- player_traits: \(joined)"
+        } else if aiImageEmphasis == .player {
+            playerTraitsLine = "- player_traits: none selected"
+        } else {
+            playerTraitsLine = "- player_traits: ignored (non-player emphasis)"
+        }
+        let geoLine = geoTraits.map { "- geo_traits: \($0)" } ?? "- geo_traits: unavailable"
+        let appLanguageName = settingsStore.appLanguage.englishNameForGemini
+        let compLines: String = {
+            guard !session.compEvents.isEmpty else { return "- none" }
+            let rows = session.compEvents.prefix(12).map { ev -> String in
+                let kindText: String = {
+                    switch ev.kind {
+                    case .dollarsCredits: return "free money/credits"
+                    case .foodBeverage:
+                        if let fb = ev.foodBeverageKindDisplayLabel, !fb.isEmpty {
+                            return "food/beverage (\(fb))"
+                        }
+                        return "food/beverage"
+                    }
+                }()
+                let details = ev.details?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if details.isEmpty {
+                    return "- \(kindText): \(settingsStore.currencySymbol)\(ev.amount)"
+                }
+                return "- \(kindText): \(settingsStore.currencySymbol)\(ev.amount) (\(details))"
+            }
+            return rows.joined(separator: "\n")
+        }()
+        return """
+        Create one social-share poster image for a poker session.
+        IMPORTANT: Use only the facts listed below. Do not invent details (for example crowd size, table size, lighting rig details, or background story).
+        Styling intent (apply visually, do NOT render as text): cool, slick, clean, premium.
+        No extra text except allowed overlays.
+        Output must be ONE single image composition only.
+        Do NOT create multiple options, variants, panels, collages, diptychs, split-screen, or before/after layouts.
+        Do NOT place labels like "Option 1", "Option 2", "Version A", or similar text anywhere in the image.
+        Do NOT render metadata or technical annotations in the image (for example "(9:16)", "AR 9:16", "prompt:", "seed:", "model:", watermarks, or debug tags).
+        Never render any instruction sentence from this prompt as image text.
+        If any text appears in the generated image, it MUST be in \(appLanguageName).
+
+        SESSION_FACTS:
+        - casino: \(session.casino)
+        - game: \(session.game)
+        - session_date: \(session.startTime.formatted(date: .abbreviated, time: .omitted))
+        - duration_hours: \(String(format: "%.2f", session.hoursPlayed))
+        \(screenNameLine)
+        \(playerTraitsLine)
+        \(geoLine)
+        - comps_definition: comps are perks earned from gameplay (free money/credits, food, beverage, or similar perks)
+        - comps_total: \(settingsStore.currencySymbol)\(session.totalComp)
+        - comps_dollars_credits_total: \(settingsStore.currencySymbol)\(session.totalCompDollarsCredits)
+
+        COMPS_BREAKDOWN:
+        \(compLines)
+
+        METRICS_SELECTED:
+        \(metricBlock)
+
+        CREATIVE_DIRECTION:
+        - \(aiImageEmphasis.promptDirective)
+        - regardless of emphasis, overall vibe must be cool, slick, and highly premium
+        - portrait composition (9:16)
+        - high readability for metrics
+        - modern premium casino aesthetic
+        - avoid trademarks and copyrighted characters
+        """
+    }
+
+    @MainActor
+    private func generateTierTapAIImageProgressLoop() {
+        exportProgressTask?.cancel()
+        exportProgressTask = Task { @MainActor in
+            while !Task.isCancelled && exportProgress < 0.78 {
+                try? await Task.sleep(nanoseconds: 420_000_000)
+                exportProgress = min(0.78, exportProgress + 0.012)
+            }
+        }
+    }
+
+    private func geoTraitsText(for session: Session) async -> String? {
+        guard let lat = session.casinoLatitude, let lon = session.casinoLongitude else { return nil }
+        let location = CLLocation(latitude: lat, longitude: lon)
+        do {
+            let placemarks = try await CLGeocoder().reverseGeocodeLocation(location)
+            if let placemark = placemarks.first {
+                let parts = [placemark.locality ?? placemark.subAdministrativeArea, placemark.administrativeArea, placemark.country]
+                    .compactMap { value -> String? in
+                        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        return trimmed.isEmpty ? nil : trimmed
+                    }
+                if !parts.isEmpty { return parts.joined(separator: ", ") }
+            }
+        } catch {
+            return String(format: "lat %.4f, lon %.4f", lat, lon)
+        }
+        return String(format: "lat %.4f, lon %.4f", lat, lon)
+    }
+
+    private func overlayTierTapLogo(on image: UIImage) -> UIImage {
+        guard let logo = UIImage(named: "TierTapLogo") else { return image }
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = image.scale
+        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
+            let minSide = min(image.size.width, image.size.height)
+            let logoWidth = max(72, minSide * 0.16)
+            let ratio = logo.size.height > 0 ? (logo.size.width / logo.size.height) : 1
+            let logoHeight = logoWidth / max(ratio, 0.001)
+            let pad = max(18, minSide * 0.03)
+            let rect = CGRect(
+                x: image.size.width - logoWidth - pad,
+                y: image.size.height - logoHeight - pad,
+                width: logoWidth,
+                height: logoHeight
+            )
+            logo.draw(in: rect, blendMode: .normal, alpha: 0.95)
+        }
+    }
+
+    private func loadAIPlayerTraitsSelection() {
+        let raw = UserDefaults.standard.stringArray(forKey: keySessionArtAIPlayerTraits) ?? []
+        let parsed = raw.compactMap { AIPlayerTrait(rawValue: $0) }
+        selectedAIPlayerTraits = Set(parsed)
+    }
+
+    private func saveAIPlayerTraitsSelection() {
+        let raw = selectedAIPlayerTraits.map(\.rawValue).sorted()
+        UserDefaults.standard.set(raw, forKey: keySessionArtAIPlayerTraits)
+    }
+
+    @MainActor
+    private func generateTierTapAIImage() async {
+        guard let session = resolvedSession else { return }
+        guard authStore.isSignedIn else {
+            exportError = "Please sign in to generate TierTap AI images."
+            return
+        }
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            exportError = "AI image generation is not configured for this build."
+            return
+        }
+        let hasPaidAccess = subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        guard hasPaidAccess else {
+            showPaywall = true
+            return
+        }
+        if let remaining = remainingTierTapAIImagesToday, remaining <= 0 {
+            exportError = "You have reached your 2 AI image generations for today."
+            return
+        }
+
+        exportStatusTitle = "Generating TierTap AI image..."
+        isExportingImage = true
+        exportProgress = 0.01
+        generateTierTapAIImageProgressLoop()
+
+        struct RequestBody: Encodable {
+            let prompt: String
+            let sessionId: String
+            let metricKeys: [String]
+            let imageEmphasis: String
+            let playerTraits: [String]
+        }
+        struct ResponseBody: Decodable {
+            let imageBase64: String
+            let mimeType: String?
+        }
+
+        let metricKeys: [String] = [
+            publishTierPerHour ? "tierPerHour" : nil,
+            publishBuyInCashOut ? "buyInCashOut" : nil,
+            publishWinLoss ? "winLoss" : nil,
+            (publishCompDetails || aiImageEmphasis == .comps) ? "compDetails" : nil
+        ].compactMap { $0 }
+        let geoTraits = await geoTraitsText(for: session)
+        let body = RequestBody(
+            prompt: buildTierTapAIImagePrompt(for: session, geoTraits: geoTraits),
+            sessionId: session.id.uuidString,
+            metricKeys: metricKeys,
+            imageEmphasis: aiImageEmphasis.rawValue,
+            playerTraits: selectedAIPlayerTraits.map(\.rawValue).sorted()
+        )
+        print("""
+        [TierTap] [session-imagen] invoke request
+          sessionId: \(body.sessionId)
+          metricKeys: \(body.metricKeys)
+          prompt:
+        \(body.prompt)
+        """)
+
+        do {
+            let response: ResponseBody = try await GeminiRouterThrottle.shared.executeWithRetries {
+                try await client.functions.invoke(
+                    "session-imagen",
+                    options: FunctionInvokeOptions(body: body)
+                )
+            }
+            guard let imageData = Data(base64Encoded: response.imageBase64),
+                  let decodedImage = UIImage(data: imageData) else {
+                throw NSError(domain: "SessionArtGeneratorView", code: -1, userInfo: [
+                    NSLocalizedDescriptionKey: "The generated image was invalid."
+                ])
+            }
+            let image = overlayTierTapLogo(on: decodedImage)
+            print("""
+            [TierTap] [session-imagen] invoke response
+              mimeType: \(response.mimeType ?? "nil")
+              base64Length: \(response.imageBase64.count)
+              decodedBytes: \(imageData.count)
+              imageSize: \(Int(image.size.width))x\(Int(image.size.height))
+            """)
+            Self.registerImageGeneration(for: tierTapAIImageQuotaKey)
+            exportProgressTask?.cancel()
+            exportProgressTask = nil
+            exportProgress = 1
+            isExportingImage = false
+            aiGeneratedImage = image
+            showAIReviewSheet = true
+        } catch {
+            print("[TierTap] [session-imagen] invoke failed: \(error.localizedDescription)")
+            exportProgressTask?.cancel()
+            exportProgressTask = nil
+            exportProgress = 0
+            isExportingImage = false
+            exportError = error.localizedDescription
+        }
     }
 
     private func chooseUnderlay(_ source: SessionUnderlaySource) {

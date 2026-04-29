@@ -13,6 +13,7 @@ struct PostCloseoutShareFlowView: View {
     @EnvironmentObject private var store: SessionStore
     @EnvironmentObject private var settingsStore: SettingsStore
     @EnvironmentObject private var authStore: AuthStore
+    @EnvironmentObject private var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var step: Step = .pickAction
@@ -54,6 +55,8 @@ struct PostCloseoutShareFlowView: View {
                     }
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
                 }
             }
         }
