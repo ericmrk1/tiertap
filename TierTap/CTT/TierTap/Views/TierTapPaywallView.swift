@@ -152,6 +152,11 @@ struct TierTapPaywallView: View {
                     subtitle: "Ask TierTap to analyze your sessions and patterns."
                 )
                 ProBenefitRow(
+                    icon: "photo.badge.sparkles",
+                    title: "AI Session Image Generation",
+                    subtitle: "Create premium session share images with TierTap AI."
+                )
+                ProBenefitRow(
                     icon: "camera.viewfinder",
                     title: "Chip Estimator at Close Out",
                     subtitle: "Estimate chip stacks from a photo with AI before you cash out."

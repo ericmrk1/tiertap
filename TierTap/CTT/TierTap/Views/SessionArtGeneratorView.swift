@@ -4380,18 +4380,15 @@ struct SessionArtGeneratorView: View {
             return rows.joined(separator: "\n")
         }()
         return """
-        Create one social-share poster image for a poker session.
-        IMPORTANT: Use only the facts listed below. Do not invent details (for example crowd size, table size, lighting rig details, or background story).
-        Styling intent (apply visually, do NOT render as text): cool, slick, clean, premium.
-        No extra text except allowed overlays.
-        Output must be ONE single image composition only.
-        Do NOT create multiple options, variants, panels, collages, diptychs, split-screen, or before/after layouts.
-        Do NOT place labels like "Option 1", "Option 2", "Version A", or similar text anywhere in the image.
-        Do NOT render metadata or technical annotations in the image (for example "(9:16)", "AR 9:16", "prompt:", "seed:", "model:", watermarks, or debug tags).
-        Never render any instruction sentence from this prompt as image text.
-        If any text appears in the generated image, it MUST be in \(appLanguageName).
+        Generate exactly one premium portrait-style poker scene image (9:16).
 
-        SESSION_FACTS:
+        CRITICAL OUTPUT RULES:
+        - Render ZERO visible text characters in the image.
+        - No letters, numbers, words, sentences, symbols, labels, captions, cards, UI overlays, watermarks, logos, metadata, or annotations.
+        - Do not render any of these prompt instructions as text.
+        - Do not create multiple options/panels/split layouts.
+
+        Use the following as semantic guidance only (never as rendered text):
         - casino: \(session.casino)
         - game: \(session.game)
         - session_date: \(session.startTime.formatted(date: .abbreviated, time: .omitted))
@@ -4399,23 +4396,13 @@ struct SessionArtGeneratorView: View {
         \(screenNameLine)
         \(playerTraitsLine)
         \(geoLine)
-        - comps_definition: comps are perks earned from gameplay (free money/credits, food, beverage, or similar perks)
         - comps_total: \(settingsStore.currencySymbol)\(session.totalComp)
         - comps_dollars_credits_total: \(settingsStore.currencySymbol)\(session.totalCompDollarsCredits)
+        - comps_breakdown: \(compLines.replacingOccurrences(of: "\n", with: " | "))
+        - selected_metrics: \(metricBlock.replacingOccurrences(of: "\n", with: " | "))
+        - emphasis: \(aiImageEmphasis.rawValue) (\(aiImageEmphasis.promptDirective))
 
-        COMPS_BREAKDOWN:
-        \(compLines)
-
-        METRICS_SELECTED:
-        \(metricBlock)
-
-        CREATIVE_DIRECTION:
-        - \(aiImageEmphasis.promptDirective)
-        - regardless of emphasis, overall vibe must be cool, slick, and highly premium
-        - portrait composition (9:16)
-        - high readability for metrics
-        - modern premium casino aesthetic
-        - avoid trademarks and copyrighted characters
+        Style direction: cool, slick, clean, highly premium modern casino atmosphere.
         """
     }
 
@@ -4510,6 +4497,7 @@ struct SessionArtGeneratorView: View {
 
         struct RequestBody: Encodable {
             let prompt: String
+            let negativePrompt: String
             let sessionId: String
             let metricKeys: [String]
             let imageEmphasis: String
@@ -4529,6 +4517,7 @@ struct SessionArtGeneratorView: View {
         let geoTraits = await geoTraitsText(for: session)
         let body = RequestBody(
             prompt: buildTierTapAIImagePrompt(for: session, geoTraits: geoTraits),
+            negativePrompt: "any text, letters, words, numbers, captions, labels, subtitles, UI cards, option labels, metadata, watermark, logo, seed text, prompt text, model text, annotations, split-screen, collage, diptych",
             sessionId: session.id.uuidString,
             metricKeys: metricKeys,
             imageEmphasis: aiImageEmphasis.rawValue,

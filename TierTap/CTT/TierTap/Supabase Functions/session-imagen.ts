@@ -11,6 +11,7 @@ const IMAGEN_FALLBACK_MODEL =
 
 type ImagenRequest = {
   prompt: string;
+  negativePrompt?: string;
   sessionId?: string;
   metricKeys?: string[];
   imageEmphasis?: string;
@@ -49,12 +50,14 @@ Deno.serve(async (req: Request) => {
   if (!prompt) {
     return new Response("Missing prompt", { status: 400, headers: corsHeaders });
   }
+  const negativePrompt = (parsed.negativePrompt ?? "").trim();
   console.log("[session-imagen] incoming request", {
     sessionId: parsed.sessionId ?? null,
     metricKeys: parsed.metricKeys ?? [],
     imageEmphasis: parsed.imageEmphasis ?? null,
     playerTraits: parsed.playerTraits ?? [],
     promptLength: prompt.length,
+    negativePromptLength: negativePrompt.length,
     prompt,
   });
 
@@ -64,6 +67,7 @@ Deno.serve(async (req: Request) => {
       sampleCount: 1,
       personGeneration: "allow_adult",
       aspectRatio: "9:16",
+      ...(negativePrompt ? { negativePrompt } : {}),
     },
   };
   async function callImagen(model: string): Promise<{ upstreamText: string; status: number }> {
