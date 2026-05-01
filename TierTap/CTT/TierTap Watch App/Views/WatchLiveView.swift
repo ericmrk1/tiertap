@@ -278,19 +278,19 @@ struct WatchLiveView: View {
             NavigationLink {
                 WatchAddCompSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Add Comp", icon: "gift.fill", accent: .cyan)
+                metricButton(title: "TierTap", value: "Add Comp", icon: "gift.fill", accent: .cyan)
             }
         case "updateTier":
             NavigationLink {
                 WatchUpdateTierSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Update Tier", icon: "chart.bar.fill", accent: .purple)
+                metricButton(title: "TierTap", value: "Update Tier", icon: "chart.bar.fill", accent: .purple)
             }
         case "stopSession":
             Button {
                 showConfirmFastCloseOut = true
             } label: {
-                metricButton(title: "Quick", value: "Stop", icon: "stop.circle.fill", accent: .red)
+                metricButton(title: "TierTap", value: "Stop", icon: "stop.circle.fill", accent: .red)
             }
         default:
             NavigationLink {
@@ -591,6 +591,7 @@ private struct WatchAddBuyInSheet: View {
     @State private var statusColor: Color = .green
     @State private var pendingExpectedTotal: Int?
     @State private var showConfirmAdd = false
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
 
     private var currentTotalBuyIn: Int {
         store.liveSession?.totalBuyIn ?? 0
@@ -599,11 +600,26 @@ private struct WatchAddBuyInSheet: View {
     private var selectedAmount: Int {
         let custom = Int(customAmountText.filter { $0.isNumber }) ?? 0
         if custom > 0 { return custom }
-        return max(20, Int(amount))
+        return max(5, Int(amount))
     }
 
     private var proposedTotal: Int {
         currentTotalBuyIn + selectedAmount
+    }
+
+    private var amountPresetValues: [Int] {
+        let defaults = [20, 100, 200, 500]
+        guard let raw = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") else {
+            return defaults
+        }
+        let parsed = parseFlexibleSeparatedIntegers(raw)
+        return parsed.isEmpty ? defaults : parsed
+    }
+
+    private var buyInConfirmationSummary: String {
+        let typedDigits = customAmountText.filter { $0.isNumber }
+        let entryMode = typedDigits.isEmpty ? "Digital Crown / preset" : "Typed amount"
+        return "Amount: $\(selectedAmount)\nEntry: \(entryMode)\nCurrent total: $\(currentTotalBuyIn)\nNew total: $\(proposedTotal)"
     }
 
     var body: some View {
@@ -621,14 +637,7 @@ private struct WatchAddBuyInSheet: View {
             Text("Proposed total: $\(proposedTotal)")
                 .font(.caption2)
                 .foregroundColor(.green)
-            HStack {
-                quickAmountButton(20)
-                quickAmountButton(100)
-            }
-            HStack {
-                quickAmountButton(200)
-                quickAmountButton(500)
-            }
+            quickAmountRows(amountPresetValues)
             TextField("Custom amount", text: $customAmountText)
                 .onChange(of: customAmountText) { new in
                     let digits = new.filter { $0.isNumber }
@@ -637,13 +646,19 @@ private struct WatchAddBuyInSheet: View {
             Button("Add Buy-In") {
                 showConfirmAdd = true
             }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .foregroundColor(.black)
+            .padding(.vertical, 6)
+            .background(Color.green)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .focusable(true)
         .digitalCrownRotation(
             $amount,
-            from: 20,
+            from: 5,
             through: 20_000,
-            by: 20,
+            by: 5,
             sensitivity: .low,
             isContinuous: false,
             isHapticFeedbackEnabled: true
@@ -661,7 +676,7 @@ private struct WatchAddBuyInSheet: View {
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
             }
         } message: {
-            Text("Add $\(selectedAmount) buy-in? New total will be $\(proposedTotal).")
+            Text("Add buy-in?\n\n\(buyInConfirmationSummary)")
         }
         .onChange(of: store.liveSession?.totalBuyIn) { newTotal in
             guard let expected = pendingExpectedTotal, let newTotal else { return }
@@ -672,7 +687,7 @@ private struct WatchAddBuyInSheet: View {
             playSuccessHaptic()
         }
         .onAppear {
-            customAmountText = "\(max(20, Int(amount)))"
+            customAmountText = "\(max(5, Int(amount)))"
         }
     }
 
@@ -681,7 +696,37 @@ private struct WatchAddBuyInSheet: View {
             amount = Double(value)
             customAmountText = "\(value)"
         }
-        .buttonStyle(.bordered)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .foregroundColor(.black)
+        .padding(.vertical, 4)
+        .background(Color.green)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func quickAmountRows(_ values: [Int]) -> some View {
+        let chunkSize = 2
+        let totalRows = Int(ceil(Double(values.count) / Double(chunkSize)))
+        ForEach(0..<max(totalRows, 1), id: \.self) { row in
+            HStack {
+                let firstIndex = row * chunkSize
+                if firstIndex < values.count {
+                    quickAmountButton(values[firstIndex])
+                }
+                let secondIndex = firstIndex + 1
+                if secondIndex < values.count {
+                    quickAmountButton(values[secondIndex])
+                }
+            }
+        }
+    }
+
+    private func parseFlexibleSeparatedIntegers(_ raw: String) -> [Int] {
+        raw
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            .filter { $0 > 0 }
     }
 
     private func playSuccessHaptic() {
@@ -702,10 +747,14 @@ private struct WatchAddCompSheet: View {
     @State private var amount: Double = 20
     @State private var customAmountText: String = "20"
     @State private var details = ""
+    @State private var selectedCompEntryMode: WatchCompEntryMode?
+    @State private var selectedContextIndex: Int = 0
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
     @State private var pendingExpectedCompTotal: Int?
     @State private var showConfirmAdd = false
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+    private let contextGridColumns: [GridItem] = [GridItem(.flexible()), GridItem(.flexible())]
 
     private var currentCompTotal: Int {
         store.liveSession?.totalComp ?? 0
@@ -714,11 +763,57 @@ private struct WatchAddCompSheet: View {
     private var selectedAmount: Int {
         let custom = Int(customAmountText.filter { $0.isNumber }) ?? 0
         if custom > 0 { return custom }
-        return max(20, Int(amount))
+        return max(5, Int(amount))
     }
 
     private var proposedCompTotal: Int {
         currentCompTotal + selectedAmount
+    }
+
+    private var compContextLabel: String {
+        let mode = selectedCompEntryMode ?? .cashValue
+        if mode == .foodBeverage {
+            let options = contextOptions
+            guard selectedContextIndex >= 0, selectedContextIndex < options.count else { return "Food/Beverage" }
+            let selected = options[selectedContextIndex].trimmingCharacters(in: .whitespacesAndNewlines)
+            return selected.isEmpty ? "Food/Beverage" : selected
+        }
+        return "Cash Value"
+    }
+
+    private var compConfirmationSummary: String {
+        let notes = details.trimmingCharacters(in: .whitespacesAndNewlines)
+        var lines = [
+            "Type: \(compContextLabel)",
+            "Amount: $\(selectedAmount)",
+            "Current comps: $\(currentCompTotal)",
+            "New comps total: $\(proposedCompTotal)"
+        ]
+        if !notes.isEmpty {
+            lines.append("Notes: \(notes)")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private var amountPresetValues: [Int] {
+        let defaults = [20, 50, 100, 500]
+        guard let raw = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") else {
+            return defaults
+        }
+        let parsed = parseFlexibleSeparatedIntegers(raw)
+        return parsed.isEmpty ? defaults : parsed
+    }
+
+    private var contextOptions: [String] {
+        let defaults = ["Cocktail", "Beer", "Food", "Cash"]
+        guard let raw = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") else {
+            return defaults
+        }
+        let parsed = raw
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return parsed.isEmpty ? defaults : parsed
     }
 
     var body: some View {
@@ -731,35 +826,95 @@ private struct WatchAddCompSheet: View {
             Text("Current comps: $\(currentCompTotal)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
-            Text("Comp: $\(selectedAmount)")
-                .font(.headline.monospacedDigit())
-            Text("Proposed comps: $\(proposedCompTotal)")
-                .font(.caption2)
-                .foregroundColor(.green)
-            HStack {
-                quickAmountButton(20)
-                quickAmountButton(50)
-            }
-            HStack {
-                quickAmountButton(100)
-                quickAmountButton(200)
-            }
-            TextField("Custom comp", text: $customAmountText)
-                .onChange(of: customAmountText) { new in
-                    let digits = new.filter { $0.isNumber }
-                    if digits != new { customAmountText = digits }
+            if selectedCompEntryMode == nil {
+                Text("Add comp as:")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Button("Add Food/Beverage") {
+                    selectedCompEntryMode = .foodBeverage
+                    selectedContextIndex = min(selectedContextIndex, max(contextOptions.count - 1, 0))
                 }
-            TextField("Details (optional)", text: $details)
+                .buttonStyle(.borderedProminent)
+                .tint(.cyan)
+                Button("Add Cash Value") {
+                    selectedCompEntryMode = .cashValue
+                }
+                .buttonStyle(.bordered)
+            } else if selectedCompEntryMode == .cashValue {
+                Text("Comp: $\(selectedAmount)")
+                    .font(.headline.monospacedDigit())
+                Text("Proposed comps: $\(proposedCompTotal)")
+                    .font(.caption2)
+                    .foregroundColor(.green)
+                quickAmountRows(amountPresetValues)
+                TextField("Custom comp", text: $customAmountText)
+                    .onChange(of: customAmountText) { new in
+                        let digits = new.filter { $0.isNumber }
+                        if digits != new { customAmountText = digits }
+                    }
+                TextField("Context (optional)", text: $details)
+            } else {
+                Text("Category")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                LazyVGrid(columns: contextGridColumns, spacing: 8) {
+                    ForEach(Array(contextOptions.enumerated()), id: \.offset) { index, option in
+                        Button {
+                            selectedContextIndex = index
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(option)
+                                    .font(.caption2.bold())
+                                    .lineLimit(1)
+                                if selectedContextIndex == index {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption2)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .foregroundColor(selectedContextIndex == index ? .black : .white)
+                        .background(selectedContextIndex == index ? Color.green : Color.gray.opacity(0.22))
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                }
+                Text("Estimated value: $\(selectedAmount)")
+                    .font(.headline.monospacedDigit())
+                Text("Proposed comps: $\(proposedCompTotal)")
+                    .font(.caption2)
+                    .foregroundColor(.green)
+                quickAmountRows(amountPresetValues)
+                TextField("Custom value", text: $customAmountText)
+                    .onChange(of: customAmountText) { new in
+                        let digits = new.filter { $0.isNumber }
+                        if digits != new { customAmountText = digits }
+                    }
+                TextField("Notes (optional)", text: $details)
+            }
+            if selectedCompEntryMode != nil {
+                Button("Change Type") {
+                    selectedCompEntryMode = nil
+                }
+                .buttonStyle(.bordered)
+            }
             Button("Add Comp") {
                 showConfirmAdd = true
             }
+            .disabled(selectedCompEntryMode == nil || selectedAmount <= 0 || (selectedCompEntryMode == .foodBeverage && contextOptions.isEmpty))
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .foregroundColor(.black)
+            .padding(.vertical, 6)
+            .background(Color.green)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .focusable(true)
         .digitalCrownRotation(
             $amount,
-            from: 20,
+            from: 5,
             through: 10_000,
-            by: 20,
+            by: 5,
             sensitivity: .low,
             isContinuous: false,
             isHapticFeedbackEnabled: true
@@ -772,14 +927,31 @@ private struct WatchAddCompSheet: View {
                 let immediate = SessionSyncManager.shared.isReachable
                 let trimmed = details.trimmingCharacters(in: .whitespacesAndNewlines)
                 pendingExpectedCompTotal = currentCompTotal + selected
-                store.addComp(amount: selected, details: trimmed.isEmpty ? nil : trimmed)
+                let mode = selectedCompEntryMode ?? .cashValue
+                if mode == .foodBeverage {
+                    let context = compContextLabel
+                    let detailsParts = [context, trimmed].filter { !$0.isEmpty }
+                    let mergedDetails = detailsParts.joined(separator: " - ")
+                    store.addComp(
+                        amount: selected,
+                        kind: .foodBeverage,
+                        details: mergedDetails.isEmpty ? nil : mergedDetails,
+                        foodBeverageKind: mappedFoodBeverageKind(for: context),
+                        foodBeverageOtherDescription: mappedFoodBeverageKind(for: context) == .other ? context : nil
+                    )
+                } else {
+                    let cashContext = "Cash Value"
+                    let detailsParts = [cashContext, trimmed].filter { !$0.isEmpty }
+                    let mergedDetails = detailsParts.joined(separator: " - ")
+                    store.addComp(amount: selected, kind: .dollarsCredits, details: mergedDetails.isEmpty ? nil : mergedDetails)
+                }
                 statusMessage = immediate ? "Comp sent" : "Comp queued"
                 statusColor = immediate ? .green : .orange
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
                 details = ""
             }
         } message: {
-            Text("Add $\(selectedAmount) comp? New comp total will be $\(proposedCompTotal).")
+            Text("Add comp?\n\n\(compConfirmationSummary)")
         }
         .onChange(of: store.liveSession?.totalComp) { newTotal in
             guard let expected = pendingExpectedCompTotal, let newTotal else { return }
@@ -790,16 +962,58 @@ private struct WatchAddCompSheet: View {
             playSuccessHaptic()
         }
         .onAppear {
-            customAmountText = "\(max(20, Int(amount)))"
+            customAmountText = "\(max(5, Int(amount)))"
+            selectedContextIndex = min(selectedContextIndex, max(contextOptions.count - 1, 0))
+        }
+    }
+
+    @ViewBuilder
+    private func quickAmountRows(_ values: [Int]) -> some View {
+        let chunkSize = 2
+        let totalRows = Int(ceil(Double(values.count) / Double(chunkSize)))
+        ForEach(0..<max(totalRows, 1), id: \.self) { row in
+            HStack {
+                let firstIndex = row * chunkSize
+                if firstIndex < values.count {
+                    quickAmountButton(values[firstIndex])
+                }
+                let secondIndex = firstIndex + 1
+                if secondIndex < values.count {
+                    quickAmountButton(values[secondIndex])
+                }
+            }
         }
     }
 
     private func quickAmountButton(_ value: Int) -> some View {
         Button("$\(value)") {
-            amount = Double(value)
-            customAmountText = "\(value)"
+            amount = Double(max(1, value))
+            customAmountText = "\(max(1, value))"
         }
-        .buttonStyle(.bordered)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .foregroundColor(.black)
+        .padding(.vertical, 4)
+        .background(Color.green)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func parseFlexibleSeparatedIntegers(_ raw: String) -> [Int] {
+        raw
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            .filter { $0 > 0 }
+    }
+
+    private func mappedFoodBeverageKind(for context: String) -> FoodBeverageKind {
+        let normalized = context.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if normalized.contains("beer") || normalized.contains("cocktail") || normalized.contains("drink") {
+            return .drinks
+        }
+        if normalized.contains("food") || normalized.contains("meal") {
+            return .meal
+        }
+        return .other
     }
 
     private func playSuccessHaptic() {
@@ -813,6 +1027,11 @@ private struct WatchAddCompSheet: View {
         WKInterfaceDevice.current().play(.click)
         #endif
     }
+}
+
+private enum WatchCompEntryMode {
+    case foodBeverage
+    case cashValue
 }
 
 private struct WatchUpdateTierSheet: View {
@@ -850,6 +1069,7 @@ private struct WatchUpdateTierSheet: View {
                 .foregroundColor(.secondary)
             Text("Add points: \(selectedTierDelta)")
                 .font(.headline.monospacedDigit())
+                .frame(maxWidth: .infinity, alignment: .center)
             Text("Proposed tier: \(proposedTierPoints)")
                 .font(.caption2)
                 .foregroundColor(.green)
@@ -869,6 +1089,12 @@ private struct WatchUpdateTierSheet: View {
             Button("Update Tier") {
                 showConfirmUpdateTier = true
             }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .foregroundColor(.black)
+            .padding(.vertical, 6)
+            .background(Color.green)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .focusable(true)
         .digitalCrownRotation(

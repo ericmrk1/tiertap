@@ -53,6 +53,9 @@ private let keyWatchSessionPulseEnabled = "ctt_watch_session_pulse_enabled"
 private let keyWatchSessionPulseMinutes = "ctt_watch_session_pulse_minutes"
 private let keyWatchWristRaiseSummaryEnabled = "ctt_watch_wrist_raise_summary_enabled"
 private let keyWatchQuickAction = "ctt_watch_quick_action"
+private let keyWatchBuyInCashDefaults = "ctt_watch_buyin_cash_defaults"
+private let keyWatchCompCashDefaults = "ctt_watch_comp_cash_defaults"
+private let keyWatchCompContextOptions = "ctt_watch_comp_context_options"
 private let appGroupSuiteName = "group.com.app.tiertap"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
@@ -648,6 +651,38 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    @Published var watchBuyInCashDefaultsText: String {
+        didSet {
+            let normalized = watchBuyInCashDefaultsText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: ",", with: " ")
+                .split(whereSeparator: \.isWhitespace)
+                .joined(separator: " ")
+            UserDefaults.standard.set(normalized, forKey: keyWatchBuyInCashDefaults)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(normalized, forKey: keyWatchBuyInCashDefaults)
+        }
+    }
+
+    @Published var watchCompCashDefaultsText: String {
+        didSet {
+            let normalized = watchCompCashDefaultsText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: ",", with: " ")
+                .split(whereSeparator: \.isWhitespace)
+                .joined(separator: " ")
+            UserDefaults.standard.set(normalized, forKey: keyWatchCompCashDefaults)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(normalized, forKey: keyWatchCompCashDefaults)
+        }
+    }
+
+    @Published var watchCompContextOptionsText: String {
+        didSet {
+            let trimmed = watchCompContextOptionsText.trimmingCharacters(in: .whitespacesAndNewlines)
+            UserDefaults.standard.set(trimmed, forKey: keyWatchCompContextOptions)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(trimmed, forKey: keyWatchCompContextOptions)
+        }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -722,8 +757,8 @@ final class SettingsStore: ObservableObject {
         } else {
             self.lastSlotSessionDefaults = nil
         }
-        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
-        self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
+        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "indigo"
+        self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "yellow"
         self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)
         self.secondaryColorHex = UserDefaults.standard.string(forKey: keySecondaryColorHex)
         self.selectedLocationFilter = UserDefaults.standard.string(forKey: keySelectedLocationFilter)
@@ -835,6 +870,18 @@ final class SettingsStore: ObservableObject {
         } else {
             self.watchQuickAction = .addBuyIn
         }
+        self.watchBuyInCashDefaultsText =
+            UserDefaults.standard.string(forKey: keyWatchBuyInCashDefaults)
+            ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyWatchBuyInCashDefaults)
+            ?? "20 100 200 500"
+        self.watchCompCashDefaultsText =
+            UserDefaults.standard.string(forKey: keyWatchCompCashDefaults)
+            ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyWatchCompCashDefaults)
+            ?? "20 50 100 500"
+        self.watchCompContextOptionsText =
+            UserDefaults.standard.string(forKey: keyWatchCompContextOptions)
+            ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyWatchCompContextOptions)
+            ?? "Cocktail, Beer, Food, Cash"
         if UserDefaults.standard.object(forKey: keyAppLockPinModeLegacy) != nil {
             AppLockPINLegacy.clearFromKeychain()
             UserDefaults.standard.removeObject(forKey: keyAppLockPinModeLegacy)
@@ -859,7 +906,7 @@ final class SettingsStore: ObservableObject {
         }
         if self.themePresets.isEmpty {
             let defaults: [ThemePreset] = [
-                ThemePreset(id: UUID(), name: "Casino Blue", primaryHex: Self.hexString(from: .black), secondaryHex: Self.hexString(from: .blue)),
+                ThemePreset(id: UUID(), name: "Royal Blue & Gold", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .yellow)),
                 ThemePreset(id: UUID(), name: "Apple Standard", primaryHex: Self.hexString(from: .blue), secondaryHex: Self.hexString(from: .teal)),
                 ThemePreset(id: UUID(), name: "Emerald Night", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .teal)),
                 ThemePreset(id: UUID(), name: "Royal Blue", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .blue)),
@@ -882,6 +929,9 @@ final class SettingsStore: ObservableObject {
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseMinutes, forKey: keyWatchSessionPulseMinutes)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchQuickAction.rawValue, forKey: keyWatchQuickAction)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchBuyInCashDefaultsText, forKey: keyWatchBuyInCashDefaults)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompCashDefaultsText, forKey: keyWatchCompCashDefaults)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompContextOptionsText, forKey: keyWatchCompContextOptions)
     }
 
     /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).

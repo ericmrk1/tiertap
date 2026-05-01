@@ -4319,91 +4319,154 @@ struct SessionArtGeneratorView: View {
         defaults.set(used + 1, forKey: countKey)
     }
 
-    private func buildTierTapAIImagePrompt(for session: Session, geoTraits: String?) -> String {
-        var metricLines: [String] = []
-        if publishTierPerHour, let tierRate = session.tiersPerHour {
-            metricLines.append("Tier per hour: \(String(format: "%.2f", tierRate))")
-        }
-        if publishBuyInCashOut {
-            metricLines.append("Total buy-in: \(settingsStore.currencySymbol)\(session.totalBuyIn)")
-            if let cashOut = session.cashOut {
-                metricLines.append("Cash out: \(settingsStore.currencySymbol)\(cashOut)")
-            }
-        }
+    private func aiImageOverlayLabel(_ english: String) -> String {
+        L10n.tr(english, language: settingsStore.appLanguage)
+    }
+
+    /// When any session metric toggles are on (TierTap AI image metrics section).
+    private var aiImageSessionMetricTogglesOn: Bool {
+        publishWinLoss || publishBuyInCashOut || publishTierPerHour || publishCompDetails
+    }
+
+    /// Text lines allowed on the generated image: verbatim session-backed values only (no invented numbers).
+    private func aiImageApprovedOverlayLines(session: Session, geoTraits: String?) -> [String] {
+        let sym = settingsStore.currencySymbol
+        var lines: [String] = []
+
         if publishWinLoss, let wl = session.winLoss {
-            metricLines.append("Win/Loss: \(wl >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(wl))")
-            if let wr = session.winRatePerHour {
-                metricLines.append("Win rate per hour: \(String(format: "%.2f", wr))")
+            let sign = wl >= 0 ? "+" : "-"
+            lines.append("\(aiImageOverlayLabel("Win/Loss")): \(sign)\(sym)\(abs(wl))")
+            if wl > 0 {
+                lines.append("\(aiImageOverlayLabel("Total win")): \(sym)\(wl)")
+            } else if wl < 0 {
+                lines.append("\(aiImageOverlayLabel("Total loss")): \(sym)\(abs(wl))")
+            } else {
+                lines.append("\(aiImageOverlayLabel("Total win")): \(sym)0")
+                lines.append("\(aiImageOverlayLabel("Total loss")): \(sym)0")
             }
         }
-        if publishCompDetails, !session.compEvents.isEmpty {
-            metricLines.append("Comps total: \(settingsStore.currencySymbol)\(session.totalComp)")
-        }
-        if let tier = session.tierPointsEarned {
-            metricLines.append("Tier points earned: \(tier)")
-        }
-        let metricBlock = metricLines.isEmpty ? "- none selected" : metricLines.map { "- \($0)" }.joined(separator: "\n")
-        let displayName = authStore.userDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let screenNameLine = (includeScreenNameInAIImage && !displayName.isEmpty)
-            ? "- screen_name: \(displayName)"
-            : "- screen_name: not included"
-        let playerTraitsLine: String
-        if aiImageEmphasis == .player && !selectedAIPlayerTraits.isEmpty {
-            let joined = selectedAIPlayerTraits.map(\.rawValue).sorted().joined(separator: ", ")
-            playerTraitsLine = "- player_traits: \(joined)"
-        } else if aiImageEmphasis == .player {
-            playerTraitsLine = "- player_traits: none selected"
-        } else {
-            playerTraitsLine = "- player_traits: ignored (non-player emphasis)"
-        }
-        let geoLine = geoTraits.map { "- geo_traits: \($0)" } ?? "- geo_traits: unavailable"
-        let appLanguageName = settingsStore.appLanguage.englishNameForGemini
-        let compLines: String = {
-            guard !session.compEvents.isEmpty else { return "- none" }
-            let rows = session.compEvents.prefix(12).map { ev -> String in
-                let kindText: String = {
-                    switch ev.kind {
-                    case .dollarsCredits: return "free money/credits"
-                    case .foodBeverage:
-                        if let fb = ev.foodBeverageKindDisplayLabel, !fb.isEmpty {
-                            return "food/beverage (\(fb))"
-                        }
-                        return "food/beverage"
-                    }
-                }()
-                let details = ev.details?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                if details.isEmpty {
-                    return "- \(kindText): \(settingsStore.currencySymbol)\(ev.amount)"
-                }
-                return "- \(kindText): \(settingsStore.currencySymbol)\(ev.amount) (\(details))"
+
+        if publishBuyInCashOut {
+            lines.append("\(aiImageOverlayLabel("Total buy-in")): \(sym)\(session.totalBuyIn)")
+            if let co = session.cashOut {
+                lines.append("\(aiImageOverlayLabel("Cash out")): \(sym)\(co)")
             }
-            return rows.joined(separator: "\n")
+        }
+
+        if publishTierPerHour, let tph = session.tiersPerHour {
+            lines.append("\(aiImageOverlayLabel("Tiers per hour")): \(String(format: "%.2f", tph))")
+        }
+
+        if publishCompDetails || aiImageEmphasis == .comps {
+            lines.append("\(aiImageOverlayLabel("Total comps")): \(sym)\(session.totalComp)")
+        }
+
+        let showTierPointOverlays = publishWinLoss || publishTierPerHour || publishCompDetails
+        if showTierPointOverlays {
+            if let end = session.endingTierPoints {
+                lines.append("\(aiImageOverlayLabel("New tier (points)")): \(end)")
+            }
+            if let delta = session.tierPointsEarned {
+                let sign = delta >= 0 ? "+" : ""
+                lines.append("\(aiImageOverlayLabel("Tier change (points)")): \(sign)\(delta)")
+            }
+        }
+
+        if includeScreenNameInAIImage {
+            let name = authStore.userDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !name.isEmpty {
+                lines.append("\(aiImageOverlayLabel("Screen name")): \(name)")
+            }
+        }
+
+        let showLocationBlock = aiImageEmphasis == .location || aiImageSessionMetricTogglesOn
+        if showLocationBlock {
+            let venue = session.casino.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !venue.isEmpty {
+                lines.append("\(aiImageOverlayLabel("Location")): \(venue)")
+            }
+            if let g = geoTraits?.trimmingCharacters(in: .whitespacesAndNewlines), !g.isEmpty {
+                lines.append("\(aiImageOverlayLabel("Area")): \(g)")
+            }
+            if let la = session.casinoLatitude, let lo = session.casinoLongitude {
+                lines.append("\(aiImageOverlayLabel("Coordinates")): \(String(format: "%.5f, %.5f", la, lo))")
+            }
+        }
+
+        return lines
+    }
+
+    /// Visual-only cues for Location emphasis (no readable signage text).
+    private func aiImageLocationEmphasisImageryGuidance(session: Session, geoTraits: String?) -> String? {
+        guard aiImageEmphasis == .location else { return nil }
+        let blob = "\(session.casino.lowercased()) \(geoTraits?.lowercased() ?? "")"
+        if blob.contains("las vegas") || blob.contains("vegas") {
+            return """
+            Location emphasis (visual only, no readable words in-image): evoke Las Vegas with neon strip energy, distant desert mountains, a generic oversized welcome-style roadside sign silhouette (do not reproduce exact trademarked wording), and tasteful show-style costume silhouettes (generic, no identifiable faces). Avoid real corporate logos and copyrighted characters.
+            """
+        }
+        if blob.contains("atlantic city") {
+            return "Location emphasis (visual only): boardwalk resort / coastal casino pier energy, evening lights (generic, no trademarked signage text)."
+        }
+        if blob.contains("macau") || blob.contains("macao") {
+            return "Location emphasis (visual only): dense East Asian casino skyline glow, waterfront reflections (generic architecture, no readable proprietary signage)."
+        }
+        if blob.contains("reno") {
+            return "Location emphasis (visual only): high-desert neon downtown casino cluster, mountain backdrop (generic, no trademarked signage)."
+        }
+        return "Location emphasis (visual only): use geography and venue name to suggest iconic regional casino-resort architecture and skyline mood (generic silhouettes, no readable proprietary signage or logos)."
+    }
+
+    private func buildTierTapAIImagePrompt(session: Session, geoTraits: String?) -> (prompt: String, negativePrompt: String) {
+        let overlayLines = aiImageApprovedOverlayLines(session: session, geoTraits: geoTraits)
+        let locationImagery = aiImageLocationEmphasisImageryGuidance(session: session, geoTraits: geoTraits)
+        let playerTraitsSemantic: String = {
+            if aiImageEmphasis == .player, !selectedAIPlayerTraits.isEmpty {
+                return selectedAIPlayerTraits.map(\.rawValue).sorted().joined(separator: ", ")
+            }
+            return ""
         }()
-        return """
-        Generate exactly one premium portrait-style poker scene image (9:16).
+        let appLanguageName = settingsStore.appLanguage.englishNameForGemini
 
-        CRITICAL OUTPUT RULES:
-        - Render ZERO visible text characters in the image.
-        - No letters, numbers, words, sentences, symbols, labels, captions, cards, UI overlays, watermarks, logos, metadata, or annotations.
-        - Do not render any of these prompt instructions as text.
-        - Do not create multiple options/panels/split layouts.
+        if overlayLines.isEmpty {
+            let prompt = """
+            Generate exactly one premium portrait-style casino image (9:16 aspect visually).
 
-        Use the following as semantic guidance only (never as rendered text):
-        - casino: \(session.casino)
-        - game: \(session.game)
-        - session_date: \(session.startTime.formatted(date: .abbreviated, time: .omitted))
-        - duration_hours: \(String(format: "%.2f", session.hoursPlayed))
-        \(screenNameLine)
-        \(playerTraitsLine)
-        \(geoLine)
-        - comps_total: \(settingsStore.currencySymbol)\(session.totalComp)
-        - comps_dollars_credits_total: \(settingsStore.currencySymbol)\(session.totalCompDollarsCredits)
-        - comps_breakdown: \(compLines.replacingOccurrences(of: "\n", with: " | "))
-        - selected_metrics: \(metricBlock.replacingOccurrences(of: "\n", with: " | "))
-        - emphasis: \(aiImageEmphasis.rawValue) (\(aiImageEmphasis.promptDirective))
+            CRITICAL: Render ZERO readable text, numbers, letters, or symbols in the image.
 
-        Style direction: cool, slick, clean, highly premium modern casino atmosphere.
+            Semantic scene only (never as text): casino \(session.casino), game \(session.game), date \(session.startTime.formatted(date: .abbreviated, time: .omitted)), duration \(String(format: "%.2f", session.hoursPlayed)) hours.
+            Emphasis: \(aiImageEmphasis.rawValue). \(aiImageEmphasis.promptDirective)
+            \(playerTraitsSemantic.isEmpty ? "" : "Player traits (visual only): \(playerTraitsSemantic).")
+            \(locationImagery.map { "\($0)\n" } ?? "")
+
+            Style: cool, slick, clean, highly premium. Single composition only; no split layouts.
+            """
+            let negative = "text, letters, numbers, words, captions, UI, watermarks, logos, paragraphs, gibberish, option labels, metadata, split-screen, collage"
+            return (prompt, negative)
+        }
+
+        let numbered = overlayLines.enumerated().map { "\($0.offset + 1). \($0.element)" }.joined(separator: "\n")
+        let prompt = """
+        Generate exactly one premium portrait-style casino image (9:16 aspect visually).
+
+        TEXT RULES (strict):
+        - The ONLY readable text in the entire image must be exactly the following lines, verbatim, in this order. Do not add, remove, reword, translate, summarize, or duplicate lines.
+        - Use \(appLanguageName) for label wording as shown in each line (keep numbers and currency symbols exactly as given).
+        - Do not add paragraphs, UI cards, captions, watermarks, metadata, or any other text.
+        - Do not render prompt instructions as text.
+
+        ALLOWED_OVERLAY_LINES (verbatim):
+        \(numbered)
+        \(locationImagery.map { "\nLOCATION_IMAGERY (visual only, no extra text): \($0)" } ?? "")
+
+        Semantic scene (never as readable text): casino \(session.casino), game \(session.game).
+        Emphasis: \(aiImageEmphasis.rawValue). \(aiImageEmphasis.promptDirective)
+        \(playerTraitsSemantic.isEmpty ? "" : "Player traits (visual only): \(playerTraitsSemantic).")
+
+        Style: cool, slick, clean, highly premium. Single composition only; no split layouts.
         """
+        let negative = "paragraphs of prose, gibberish text, UI mockups, option labels, fake metrics, watermarks, extra words beyond ALLOWED_OVERLAY_LINES, copyrighted character faces, readable trademark logos"
+        return (prompt, negative)
     }
 
     @MainActor
@@ -4515,9 +4578,10 @@ struct SessionArtGeneratorView: View {
             (publishCompDetails || aiImageEmphasis == .comps) ? "compDetails" : nil
         ].compactMap { $0 }
         let geoTraits = await geoTraitsText(for: session)
+        let aiPrompt = buildTierTapAIImagePrompt(session: session, geoTraits: geoTraits)
         let body = RequestBody(
-            prompt: buildTierTapAIImagePrompt(for: session, geoTraits: geoTraits),
-            negativePrompt: "any text, letters, words, numbers, captions, labels, subtitles, UI cards, option labels, metadata, watermark, logo, seed text, prompt text, model text, annotations, split-screen, collage, diptych",
+            prompt: aiPrompt.prompt,
+            negativePrompt: aiPrompt.negativePrompt,
             sessionId: session.id.uuidString,
             metricKeys: metricKeys,
             imageEmphasis: aiImageEmphasis.rawValue,

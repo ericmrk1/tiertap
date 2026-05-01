@@ -859,6 +859,27 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
 
+                TextField("Watch buy-in cash defaults (e.g. 20, 100 200, 500)", text: $settingsStore.watchBuyInCashDefaultsText)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.numbersAndPunctuation)
+                Text("Buy-in quick picks. Accepts comma or space delimiters.")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+
+                TextField("Watch comp cash defaults (e.g. 20 50 100 500)", text: $settingsStore.watchCompCashDefaultsText)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.numbersAndPunctuation)
+                Text("Comp value quick picks. Accepts comma or space delimiters.")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+
+                TextField("Watch comp type options (comma-delimited)", text: $settingsStore.watchCompContextOptionsText)
+                    .textFieldStyle(DarkTextFieldStyle())
+                    .keyboardType(.alphabet)
+                Text("Example: Cocktail, Beer, Food, Cash. These appear under Add Food/Beverage on watch.")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+
                 Text("These controls sync to Apple Watch and customize haptics, pulse nudges, wrist-raise summary cards, and quick action defaults.")
                     .font(.caption2)
                     .foregroundColor(.gray)

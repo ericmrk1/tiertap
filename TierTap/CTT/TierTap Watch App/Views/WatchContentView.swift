@@ -97,6 +97,9 @@ private struct WatchSettingsView: View {
     @State private var watchWristRaiseSummaryEnabled = true
     @State private var watchHapticProfile = "classic"
     @State private var watchQuickAction = "addBuyIn"
+    @State private var watchBuyInCashDefaults = "20 100 200 500"
+    @State private var watchCompCashDefaults = "20 50 100 500"
+    @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
 
     var body: some View {
         Form {
@@ -122,6 +125,9 @@ private struct WatchSettingsView: View {
                 Text("Update Tier").tag("updateTier")
                 Text("Stop Session").tag("stopSession")
             }
+            TextField("Buy-in cash defaults", text: $watchBuyInCashDefaults)
+            TextField("Comp cash defaults", text: $watchCompCashDefaults)
+            TextField("Comp type options", text: $watchCompContextOptions)
         }
         .localizedNavigationTitle("Watch Settings")
         .onAppear(perform: load)
@@ -131,6 +137,9 @@ private struct WatchSettingsView: View {
         .onChange(of: watchWristRaiseSummaryEnabled) { _ in save() }
         .onChange(of: watchHapticProfile) { _ in save() }
         .onChange(of: watchQuickAction) { _ in save() }
+        .onChange(of: watchBuyInCashDefaults) { _ in save() }
+        .onChange(of: watchCompCashDefaults) { _ in save() }
+        .onChange(of: watchCompContextOptions) { _ in save() }
     }
 
     private func load() {
@@ -141,6 +150,9 @@ private struct WatchSettingsView: View {
         watchWristRaiseSummaryEnabled = groupDefaults?.object(forKey: "ctt_watch_wrist_raise_summary_enabled") as? Bool ?? true
         watchHapticProfile = groupDefaults?.string(forKey: "ctt_watch_haptic_profile") ?? "classic"
         watchQuickAction = groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "addBuyIn"
+        watchBuyInCashDefaults = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") ?? "20 100 200 500"
+        watchCompCashDefaults = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") ?? "20 50 100 500"
+        watchCompContextOptions = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") ?? "Cocktail, Beer, Food, Cash"
     }
 
     private func save() {
@@ -150,6 +162,21 @@ private struct WatchSettingsView: View {
         groupDefaults?.set(watchWristRaiseSummaryEnabled, forKey: "ctt_watch_wrist_raise_summary_enabled")
         groupDefaults?.set(watchHapticProfile, forKey: "ctt_watch_haptic_profile")
         groupDefaults?.set(watchQuickAction, forKey: "ctt_watch_quick_action")
+        let normalizedBuyInDefaults = normalizeNumbersDelimiter(watchBuyInCashDefaults)
+        let normalizedCashDefaults = watchCompCashDefaults
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+        groupDefaults?.set(normalizedBuyInDefaults, forKey: "ctt_watch_buyin_cash_defaults")
+        groupDefaults?.set(normalizedCashDefaults, forKey: "ctt_watch_comp_cash_defaults")
+        groupDefaults?.set(watchCompContextOptions, forKey: "ctt_watch_comp_context_options")
+    }
+
+    private func normalizeNumbersDelimiter(_ raw: String) -> String {
+        raw
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
     }
 }
 
