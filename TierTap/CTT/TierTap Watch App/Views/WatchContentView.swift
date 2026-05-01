@@ -33,6 +33,13 @@ struct WatchContentView: View {
                 }
 
                 NavigationLink {
+                    WatchVisualsView()
+                        .environmentObject(store)
+                } label: {
+                    Label("Visuals", systemImage: "swatchpalette")
+                }
+
+                NavigationLink {
                     WatchHistoryView()
                         .environmentObject(store)
                 } label: {
@@ -100,6 +107,8 @@ private struct WatchSettingsView: View {
     @State private var watchBuyInCashDefaults = "20 100 200 500"
     @State private var watchCompCashDefaults = "20 50 100 500"
     @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
+    @State private var watchVisualsAutoScrollEnabled = false
+    @State private var watchVisualsAutoScrollSeconds = 6
 
     var body: some View {
         Form {
@@ -128,6 +137,15 @@ private struct WatchSettingsView: View {
             TextField("Buy-in cash defaults", text: $watchBuyInCashDefaults)
             TextField("Comp cash defaults", text: $watchCompCashDefaults)
             TextField("Comp type options", text: $watchCompContextOptions)
+            Toggle("Visuals auto-scroll", isOn: $watchVisualsAutoScrollEnabled)
+            Picker("Visuals scroll every", selection: $watchVisualsAutoScrollSeconds) {
+                Text("3 sec").tag(3)
+                Text("4 sec").tag(4)
+                Text("5 sec").tag(5)
+                Text("6 sec").tag(6)
+                Text("8 sec").tag(8)
+                Text("10 sec").tag(10)
+            }
         }
         .localizedNavigationTitle("Watch Settings")
         .onAppear(perform: load)
@@ -140,6 +158,8 @@ private struct WatchSettingsView: View {
         .onChange(of: watchBuyInCashDefaults) { _ in save() }
         .onChange(of: watchCompCashDefaults) { _ in save() }
         .onChange(of: watchCompContextOptions) { _ in save() }
+        .onChange(of: watchVisualsAutoScrollEnabled) { _ in save() }
+        .onChange(of: watchVisualsAutoScrollSeconds) { _ in save() }
     }
 
     private func load() {
@@ -153,6 +173,9 @@ private struct WatchSettingsView: View {
         watchBuyInCashDefaults = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") ?? "20 100 200 500"
         watchCompCashDefaults = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") ?? "20 50 100 500"
         watchCompContextOptions = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") ?? "Cocktail, Beer, Food, Cash"
+        watchVisualsAutoScrollEnabled = groupDefaults?.object(forKey: "ctt_watch_visuals_auto_scroll_enabled") as? Bool ?? false
+        let visualsSeconds = groupDefaults?.integer(forKey: "ctt_watch_visuals_auto_scroll_seconds") ?? 6
+        watchVisualsAutoScrollSeconds = max(3, visualsSeconds)
     }
 
     private func save() {
@@ -170,6 +193,8 @@ private struct WatchSettingsView: View {
         groupDefaults?.set(normalizedBuyInDefaults, forKey: "ctt_watch_buyin_cash_defaults")
         groupDefaults?.set(normalizedCashDefaults, forKey: "ctt_watch_comp_cash_defaults")
         groupDefaults?.set(watchCompContextOptions, forKey: "ctt_watch_comp_context_options")
+        groupDefaults?.set(watchVisualsAutoScrollEnabled, forKey: "ctt_watch_visuals_auto_scroll_enabled")
+        groupDefaults?.set(max(3, watchVisualsAutoScrollSeconds), forKey: "ctt_watch_visuals_auto_scroll_seconds")
     }
 
     private func normalizeNumbersDelimiter(_ raw: String) -> String {

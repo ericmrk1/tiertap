@@ -3,6 +3,12 @@ import SwiftUI
 import WatchKit
 #endif
 
+enum WatchLivePane: Hashable {
+    case timer
+    case grid
+    case options
+}
+
 struct WatchLiveView: View {
     @EnvironmentObject var store: SessionStore
     @Environment(\.scenePhase) private var scenePhase
@@ -12,6 +18,7 @@ struct WatchLiveView: View {
     @State private var showConfirmFastCloseOut = false
     @State private var showFastStartSheet = false
     @State private var showWristSummary = false
+    @State private var selectedPane: WatchLivePane
     @State private var lastPulseMinuteMark: Int = -1
     private let syncTicker = Timer.publish(every: 8, on: .main, in: .common).autoconnect()
     @State private var lastAppGroupSnapshotRevision: Int = 0
@@ -29,7 +36,52 @@ struct WatchLiveView: View {
         return max(0, end.timeIntervalSince(live.startTime))
     }
 
+    init(initialPane: WatchLivePane = .timer) {
+        _selectedPane = State(initialValue: initialPane)
+    }
+
     var body: some View {
+        TabView(selection: $selectedPane) {
+            timerPane
+                .tag(WatchLivePane.timer)
+            quickGridPane
+                .tag(WatchLivePane.grid)
+            optionsPane
+                .tag(WatchLivePane.options)
+        }
+        .tabViewStyle(.page)
+        .indexViewStyle(.page(backgroundDisplayMode: .automatic))
+        .localizedNavigationTitle("TierTap Remote")
+        .onReceive(syncTicker) { _ in
+            requestLatestContext()
+            runSessionPulseIfNeeded()
+        }
+        .onAppear {
+            requestLatestContext()
+            presentWristSummaryIfNeeded()
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                presentWristSummaryIfNeeded()
+            }
+        }
+        .alert("Fast close out session?", isPresented: $showConfirmFastCloseOut) {
+            Button("No", role: .cancel) {}
+            Button("Yes", role: .destructive) {
+                triggerWatchAction(name: "Fast Close Out") {
+                    store.fastCloseSessionWithDefaultsUnverified()
+                }
+            }
+        } message: {
+            Text("This will end the live session immediately using default close-out values.")
+        }
+        .sheet(isPresented: $showFastStartSheet) {
+            WatchFastStartSheet()
+                .environmentObject(store)
+        }
+    }
+
+    private var timerPane: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -72,7 +124,6 @@ struct WatchLiveView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
 
-                // TimelineView drives the clock reliably on watchOS (Timer.publish often does not tick here).
                 TimelineView(.animation(minimumInterval: 1.0, paused: !hasLiveSession || isSessionPaused)) { context in
                     Button {
                         handlePrimaryTimerAction()
@@ -94,6 +145,28 @@ struct WatchLiveView: View {
                     .background(Color.green)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 }
+
+                Text("Swipe for quick grid and options")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+
+                if let feedbackMessage {
+                    Text(feedbackMessage)
+                        .font(.caption2)
+                        .foregroundColor(feedbackColor)
+                        .lineLimit(2)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var quickGridPane: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Quick Actions")
+                    .font(.caption2.bold())
+                    .foregroundColor(.secondary)
 
                 LazyVGrid(columns: metricColumns, spacing: 8) {
                     NavigationLink {
@@ -136,16 +209,16 @@ struct WatchLiveView: View {
                     .buttonStyle(.plain)
 
                     quickActionTile
-                    .buttonStyle(.plain)
+                        .buttonStyle(.plain)
                 }
+            }
+            .padding()
+        }
+    }
 
-                if let feedbackMessage {
-                    Text(feedbackMessage)
-                        .font(.caption2)
-                        .foregroundColor(feedbackColor)
-                        .lineLimit(2)
-                }
-
+    private var optionsPane: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
                 if let prog = s?.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
                     Text(prog)
                         .font(.caption2)
@@ -153,9 +226,6 @@ struct WatchLiveView: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                 }
-
-                Divider()
-                    .padding(.vertical, 2)
 
                 Button {
                     triggerWatchAction(name: "Pause Session") {
@@ -211,34 +281,6 @@ struct WatchLiveView: View {
                 }
             }
             .padding()
-        }
-        .localizedNavigationTitle("TierTap Remote")
-        .onReceive(syncTicker) { _ in
-            requestLatestContext()
-            runSessionPulseIfNeeded()
-        }
-        .onAppear {
-            requestLatestContext()
-            presentWristSummaryIfNeeded()
-        }
-        .onChange(of: scenePhase) { phase in
-            if phase == .active {
-                presentWristSummaryIfNeeded()
-            }
-        }
-        .alert("Fast close out session?", isPresented: $showConfirmFastCloseOut) {
-            Button("No", role: .cancel) {}
-            Button("Yes", role: .destructive) {
-                triggerWatchAction(name: "Fast Close Out") {
-                    store.fastCloseSessionWithDefaultsUnverified()
-                }
-            }
-        } message: {
-            Text("This will end the live session immediately using default close-out values.")
-        }
-        .sheet(isPresented: $showFastStartSheet) {
-            WatchFastStartSheet()
-                .environmentObject(store)
         }
     }
 
