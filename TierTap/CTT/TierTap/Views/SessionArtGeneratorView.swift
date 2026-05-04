@@ -3683,6 +3683,7 @@ struct SessionArtGeneratorView: View {
         }
         .onAppear {
             applySavedSharePresetIfNeeded()
+            sanitizeOutputKindForCurrentBuild()
             loadAIPlayerTraitsSelection()
         }
         .onDisappear {
@@ -3744,7 +3745,7 @@ struct SessionArtGeneratorView: View {
                 .font(.caption.bold())
                 .foregroundColor(.gray)
             Picker("", selection: $outputKind) {
-                ForEach(OutputKind.allCases, id: \.self) { k in
+                ForEach(availableOutputKinds, id: \.self) { k in
                     Text(k.rawValue).tag(k)
                 }
             }
@@ -4238,6 +4239,7 @@ struct SessionArtGeneratorView: View {
             selectedTextBackgroundColor = bgColor
         }
         textBackgroundOpacity = min(0.9, max(0, CGFloat(preset.textBackgroundOpacity)))
+        sanitizeOutputKindForCurrentBuild()
     }
 
     private func saveSharePreset() {
@@ -4282,6 +4284,18 @@ struct SessionArtGeneratorView: View {
         #else
         return SupabaseConfig.isTestFlight
         #endif
+    }
+
+    private var availableOutputKinds: [OutputKind] {
+        if canBypassTierTapAIImageLimits {
+            return OutputKind.allCases
+        }
+        return OutputKind.allCases.filter { $0 != .tierTapAI }
+    }
+
+    private func sanitizeOutputKindForCurrentBuild() {
+        guard outputKind == .tierTapAI, !canBypassTierTapAIImageLimits else { return }
+        outputKind = .image
     }
 
     private var tierTapAIImageQuotaKey: String {
@@ -4500,25 +4514,7 @@ struct SessionArtGeneratorView: View {
     }
 
     private func overlayTierTapLogo(on image: UIImage) -> UIImage {
-        guard let logo = UIImage(named: "TierTapLogo") else { return image }
-        let format = UIGraphicsImageRendererFormat.default()
-        format.scale = image.scale
-        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        return renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: image.size))
-            let minSide = min(image.size.width, image.size.height)
-            let logoWidth = max(72, minSide * 0.16)
-            let ratio = logo.size.height > 0 ? (logo.size.width / logo.size.height) : 1
-            let logoHeight = logoWidth / max(ratio, 0.001)
-            let pad = max(18, minSide * 0.03)
-            let rect = CGRect(
-                x: image.size.width - logoWidth - pad,
-                y: image.size.height - logoHeight - pad,
-                width: logoWidth,
-                height: logoHeight
-            )
-            logo.draw(in: rect, blendMode: .normal, alpha: 0.95)
-        }
+        image.withTierTapShareLogoOverlay()
     }
 
     private func loadAIPlayerTraitsSelection() {

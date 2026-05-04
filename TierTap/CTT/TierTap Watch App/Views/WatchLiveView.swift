@@ -12,22 +12,36 @@ enum WatchLivePane: Hashable {
 struct WatchLiveView: View {
     @EnvironmentObject var store: SessionStore
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @ObservedObject private var syncManager = SessionSyncManager.shared
     @State private var feedbackMessage: String?
     @State private var feedbackColor: Color = .green
     @State private var showConfirmFastCloseOut = false
+    @State private var showOfferWinLossEstimate = false
+    @State private var showWatchWinLossEstimateSheet = false
     @State private var showFastStartSheet = false
     @State private var showWristSummary = false
     @State private var selectedPane: WatchLivePane
     @State private var lastPulseMinuteMark: Int = -1
     private let syncTicker = Timer.publish(every: 8, on: .main, in: .common).autoconnect()
     @State private var lastAppGroupSnapshotRevision: Int = 0
+    @State private var lastObservedBuyIn: Int?
+    @State private var lastObservedComp: Int?
+    @State private var lastObservedTier: Int?
+    @State private var buyInSuccessPulse = 0
+    @State private var compSuccessPulse = 0
+    @State private var tierSuccessPulse = 0
 
     private var s: Session? { store.liveSession }
     private var hasLiveSession: Bool { store.liveSession != nil }
     private var isSessionPaused: Bool { s?.endTime != nil }
     private let metricColumns: [GridItem] = [GridItem(.flexible()), GridItem(.flexible())]
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var watchAnimationsAllowMotion: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
 
     /// Elapsed play time for the current live session (frozen while paused via `endTime`).
     private func liveElapsedSeconds(at date: Date) -> TimeInterval {
@@ -68,16 +82,51 @@ struct WatchLiveView: View {
         .alert("Fast close out session?", isPresented: $showConfirmFastCloseOut) {
             Button("No", role: .cancel) {}
             Button("Yes", role: .destructive) {
+                showConfirmFastCloseOut = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    showOfferWinLossEstimate = true
+                }
+            }
+        } message: {
+            Text("This will end the live session on iPhone. You can optionally set an estimated win/loss next.")
+        }
+        .alert("Enter win / loss estimate?", isPresented: $showOfferWinLossEstimate) {
+            Button("No") {
                 triggerWatchAction(name: "Fast Close Out") {
                     store.fastCloseSessionWithDefaultsUnverified()
                 }
             }
+            Button("Yes") {
+                showWatchWinLossEstimateSheet = true
+            }
         } message: {
-            Text("This will end the live session immediately using default close-out values.")
+            Text("If yes, review estimated cash-out and win/loss from your buy-in, then tap Done to close the session.")
+        }
+        .sheet(isPresented: $showWatchWinLossEstimateSheet) {
+            WatchWinLossEstimateCloseSheet()
+                .environmentObject(store)
         }
         .sheet(isPresented: $showFastStartSheet) {
             WatchFastStartSheet()
                 .environmentObject(store)
+        }
+        .onChange(of: s?.totalBuyIn) { _, newTotal in
+            if watchAnimationsAllowMotion, let prev = lastObservedBuyIn, let n = newTotal, n > prev {
+                buyInSuccessPulse += 1
+            }
+            lastObservedBuyIn = newTotal
+        }
+        .onChange(of: s?.totalComp) { _, newTotal in
+            if watchAnimationsAllowMotion, let prev = lastObservedComp, let n = newTotal, n > prev {
+                compSuccessPulse += 1
+            }
+            lastObservedComp = newTotal
+        }
+        .onChange(of: s?.startingTierPoints) { _, newPoints in
+            if watchAnimationsAllowMotion, let prev = lastObservedTier, let n = newPoints, n > prev {
+                tierSuccessPulse += 1
+            }
+            lastObservedTier = newPoints
         }
     }
 
@@ -89,6 +138,7 @@ struct WatchLiveView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 22, height: 22)
+                        .modifier(WatchChipNudgeModifier(trigger: buyInSuccessPulse, enabled: watchAnimationsAllowMotion))
                     Circle().fill(Color.red).frame(width: 6, height: 6)
                     L10nText("LIVE").font(.caption2.bold()).foregroundColor(.red)
                 }
@@ -140,9 +190,11 @@ struct WatchLiveView: View {
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WatchPrimaryTimerPressStyle(animationsEnabled: watchAnimationsAllowMotion))
                     .frame(maxWidth: .infinity, minHeight: 72)
-                    .background(Color.green)
+                    .background(primaryTimerFill)
+                    .animation(watchAnimationsAllowMotion ? .easeInOut(duration: 0.34) : nil, value: isSessionPaused)
+                    .animation(watchAnimationsAllowMotion ? .easeInOut(duration: 0.28) : nil, value: hasLiveSession)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 }
 
@@ -177,10 +229,11 @@ struct WatchLiveView: View {
                             title: "Buy-In",
                             value: "$\((s?.totalBuyIn ?? 0).formatted(.number.grouping(.automatic)))",
                             icon: "plus.circle.fill",
-                            accent: .blue
+                            accent: .blue,
+                            successPulse: buyInSuccessPulse
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
 
                     NavigationLink {
                         WatchAddCompSheet()
@@ -190,10 +243,11 @@ struct WatchLiveView: View {
                             title: "Comps",
                             value: "$\((s?.totalComp ?? 0).formatted(.number.grouping(.automatic)))",
                             icon: "gift.fill",
-                            accent: .cyan
+                            accent: .cyan,
+                            successPulse: compSuccessPulse
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
 
                     NavigationLink {
                         WatchUpdateTierSheet()
@@ -203,13 +257,14 @@ struct WatchLiveView: View {
                             title: "Tier",
                             value: (s?.startingTierPoints ?? 0).formatted(.number.grouping(.automatic)),
                             icon: "chart.bar.fill",
-                            accent: .purple
+                            accent: .purple,
+                            successPulse: tierSuccessPulse
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
 
                     quickActionTile
-                        .buttonStyle(.plain)
+                        .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
                 }
             }
             .padding()
@@ -289,6 +344,11 @@ struct WatchLiveView: View {
         return isSessionPaused ? "Continue Session" : "Pause Session"
     }
 
+    private var primaryTimerFill: Color {
+        if !hasLiveSession { return .green }
+        return isSessionPaused ? .orange : .green
+    }
+
     private var timerStatusColor: Color {
         if let msg = feedbackMessage, msg.localizedCaseInsensitiveContains("close out") {
             return .red
@@ -320,25 +380,25 @@ struct WatchLiveView: View {
             NavigationLink {
                 WatchAddCompSheet().environmentObject(store)
             } label: {
-                metricButton(title: "TierTap", value: "Add Comp", icon: "gift.fill", accent: .cyan)
+                metricButton(title: "TierTap", value: "Add Comp", icon: "gift.fill", accent: .cyan, successPulse: compSuccessPulse)
             }
         case "updateTier":
             NavigationLink {
                 WatchUpdateTierSheet().environmentObject(store)
             } label: {
-                metricButton(title: "TierTap", value: "Update Tier", icon: "chart.bar.fill", accent: .purple)
+                metricButton(title: "TierTap", value: "Update Tier", icon: "chart.bar.fill", accent: .purple, successPulse: tierSuccessPulse)
             }
         case "stopSession":
             Button {
                 showConfirmFastCloseOut = true
             } label: {
-                metricButton(title: "TierTap", value: "Stop", icon: "stop.circle.fill", accent: .red)
+                metricButton(title: "TierTap", value: "Stop", icon: "stop.circle.fill", accent: .red, successPulse: 0)
             }
         default:
             NavigationLink {
                 WatchAddBuyInSheet().environmentObject(store)
             } label: {
-                metricButton(title: "Quick", value: "Add Buy-In", icon: "plus.circle.fill", accent: .blue)
+                metricButton(title: "Quick", value: "Add Buy-In", icon: "plus.circle.fill", accent: .blue, successPulse: buyInSuccessPulse)
             }
         }
     }
@@ -359,30 +419,15 @@ struct WatchLiveView: View {
         }
     }
 
-    private func metricButton(title: String, value: String, icon: String, accent: Color) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Label {
-                Text(title)
-                    .font(.caption2)
-                    .lineLimit(1)
-            } icon: {
-                Image(systemName: icon)
-                    .font(.caption2)
-            }
-            .foregroundColor(.secondary)
-            Text(value)
-                .font(.footnote.monospacedDigit().bold())
-                .foregroundColor(accent)
-                .lineLimit(1)
-            Text("+")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-        }
-        .padding(8)
-        .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
-        .background(Color.gray.opacity(0.18))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    private func metricButton(title: String, value: String, icon: String, accent: Color, successPulse: Int) -> some View {
+        WatchQuickMetricLabel(
+            title: title,
+            value: value,
+            icon: icon,
+            accent: accent,
+            motionEnabled: watchAnimationsAllowMotion,
+            successPulse: successPulse
+        )
     }
 
     private func buttonLabel(_ title: String, icon: String) -> some View {
@@ -486,9 +531,233 @@ struct WatchLiveView: View {
     }
 }
 
+// MARK: - Win/loss estimate before Watch fast close
+
+private struct WatchWinLossEstimateCloseSheet: View {
+    @EnvironmentObject var store: SessionStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var winLossDelta: Double = 0
+
+    private var buyIn: Int { max(0, store.liveSession?.totalBuyIn ?? 0) }
+
+    private var estimatedCashOut: Int {
+        max(0, buyIn + Int(winLossDelta.rounded(.toNearestOrAwayFromZero)))
+    }
+
+    private var estimatedWinLoss: Int { estimatedCashOut - buyIn }
+
+    private var crownLower: Double { -Double(buyIn) }
+    private var crownUpper: Double { max(Double(buyIn) * 10, 25_000) }
+    private var crownStep: Double { buyIn >= 500 ? 25 : 5 }
+
+    private func formattedDollars(_ n: Int) -> String {
+        "$\(n.formatted(.number.grouping(.automatic)))"
+    }
+
+    private var winLossSummary: String {
+        let wl = estimatedWinLoss
+        let body = "$\(abs(wl).formatted(.number.grouping(.automatic)))"
+        if wl > 0 { return "+\(body)" }
+        if wl < 0 { return "-\(body)" }
+        return body
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text("Buy-in: \(formattedDollars(buyIn))")
+                    Text("Est. cash-out: \(formattedDollars(estimatedCashOut))")
+                    Text("Est. win/loss: \(winLossSummary)")
+                        .foregroundColor(estimatedWinLoss >= 0 ? .green : .red)
+                }
+                if buyIn > 0 {
+                    Text("Turn the Digital Crown to adjust win/loss vs your buy-in. Tap Done to close the session on iPhone with this cash-out.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("No buy-in is logged yet. The session will close with $0 cash-out on iPhone; you can add buy-ins and fix totals there.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .modifier(WatchWinLossCrownModifier(
+                enabled: buyIn > 0,
+                winLossDelta: $winLossDelta,
+                from: crownLower,
+                through: crownUpper,
+                by: crownStep
+            ))
+            .navigationTitle("Estimate")
+            #if os(watchOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { confirmAndClose() }
+                }
+            }
+        }
+    }
+
+    private func confirmAndClose() {
+        let immediate = SessionSyncManager.shared.isReachable
+        if buyIn == 0 {
+            store.fastCloseSessionWithDefaultsUnverified()
+        } else {
+            store.fastCloseSessionWithDefaultsUnverified(cashOutOverride: estimatedCashOut)
+        }
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(immediate ? .success : .click)
+        #endif
+        dismiss()
+    }
+}
+
+private struct WatchWinLossCrownModifier: ViewModifier {
+    var enabled: Bool
+    @Binding var winLossDelta: Double
+    var from: Double
+    var through: Double
+    var by: Double
+
+    func body(content: Content) -> some View {
+        if enabled {
+            content
+                .focusable(true)
+                .digitalCrownRotation(
+                    $winLossDelta,
+                    from: from,
+                    through: through,
+                    by: by,
+                    sensitivity: .low,
+                    isContinuous: false,
+                    isHapticFeedbackEnabled: true
+                )
+        } else {
+            content
+        }
+    }
+}
+
+// MARK: - Quick metric tiles & press feedback
+
+private struct WatchQuickTilePressStyle: ButtonStyle {
+    var enabled: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(enabled && configuration.isPressed ? 0.96 : 1)
+            .animation(enabled ? .spring(response: 0.2, dampingFraction: 0.76) : nil, value: configuration.isPressed)
+    }
+}
+
+private struct WatchPrimaryTimerPressStyle: ButtonStyle {
+    var animationsEnabled: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(animationsEnabled && configuration.isPressed ? 0.98 : 1)
+            .animation(animationsEnabled ? .spring(response: 0.22, dampingFraction: 0.8) : nil, value: configuration.isPressed)
+    }
+}
+
+private struct WatchQuickMetricLabel: View {
+    let title: String
+    let value: String
+    let icon: String
+    let accent: Color
+    let motionEnabled: Bool
+    let successPulse: Int
+    @State private var rippleScale: CGFloat = 1
+    @State private var rippleOpacity: Double = 0
+
+    var body: some View {
+        ZStack {
+            VStack(alignment: .leading, spacing: 3) {
+                Label {
+                    Text(title)
+                        .font(.caption2)
+                        .lineLimit(1)
+                } icon: {
+                    iconImage
+                }
+                .foregroundColor(.secondary)
+                Text(value)
+                    .font(.footnote.monospacedDigit().bold())
+                    .foregroundColor(accent)
+                    .contentTransition(.numericText())
+                    .animation(motionEnabled ? .snappy : nil, value: value)
+                    .lineLimit(1)
+                Text("+")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
+            .background(Color.gray.opacity(0.18))
+
+            if motionEnabled {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(accent.opacity(0.78 * rippleOpacity), lineWidth: 2)
+                    .scaleEffect(rippleScale)
+                    .allowsHitTesting(false)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .onChange(of: successPulse) { _, newValue in
+            guard motionEnabled, newValue > 0 else { return }
+            rippleScale = 0.9
+            rippleOpacity = 1
+            withAnimation(.easeOut(duration: 0.34)) {
+                rippleScale = 1.22
+                rippleOpacity = 0
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var iconImage: some View {
+        if motionEnabled {
+            Image(systemName: icon)
+                .font(.caption2)
+                .symbolEffect(.bounce, value: successPulse)
+        } else {
+            Image(systemName: icon)
+                .font(.caption2)
+        }
+    }
+}
+
+private struct WatchChipNudgeModifier: ViewModifier {
+    var trigger: Int
+    var enabled: Bool
+    @State private var nudge: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(.degrees(Double(nudge) * 12))
+            .offset(y: CGFloat(nudge) * -5)
+            .onChange(of: trigger) { _, new in
+                guard enabled, new > 0 else { return }
+                nudge = 0
+                withAnimation(.spring(response: 0.26, dampingFraction: 0.52)) {
+                    nudge = 1
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+                    withAnimation(.spring(response: 0.38, dampingFraction: 0.78)) {
+                        nudge = 0
+                    }
+                }
+            }
+    }
+}
+
 private struct WatchFastStartSheet: View {
     @EnvironmentObject var store: SessionStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
     @State private var pendingFastStart = false
@@ -501,6 +770,10 @@ private struct WatchFastStartSheet: View {
     private var slotsTemplate: Session? { store.mostRecentSession(forGameCategory: .slots) }
     private var hasAnyTemplate: Bool {
         pokerTemplate != nil || tableTemplate != nil || slotsTemplate != nil
+    }
+
+    private var fastStartMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
     }
 
     var body: some View {
@@ -516,6 +789,7 @@ private struct WatchFastStartSheet: View {
                 } label: {
                     Label(fastStartLabel(for: .poker, template: pokerTemplate), systemImage: iconName(for: .poker))
                 }
+                .buttonStyle(WatchQuickTilePressStyle(enabled: fastStartMotionOK))
             }
             if let tableTemplate {
                 Button {
@@ -523,6 +797,7 @@ private struct WatchFastStartSheet: View {
                 } label: {
                     Label(fastStartLabel(for: .table, template: tableTemplate), systemImage: iconName(for: .table))
                 }
+                .buttonStyle(WatchQuickTilePressStyle(enabled: fastStartMotionOK))
             }
             if let slotsTemplate {
                 Button {
@@ -530,6 +805,7 @@ private struct WatchFastStartSheet: View {
                 } label: {
                     Label(fastStartLabel(for: .slots, template: slotsTemplate), systemImage: iconName(for: .slots))
                 }
+                .buttonStyle(WatchQuickTilePressStyle(enabled: fastStartMotionOK))
             }
             if !hasAnyTemplate {
                 Text("No fast start templates available yet. Start a session on iPhone first.")
@@ -627,13 +903,20 @@ private struct WatchFastStartSheet: View {
 
 private struct WatchAddBuyInSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var amount: Double = 100
     @State private var customAmountText: String = "100"
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
     @State private var pendingExpectedTotal: Int?
     @State private var showConfirmAdd = false
+    @State private var addOnChipNudge = 0
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var buyInMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
 
     private var currentTotalBuyIn: Int {
         store.liveSession?.totalBuyIn ?? 0
@@ -674,11 +957,24 @@ private struct WatchAddBuyInSheet: View {
             Text("Current total: $\(currentTotalBuyIn)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
-            Text("Amount: $\(selectedAmount)")
-                .font(.headline.monospacedDigit())
+                .contentTransition(.numericText())
+                .animation(buyInMotionOK ? .snappy : nil, value: currentTotalBuyIn)
+            HStack(alignment: .center, spacing: 8) {
+                Text("Amount: $\(selectedAmount)")
+                    .font(.headline.monospacedDigit())
+                    .contentTransition(.numericText())
+                    .animation(buyInMotionOK ? .snappy : nil, value: selectedAmount)
+                Image("TierTap_C_PokerChip")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .modifier(WatchChipNudgeModifier(trigger: addOnChipNudge, enabled: buyInMotionOK))
+            }
             Text("Proposed total: $\(proposedTotal)")
                 .font(.caption2)
                 .foregroundColor(.green)
+                .contentTransition(.numericText())
+                .animation(buyInMotionOK ? .snappy : nil, value: proposedTotal)
             quickAmountRows(amountPresetValues)
             TextField("Custom amount", text: $customAmountText)
                 .onChange(of: customAmountText) { new in
@@ -727,6 +1023,9 @@ private struct WatchAddBuyInSheet: View {
             statusMessage = "Buy-in updated on iPhone"
             statusColor = .green
             playSuccessHaptic()
+            if buyInMotionOK {
+                addOnChipNudge += 1
+            }
         }
         .onAppear {
             customAmountText = "\(max(5, Int(amount)))"
@@ -738,6 +1037,7 @@ private struct WatchAddBuyInSheet: View {
             amount = Double(value)
             customAmountText = "\(value)"
         }
+        .buttonStyle(WatchQuickTilePressStyle(enabled: buyInMotionOK))
         .frame(maxWidth: .infinity, alignment: .center)
         .foregroundColor(.black)
         .padding(.vertical, 4)
@@ -786,6 +1086,8 @@ private struct WatchAddBuyInSheet: View {
 
 private struct WatchAddCompSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var amount: Double = 20
     @State private var customAmountText: String = "20"
     @State private var details = ""
@@ -795,8 +1097,15 @@ private struct WatchAddCompSheet: View {
     @State private var statusColor: Color = .green
     @State private var pendingExpectedCompTotal: Int?
     @State private var showConfirmAdd = false
+    @State private var compCelebrationToken = 0
+    @State private var foodToastText: String?
+    @State private var categoryWobbleDegrees: Double = 0
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
     private let contextGridColumns: [GridItem] = [GridItem(.flexible()), GridItem(.flexible())]
+
+    private var compMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
 
     private var currentCompTotal: Int {
         store.liveSession?.totalComp ?? 0
@@ -859,15 +1168,27 @@ private struct WatchAddCompSheet: View {
     }
 
     var body: some View {
-        Form {
+        ZStack(alignment: .top) {
+            Form {
             if let statusMessage {
                 Text(statusMessage)
                     .font(.caption2.bold())
                     .foregroundColor(statusColor)
             }
-            Text("Current comps: $\(currentCompTotal)")
-                .font(.caption2)
-                .foregroundColor(.secondary)
+            HStack {
+                Text("Current comps: $\(currentCompTotal)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .contentTransition(.numericText())
+                    .animation(compMotionOK ? .snappy : nil, value: currentCompTotal)
+                Spacer(minLength: 0)
+                if compMotionOK {
+                    Image(systemName: "gift.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.cyan)
+                        .symbolEffect(.bounce, value: compCelebrationToken)
+                }
+            }
             if selectedCompEntryMode == nil {
                 Text("Add comp as:")
                     .font(.caption2)
@@ -885,9 +1206,22 @@ private struct WatchAddCompSheet: View {
             } else if selectedCompEntryMode == .cashValue {
                 Text("Comp: $\(selectedAmount)")
                     .font(.headline.monospacedDigit())
-                Text("Proposed comps: $\(proposedCompTotal)")
-                    .font(.caption2)
-                    .foregroundColor(.green)
+                    .contentTransition(.numericText())
+                    .animation(compMotionOK ? .snappy : nil, value: selectedAmount)
+                HStack(spacing: 6) {
+                    Text("Proposed comps: $\(proposedCompTotal)")
+                        .font(.caption2)
+                        .foregroundColor(.green)
+                        .contentTransition(.numericText())
+                        .animation(compMotionOK ? .snappy : nil, value: proposedCompTotal)
+                    if compMotionOK, selectedAmount > 0 {
+                        Text("+\(selectedAmount)")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundColor(.green.opacity(0.9))
+                            .transition(.move(edge: .trailing).combined(with: .opacity))
+                    }
+                }
+                .animation(compMotionOK ? .spring(response: 0.28, dampingFraction: 0.82) : nil, value: selectedAmount)
                 quickAmountRows(amountPresetValues)
                 TextField("Custom comp", text: $customAmountText)
                     .onChange(of: customAmountText) { new in
@@ -913,8 +1247,9 @@ private struct WatchAddCompSheet: View {
                                         .font(.caption2)
                                 }
                             }
+                            .rotationEffect(.degrees(selectedContextIndex == index ? categoryWobbleDegrees : 0))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(WatchQuickTilePressStyle(enabled: compMotionOK))
                         .frame(maxWidth: .infinity, minHeight: 34)
                         .foregroundColor(selectedContextIndex == index ? .black : .white)
                         .background(selectedContextIndex == index ? Color.green : Color.gray.opacity(0.22))
@@ -923,9 +1258,14 @@ private struct WatchAddCompSheet: View {
                 }
                 Text("Estimated value: $\(selectedAmount)")
                     .font(.headline.monospacedDigit())
+                    .contentTransition(.numericText())
+                    .animation(compMotionOK ? .snappy : nil, value: selectedAmount)
                 Text("Proposed comps: $\(proposedCompTotal)")
                     .font(.caption2)
                     .foregroundColor(.green)
+                    .underline(true, color: .cyan)
+                    .contentTransition(.numericText())
+                    .animation(compMotionOK ? .snappy : nil, value: proposedCompTotal)
                 quickAmountRows(amountPresetValues)
                 TextField("Custom value", text: $customAmountText)
                     .onChange(of: customAmountText) { new in
@@ -950,7 +1290,19 @@ private struct WatchAddCompSheet: View {
             .padding(.vertical, 6)
             .background(Color.green)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            if compMotionOK, let toast = foodToastText {
+                Text(toast)
+                    .font(.caption2.bold())
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Capsule().fill(Color.cyan.opacity(0.92)))
+                    .padding(.top, 4)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
+        .animation(compMotionOK ? .spring(response: 0.35, dampingFraction: 0.82) : nil, value: foodToastText)
         .focusable(true)
         .digitalCrownRotation(
             $amount,
@@ -990,6 +1342,13 @@ private struct WatchAddCompSheet: View {
                 statusMessage = immediate ? "Comp sent" : "Comp queued"
                 statusColor = immediate ? .green : .orange
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
+                if compMotionOK, mode == .foodBeverage {
+                    let label = compContextLabel
+                    foodToastText = label
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.65) {
+                        foodToastText = nil
+                    }
+                }
                 details = ""
             }
         } message: {
@@ -1002,6 +1361,20 @@ private struct WatchAddCompSheet: View {
             statusMessage = "Comp updated on iPhone"
             statusColor = .green
             playSuccessHaptic()
+            if compMotionOK {
+                compCelebrationToken += 1
+            }
+        }
+        .onChange(of: selectedContextIndex) { old, new in
+            guard old != new, compMotionOK else { return }
+            withAnimation(.spring(response: 0.22, dampingFraction: 0.48)) {
+                categoryWobbleDegrees = 7
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.72)) {
+                    categoryWobbleDegrees = 0
+                }
+            }
         }
         .onAppear {
             customAmountText = "\(max(5, Int(amount)))"
@@ -1032,6 +1405,7 @@ private struct WatchAddCompSheet: View {
             amount = Double(max(1, value))
             customAmountText = "\(max(1, value))"
         }
+        .buttonStyle(WatchQuickTilePressStyle(enabled: compMotionOK))
         .frame(maxWidth: .infinity, alignment: .center)
         .foregroundColor(.black)
         .padding(.vertical, 4)
@@ -1076,14 +1450,51 @@ private enum WatchCompEntryMode {
     case cashValue
 }
 
+private struct WatchTierLadderBars: View {
+    var motionEnabled: Bool
+    var pulseSignal: Int
+    @State private var heights: [CGFloat] = [5, 5, 5]
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 4) {
+            ForEach(0..<3, id: \.self) { i in
+                RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    .fill(Color.purple.opacity(0.88))
+                    .frame(width: 7, height: heights[i])
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 22, alignment: .bottom)
+        .onChange(of: pulseSignal) { _, new in
+            guard motionEnabled, new > 0 else { return }
+            heights = [5, 5, 5]
+            withAnimation(.spring(response: 0.34, dampingFraction: 0.68)) {
+                heights = [11, 18, 13]
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.52) {
+                withAnimation(.easeOut(duration: 0.26)) {
+                    heights = [6, 6, 6]
+                }
+            }
+        }
+    }
+}
+
 private struct WatchUpdateTierSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var pointsDelta: Double = 0
     @State private var customTierDeltaText: String = "0"
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
     @State private var pendingTierPoints: Int?
     @State private var showConfirmUpdateTier = false
+    @State private var tierLadderPulse = 0
+
+    private var tierMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
 
     private var currentTierPoints: Int {
         store.liveSession?.startingTierPoints ?? 0
@@ -1109,12 +1520,32 @@ private struct WatchUpdateTierSheet: View {
             Text("Current tier: \(currentTierPoints)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
-            Text("Add points: \(selectedTierDelta)")
-                .font(.headline.monospacedDigit())
-                .frame(maxWidth: .infinity, alignment: .center)
+                .contentTransition(.numericText())
+                .animation(tierMotionOK ? .snappy : nil, value: currentTierPoints)
+            ZStack {
+                if tierMotionOK {
+                    Circle()
+                        .stroke(Color.purple.opacity(0.14), lineWidth: 3)
+                        .frame(width: 54, height: 54)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(min(pointsDelta / 12_000.0, 1.0)))
+                        .stroke(Color.purple.opacity(0.78), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: 54, height: 54)
+                        .animation(tierMotionOK ? .easeOut(duration: 0.18) : nil, value: pointsDelta)
+                }
+                Text("Add points: \(selectedTierDelta)")
+                    .font(.headline.monospacedDigit())
+                    .contentTransition(.numericText())
+                    .animation(tierMotionOK ? .snappy : nil, value: selectedTierDelta)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
             Text("Proposed tier: \(proposedTierPoints)")
                 .font(.caption2)
                 .foregroundColor(.green)
+                .contentTransition(.numericText())
+                .animation(tierMotionOK ? .snappy : nil, value: proposedTierPoints)
+            WatchTierLadderBars(motionEnabled: tierMotionOK, pulseSignal: tierLadderPulse)
             HStack {
                 tierPresetButton(0)
                 tierPresetButton(100)
@@ -1174,6 +1605,9 @@ private struct WatchUpdateTierSheet: View {
             statusMessage = "Tier updated on iPhone"
             statusColor = .green
             playSuccessHaptic()
+            if tierMotionOK {
+                tierLadderPulse += 1
+            }
             pointsDelta = 0
             customTierDeltaText = "0"
         }

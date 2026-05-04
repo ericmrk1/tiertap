@@ -11,6 +11,7 @@ struct SessionDetailView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showCompleteSession = false
     @State private var showEditSession = false
+    @State private var showShareFlow = false
     @State private var privateNotes: String = ""
     @State private var tierPointsVerification: SessionTierPointsVerification = .verified
 
@@ -319,7 +320,7 @@ struct SessionDetailView: View {
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         showEditSession = true
                     } label: {
@@ -329,6 +330,17 @@ struct SessionDetailView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityHint("Edit session information")
+
+                    Button {
+                        showShareFlow = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.green)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Share")
+                    .accessibilityHint("Open session share options")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }.foregroundColor(.green)
@@ -346,6 +358,13 @@ struct SessionDetailView: View {
                     .environmentObject(settingsStore)
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
+            }
+            .sheet(isPresented: $showShareFlow) {
+                PostCloseoutShareFlowView(sessionId: displaySession.id)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
             }
         }
     }

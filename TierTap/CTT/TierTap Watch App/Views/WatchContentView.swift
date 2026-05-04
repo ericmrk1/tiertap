@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(watchOS)
+import WatchKit
+#endif
 
 /// Watch app is strictly a remote control for the live session on iPhone.
 struct WatchContentView: View {
@@ -109,10 +112,12 @@ private struct WatchSettingsView: View {
     @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
     @State private var watchVisualsAutoScrollEnabled = false
     @State private var watchVisualsAutoScrollSeconds = 6
+    @State private var watchAnimationsEnabled = true
 
     var body: some View {
         Form {
             Toggle("Watch haptics", isOn: $watchHapticsEnabled)
+            Toggle("Animations", isOn: $watchAnimationsEnabled)
             Picker("Haptic profile", selection: $watchHapticProfile) {
                 Text("Classic").tag("classic")
                 Text("Subtle").tag("subtle")
@@ -150,6 +155,7 @@ private struct WatchSettingsView: View {
         .localizedNavigationTitle("Watch Settings")
         .onAppear(perform: load)
         .onChange(of: watchHapticsEnabled) { _ in save() }
+        .onChange(of: watchAnimationsEnabled) { _ in save() }
         .onChange(of: watchSessionPulseEnabled) { _ in save() }
         .onChange(of: watchSessionPulseMinutes) { _ in save() }
         .onChange(of: watchWristRaiseSummaryEnabled) { _ in save() }
@@ -163,6 +169,7 @@ private struct WatchSettingsView: View {
     }
 
     private func load() {
+        watchAnimationsEnabled = TierTapWatchAnimationsSettings.isEnabled(userDefaults: groupDefaults)
         watchHapticsEnabled = groupDefaults?.object(forKey: "ctt_watch_haptics_enabled") as? Bool ?? true
         watchSessionPulseEnabled = groupDefaults?.object(forKey: "ctt_watch_session_pulse_enabled") as? Bool ?? true
         let pulse = groupDefaults?.integer(forKey: "ctt_watch_session_pulse_minutes") ?? 20
@@ -179,6 +186,7 @@ private struct WatchSettingsView: View {
     }
 
     private func save() {
+        groupDefaults?.set(watchAnimationsEnabled, forKey: TierTapWatchAnimationsSettings.userDefaultsKey)
         groupDefaults?.set(watchHapticsEnabled, forKey: "ctt_watch_haptics_enabled")
         groupDefaults?.set(watchSessionPulseEnabled, forKey: "ctt_watch_session_pulse_enabled")
         groupDefaults?.set(max(1, watchSessionPulseMinutes), forKey: "ctt_watch_session_pulse_minutes")
@@ -264,28 +272,33 @@ struct WatchHistoryView: View {
                 .padding(.vertical, 4)
             } else {
                 ForEach(sessions.prefix(100)) { session in
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(session.casino.isEmpty ? "Unknown casino" : session.casino)
-                            .font(.caption.bold())
-                            .lineLimit(1)
-                        Text(session.game.isEmpty ? "Unknown game" : session.game)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                        HStack(spacing: 6) {
-                            Text(Session.durationString(session.duration))
-                            if let wl = session.winLoss {
-                                Text("•")
-                                Text("W/L \(wl >= 0 ? "+" : "")\(wl)")
+                    NavigationLink {
+                        WatchSessionDetailView(session: session)
+                            .environmentObject(store)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(session.casino.isEmpty ? "Unknown casino" : session.casino)
+                                .font(.caption.bold())
+                                .lineLimit(1)
+                            Text(session.game.isEmpty ? "Unknown game" : session.game)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                            HStack(spacing: 6) {
+                                Text(Session.durationString(session.duration))
+                                if let wl = session.winLoss {
+                                    Text("•")
+                                    Text("W/L \(wl >= 0 ? "+" : "")\(wl)")
+                                }
                             }
-                        }
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        Text(session.endTime ?? session.startTime, style: .date)
                             .font(.caption2)
                             .foregroundColor(.secondary)
+                            Text(session.endTime ?? session.startTime, style: .date)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
                 }
             }
         }
@@ -313,6 +326,120 @@ struct WatchHistoryView: View {
                 isRefreshing = false
             }
         }
+    }
+}
+
+private struct WatchSessionDetailView: View {
+    let session: Session
+    @EnvironmentObject private var store: SessionStore
+    @ObservedObject private var syncManager = SessionSyncManager.shared
+    @State private var statusMessage: String?
+    @State private var confirmCommunityPublish = false
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var resolvedSession: Session {
+        store.sessions.first(where: { $0.id == session.id }) ?? session
+    }
+
+    private var currencySymbol: String {
+        let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
+
+    private var shareText: String {
+        let s = resolvedSession
+        let dateText = s.startTime.formatted(date: .abbreviated, time: .shortened)
+        let durationText = Session.durationString(s.duration)
+        let buyInText = "\(currencySymbol)\(s.totalBuyIn)"
+        let compsText = s.totalComp > 0 ? " • Comps \(currencySymbol)\(s.totalComp)" : ""
+        let wlText: String
+        if let wl = s.winLoss {
+            wlText = " • W/L \(wl >= 0 ? "+" : "-")\(currencySymbol)\(abs(wl))"
+        } else if let cashOut = s.cashOut {
+            wlText = " • Cash out \(currencySymbol)\(cashOut)"
+        } else {
+            wlText = ""
+        }
+        return "\(dateText) at \(s.casino): \(s.game), \(durationText), buy-in \(buyInText)\(compsText)\(wlText)"
+    }
+
+    var body: some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(resolvedSession.casino.isEmpty ? "Unknown casino" : resolvedSession.casino)
+                        .font(.caption.bold())
+                    Text(resolvedSession.game.isEmpty ? "Unknown game" : resolvedSession.game)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text(resolvedSession.endTime ?? resolvedSession.startTime, style: .date)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 2)
+            }
+
+            Section("Session") {
+                LabeledContent("Duration", value: Session.durationString(resolvedSession.duration))
+                LabeledContent("Buy-in", value: "\(currencySymbol)\(resolvedSession.totalBuyIn)")
+                LabeledContent("Comps", value: "\(currencySymbol)\(resolvedSession.totalComp)")
+                if let wl = resolvedSession.winLoss {
+                    LabeledContent("W/L", value: "\(wl >= 0 ? "+" : "")\(currencySymbol)\(abs(wl))")
+                }
+            }
+
+            Section("Share") {
+                ShareLink(item: shareText) {
+                    Label("Share Text", systemImage: "square.and.arrow.up")
+                }
+
+                Button {
+                    confirmCommunityPublish = true
+                } label: {
+                    Label("Share to Community", systemImage: "paperplane.circle.fill")
+                }
+            }
+
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .localizedNavigationTitle("Session")
+        .confirmationDialog(
+            "Publish to Community?",
+            isPresented: $confirmCommunityPublish,
+            titleVisibility: .visible
+        ) {
+            Button("Publish") {
+                let immediate = syncManager.isReachable
+                store.requestWatchCommunityPublishFromWatch(sessionId: resolvedSession.id) { ok, message in
+                    statusMessage = message
+                    if ok {
+                        playHaptic(immediate: immediate)
+                    } else {
+                        WKInterfaceDevice.current().play(.failure)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Uses your Community screen name and tier/hour only (no wins, comps, or comment). TierTap on iPhone publishes in the background — no share sheet on the phone.")
+        }
+    }
+
+    private func playHaptic(immediate: Bool) {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(immediate ? .success : .click)
+        #endif
     }
 }
 

@@ -1,6 +1,19 @@
 import Foundation
 import WatchConnectivity
 
+/// Returned from iPhone `SessionSyncManager.onActionReceived` so the Watch can read `replyExtras` (e.g. publish status).
+struct WatchConnectivityActionResult {
+    let sessions: [Session]
+    let liveSession: Session?
+    let replyExtras: [String: Any]
+
+    init(sessions: [Session], liveSession: Session?, replyExtras: [String: Any] = [:]) {
+        self.sessions = sessions
+        self.liveSession = liveSession
+        self.replyExtras = replyExtras
+    }
+}
+
 struct RemoteCommandLogEntry: Identifiable, Codable {
     enum Delivery: String, Codable {
         case sent
@@ -56,8 +69,8 @@ final class SessionSyncManager: NSObject, ObservableObject {
     /// Called on Watch when iPhone pushes new state. Arguments: (sessions, liveSession).
     var onContextReceived: (([Session], Session?) -> Void)?
 
-    /// Called on iPhone when Watch sends an action. Params vary by action. Return (sessions, liveSession) to reply to Watch.
-    var onActionReceived: ((String, [String: Any]) -> (sessions: [Session], liveSession: Session?)?)?
+    /// Called on iPhone when Watch sends an action. Params vary by action. Return state plus optional `replyExtras` merged into the WC reply (Watch reads these in `sendAction` completion).
+    var onActionReceived: ((String, [String: Any]) -> WatchConnectivityActionResult?)?
 
     /// iPhone: authoritative snapshot for state requests (main-thread `SessionStore`).
     var stateSnapshotProvider: (() -> (sessions: [Session], liveSession: Session?))?
@@ -136,7 +149,9 @@ final class SessionSyncManager: NSObject, ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: fallback)
         session.sendMessage(["request": "state"], replyHandler: { [weak self] reply in
             fallback.cancel()
-            self?.decodeReply(reply, completion: completion)
+            self?.decodeReply(reply) { sessions, live, _ in
+                completion(sessions, live)
+            }
         }, errorHandler: { [weak self] _ in
             fallback.cancel()
             if let self {
@@ -154,9 +169,9 @@ final class SessionSyncManager: NSObject, ObservableObject {
 
     // MARK: - Watch: send action to iPhone
 
-    func sendAction(_ action: String, params: [String: Any], completion: @escaping ([Session], Session?) -> Void) {
+    func sendAction(_ action: String, params: [String: Any], completion: @escaping ([Session], Session?, [String: Any]) -> Void) {
         guard let session = session else {
-            completion(cachedSessions, cachedLiveSession)
+            completion(cachedSessions, cachedLiveSession, [:])
             return
         }
         var msg = params
@@ -170,14 +185,14 @@ final class SessionSyncManager: NSObject, ObservableObject {
                 guard let self else { return }
                 session.transferUserInfo(msg)
                 self.appendRemoteCommandLog(action: action, paramsSummary: paramsSummary, delivery: .queued)
-                completion(self.cachedSessions, self.cachedLiveSession)
+                completion(self.cachedSessions, self.cachedLiveSession, [:])
             })
             return
         }
         // Fallback path for simulator/background iPhone app: queue action for delivery.
         session.transferUserInfo(msg)
         appendRemoteCommandLog(action: action, paramsSummary: paramsSummary, delivery: .queued)
-        completion(cachedSessions, cachedLiveSession)
+        completion(cachedSessions, cachedLiveSession, [:])
     }
 
     func clearRemoteCommandLog() {
@@ -187,7 +202,7 @@ final class SessionSyncManager: NSObject, ObservableObject {
         }
     }
 
-    private func decodeReply(_ reply: [String: Any], completion: ([Session], Session?) -> Void) {
+    private func decodeReply(_ reply: [String: Any], completion: @escaping ([Session], Session?, [String: Any]) -> Void) {
         if let enabled = reply["sessionRemindersEnabled"] as? Bool {
             UserDefaults.standard.set(enabled, forKey: reminderEnabledKey)
         }
@@ -206,14 +221,30 @@ final class SessionSyncManager: NSObject, ObservableObject {
         if reply["sessions"] == nil && reply["liveSession"] == nil {
             updateStatus("Reply missing state payload.")
             queueStateRequestIfNeeded()
-            completion(cachedSessions, cachedLiveSession)
+            completion(cachedSessions, cachedLiveSession, replyMetadata(from: reply))
             return
         }
         cachedSessions = sessions
         cachedLiveSession = live
         setDebugSnapshot(sessionCount: sessions.count, liveSessionID: live?.id)
         markSynced(status: "Synced from iPhone reply")
-        completion(sessions, live)
+        completion(sessions, live, replyMetadata(from: reply))
+    }
+
+    /// Keys copied back to the Watch alongside session state (everything except WC transport fields).
+    private func replyMetadata(from reply: [String: Any]) -> [String: Any] {
+        let skip: Set<String> = [
+            "sessions",
+            "liveSession",
+            liveSummaryKey,
+            "sessionRemindersEnabled",
+            "sessionReminderFrequencyMinutes"
+        ]
+        var out: [String: Any] = [:]
+        for (k, v) in reply where !skip.contains(k) {
+            out[k] = v
+        }
+        return out
     }
 
     private func decodeContextPayload(from payload: [String: Any]) -> (sessions: [Session], liveSession: Session?)? {
@@ -624,6 +655,9 @@ extension SessionSyncManager: WCSessionDelegate {
             reply["sessionRemindersEnabled"] = UserDefaults.standard.bool(forKey: self.reminderEnabledKey)
             let minutes = UserDefaults.standard.integer(forKey: self.reminderFrequencyMinutesKey)
             reply["sessionReminderFrequencyMinutes"] = max(1, minutes > 0 ? minutes : 30)
+            for (k, v) in result.replyExtras {
+                reply[k] = v
+            }
             replyHandler(reply)
             #if os(iOS)
             // Keep watch's application context fresh even when it requested via direct message.
@@ -720,5 +754,20 @@ extension SessionSyncManager: WCSessionDelegate {
             return (sessionsData, nil, summary)
         }
         return (sessionsData, encodedLive, summary)
+    }
+}
+
+// MARK: - Watch UI animations (App Group; mirrored from iPhone Settings)
+
+/// Shared UserDefaults key for TierTap Watch motion effects. Default when unset: **on**.
+enum TierTapWatchAnimationsSettings {
+    static let userDefaultsKey = "ctt_watch_animations_enabled"
+    static let appGroupSuiteName = "group.com.app.tiertap"
+
+    /// When the key is absent, animations are treated as enabled.
+    static func isEnabled(userDefaults: UserDefaults? = UserDefaults(suiteName: appGroupSuiteName)) -> Bool {
+        guard let ud = userDefaults else { return true }
+        if ud.object(forKey: userDefaultsKey) == nil { return true }
+        return ud.bool(forKey: userDefaultsKey)
     }
 }

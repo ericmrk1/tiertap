@@ -822,6 +822,8 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Toggle("Watch haptics", isOn: $settingsStore.watchHapticsEnabled)
                     .tint(.green)
+                Toggle("Watch animations", isOn: $settingsStore.watchAnimationsEnabled)
+                    .tint(.green)
                 Picker("Haptic profile", selection: $settingsStore.watchHapticProfile) {
                     Text("Classic").tag(SettingsStore.WatchHapticProfile.classic)
                     Text("Subtle").tag(SettingsStore.WatchHapticProfile.subtle)
@@ -880,7 +882,7 @@ struct SettingsView: View {
                     .font(.caption2)
                     .foregroundColor(.gray)
 
-                Text("These controls sync to Apple Watch and customize haptics, pulse nudges, wrist-raise summary cards, and quick action defaults.")
+                Text("These controls sync to Apple Watch and customize haptics, animations, pulse nudges, wrist-raise summary cards, and quick action defaults.")
                     .font(.caption2)
                     .foregroundColor(.gray)
             }

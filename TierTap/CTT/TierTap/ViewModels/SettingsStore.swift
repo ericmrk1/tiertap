@@ -56,6 +56,7 @@ private let keyWatchQuickAction = "ctt_watch_quick_action"
 private let keyWatchBuyInCashDefaults = "ctt_watch_buyin_cash_defaults"
 private let keyWatchCompCashDefaults = "ctt_watch_comp_cash_defaults"
 private let keyWatchCompContextOptions = "ctt_watch_comp_context_options"
+private let keyWatchAnimationsEnabled = TierTapWatchAnimationsSettings.userDefaultsKey
 private let appGroupSuiteName = "group.com.app.tiertap"
 
 /// Saved poker choices from the last completed or started session; used to pre-fill check-in.
@@ -683,6 +684,14 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// Motion effects on Apple Watch (press feedback, ripples, tier/comp/buy-in flourishes). Synced to the App Group.
+    @Published var watchAnimationsEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(watchAnimationsEnabled, forKey: keyWatchAnimationsEnabled)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(watchAnimationsEnabled, forKey: keyWatchAnimationsEnabled)
+        }
+    }
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -882,6 +891,11 @@ final class SettingsStore: ObservableObject {
             UserDefaults.standard.string(forKey: keyWatchCompContextOptions)
             ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyWatchCompContextOptions)
             ?? "Cocktail, Beer, Food, Cash"
+        if UserDefaults.standard.object(forKey: keyWatchAnimationsEnabled) != nil {
+            self.watchAnimationsEnabled = UserDefaults.standard.bool(forKey: keyWatchAnimationsEnabled)
+        } else {
+            self.watchAnimationsEnabled = true
+        }
         if UserDefaults.standard.object(forKey: keyAppLockPinModeLegacy) != nil {
             AppLockPINLegacy.clearFromKeychain()
             UserDefaults.standard.removeObject(forKey: keyAppLockPinModeLegacy)
@@ -932,6 +946,7 @@ final class SettingsStore: ObservableObject {
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchBuyInCashDefaultsText, forKey: keyWatchBuyInCashDefaults)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompCashDefaultsText, forKey: keyWatchCompCashDefaults)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompContextOptionsText, forKey: keyWatchCompContextOptions)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchAnimationsEnabled, forKey: keyWatchAnimationsEnabled)
     }
 
     /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).

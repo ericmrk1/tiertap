@@ -9,11 +9,16 @@ struct TierTapWatchApp: App {
     @StateObject private var store = SessionStore()
     @State private var appLanguage: AppLanguage = .english
     @StateObject private var notificationDelegate = WatchNotificationDelegate()
+    @AppStorage(
+        TierTapWatchAnimationsSettings.userDefaultsKey,
+        store: UserDefaults(suiteName: TierTapWatchAnimationsSettings.appGroupSuiteName)
+    ) private var watchTierTapAnimationsEnabled = true
 
     var body: some Scene {
         WindowGroup {
             WatchContentView()
                 .environmentObject(store)
+                .environment(\.tierTapWatchAnimationsEnabled, watchTierTapAnimationsEnabled)
                 .environment(\.locale, appLanguage.locale)
                 .environment(\.layoutDirection, appLanguage.layoutDirection)
                 .environment(\.appLanguage, appLanguage)
@@ -66,5 +71,17 @@ final class WatchNotificationDelegate: NSObject, ObservableObject, UNUserNotific
             WKInterfaceDevice.current().play(.notification)
         }
         #endif
+    }
+}
+
+private struct TierTapWatchAnimationsEnvironmentKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// When false (or Reduce Motion on), TierTap Watch skips decorative motion (press scale, ripples, symbol effects).
+    var tierTapWatchAnimationsEnabled: Bool {
+        get { self[TierTapWatchAnimationsEnvironmentKey.self] }
+        set { self[TierTapWatchAnimationsEnvironmentKey.self] = newValue }
     }
 }

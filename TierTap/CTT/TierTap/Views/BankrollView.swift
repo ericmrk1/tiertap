@@ -172,11 +172,12 @@ struct BankrollView: View {
             currencySymbol: settingsStore.currencySymbol
         )
         guard let image = renderBankrollCardToImage(card) else { return }
+        let shareImage = image.withTierTapShareLogoOverlay()
         let df = DateFormatter()
         df.dateFormat = "yyyyMMddHHmmss"
         let name = "TierTapBankroll\(df.string(from: Date())).png"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
-        guard let data = image.pngData(), (try? data.write(to: url)) != nil else { return }
+        guard let data = shareImage.pngData(), (try? data.write(to: url)) != nil else { return }
         shareURL = url
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             isShareSheetPresented = true

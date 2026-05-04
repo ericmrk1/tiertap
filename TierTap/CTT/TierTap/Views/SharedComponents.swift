@@ -2612,6 +2612,29 @@ extension UIImage {
         guard let outCGImage = context.makeImage() else { return nil }
         return UIImage(cgImage: outCGImage, scale: scale, orientation: imageOrientation)
     }
+
+    /// Returns a copy with the TierTap logo in the bottom-right (same layout as session-art AI shares).
+    func withTierTapShareLogoOverlay() -> UIImage {
+        guard let logo = UIImage(named: "TierTapLogo") else { return self }
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+            let minSide = min(size.width, size.height)
+            let logoWidth = max(72, minSide * 0.16)
+            let ratio = logo.size.height > 0 ? (logo.size.width / logo.size.height) : 1
+            let logoHeight = logoWidth / max(ratio, 0.001)
+            let pad = max(18, minSide * 0.03)
+            let rect = CGRect(
+                x: size.width - logoWidth - pad,
+                y: size.height - logoHeight - pad,
+                width: logoWidth,
+                height: logoHeight
+            )
+            logo.draw(in: rect, blendMode: .normal, alpha: 0.95)
+        }
+    }
 }
 
 enum TransparentLogoCache {

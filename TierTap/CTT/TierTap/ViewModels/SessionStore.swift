@@ -28,6 +28,9 @@ class SessionStore: ObservableObject {
     #if os(iOS)
     /// After a session is fully completed (live close-out or finishing a Watch cash-out), set briefly so the app can offer share / publish / session art.
     @Published var postCloseoutSharePromptSessionId: UUID?
+    /// Set from `TierTapAppRoot` so Watch-initiated community publish can read sign-in and currency on iPhone.
+    weak var watchActionAuthStore: AuthStore?
+    weak var watchActionSettingsStore: SettingsStore?
     #endif
 
     private let sessKey = "ctt_sessions_v2"
@@ -85,10 +88,10 @@ class SessionStore: ObservableObject {
 
     private func setupSync() {
         #if os(iOS)
-        SessionSyncManager.shared.onActionReceived = { [weak self] action, params in
+        SessionSyncManager.shared.onActionReceived = { @MainActor [weak self] action, params in
             guard let self = self else { return nil }
             if action.isEmpty, params["request"] as? String == "state" {
-                return (self.sessions, self.liveSession)
+                return WatchConnectivityActionResult(sessions: self.sessions, liveSession: self.liveSession)
             }
             switch action {
             case "startSession":
@@ -96,16 +99,16 @@ class SessionStore: ObservableObject {
                       let st = params["startingTier"] as? Int, let bi = params["initialBuyIn"] as? Int else { return nil }
                 let program = params["rewardsProgramName"] as? String
                 self.startSession(game: game, casino: casino, startingTier: st, initialBuyIn: bi, rewardsProgramName: program)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "fastStartSession":
                 guard let raw = params["category"] as? String,
                       let category = SessionGameCategory(rawValue: raw) else { return nil }
                 self.fastStartSession(category: category)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "addBuyIn":
                 guard let amount = params["amount"] as? Int else { return nil }
                 self.addBuyIn(amount)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "addComp":
                 guard let amount = params["amount"] as? Int else { return nil }
                 let kind = (params["kind"] as? String).flatMap { CompKind(rawValue: $0) } ?? .dollarsCredits
@@ -117,24 +120,30 @@ class SessionStore: ObservableObject {
                 let trimmedOther = rawOther?.trimmingCharacters(in: .whitespacesAndNewlines)
                 let otherDesc = (trimmedOther?.isEmpty == false) ? trimmedOther : nil
                 self.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: fb, foodBeverageOtherDescription: otherDesc)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "closeSessionCashOutOnly":
                 guard let cashOut = params["cashOut"] as? Int else { return nil }
                 self.closeSessionCashOutOnly(cashOut: cashOut)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "fastCloseOut":
-                self.fastCloseSessionWithDefaultsUnverified()
-                return (self.sessions, self.liveSession)
+                let cashOutOverride = params["cashOut"] as? Int
+                self.fastCloseSessionWithDefaultsUnverified(
+                    presentPostCloseoutSharePrompt: false,
+                    cashOutOverride: cashOutOverride
+                )
+                return self.watchConnectivityReply()
             case "pauseSession":
                 self.stopLiveSessionTimer()
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "resumeSession":
                 self.resumeLiveSessionTimer()
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
             case "updateTier":
                 guard let points = params["points"] as? Int else { return nil }
                 self.updateLiveSessionStartingTier(points)
-                return (self.sessions, self.liveSession)
+                return self.watchConnectivityReply()
+            case "presentPostCloseoutSharePrompt", "publishSessionToCommunityFromWatch":
+                return self.handleWatchRequestedCommunityPublish(params: params)
             default:
                 return nil
             }
@@ -142,6 +151,65 @@ class SessionStore: ObservableObject {
         pushContext()
         #endif
     }
+
+    #if os(iOS)
+    private func watchConnectivityReply(extras: [String: Any] = [:]) -> WatchConnectivityActionResult {
+        WatchConnectivityActionResult(sessions: sessions, liveSession: liveSession, replyExtras: extras)
+    }
+
+    /// Watch: publish with the same defaults as “Pick Sessions To Publish” (screen name + tier/hour only); no in-app sheets.
+    /// Must run on the main queue (`SessionSyncManager` delivers watch actions on the main actor).
+    private func handleWatchRequestedCommunityPublish(params: [String: Any]) -> WatchConnectivityActionResult {
+        MainActor.assumeIsolated {
+            guard let rawSessionID = params["sessionId"] as? String,
+                  let sessionId = UUID(uuidString: rawSessionID) else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Invalid session."])
+            }
+            guard let session = sessions.first(where: { $0.id == sessionId }) else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Session not found."])
+            }
+            guard session.isComplete else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Session is not complete yet."])
+            }
+            guard SupabaseConfig.isConfigured else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Community is not set up on this iPhone."])
+            }
+            guard let auth = watchActionAuthStore, let settings = watchActionSettingsStore else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Open TierTap on iPhone once, then try again."])
+            }
+            guard auth.isSignedIn, auth.session != nil else {
+                return watchConnectivityReply(extras: ["watchPublishError": "Sign in under Community on iPhone to publish."])
+            }
+            enqueueWatchCommunityPublishFromWatch(session: session, auth: auth, settings: settings)
+            return watchConnectivityReply(extras: [
+                "watchPublishAccepted": true,
+                "watchPublishMessage": "Publishing on iPhone (screen name + tier/hour only)."
+            ])
+        }
+    }
+
+    private func enqueueWatchCommunityPublishFromWatch(session: Session, auth: AuthStore, settings: SettingsStore) {
+        Task {
+            do {
+                _ = try await CommunityPublisher.publishSessions(
+                    [session],
+                    authStore: auth,
+                    currencyCode: settings.currencyCode,
+                    currencySymbol: settings.currencySymbol,
+                    comment: nil,
+                    publishTierPerHour: true,
+                    publishWinLoss: false,
+                    publishCompDetails: false,
+                    attachScreenName: true
+                )
+            } catch {
+                #if DEBUG
+                print("[Watch→Community] publish failed: \(error.localizedDescription)")
+                #endif
+            }
+        }
+    }
+    #endif
 
     private func pushContext() {
         #if os(iOS)
@@ -165,7 +233,7 @@ class SessionStore: ObservableObject {
             "game": game, "casino": casino, "startingTier": startingTier, "initialBuyIn": initialBuyIn
         ]
         if let name = rewardsProgramName { p["rewardsProgramName"] = name }
-        SessionSyncManager.shared.sendAction("startSession", params: p) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("startSession", params: p) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -197,7 +265,7 @@ class SessionStore: ObservableObject {
 
     func addBuyIn(_ amount: Int) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("addBuyIn", params: ["amount": amount]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("addBuyIn", params: ["amount": amount]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -213,7 +281,7 @@ class SessionStore: ObservableObject {
 
     func fastStartSession(category: SessionGameCategory) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("fastStartSession", params: ["category": category.rawValue]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("fastStartSession", params: ["category": category.rawValue]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -272,7 +340,7 @@ class SessionStore: ObservableObject {
         if let storedDetails { p["details"] = storedDetails }
         if let storedFB { p["foodBeverageKind"] = storedFB.rawValue }
         if let storedOther { p["foodBeverageOtherDescription"] = storedOther }
-        SessionSyncManager.shared.sendAction("addComp", params: p) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("addComp", params: p) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -296,15 +364,25 @@ class SessionStore: ObservableObject {
     /// End the live session immediately using the same defaults as the close-out sheet pre-fill:
     /// cash out = total buy-in, ending tier = starting tier (or recent history for this casino, else 0).
     /// Marks tier point figures as **unverified** so W/L and tier gains stay provisional.
-    func fastCloseSessionWithDefaultsUnverified() {
+    /// When `presentPostCloseoutSharePrompt` is false (Watch fast-close on iPhone), the app does not show the post-closeout share sheet.
+    /// `cashOutOverride` (e.g. from Watch after an estimated win/loss sheet) replaces the default of total buy-in.
+    func fastCloseSessionWithDefaultsUnverified(
+        presentPostCloseoutSharePrompt: Bool = true,
+        cashOutOverride: Int? = nil
+    ) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("fastCloseOut", params: [:]) { [weak self] sessions, liveSession in
+        var params: [String: Any] = [:]
+        if let c = cashOutOverride {
+            params["cashOut"] = c
+        }
+        SessionSyncManager.shared.sendAction("fastCloseOut", params: params) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
         #endif
         guard var s = liveSession else { return }
-        let cashOut = s.totalBuyIn
+        let defaultCashOut = s.totalBuyIn
+        let cashOut = max(0, cashOutOverride ?? defaultCashOut)
         let endingTier: Int
         if s.startingTierPoints > 0 {
             endingTier = s.startingTierPoints
@@ -315,10 +393,20 @@ class SessionStore: ObservableObject {
         }
         s.tierPointsVerification = .unverified
         liveSession = s
-        closeSession(cashOut: cashOut, endingTier: endingTier, privateNotes: nil)
+        closeSession(
+            cashOut: cashOut,
+            endingTier: endingTier,
+            privateNotes: nil,
+            presentPostCloseoutSharePrompt: presentPostCloseoutSharePrompt
+        )
     }
 
-    func closeSession(cashOut: Int, endingTier: Int, privateNotes: String? = nil) {
+    func closeSession(
+        cashOut: Int,
+        endingTier: Int,
+        privateNotes: String? = nil,
+        presentPostCloseoutSharePrompt: Bool = true
+    ) {
         guard var s = liveSession else { return }
         s.cashOut = cashOut
         s.avgBetActual = nil
@@ -335,7 +423,9 @@ class SessionStore: ObservableObject {
         #if os(iOS)
         LiveActivityManager.shared.end()
         pushContext()
-        schedulePostCloseoutSharePrompt(sessionId: s.id)
+        if presentPostCloseoutSharePrompt {
+            schedulePostCloseoutSharePrompt(sessionId: s.id)
+        }
         #endif
     }
 
@@ -361,10 +451,39 @@ class SessionStore: ObservableObject {
     }
     #endif
 
+    /// Opens the post-closeout share flow for a specific session (iPhone only).
+    func requestPostCloseoutSharePrompt(sessionId: UUID) {
+        #if os(watchOS)
+        return
+        #else
+        presentPostCloseoutSharePrompt(sessionId: sessionId)
+        #endif
+    }
+
+    #if os(watchOS)
+    /// Watch: after confirming on-wrist, publishes on iPhone with screen name + tier/hour only (no TierTap share sheets).
+    func requestWatchCommunityPublishFromWatch(sessionId: UUID, completion: ((Bool, String) -> Void)? = nil) {
+        SessionSyncManager.shared.sendAction(
+            "publishSessionToCommunityFromWatch",
+            params: ["sessionId": sessionId.uuidString]
+        ) { [weak self] sessions, liveSession, extras in
+            DispatchQueue.main.async {
+                self?.applySyncedState(sessions: sessions, liveSession: liveSession)
+                if let err = extras["watchPublishError"] as? String {
+                    completion?(false, err)
+                } else {
+                    let msg = extras["watchPublishMessage"] as? String ?? "Publishing on iPhone…"
+                    completion?(true, msg)
+                }
+            }
+        }
+    }
+    #endif
+
     /// Call from Watch (or quick cash-out): save session with only cash-out; status = requiringMoreInfo.
     func closeSessionCashOutOnly(cashOut: Int) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("closeSessionCashOutOnly", params: ["cashOut": cashOut]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("closeSessionCashOutOnly", params: ["cashOut": cashOut]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -459,7 +578,7 @@ class SessionStore: ObservableObject {
     /// Freeze the live session end time so duration stops increasing (e.g. while user fills closeout form).
     func stopLiveSessionTimer() {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("pauseSession", params: [:]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("pauseSession", params: [:]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -480,7 +599,7 @@ class SessionStore: ObservableObject {
     /// Un-freeze the live session timer so duration resumes increasing.
     func resumeLiveSessionTimer() {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("resumeSession", params: [:]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("resumeSession", params: [:]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return
@@ -502,7 +621,7 @@ class SessionStore: ObservableObject {
 
     func updateLiveSessionStartingTier(_ points: Int) {
         #if os(watchOS)
-        SessionSyncManager.shared.sendAction("updateTier", params: ["points": points]) { [weak self] sessions, liveSession in
+        SessionSyncManager.shared.sendAction("updateTier", params: ["points": points]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
         }
         return

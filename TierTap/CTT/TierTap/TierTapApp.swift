@@ -105,6 +105,8 @@ private struct TierTapAppRoot: View {
         .animation(.easeOut(duration: 0.35), value: showWelcome)
         .animation(.easeOut(duration: 0.25), value: shouldShowLockGate)
         .onAppear {
+            store.watchActionAuthStore = authStore
+            store.watchActionSettingsStore = settingsStore
             NotificationCenter.default.addObserver(
                 forName: NSNotification.Name("ShowAccountSheet"),
                 object: nil,

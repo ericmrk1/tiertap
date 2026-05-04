@@ -5,13 +5,21 @@ import WatchKit
 
 struct WatchVisualsView: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @ObservedObject private var syncManager = SessionSyncManager.shared
     @State private var chipAmount: Double = 100
     @State private var selectedCard: VisualCard = .chipStack
     @State private var pendingMessage: String?
     @State private var lastAutoScrollAt: Date = .distantPast
+    @State private var visualsBuyInPulse = 0
+    @State private var lastObservedVisualBuyIn: Int?
     private let autoScrollTicker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var visualsMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
 
     private var live: Session? { store.liveSession }
     private var hasLiveSession: Bool { live != nil }
@@ -67,6 +75,12 @@ struct WatchVisualsView: View {
             lastAutoScrollAt = now
             selectedCard = selectedCard.next
         }
+        .onChange(of: buyIns) { _, newTotal in
+            if visualsMotionOK, let prev = lastObservedVisualBuyIn, newTotal > prev {
+                visualsBuyInPulse += 1
+            }
+            lastObservedVisualBuyIn = newTotal
+        }
     }
 
     private var chipStackCard: some View {
@@ -77,6 +91,8 @@ struct WatchVisualsView: View {
 
             Text("$\(buyIns.formatted(.number.grouping(.automatic)))")
                 .font(.title3.monospacedDigit().bold())
+                .contentTransition(.numericText())
+                .animation(visualsMotionOK ? .snappy : nil, value: buyIns)
 
             ZStack {
                 ForEach(0..<4, id: \.self) { idx in
@@ -87,6 +103,7 @@ struct WatchVisualsView: View {
                         useDarkLabel: idx == 3
                     )
                         .offset(y: CGFloat((3 - idx) * 4))
+                        .modifier(WatchVisualChipStackNudgeModifier(trigger: visualsBuyInPulse, enabled: visualsMotionOK, layer: idx))
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 74)
@@ -105,6 +122,9 @@ struct WatchVisualsView: View {
                 store.addBuyIn(selectedChipAmount)
                 pendingMessage = immediate ? "Buy-in sent" : "Buy-in queued"
                 playConfiguredHaptic(style: immediate ? .success : .queue)
+                if visualsMotionOK {
+                    visualsBuyInPulse += 1
+                }
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
@@ -253,6 +273,8 @@ struct WatchVisualsView: View {
                 Text(value)
                     .font(.headline.monospacedDigit().bold())
                     .foregroundColor(tint)
+                    .contentTransition(.numericText())
+                    .animation(visualsMotionOK ? .snappy : nil, value: value)
                 Text("Tap to send")
                     .font(.caption2)
                     .foregroundColor(.secondary)
@@ -262,7 +284,7 @@ struct WatchVisualsView: View {
             .background(Color.gray.opacity(0.18))
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(WatchVisualQuickTilePressStyle(enabled: visualsMotionOK && hasLiveSession))
         .disabled(!hasLiveSession)
     }
 
@@ -399,6 +421,39 @@ struct WatchVisualsView: View {
         // watchOS haptics include an audible tap/tone, giving immediate feedback.
         WKInterfaceDevice.current().play(haptic)
         #endif
+    }
+}
+
+private struct WatchVisualQuickTilePressStyle: ButtonStyle {
+    var enabled: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(enabled && configuration.isPressed ? 0.96 : 1)
+            .animation(enabled ? .spring(response: 0.2, dampingFraction: 0.76) : nil, value: configuration.isPressed)
+    }
+}
+
+private struct WatchVisualChipStackNudgeModifier: ViewModifier {
+    var trigger: Int
+    var enabled: Bool
+    let layer: Int
+    @State private var hop: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        let damp = max(0.15, (4 - CGFloat(layer)) / 4)
+        content
+            .offset(y: -hop * damp * 7)
+            .onChange(of: trigger) { _, new in
+                guard enabled, new > 0 else { return }
+                withAnimation(.spring(response: 0.24, dampingFraction: 0.52)) {
+                    hop = 1
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+                    withAnimation(.spring(response: 0.36, dampingFraction: 0.78)) {
+                        hop = 0
+                    }
+                }
+            }
     }
 }
 
