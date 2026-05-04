@@ -132,6 +132,18 @@ class SessionStore: ObservableObject {
                     cashOutOverride: cashOutOverride
                 )
                 return self.watchConnectivityReply()
+            case "watchStopLiveSession":
+                return self.performWatchStopLiveSessionPendingCloseout()
+            case "watchApplyCloseoutCashOut":
+                guard let raw = params["sessionId"] as? String,
+                      let sessionId = UUID(uuidString: raw) else {
+                    return self.watchConnectivityReply(extras: ["watchCloseoutError": "Invalid session id."])
+                }
+                let co = (params["cashOut"] as? NSNumber)?.intValue ?? params["cashOut"] as? Int
+                guard let cashOut = co else {
+                    return self.watchConnectivityReply(extras: ["watchCloseoutError": "Invalid cash out."])
+                }
+                return self.applyWatchCloseoutCashOutFromWatch(sessionId: sessionId, cashOut: cashOut)
             case "pauseSession":
                 self.stopLiveSessionTimer()
                 return self.watchConnectivityReply()
@@ -141,6 +153,9 @@ class SessionStore: ObservableObject {
             case "updateTier":
                 guard let points = params["points"] as? Int else { return nil }
                 self.updateLiveSessionStartingTier(points)
+                return self.watchConnectivityReply()
+            case "discardLiveSession":
+                self.discardLiveSession()
                 return self.watchConnectivityReply()
             case "presentPostCloseoutSharePrompt", "publishSessionToCommunityFromWatch":
                 return self.handleWatchRequestedCommunityPublish(params: params)
@@ -155,6 +170,64 @@ class SessionStore: ObservableObject {
     #if os(iOS)
     private func watchConnectivityReply(extras: [String: Any] = [:]) -> WatchConnectivityActionResult {
         WatchConnectivityActionResult(sessions: sessions, liveSession: liveSession, replyExtras: extras)
+    }
+
+    /// Ends the live session on iPhone, freezes the timer (`endTime` if needed), and moves the session to history as `requiringMoreInfo` with no cash-out yet.
+    private func performWatchStopLiveSessionPendingCloseout() -> WatchConnectivityActionResult {
+        guard var s = liveSession else {
+            return watchConnectivityReply(extras: ["watchStopError": "No live session on iPhone."])
+        }
+        let sessionId = s.id
+        if s.endTime == nil { s.endTime = Date() }
+        s.isLive = false
+        s.cashOut = nil
+        s.status = .requiringMoreInfo
+        sessions.insert(s, at: 0)
+        liveSession = nil
+        clearLive()
+        saveSessions()
+        #if os(iOS) || os(watchOS)
+        SessionReminderScheduler.shared.refresh(liveSession: nil)
+        #endif
+        LiveActivityManager.shared.end()
+        pushContext()
+        return watchConnectivityReply(extras: ["stoppedSessionId": sessionId.uuidString])
+    }
+
+    /// Completes a session that was stopped from the Watch (`requiringMoreInfo`), using the Watch cash-out and the same default ending tier logic as fast close-out.
+    private func applyWatchCloseoutCashOutFromWatch(sessionId: UUID, cashOut: Int) -> WatchConnectivityActionResult {
+        let extras = mutateSessionApplyingWatchCloseout(sessionId: sessionId, cashOut: cashOut)
+        return watchConnectivityReply(extras: extras)
+    }
+
+    private func mutateSessionApplyingWatchCloseout(sessionId: UUID, cashOut: Int) -> [String: Any] {
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionId }) else {
+            return ["watchCloseoutError": "Session not found."]
+        }
+        var s = sessions[idx]
+        guard s.requiresMoreInfo else {
+            return ["watchCloseoutError": "Session is not awaiting close-out."]
+        }
+        let co = max(0, cashOut)
+        let endingTier: Int
+        if s.startingTierPoints > 0 {
+            endingTier = s.startingTierPoints
+        } else if let hist = defaultEndingTierPoints(for: s.casino) {
+            endingTier = hist
+        } else {
+            endingTier = 0
+        }
+        s.cashOut = co
+        s.endingTierPoints = endingTier
+        s.tierPointsVerification = .unverified
+        s.avgBetActual = nil
+        s.avgBetRated = nil
+        s.status = .complete
+        s.isLive = false
+        sessions[idx] = s
+        saveSessions()
+        pushContext()
+        return [:]
     }
 
     /// Watch: publish with the same defaults as “Pick Sessions To Publish” (screen name + tier/hour only); no in-app sheets.
@@ -478,6 +551,68 @@ class SessionStore: ObservableObject {
             }
         }
     }
+
+    /// Watch: end live session on iPhone (stops timer), session awaits close-out; reply may include `stoppedSessionId`.
+    /// On success, `errorMessage` is nil and `sessionId` is set. On failure, `sessionId` is nil and `errorMessage` explains why.
+    func watchStopLiveSessionForCloseout(completion: @escaping (_ sessionId: UUID?, _ errorMessage: String?) -> Void) {
+        SessionSyncManager.shared.sendAction("watchStopLiveSession", params: [:]) { [weak self] sessions, liveSession, extras in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.applySyncedState(sessions: sessions, liveSession: liveSession)
+                if let err = extras["watchStopError"] as? String {
+                    completion(nil, err)
+                    return
+                }
+                if let raw = extras["stoppedSessionId"] as? String, let id = UUID(uuidString: raw) {
+                    completion(id, nil)
+                    return
+                }
+                if let id = SessionStore.inferWatchStoppedSessionId(sessions: sessions, liveSession: liveSession) {
+                    completion(id, nil)
+                    return
+                }
+                SessionSyncManager.shared.requestContext { sessions2, live2 in
+                    DispatchQueue.main.async {
+                        self.applySyncedState(sessions: sessions2, liveSession: live2)
+                        if let id = SessionStore.inferWatchStoppedSessionId(sessions: sessions2, liveSession: live2) {
+                            completion(id, nil)
+                        } else {
+                            completion(nil, "Session stopped on iPhone, but this watch could not read which session. Check Session History on the watch.")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Watch: apply cash-out (and complete with default ending tier) to the session you just stopped from the wrist.
+    func watchApplyCloseoutCashOut(sessionId: UUID, cashOut: Int, completion: @escaping (String?) -> Void) {
+        SessionSyncManager.shared.sendAction(
+            "watchApplyCloseoutCashOut",
+            params: ["sessionId": sessionId.uuidString, "cashOut": cashOut]
+        ) { [weak self] sessions, liveSession, extras in
+            DispatchQueue.main.async {
+                self?.applySyncedState(sessions: sessions, liveSession: liveSession)
+                completion(extras["watchCloseoutError"] as? String)
+            }
+        }
+    }
+
+    /// When the iPhone reply does not include `stoppedSessionId` (e.g. queued `transferUserInfo`), pick the session that was just parked awaiting close-out.
+    private static func inferWatchStoppedSessionId(sessions: [Session], liveSession: Session?) -> UUID? {
+        guard liveSession == nil else { return nil }
+        let now = Date()
+        let window: TimeInterval = 180
+        let recentPending = sessions.filter { s in
+            s.requiresMoreInfo && (s.endTime.map { now.timeIntervalSince($0) < window && now.timeIntervalSince($0) >= 0 } ?? false)
+        }
+        if recentPending.count == 1 { return recentPending[0].id }
+        guard let best = sessions.filter(\.requiresMoreInfo).max(by: { a, b in
+            (a.endTime ?? .distantPast) < (b.endTime ?? .distantPast)
+        }) else { return nil }
+        guard let end = best.endTime, now.timeIntervalSince(end) < window * 4 else { return nil }
+        return best.id
+    }
     #endif
 
     /// Call from Watch (or quick cash-out): save session with only cash-out; status = requiringMoreInfo.
@@ -560,6 +695,12 @@ class SessionStore: ObservableObject {
     }
 
     func discardLiveSession() {
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("discardLiveSession", params: [:]) { [weak self] sessions, liveSession, _ in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
         #if os(iOS)
         if let s = liveSession {
             CompPhotoStorage.deleteImages(for: s.compEvents)

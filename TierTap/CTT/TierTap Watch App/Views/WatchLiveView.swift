@@ -9,6 +9,135 @@ enum WatchLivePane: Hashable {
     case options
 }
 
+private struct WatchCloseoutSheetRef: Identifiable, Hashable {
+    let id: UUID
+    let totalBuyIn: Int
+}
+
+/// Fast close-out, regular close-out (cash-out on watch), or cancel (discard) live session — complements pause/unpause on the timer tab.
+private struct WatchEndSessionOptionsView: View {
+    @EnvironmentObject var store: SessionStore
+    @State private var showConfirmFastClose = false
+    @State private var showConfirmRegularClose = false
+    @State private var showConfirmDiscard = false
+    @State private var statusLine: String?
+    @State private var statusColor: Color = .green
+    @State private var closeoutSheetRef: WatchCloseoutSheetRef?
+
+    private var hasLive: Bool { store.liveSession != nil }
+
+    var body: some View {
+        List {
+            if let statusLine {
+                Text(statusLine)
+                    .font(.caption2.bold())
+                    .foregroundStyle(statusColor)
+            }
+            if !hasLive {
+                Text("No live session on iPhone. Start one from the phone or use Fast Start on the timer tab.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Pause and unpause the timer from the first Live Remote tab.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+
+                Section("Close-out") {
+                    Button {
+                        showConfirmFastClose = true
+                    } label: {
+                        Label("Fast close-out", systemImage: "bolt.fill")
+                    }
+                    Button {
+                        showConfirmRegularClose = true
+                    } label: {
+                        Label("Regular close-out", systemImage: "list.clipboard.fill")
+                    }
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        showConfirmDiscard = true
+                    } label: {
+                        Label("Cancel session", systemImage: "trash.fill")
+                    }
+                } header: {
+                    Text("Discard")
+                }
+            }
+        }
+        .navigationTitle("End session")
+        .alert("Fast close-out?", isPresented: $showConfirmFastClose) {
+            Button("No", role: .cancel) {}
+            Button("Yes") {
+                let immediate = SessionSyncManager.shared.isReachable
+                store.fastCloseSessionWithDefaultsUnverified()
+                statusLine = immediate ? "Fast close-out sent" : "Fast close-out queued"
+                statusColor = immediate ? .green : .orange
+                playWatchEndFlowHaptic(success: immediate)
+            }
+        } message: {
+            Text("Stops the timer and closes the session on iPhone with default cash-out and ending tier. No extra questions here.")
+        }
+        .alert("Regular close-out?", isPresented: $showConfirmRegularClose) {
+            Button("No", role: .cancel) {}
+            Button("Yes") {
+                store.watchStopLiveSessionForCloseout { sessionId, err in
+                    if let err {
+                        statusLine = err
+                        statusColor = .orange
+                        playWatchEndFlowHaptic(success: false)
+                    } else if let sessionId {
+                        let buyIn = store.sessions.first(where: { $0.id == sessionId })?.totalBuyIn ?? 0
+                        closeoutSheetRef = WatchCloseoutSheetRef(id: sessionId, totalBuyIn: buyIn)
+                        statusLine = "Enter cash-out on the next screen."
+                        statusColor = .green
+                        playWatchEndFlowHaptic(success: SessionSyncManager.shared.isReachable)
+                    } else {
+                        statusLine = "Stop did not complete. Try again."
+                        statusColor = .orange
+                        playWatchEndFlowHaptic(success: false)
+                    }
+                }
+            }
+        } message: {
+            Text("Stops the timer and ends the live session on iPhone, then asks for cash-out on the watch. You can add avg bet, ending tier, and other details later on the phone if needed.")
+        }
+        .alert("Cancel session?", isPresented: $showConfirmDiscard) {
+            Button("No", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                let immediate = SessionSyncManager.shared.isReachable
+                store.discardLiveSession()
+                statusLine = immediate ? "Cancel sent" : "Cancel queued"
+                statusColor = immediate ? .green : .orange
+                playWatchEndFlowHaptic(success: immediate)
+            }
+        } message: {
+            Text("Permanently deletes this live session on iPhone. It will not appear in history.")
+        }
+        .sheet(item: $closeoutSheetRef) { ref in
+            WatchCloseoutCashSheet(ref: ref) { err in
+                if let err {
+                    statusLine = err
+                    statusColor = .orange
+                    playWatchEndFlowHaptic(success: false)
+                } else {
+                    statusLine = "Close-out complete"
+                    statusColor = .green
+                    playWatchEndFlowHaptic(success: true)
+                }
+            }
+            .environmentObject(store)
+        }
+    }
+
+    private func playWatchEndFlowHaptic(success: Bool) {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(success ? .success : .click)
+        #endif
+    }
+}
+
 struct WatchLiveView: View {
     @EnvironmentObject var store: SessionStore
     @Environment(\.scenePhase) private var scenePhase
@@ -17,9 +146,6 @@ struct WatchLiveView: View {
     @ObservedObject private var syncManager = SessionSyncManager.shared
     @State private var feedbackMessage: String?
     @State private var feedbackColor: Color = .green
-    @State private var showConfirmFastCloseOut = false
-    @State private var showOfferWinLossEstimate = false
-    @State private var showWatchWinLossEstimateSheet = false
     @State private var showFastStartSheet = false
     @State private var showWristSummary = false
     @State private var selectedPane: WatchLivePane
@@ -78,33 +204,6 @@ struct WatchLiveView: View {
             if phase == .active {
                 presentWristSummaryIfNeeded()
             }
-        }
-        .alert("Fast close out session?", isPresented: $showConfirmFastCloseOut) {
-            Button("No", role: .cancel) {}
-            Button("Yes", role: .destructive) {
-                showConfirmFastCloseOut = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    showOfferWinLossEstimate = true
-                }
-            }
-        } message: {
-            Text("This will end the live session on iPhone. You can optionally set an estimated win/loss next.")
-        }
-        .alert("Enter win / loss estimate?", isPresented: $showOfferWinLossEstimate) {
-            Button("No") {
-                triggerWatchAction(name: "Fast Close Out") {
-                    store.fastCloseSessionWithDefaultsUnverified()
-                }
-            }
-            Button("Yes") {
-                showWatchWinLossEstimateSheet = true
-            }
-        } message: {
-            Text("If yes, review estimated cash-out and win/loss from your buy-in, then tap Done to close the session.")
-        }
-        .sheet(isPresented: $showWatchWinLossEstimateSheet) {
-            WatchWinLossEstimateCloseSheet()
-                .environmentObject(store)
         }
         .sheet(isPresented: $showFastStartSheet) {
             WatchFastStartSheet()
@@ -283,32 +382,34 @@ struct WatchLiveView: View {
                 }
 
                 Button {
-                    triggerWatchAction(name: "Pause Session") {
+                    triggerWatchAction(name: "Pause session") {
                         store.stopLiveSessionTimer()
                     }
                 } label: {
-                    buttonLabel("Pause Session", icon: "pause.circle.fill")
+                    buttonLabel("Pause session", icon: "pause.circle.fill")
                 }
                 .buttonStyle(.bordered)
                 .disabled(!hasLiveSession || isSessionPaused)
 
                 Button {
-                    triggerWatchAction(name: "Resume Session") {
+                    triggerWatchAction(name: "Unpause session") {
                         store.resumeLiveSessionTimer()
                     }
                 } label: {
-                    buttonLabel("Continue Session", icon: "play.circle.fill")
+                    buttonLabel("Unpause session", icon: "play.circle.fill")
                 }
                 .buttonStyle(.bordered)
                 .disabled(!hasLiveSession || !isSessionPaused)
 
-                Button(role: .destructive) {
-                    showConfirmFastCloseOut = true
+                NavigationLink {
+                    WatchEndSessionOptionsView()
+                        .environmentObject(store)
                 } label: {
-                    buttonLabel("Stop Session", icon: "stop.circle.fill")
+                    buttonLabel("End session…", icon: "flag.checkered")
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.red)
+                .tint(.orange)
+                .disabled(!hasLiveSession)
 
                 NavigationLink {
                     WatchRemotesView()
@@ -341,7 +442,7 @@ struct WatchLiveView: View {
 
     private var primaryTimerButtonTitle: String {
         if !hasLiveSession { return "Start Session" }
-        return isSessionPaused ? "Continue Session" : "Pause Session"
+        return isSessionPaused ? "Unpause session" : "Pause session"
     }
 
     private var primaryTimerFill: Color {
@@ -389,10 +490,11 @@ struct WatchLiveView: View {
                 metricButton(title: "TierTap", value: "Update Tier", icon: "chart.bar.fill", accent: .purple, successPulse: tierSuccessPulse)
             }
         case "stopSession":
-            Button {
-                showConfirmFastCloseOut = true
+            NavigationLink {
+                WatchEndSessionOptionsView()
+                    .environmentObject(store)
             } label: {
-                metricButton(title: "TierTap", value: "Stop", icon: "stop.circle.fill", accent: .red, successPulse: 0)
+                metricButton(title: "TierTap", value: "End", icon: "flag.checkered", accent: .orange, successPulse: 0)
             }
         default:
             NavigationLink {
@@ -409,11 +511,11 @@ struct WatchLiveView: View {
             return
         }
         if isSessionPaused {
-            triggerWatchAction(name: "Resume Session") {
+            triggerWatchAction(name: "Unpause session") {
                 store.resumeLiveSessionTimer()
             }
         } else {
-            triggerWatchAction(name: "Pause Session") {
+            triggerWatchAction(name: "Pause session") {
                 store.stopLiveSessionTimer()
             }
         }
@@ -531,15 +633,19 @@ struct WatchLiveView: View {
     }
 }
 
-// MARK: - Win/loss estimate before Watch fast close
+// MARK: - Cash-out sheet (session already stopped on iPhone)
 
-private struct WatchWinLossEstimateCloseSheet: View {
+private struct WatchCloseoutCashSheet: View {
     @EnvironmentObject var store: SessionStore
     @Environment(\.dismiss) private var dismiss
 
+    let ref: WatchCloseoutSheetRef
+    /// Called with `nil` on success, or an error message from the phone.
+    let onFinished: (String?) -> Void
+
     @State private var winLossDelta: Double = 0
 
-    private var buyIn: Int { max(0, store.liveSession?.totalBuyIn ?? 0) }
+    private var buyIn: Int { max(0, ref.totalBuyIn) }
 
     private var estimatedCashOut: Int {
         max(0, buyIn + Int(winLossDelta.rounded(.toNearestOrAwayFromZero)))
@@ -568,54 +674,49 @@ private struct WatchWinLossEstimateCloseSheet: View {
             Form {
                 Section {
                     Text("Buy-in: \(formattedDollars(buyIn))")
-                    Text("Est. cash-out: \(formattedDollars(estimatedCashOut))")
-                    Text("Est. win/loss: \(winLossSummary)")
+                    Text("Cash-out: \(formattedDollars(estimatedCashOut))")
+                    Text("Win/loss: \(winLossSummary)")
                         .foregroundColor(estimatedWinLoss >= 0 ? .green : .red)
                 }
                 if buyIn > 0 {
-                    Text("Turn the Digital Crown to adjust win/loss vs your buy-in. Tap Done to close the session on iPhone with this cash-out.")
+                    Text("Turn the Digital Crown to adjust cash-out vs buy-in, then tap Done to save to this session on iPhone.")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("No buy-in is logged yet. The session will close with $0 cash-out on iPhone; you can add buy-ins and fix totals there.")
+                    Text("No buy-in was logged. Done saves $0 cash-out on iPhone; you can fix totals there.")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
-            .modifier(WatchWinLossCrownModifier(
+            .modifier(WatchCloseoutCrownModifier(
                 enabled: buyIn > 0,
                 winLossDelta: $winLossDelta,
                 from: crownLower,
                 through: crownUpper,
                 by: crownStep
             ))
-            .navigationTitle("Estimate")
+            .navigationTitle("Cash-out")
             #if os(watchOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { confirmAndClose() }
+                    Button("Done") { confirmAndSave() }
                 }
             }
         }
     }
 
-    private func confirmAndClose() {
-        let immediate = SessionSyncManager.shared.isReachable
-        if buyIn == 0 {
-            store.fastCloseSessionWithDefaultsUnverified()
-        } else {
-            store.fastCloseSessionWithDefaultsUnverified(cashOutOverride: estimatedCashOut)
+    private func confirmAndSave() {
+        let cashOut = estimatedCashOut
+        store.watchApplyCloseoutCashOut(sessionId: ref.id, cashOut: cashOut) { err in
+            onFinished(err)
+            dismiss()
         }
-        #if os(watchOS)
-        WKInterfaceDevice.current().play(immediate ? .success : .click)
-        #endif
-        dismiss()
     }
 }
 
-private struct WatchWinLossCrownModifier: ViewModifier {
+private struct WatchCloseoutCrownModifier: ViewModifier {
     var enabled: Bool
     @Binding var winLossDelta: Double
     var from: Double
