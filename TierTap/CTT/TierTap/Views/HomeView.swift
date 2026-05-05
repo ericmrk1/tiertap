@@ -515,10 +515,17 @@ struct LiveNowCard: View {
 
 struct TapLevelCard: View {
     let tapLevel: TapLevel
+    @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @State private var showLevelsExplainer = false
-    @State private var showShareSheet = false
-    @State private var shareURL: URL?
+    @State private var showShareOptions = false
+    @State private var shareURLItem: ShareURLItem?
+    @State private var sharePreviewItem: ShareableImageItem?
+    @State private var pendingShareURL: URL?
+    @State private var lastSharedURL: URL?
+    @State private var shouldPresentShareAfterPreviewDismiss = false
+    @State private var selectedPreset: LevelSharePreset = .performance
+    @State private var customStats: Set<LevelShareOverlayStat> = [.sessionsThisMonth, .lifetimeWinLoss, .winRatePerHour, .bestSession]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -536,7 +543,7 @@ struct TapLevelCard: View {
                     Text(tapLevel.title)
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.8))
-                    Text("\(tapLevel.sessionCount) sessions · \(tapLevel.sessionMilestoneLabel)")
+                    Text("\(tapLevel.sessionCount) sessions")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.65))
                 }
@@ -552,7 +559,7 @@ struct TapLevelCard: View {
                     .accessibilityLabel("Levels explained")
                     #if os(iOS)
                     Button {
-                        shareLevelAsImage()
+                        showShareOptions = true
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                             .font(.title3)
@@ -585,26 +592,178 @@ struct TapLevelCard: View {
                 .environmentObject(settingsStore)
         }
         #if os(iOS)
-        .adaptiveSheet(isPresented: $showShareSheet) {
-            if let url = shareURL {
-                ShareSheet(items: [url])
+        .adaptiveSheet(isPresented: $showShareOptions) {
+            shareOptionsSheet
+        }
+        .sheet(item: $sharePreviewItem, onDismiss: {
+            guard shouldPresentShareAfterPreviewDismiss else { return }
+            shouldPresentShareAfterPreviewDismiss = false
+            guard let url = pendingShareURL else { return }
+            lastSharedURL = url
+            shareURLItem = ShareURLItem(url: url)
+        }) { preview in
+            NavigationStack {
+                ZStack {
+                    settingsStore.primaryGradient.ignoresSafeArea()
+                    VStack(spacing: 14) {
+                        Text("Share Preview")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Image(uiImage: preview.image)
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                        Button {
+                            guard pendingShareURL != nil else { return }
+                            shouldPresentShareAfterPreviewDismiss = true
+                            sharePreviewItem = nil
+                        } label: {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.green)
+                                .foregroundColor(.black)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding()
+                }
+                .localizedNavigationTitle("Share Level")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+                .toolbarColorScheme(.dark, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") {
+                            shouldPresentShareAfterPreviewDismiss = false
+                            if let url = pendingShareURL, lastSharedURL == nil {
+                                try? FileManager.default.removeItem(at: url)
+                            }
+                            pendingShareURL = nil
+                            sharePreviewItem = nil
+                        }
+                            .foregroundColor(.green)
+                    }
+                }
             }
         }
-        .onChange(of: showShareSheet) { newValue in
-            if !newValue, let url = shareURL {
+        .sheet(item: $shareURLItem) { shareItem in
+            ShareSheet(items: [shareItem.url])
+        }
+        .onChange(of: shareURLItem) { newValue in
+            if newValue == nil, let url = lastSharedURL {
                 try? FileManager.default.removeItem(at: url)
-                shareURL = nil
+                lastSharedURL = nil
+                pendingShareURL = nil
             }
         }
         #endif
     }
 
     #if os(iOS)
+    private var shareOptionsSheet: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("Share Overlay")
+                            .font(.headline)
+                            .foregroundColor(.white)
+
+                        ForEach(LevelSharePreset.allCases, id: \.self) { preset in
+                            Button {
+                                selectedPreset = preset
+                            } label: {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(preset.displayName)
+                                            .font(.subheadline.bold())
+                                            .foregroundColor(.white)
+                                        Text(preset.description)
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.75))
+                                    }
+                                    Spacer()
+                                    Image(systemName: selectedPreset == preset ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(selectedPreset == preset ? .green : .white.opacity(0.5))
+                                }
+                                .padding(10)
+                                .background(Color(.systemGray6).opacity(0.18))
+                                .cornerRadius(10)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        if selectedPreset == .custom {
+                            Text("Custom stats (up to 4)")
+                                .font(.caption.bold())
+                                .foregroundColor(.gray)
+                                .padding(.top, 4)
+                            ForEach(LevelShareOverlayStat.allCases, id: \.self) { stat in
+                                let isOn = customStats.contains(stat)
+                                Button {
+                                    if isOn {
+                                        customStats.remove(stat)
+                                    } else if customStats.count < 4 {
+                                        customStats.insert(stat)
+                                    }
+                                } label: {
+                                    HStack {
+                                        Text(stat.displayName)
+                                            .font(.subheadline)
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                        Image(systemName: isOn ? "checkmark.square.fill" : "square")
+                                            .foregroundColor(isOn ? .green : .white.opacity(0.6))
+                                    }
+                                    .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+
+                        Button {
+                            shareLevelAsImage()
+                            showShareOptions = false
+                        } label: {
+                            Label("Preview Share Image", systemImage: "photo")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.green)
+                                .foregroundColor(.black)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .localizedNavigationTitle("Share Options")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { showShareOptions = false }
+                        .foregroundColor(.green)
+                }
+            }
+        }
+    }
+
     @MainActor
     private func shareLevelAsImage() {
+        let metrics = resolvedShareMetrics()
         let card = TapLevelShareCard(
             tapLevel: tapLevel,
-            gradient: settingsStore.primaryGradient
+            gradient: settingsStore.primaryGradient,
+            overlayMetrics: metrics
         )
         guard let image = renderTapLevelCardToImage(card) else { return }
         let df = DateFormatter()
@@ -612,16 +771,14 @@ struct TapLevelCard: View {
         let name = "TierTapLevel\(tapLevel.level)_\(df.string(from: Date())).png"
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(name)
         guard let data = image.pngData(), (try? data.write(to: url)) != nil else { return }
-        shareURL = url
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            showShareSheet = true
-        }
+        pendingShareURL = url
+        sharePreviewItem = ShareableImageItem(image: image)
     }
 
     @MainActor
     private func renderTapLevelCardToImage(_ view: TapLevelShareCard) -> UIImage? {
         let width = ShareImageExportQuality.wideCardWidthPoints
-        let height: CGFloat = 220
+        let height: CGFloat = 440
         let wrapped = view
             .frame(width: width, height: height)
         if #available(iOS 16.0, *) {
@@ -639,7 +796,88 @@ struct TapLevelCard: View {
             }
         }
     }
+
+    private func resolvedShareMetrics() -> [ShareOverlayMetric] {
+        let chosen: [LevelShareOverlayStat]
+        switch selectedPreset {
+        case .performance:
+            chosen = [.lifetimeWinLoss, .winRatePerHour, .bestSession, .winPercent]
+        case .grind:
+            chosen = [.sessionsThisMonth, .avgSessionHours, .totalTierPoints, .sessionCount]
+        case .rewards:
+            chosen = [.totalComps, .compsPerSession, .avgWinLossPerSession, .topGame]
+        case .minimal:
+            chosen = [.lifetimeWinLoss]
+        case .custom:
+            chosen = Array(customStats.prefix(4))
+        }
+        return chosen.compactMap { overlayMetric(for: $0) }
+    }
+
+    private func overlayMetric(for stat: LevelShareOverlayStat) -> ShareOverlayMetric? {
+        let sessions = store.sessions
+        let closedWithWL = sessions.compactMap { s -> Session? in
+            s.winLoss == nil ? nil : s
+        }
+        switch stat {
+        case .sessionCount:
+            return ShareOverlayMetric(title: "Sessions", value: "\(sessions.count)")
+        case .sessionsThisMonth:
+            let calendar = Calendar.current
+            let now = Date()
+            let count = sessions.filter { calendar.isDate($0.startTime, equalTo: now, toGranularity: .month) && calendar.isDate($0.startTime, equalTo: now, toGranularity: .year) }.count
+            return ShareOverlayMetric(title: "This Month", value: "\(count)")
+        case .lifetimeWinLoss:
+            let total = closedWithWL.compactMap(\.winLoss).reduce(0, +)
+            let sign = total >= 0 ? "+" : "-"
+            return ShareOverlayMetric(title: "Lifetime W/L", value: "\(sign)\(settingsStore.currencySymbol)\(abs(total).formatted(.number.grouping(.automatic)))")
+        case .avgWinLossPerSession:
+            guard !closedWithWL.isEmpty else { return nil }
+            let avg = Double(closedWithWL.compactMap(\.winLoss).reduce(0, +)) / Double(closedWithWL.count)
+            let rounded = Int(avg.rounded())
+            let sign = rounded >= 0 ? "+" : "-"
+            return ShareOverlayMetric(title: "Avg W/L", value: "\(sign)\(settingsStore.currencySymbol)\(abs(rounded).formatted(.number.grouping(.automatic)))")
+        case .bestSession:
+            guard let best = closedWithWL.compactMap(\.winLoss).max() else { return nil }
+            return ShareOverlayMetric(title: "Best Session", value: "+\(settingsStore.currencySymbol)\(best.formatted(.number.grouping(.automatic)))")
+        case .winRatePerHour:
+            let totalWl = closedWithWL.compactMap(\.winLoss).reduce(0, +)
+            let totalHours = closedWithWL.reduce(0.0) { $0 + $1.hoursPlayed }
+            guard totalHours > 0 else { return nil }
+            let rate = Int((Double(totalWl) / totalHours).rounded())
+            let sign = rate >= 0 ? "+" : "-"
+            return ShareOverlayMetric(title: "Win Rate", value: "\(sign)\(settingsStore.currencySymbol)\(abs(rate).formatted(.number.grouping(.automatic)))/hr")
+        case .avgSessionHours:
+            guard !sessions.isEmpty else { return nil }
+            let avg = sessions.reduce(0.0) { $0 + $1.hoursPlayed } / Double(sessions.count)
+            return ShareOverlayMetric(title: "Avg Session", value: String(format: "%.1f hrs", avg))
+        case .winPercent:
+            guard !closedWithWL.isEmpty else { return nil }
+            let wins = closedWithWL.compactMap(\.winLoss).filter { $0 > 0 }.count
+            let pct = Int((Double(wins) / Double(closedWithWL.count) * 100).rounded())
+            return ShareOverlayMetric(title: "Win %", value: "\(pct)%")
+        case .totalTierPoints:
+            let total = sessions.compactMap(\.tierPointsEarned).reduce(0, +)
+            return ShareOverlayMetric(title: "Tier Earned", value: "\(total.formatted(.number.grouping(.automatic)))")
+        case .totalComps:
+            let total = sessions.reduce(0) { $0 + $1.totalComp }
+            return ShareOverlayMetric(title: "Total Comps", value: "\(settingsStore.currencySymbol)\(total.formatted(.number.grouping(.automatic)))")
+        case .compsPerSession:
+            guard !sessions.isEmpty else { return nil }
+            let avg = Double(sessions.reduce(0) { $0 + $1.totalComp }) / Double(sessions.count)
+            return ShareOverlayMetric(title: "Comps/Session", value: "\(settingsStore.currencySymbol)\(Int(avg.rounded()).formatted(.number.grouping(.automatic)))")
+        case .topGame:
+            let grouped = Dictionary(grouping: sessions.map(\.game).filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) { $0 }
+            guard let top = grouped.max(by: { $0.value.count < $1.value.count }) else { return nil }
+            return ShareOverlayMetric(title: "Top Game", value: top.key)
+        }
+    }
     #endif
+}
+
+private struct ShareURLItem: Identifiable, Equatable {
+    let id = UUID()
+    let url: URL
 }
 
 /// Full-screen level-up celebration: confetti, haptics, sound, and a pop-up card.
@@ -688,38 +926,164 @@ struct TapLevelLevelUpCelebrationView: View {
 }
 
 /// Card view used when sharing Tap Level as an image (gradient, batch emoji, level, title, sessions, TierTap).
-struct TapLevelShareCard: View {
+private struct TapLevelShareCard: View {
     let tapLevel: TapLevel
     let gradient: LinearGradient
+    let overlayMetrics: [ShareOverlayMetric]
 
     var body: some View {
         ZStack {
             gradient.ignoresSafeArea()
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    Text(tapLevel.sessionMilestoneEmoji)
-                        .font(.system(size: 52))
-                    Text(tapLevel.emoji)
-                        .font(.system(size: 40))
+            VStack(spacing: 0) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Tap Level Progress")
+                            .font(.headline.weight(.bold))
+                            .foregroundColor(.white)
+                    }
+                    Spacer(minLength: 0)
+                    Text(Date.now.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.7))
                 }
-                Text("Tap Level \(tapLevel.level)")
-                    .font(.title.bold())
-                    .foregroundColor(.white)
-                Text(tapLevel.title)
-                    .font(.title2)
-                    .foregroundColor(.white.opacity(0.9))
-                Text("\(tapLevel.sessionCount) sessions · \(tapLevel.sessionMilestoneLabel)")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
                 Spacer()
-                L10nText("TierTap")
-                    .font(.caption.weight(.medium))
-                    .foregroundColor(.white.opacity(0.6))
+
+                VStack(spacing: 14) {
+                    HStack(spacing: 16) {
+                        Text(tapLevel.sessionMilestoneEmoji)
+                            .font(.system(size: 84))
+                        Text(tapLevel.emoji)
+                            .font(.system(size: 64))
+                    }
+
+                    Text("Tap Level \(tapLevel.level)")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .foregroundColor(.white)
+
+                    Text(tapLevel.title)
+                        .font(.title2.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.95))
+
+                    Text("\(tapLevel.sessionCount) sessions")
+                        .font(.headline)
+                        .foregroundColor(.white.opacity(0.86))
+                        .padding(.bottom, 16)
+                }
+                .multilineTextAlignment(.center)
+
+                if !overlayMetrics.isEmpty {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                        ForEach(Array(overlayMetrics.prefix(4).enumerated()), id: \.offset) { _, metric in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(metric.title)
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.72))
+                                    .lineLimit(1)
+                                Text(metric.value)
+                                    .font(.caption.bold())
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.12))
+                            .cornerRadius(8)
+                        }
+                    }
+                }
+
+                Spacer()
+
+                HStack(alignment: .bottom) {
+                    Text("")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
+                    Spacer(minLength: 0)
+                    HStack(spacing: 8) {
+                        Image("TierTapLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
+                        Text("TierTap")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.14))
+                    .clipShape(Capsule())
+                }
             }
-            .padding(.vertical, 28)
-            .padding(.horizontal, 24)
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
         }
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+private struct ShareOverlayMetric {
+    let title: String
+    let value: String
+}
+
+private enum LevelSharePreset: CaseIterable {
+    case performance
+    case grind
+    case rewards
+    case minimal
+    case custom
+
+    var displayName: String {
+        switch self {
+        case .performance: return "Performance"
+        case .grind: return "Grind"
+        case .rewards: return "Rewards"
+        case .minimal: return "Minimal"
+        case .custom: return "Custom"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .performance: return "W/L, win rate, best session, win percentage."
+        case .grind: return "Volume, cadence, and tier progress."
+        case .rewards: return "Comps and game profile focus."
+        case .minimal: return "Single hero metric only."
+        case .custom: return "Pick up to four overlay stats."
+        }
+    }
+}
+
+private enum LevelShareOverlayStat: CaseIterable {
+    case sessionCount
+    case sessionsThisMonth
+    case lifetimeWinLoss
+    case avgWinLossPerSession
+    case bestSession
+    case winRatePerHour
+    case avgSessionHours
+    case winPercent
+    case totalTierPoints
+    case totalComps
+    case compsPerSession
+    case topGame
+
+    var displayName: String {
+        switch self {
+        case .sessionCount: return "Session Count"
+        case .sessionsThisMonth: return "Sessions This Month"
+        case .lifetimeWinLoss: return "Lifetime W/L"
+        case .avgWinLossPerSession: return "Avg W/L Per Session"
+        case .bestSession: return "Best Session"
+        case .winRatePerHour: return "Win Rate Per Hour"
+        case .avgSessionHours: return "Average Session Hours"
+        case .winPercent: return "Win %"
+        case .totalTierPoints: return "Total Tier Points"
+        case .totalComps: return "Total Comps"
+        case .compsPerSession: return "Comps Per Session"
+        case .topGame: return "Top Game"
+        }
     }
 }
 

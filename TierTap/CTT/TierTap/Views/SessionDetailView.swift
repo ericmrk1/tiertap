@@ -102,29 +102,41 @@ struct SessionDetailView: View {
                             }
                         }
 
-                        // Metrics highlights
-                        HStack(spacing: 12) {
-                            if let e = displaySession.tierPointsEarned {
-                                MetricCard(title: "Pts Earned",
-                                           value: "\(e >= 0 ? "+" : "")\(e)",
-                                           color: e >= 0 ? .green : .orange)
+                        // Metrics highlights (2x2 grid)
+                        VStack(spacing: 8) {
+                            HStack(spacing: 12) {
+                                if let e = displaySession.tierPointsEarned {
+                                    MetricCard(title: "Pts Earned",
+                                               value: "\(e >= 0 ? "+" : "")\(e)",
+                                               color: e >= 0 ? .green : .orange)
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
+                                if let wl = displaySession.winLoss {
+                                    MetricCard(title: "Win/Loss",
+                                               value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
+                                               color: wl >= 0 ? .green : .red)
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
                             }
-                            if let wl = displaySession.winLoss {
-                                MetricCard(title: "Win/Loss",
-                                           value: wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))",
-                                           color: wl >= 0 ? .green : .red)
-                            }
-                            if let ev = displaySession.expectedValue {
-                                MetricCard(title: "EV",
-                                           value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
-                                           color: ev >= 0 ? .green : .red)
-                            }
-                            if let rate = displaySession.winRatePerHour {
-                                MetricCard(title: "Win Rate",
-                                           value: String(format: "%@%.0f/hr",
-                                                         rate >= 0 ? "+\(settingsStore.currencySymbol)" : "-\(settingsStore.currencySymbol)",
-                                                         fabs(rate)),
-                                           color: rate >= 0 ? .green : .red)
+                            HStack(spacing: 12) {
+                                if let ev = displaySession.expectedValue {
+                                    MetricCard(title: "EV",
+                                               value: ev >= 0 ? "+\(settingsStore.currencySymbol)\(ev)" : "-\(settingsStore.currencySymbol)\(abs(ev))",
+                                               color: ev >= 0 ? .green : .red)
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
+                                if let rate = displaySession.winRatePerHour {
+                                    MetricCard(title: "Win Rate",
+                                               value: String(format: "%@%.0f/hr",
+                                                             rate >= 0 ? "+\(settingsStore.currencySymbol)" : "-\(settingsStore.currencySymbol)",
+                                                             fabs(rate)),
+                                               color: rate >= 0 ? .green : .red)
+                                } else {
+                                    Spacer(minLength: 0)
+                                }
                             }
                         }
 

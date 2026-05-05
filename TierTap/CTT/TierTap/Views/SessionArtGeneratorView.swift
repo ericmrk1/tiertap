@@ -21,6 +21,74 @@ private struct SessionArtShareMediaItem: Identifiable {
     let activityItems: [Any]
 }
 
+private struct SessionGraphPreviewItem: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
+private struct SessionGraphPoint: Identifiable {
+    let id = UUID()
+    let time: Date
+    let value: Double
+}
+
+private enum SessionGraphMetric: String, CaseIterable, Identifiable {
+    case stackSize = "Stack Size"
+    case comps = "Comps"
+    case rebuys = "Re-Buys"
+
+    var id: String { rawValue }
+}
+
+private struct SessionGraphPreviewSheet: View {
+    let image: UIImage
+    let onClose: () -> Void
+    let onShare: () -> Void
+
+    @EnvironmentObject private var settingsStore: SettingsStore
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 14) {
+                    Text("Graph Preview")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        )
+                    Button(action: onShare) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Session Graph")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close", action: onClose)
+                        .foregroundColor(.green)
+                }
+            }
+        }
+    }
+}
+
 private struct SessionAIGeneratedImageReviewSheet: View {
     let image: UIImage
     let onClose: () -> Void
@@ -3436,6 +3504,214 @@ private struct SessionArtPreviewSheet: View {
     }
 }
 
+private struct SessionGraphShareCard: View {
+    let session: Session
+    let metric: SessionGraphMetric
+    let points: [SessionGraphPoint]
+    let currencySymbol: String
+
+    private var lineColor: Color {
+        switch metric {
+        case .stackSize: return .green
+        case .comps: return .cyan
+        case .rebuys: return .orange
+        }
+    }
+
+    private var yAxisTitle: String {
+        switch metric {
+        case .stackSize: return "Stack"
+        case .comps: return "Total comps"
+        case .rebuys: return "Re-buys"
+        }
+    }
+
+    private var latestValueText: String {
+        guard let value = points.last?.value else { return "-" }
+        switch metric {
+        case .stackSize, .comps:
+            return "\(currencySymbol)\(Int(value).formatted(.number.grouping(.automatic)))"
+        case .rebuys:
+            return "\(Int(value))"
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color.black, Color(red: 0.08, green: 0.12, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(session.casino.isEmpty ? "Session Graph" : session.casino)
+                        .font(.system(size: 62, weight: .bold))
+                        .foregroundColor(.white)
+                        .lineLimit(2)
+                    Text(session.game)
+                        .font(.system(size: 42, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.88))
+                    Text(metric.rawValue + " Over Time")
+                        .font(.system(size: 34, weight: .medium))
+                        .foregroundColor(.white.opacity(0.75))
+                }
+
+                SessionGraphPlot(
+                    points: points,
+                    lineColor: lineColor,
+                    yAxisTitle: yAxisTitle,
+                    metric: metric,
+                    currencySymbol: currencySymbol
+                )
+                    .frame(height: 980)
+                    .padding(28)
+                    .background(Color.white.opacity(0.07))
+                    .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 34, style: .continuous)
+                            .stroke(Color.white.opacity(0.14), lineWidth: 2)
+                    )
+
+                HStack {
+                    Text("\(yAxisTitle): \(latestValueText)")
+                        .font(.system(size: 38, weight: .semibold))
+                        .foregroundColor(.white)
+                    Spacer()
+                    Text(session.startTime.formatted(date: .abbreviated, time: .shortened))
+                        .font(.system(size: 28, weight: .medium))
+                        .foregroundColor(.white.opacity(0.75))
+                }
+            }
+            .padding(70)
+        }
+    }
+}
+
+private struct SessionGraphPlot: View {
+    let points: [SessionGraphPoint]
+    let lineColor: Color
+    let yAxisTitle: String
+    let metric: SessionGraphMetric
+    let currencySymbol: String
+
+    var body: some View {
+        GeometryReader { geo in
+            let leftPad: CGFloat = 120
+            let rightPad: CGFloat = 24
+            let topPad: CGFloat = 16
+            let bottomPad: CGFloat = 120
+            let chartHeight = max(1, geo.size.height - topPad - bottomPad)
+            let chartWidth = max(1, geo.size.width - leftPad - rightPad)
+            let values = points.map(\.value)
+            let minV = values.min() ?? 0
+            let maxV = values.max() ?? 1
+            let valueRange = max(1, maxV - minV)
+            let countRange = max(1, points.count - 1)
+
+            ZStack {
+                Path { path in
+                    for step in 0...4 {
+                        let y = CGFloat(step) / 4.0 * chartHeight + topPad
+                        path.move(to: CGPoint(x: leftPad, y: y))
+                        path.addLine(to: CGPoint(x: leftPad + chartWidth, y: y))
+                    }
+                }
+                .stroke(Color.white.opacity(0.18), style: StrokeStyle(lineWidth: 1, dash: [8, 6]))
+
+                Path { path in
+                    for step in 0...4 {
+                        let x = CGFloat(step) / 4.0 * chartWidth + leftPad
+                        path.move(to: CGPoint(x: x, y: topPad))
+                        path.addLine(to: CGPoint(x: x, y: topPad + chartHeight))
+                    }
+                }
+                .stroke(Color.white.opacity(0.12), style: StrokeStyle(lineWidth: 1, dash: [6, 6]))
+
+                Path { path in
+                    for (idx, point) in points.enumerated() {
+                        let x = CGFloat(idx) / CGFloat(countRange) * chartWidth + leftPad
+                        let normalized = (point.value - minV) / valueRange
+                        let y = chartHeight - (CGFloat(normalized) * chartHeight) + topPad
+                        if idx == 0 {
+                            path.move(to: CGPoint(x: x, y: y))
+                        } else {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                    }
+                }
+                .stroke(lineColor, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
+
+                ForEach(Array(points.enumerated()), id: \.element.id) { idx, point in
+                    let x = CGFloat(idx) / CGFloat(countRange) * chartWidth + leftPad
+                    let normalized = (point.value - minV) / valueRange
+                    let y = chartHeight - (CGFloat(normalized) * chartHeight) + topPad
+                    Circle()
+                        .fill(lineColor)
+                        .frame(width: 14, height: 14)
+                        .overlay(Circle().stroke(Color.white.opacity(0.9), lineWidth: 2))
+                        .position(x: x, y: y)
+                }
+
+                ForEach(0...4, id: \.self) { step in
+                    let y = CGFloat(step) / 4.0 * chartHeight + topPad
+                    let tickValue = maxV - ((Double(step) / 4.0) * valueRange)
+                    Text(formattedValue(tickValue))
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.85))
+                        .position(x: leftPad * 0.42, y: y)
+                }
+
+                ForEach(xTickIndices, id: \.self) { idx in
+                    let x = CGFloat(idx) / CGFloat(countRange) * chartWidth + leftPad
+                    Text(xTickLabel(for: idx))
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.85))
+                        .position(x: x, y: topPad + chartHeight + 34)
+                }
+
+                Text(yAxisTitle)
+                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.92))
+                    .rotationEffect(.degrees(-90))
+                    .position(x: 24, y: topPad + (chartHeight / 2))
+
+                Text("Time")
+                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white.opacity(0.92))
+                    .position(x: leftPad + (chartWidth / 2), y: topPad + chartHeight + 78)
+            }
+        }
+    }
+
+    private var xTickIndices: [Int] {
+        guard !points.isEmpty else { return [] }
+        let last = points.count - 1
+        let middle = last / 2
+        return Array(Set([0, middle, last])).sorted()
+    }
+
+    private func xTickLabel(for index: Int) -> String {
+        guard index >= 0, index < points.count, let start = points.first?.time else { return "-" }
+        let delta = max(0, points[index].time.timeIntervalSince(start))
+        let minutes = Int(delta / 60)
+        let hours = minutes / 60
+        let remMins = minutes % 60
+        return String(format: "%dh %02dm", hours, remMins)
+    }
+
+    private func formattedValue(_ value: Double) -> String {
+        switch metric {
+        case .stackSize, .comps:
+            return "\(currencySymbol)\(Int(value.rounded()).formatted(.number.grouping(.automatic)))"
+        case .rebuys:
+            return "\(Int(value.rounded()))"
+        }
+    }
+}
+
 // MARK: - Main view
 
 struct SessionArtGeneratorView: View {
@@ -3450,6 +3726,7 @@ struct SessionArtGeneratorView: View {
 
     @State private var outputKind: OutputKind = .image
     @State private var artStyle: ArtStyle = .photoWithMetrics
+    @State private var selectedGraphMetric: SessionGraphMetric = .stackSize
     @State private var publishTierPerHour = true
     @State private var publishWinLoss = false
     @State private var publishBuyInCashOut = true
@@ -3473,6 +3750,9 @@ struct SessionArtGeneratorView: View {
 
     @State private var shareMediaItem: SessionArtShareMediaItem?
     @State private var shareTextItem: SessionArtShareTextItem?
+    @State private var graphPreviewItem: SessionGraphPreviewItem?
+    @State private var pendingGraphShareImage: UIImage?
+    @State private var shouldShareGraphAfterPreviewDismiss = false
     @State private var aiGeneratedImage: UIImage?
     @State private var showAIReviewSheet = false
     @State private var showPaywall = false
@@ -3502,6 +3782,7 @@ struct SessionArtGeneratorView: View {
 
     private enum OutputKind: String, CaseIterable {
         case image = "Image"
+        case graph = "Graph"
         case text = "Text"
         case tierTapAI = "TierTap AI"
     }
@@ -3523,6 +3804,8 @@ struct SessionArtGeneratorView: View {
                         outputKindPicker
                         if outputKind == .text {
                             textShareOptionsSection
+                        } else if outputKind == .graph {
+                            graphOptionsSection
                         } else if outputKind == .tierTapAI {
                             metricsOptionsBubble
                             aiGenerationSection
@@ -3596,6 +3879,29 @@ struct SessionArtGeneratorView: View {
         }
         .sheet(item: $shareTextItem, onDismiss: { dismiss() }) { item in
             ShareSheet(items: [item.text])
+        }
+        .sheet(item: $graphPreviewItem, onDismiss: {
+            if shouldShareGraphAfterPreviewDismiss, let image = pendingGraphShareImage {
+                shouldShareGraphAfterPreviewDismiss = false
+                pendingGraphShareImage = nil
+                shareMediaItem = SessionArtShareMediaItem(activityItems: [image])
+            } else {
+                shouldShareGraphAfterPreviewDismiss = false
+                pendingGraphShareImage = nil
+            }
+        }) { item in
+            SessionGraphPreviewSheet(
+                image: item.image,
+                onClose: {
+                    shouldShareGraphAfterPreviewDismiss = false
+                    graphPreviewItem = nil
+                },
+                onShare: {
+                    shouldShareGraphAfterPreviewDismiss = true
+                    graphPreviewItem = nil
+                }
+            )
+            .environmentObject(settingsStore)
         }
         .adaptiveSheet(isPresented: $showAIReviewSheet) {
             if let image = aiGeneratedImage {
@@ -3733,6 +4039,26 @@ struct SessionArtGeneratorView: View {
             Toggle("Include buy-in, cash-out, and result lines", isOn: $publishWinLoss)
                 .tint(.green)
                 .foregroundColor(.white)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(12)
+    }
+
+    private var graphOptionsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Graph metric")
+                .font(.caption.bold())
+                .foregroundColor(.gray)
+            Picker("Metric", selection: $selectedGraphMetric) {
+                ForEach(SessionGraphMetric.allCases) { metric in
+                    Text(metric.rawValue).tag(metric)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text("Creates a share-ready graph image with session header and TierTap logo.")
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.8))
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -4183,6 +4509,9 @@ struct SessionArtGeneratorView: View {
         if outputKind == .text {
             return "Preview & edit text (Text)"
         }
+        if outputKind == .graph {
+            return "Generate & share graph"
+        }
         let mediaType = selectedShareVideoURL == nil ? "Image" : "Video"
         return "Preview & adjust (\(mediaType))"
     }
@@ -4272,6 +4601,9 @@ struct SessionArtGeneratorView: View {
                 currencySymbol: settingsStore.currencySymbol,
                 includeWinLoss: publishWinLoss
             )
+        } else if outputKind == .graph {
+            exportSessionGraphImage(session: s)
+            return
         } else {
             previewLayout = composedLayout(for: s, canvasSize: designCanvas)
         }
@@ -4515,6 +4847,75 @@ struct SessionArtGeneratorView: View {
 
     private func overlayTierTapLogo(on image: UIImage) -> UIImage {
         image.withTierTapShareLogoOverlay()
+    }
+
+    private func exportSessionGraphImage(session: Session) {
+        let points = graphPoints(for: session, metric: selectedGraphMetric)
+        guard points.count >= 2 else {
+            exportError = "Not enough data points yet for this graph."
+            return
+        }
+        let graphView = SessionGraphShareCard(
+            session: session,
+            metric: selectedGraphMetric,
+            points: points,
+            currencySymbol: settingsStore.currencySymbol
+        )
+        .frame(width: 1200, height: 1800)
+
+        let renderer = ImageRenderer(content: graphView)
+        renderer.scale = UIScreen.main.scale
+        guard let image = renderer.uiImage else {
+            exportError = "Could not generate graph image."
+            return
+        }
+        let imageWithLogo = overlayTierTapLogo(on: image)
+        pendingGraphShareImage = imageWithLogo
+        graphPreviewItem = SessionGraphPreviewItem(image: imageWithLogo)
+    }
+
+    private func graphPoints(for session: Session, metric: SessionGraphMetric) -> [SessionGraphPoint] {
+        let end = session.endTime ?? Date()
+        switch metric {
+        case .stackSize:
+            let source = session.stackUpdateEvents.sorted { $0.timestamp < $1.timestamp }
+            if !source.isEmpty {
+                return source.map { SessionGraphPoint(time: $0.timestamp, value: Double($0.amount)) }
+            }
+            return [
+                SessionGraphPoint(time: session.startTime, value: Double(session.totalBuyIn)),
+                SessionGraphPoint(time: end, value: Double(session.cashOut ?? session.totalBuyIn))
+            ]
+        case .comps:
+            let events = session.compEvents.sorted { $0.timestamp < $1.timestamp }
+            var running = 0
+            var points: [SessionGraphPoint] = [SessionGraphPoint(time: session.startTime, value: 0)]
+            for event in events {
+                running += event.amount
+                points.append(SessionGraphPoint(time: event.timestamp, value: Double(running)))
+            }
+            if points.count == 1 {
+                points.append(SessionGraphPoint(time: end, value: 0))
+            } else if points.last?.time != end {
+                points.append(SessionGraphPoint(time: end, value: Double(running)))
+            }
+            return points
+        case .rebuys:
+            let events = session.buyInEvents.sorted { $0.timestamp < $1.timestamp }
+            var count = 0
+            var points: [SessionGraphPoint] = [SessionGraphPoint(time: session.startTime, value: 0)]
+            for (index, event) in events.enumerated() {
+                if index == 0 { continue } // Initial buy-in is not a re-buy.
+                count += 1
+                points.append(SessionGraphPoint(time: event.timestamp, value: Double(count)))
+            }
+            if points.count == 1 {
+                points.append(SessionGraphPoint(time: end, value: 0))
+            } else if points.last?.time != end {
+                points.append(SessionGraphPoint(time: end, value: Double(count)))
+            }
+            return points
+        }
     }
 
     private func loadAIPlayerTraitsSelection() {

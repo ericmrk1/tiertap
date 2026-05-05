@@ -332,10 +332,6 @@ struct CloseoutView: View {
                                     L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
                                     Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
                                 }
-                                VStack(alignment: .leading, spacing: 4) {
-                                    L10nText("Hrs").font(.caption2).foregroundColor(.gray)
-                                    Text(String(format: "%.2f", previewHours)).font(.subheadline).foregroundColor(.white)
-                                }
                                 if let hourly = previewHourlyWinLoss,
                                    let amount = Int(exactly: round(hourly)) {
                                     VStack(alignment: .leading, spacing: 4) {
