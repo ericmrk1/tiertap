@@ -185,7 +185,6 @@ class SessionStore: ObservableObject {
         let sessionId = s.id
         if s.endTime == nil { s.endTime = Date() }
         s.isLive = false
-        s.liveTrackedStackAmount = nil
         s.cashOut = nil
         s.status = .requiringMoreInfo
         sessions.insert(s, at: 0)

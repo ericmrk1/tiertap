@@ -106,7 +106,6 @@ private struct WatchSettingsView: View {
     @State private var watchSessionPulseMinutes = 20
     @State private var watchWristRaiseSummaryEnabled = true
     @State private var watchHapticProfile = "classic"
-    @State private var watchQuickAction = "updateStack"
     @State private var watchBuyInCashDefaults = "20 100 200 500"
     @State private var watchCompCashDefaults = "20 50 100 500"
     @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
@@ -133,15 +132,14 @@ private struct WatchSettingsView: View {
                 Text("60 min").tag(60)
             }
             Toggle("Wrist-raise summary", isOn: $watchWristRaiseSummaryEnabled)
-            Picker("Quick action", selection: $watchQuickAction) {
-                Text("Update Stack").tag("updateStack")
-                Text("Add Buy-In").tag("addBuyIn")
-                Text("Add Comp").tag("addComp")
-                Text("Update Tier").tag("updateTier")
-                Text("Stop Session").tag("stopSession")
-            }
-            TextField("Buy-in cash defaults", text: $watchBuyInCashDefaults)
-            TextField("Comp cash defaults", text: $watchCompCashDefaults)
+            Text("Buy-in quick picks")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            WatchNumericDigitPad(text: $watchBuyInCashDefaults, allowSpace: true, maxLength: 48)
+            Text("Comp quick picks")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            WatchNumericDigitPad(text: $watchCompCashDefaults, allowSpace: true, maxLength: 48)
             TextField("Comp type options", text: $watchCompContextOptions)
             Toggle("Visuals auto-scroll", isOn: $watchVisualsAutoScrollEnabled)
             Picker("Visuals scroll every", selection: $watchVisualsAutoScrollSeconds) {
@@ -161,7 +159,6 @@ private struct WatchSettingsView: View {
         .onChange(of: watchSessionPulseMinutes) { _ in save() }
         .onChange(of: watchWristRaiseSummaryEnabled) { _ in save() }
         .onChange(of: watchHapticProfile) { _ in save() }
-        .onChange(of: watchQuickAction) { _ in save() }
         .onChange(of: watchBuyInCashDefaults) { _ in save() }
         .onChange(of: watchCompCashDefaults) { _ in save() }
         .onChange(of: watchCompContextOptions) { _ in save() }
@@ -177,7 +174,6 @@ private struct WatchSettingsView: View {
         watchSessionPulseMinutes = max(1, pulse)
         watchWristRaiseSummaryEnabled = groupDefaults?.object(forKey: "ctt_watch_wrist_raise_summary_enabled") as? Bool ?? true
         watchHapticProfile = groupDefaults?.string(forKey: "ctt_watch_haptic_profile") ?? "classic"
-        watchQuickAction = groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "updateStack"
         watchBuyInCashDefaults = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") ?? "20 100 200 500"
         watchCompCashDefaults = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") ?? "20 50 100 500"
         watchCompContextOptions = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") ?? "Cocktail, Beer, Food, Cash"
@@ -193,7 +189,6 @@ private struct WatchSettingsView: View {
         groupDefaults?.set(max(1, watchSessionPulseMinutes), forKey: "ctt_watch_session_pulse_minutes")
         groupDefaults?.set(watchWristRaiseSummaryEnabled, forKey: "ctt_watch_wrist_raise_summary_enabled")
         groupDefaults?.set(watchHapticProfile, forKey: "ctt_watch_haptic_profile")
-        groupDefaults?.set(watchQuickAction, forKey: "ctt_watch_quick_action")
         let normalizedBuyInDefaults = normalizeNumbersDelimiter(watchBuyInCashDefaults)
         let normalizedCashDefaults = watchCompCashDefaults
             .replacingOccurrences(of: ",", with: " ")

@@ -853,15 +853,6 @@ struct SettingsView: View {
                 Toggle("Wrist-raise live summary", isOn: $settingsStore.watchWristRaiseSummaryEnabled)
                     .tint(.green)
 
-                Picker("Default quick action tile", selection: $settingsStore.watchQuickAction) {
-                    Text("Update Stack").tag(SettingsStore.WatchQuickAction.updateStack)
-                    Text("Add Buy-In").tag(SettingsStore.WatchQuickAction.addBuyIn)
-                    Text("Add Comp").tag(SettingsStore.WatchQuickAction.addComp)
-                    Text("Update Tier").tag(SettingsStore.WatchQuickAction.updateTier)
-                    Text("Stop Session").tag(SettingsStore.WatchQuickAction.stopSession)
-                }
-                .pickerStyle(.menu)
-
                 TextField("Watch buy-in cash defaults (e.g. 20, 100 200, 500)", text: $settingsStore.watchBuyInCashDefaultsText)
                     .textFieldStyle(DarkTextFieldStyle())
                     .keyboardType(.numbersAndPunctuation)
@@ -883,7 +874,7 @@ struct SettingsView: View {
                     .font(.caption2)
                     .foregroundColor(.gray)
 
-                Text("These controls sync to Apple Watch and customize haptics, animations, pulse nudges, wrist-raise summary cards, and quick action defaults.")
+                Text("These controls sync to Apple Watch and customize haptics, animations, pulse nudges, wrist-raise summary cards, and quick-pick defaults.")
                     .font(.caption2)
                     .foregroundColor(.gray)
             }

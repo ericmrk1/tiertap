@@ -52,7 +52,6 @@ private let keyWatchHapticProfile = "ctt_watch_haptic_profile"
 private let keyWatchSessionPulseEnabled = "ctt_watch_session_pulse_enabled"
 private let keyWatchSessionPulseMinutes = "ctt_watch_session_pulse_minutes"
 private let keyWatchWristRaiseSummaryEnabled = "ctt_watch_wrist_raise_summary_enabled"
-private let keyWatchQuickAction = "ctt_watch_quick_action"
 private let keyWatchBuyInCashDefaults = "ctt_watch_buyin_cash_defaults"
 private let keyWatchCompCashDefaults = "ctt_watch_comp_cash_defaults"
 private let keyWatchCompContextOptions = "ctt_watch_comp_context_options"
@@ -597,15 +596,6 @@ final class SettingsStore: ObservableObject {
         var id: String { rawValue }
     }
 
-    enum WatchQuickAction: String, CaseIterable, Identifiable, Codable {
-        case updateStack
-        case addBuyIn
-        case addComp
-        case updateTier
-        case stopSession
-        var id: String { rawValue }
-    }
-
     @Published var watchHapticsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
@@ -643,13 +633,6 @@ final class SettingsStore: ObservableObject {
         didSet {
             UserDefaults.standard.set(watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
             UserDefaults(suiteName: appGroupSuiteName)?.set(watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
-        }
-    }
-
-    @Published var watchQuickAction: WatchQuickAction {
-        didSet {
-            UserDefaults.standard.set(watchQuickAction.rawValue, forKey: keyWatchQuickAction)
-            UserDefaults(suiteName: appGroupSuiteName)?.set(watchQuickAction.rawValue, forKey: keyWatchQuickAction)
         }
     }
 
@@ -874,12 +857,6 @@ final class SettingsStore: ObservableObject {
         } else {
             self.watchWristRaiseSummaryEnabled = true
         }
-        if let raw = UserDefaults.standard.string(forKey: keyWatchQuickAction),
-           let quick = WatchQuickAction(rawValue: raw) {
-            self.watchQuickAction = quick
-        } else {
-            self.watchQuickAction = .updateStack
-        }
         self.watchBuyInCashDefaultsText =
             UserDefaults.standard.string(forKey: keyWatchBuyInCashDefaults)
             ?? UserDefaults(suiteName: appGroupSuiteName)?.string(forKey: keyWatchBuyInCashDefaults)
@@ -943,7 +920,6 @@ final class SettingsStore: ObservableObject {
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseEnabled, forKey: keyWatchSessionPulseEnabled)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseMinutes, forKey: keyWatchSessionPulseMinutes)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchWristRaiseSummaryEnabled, forKey: keyWatchWristRaiseSummaryEnabled)
-        UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchQuickAction.rawValue, forKey: keyWatchQuickAction)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchBuyInCashDefaultsText, forKey: keyWatchBuyInCashDefaults)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompCashDefaultsText, forKey: keyWatchCompCashDefaults)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompContextOptionsText, forKey: keyWatchCompContextOptions)

@@ -485,10 +485,6 @@ struct WatchLiveView: View {
         max(1, groupDefaults?.integer(forKey: "ctt_watch_session_pulse_minutes") ?? 20)
     }
 
-    private var watchQuickAction: String {
-        groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "updateStack"
-    }
-
     private var currencySymbol: String {
         let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
         switch code.uppercased() {
@@ -506,46 +502,17 @@ struct WatchLiveView: View {
         return "\(currencySymbol)\(stack.formatted(.number.grouping(.automatic)))"
     }
 
-    @ViewBuilder
     private var quickActionTile: some View {
-        switch watchQuickAction {
-        case "addComp":
-            NavigationLink {
-                WatchAddCompSheet().environmentObject(store)
-            } label: {
-                metricButton(title: "TierTap", value: "Add Comp", icon: "gift.fill", accent: .cyan, successPulse: compSuccessPulse)
-            }
-        case "updateTier":
-            NavigationLink {
-                WatchUpdateTierSheet().environmentObject(store)
-            } label: {
-                metricButton(title: "TierTap", value: "Update Tier", icon: "chart.bar.fill", accent: .purple, successPulse: tierSuccessPulse)
-            }
-        case "stopSession":
-            NavigationLink {
-                WatchEndSessionOptionsView()
-                    .environmentObject(store)
-            } label: {
-                metricButton(title: "TierTap", value: "End", icon: "flag.checkered", accent: .orange, successPulse: 0)
-            }
-        case "addBuyIn":
-            NavigationLink {
-                WatchAddBuyInSheet().environmentObject(store)
-            } label: {
-                metricButton(title: "Quick", value: "Add Buy-In", icon: "plus.circle.fill", accent: .blue, successPulse: buyInSuccessPulse)
-            }
-        default:
-            NavigationLink {
-                WatchUpdateStackSheet().environmentObject(store)
-            } label: {
-                metricButton(
-                    title: "Stack",
-                    value: quickStackTileValue,
-                    icon: TierTapLabelIcon.chipStackSentinel,
-                    accent: .green,
-                    successPulse: stackSuccessPulse
-                )
-            }
+        NavigationLink {
+            WatchUpdateStackSheet().environmentObject(store)
+        } label: {
+            metricButton(
+                title: "Stack",
+                value: quickStackTileValue,
+                icon: TierTapLabelIcon.chipStackSentinel,
+                accent: .green,
+                successPulse: stackSuccessPulse
+            )
         }
     }
 
@@ -1128,11 +1095,6 @@ private struct WatchAddBuyInSheet: View {
                     .font(.headline.monospacedDigit())
                     .contentTransition(.numericText())
                     .animation(buyInMotionOK ? .snappy : nil, value: selectedAmount)
-                Image("TierTap_C_PokerChip")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .modifier(WatchChipNudgeModifier(trigger: addOnChipNudge, enabled: buyInMotionOK))
             }
             Text("Proposed total: $\(proposedTotal)")
                 .font(.caption2)
@@ -1140,11 +1102,10 @@ private struct WatchAddBuyInSheet: View {
                 .contentTransition(.numericText())
                 .animation(buyInMotionOK ? .snappy : nil, value: proposedTotal)
             quickAmountRows(amountPresetValues)
-            TextField("Custom amount", text: $customAmountText)
-                .onChange(of: customAmountText) { new in
-                    let digits = new.filter { $0.isNumber }
-                    if digits != new { customAmountText = digits }
-                }
+            Text("Custom amount")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
             Button("Add Buy-In") {
                 showConfirmAdd = true
             }
@@ -1324,11 +1285,10 @@ private struct WatchUpdateStackSheet: View {
                 .contentTransition(.numericText())
                 .animation(stackMotionOK ? .snappy : nil, value: sessionWinLossPreview)
             quickAmountRows(amountPresetValues)
-            TextField("Custom stack", text: $customAmountText)
-                .onChange(of: customAmountText) { new in
-                    let digits = new.filter { $0.isNumber }
-                    if digits != new { customAmountText = digits }
-                }
+            Text("Custom stack")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
             Button("Update Stack") {
                 showConfirmUpdate = true
             }
@@ -1579,11 +1539,10 @@ private struct WatchAddCompSheet: View {
                 }
                 .animation(compMotionOK ? .spring(response: 0.28, dampingFraction: 0.82) : nil, value: selectedAmount)
                 quickAmountRows(amountPresetValues)
-                TextField("Custom comp", text: $customAmountText)
-                    .onChange(of: customAmountText) { new in
-                        let digits = new.filter { $0.isNumber }
-                        if digits != new { customAmountText = digits }
-                    }
+                Text("Custom comp")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
                 TextField("Context (optional)", text: $details)
             } else {
                 Text("Category")
@@ -1623,11 +1582,10 @@ private struct WatchAddCompSheet: View {
                     .contentTransition(.numericText())
                     .animation(compMotionOK ? .snappy : nil, value: proposedCompTotal)
                 quickAmountRows(amountPresetValues)
-                TextField("Custom value", text: $customAmountText)
-                    .onChange(of: customAmountText) { new in
-                        let digits = new.filter { $0.isNumber }
-                        if digits != new { customAmountText = digits }
-                    }
+                Text("Custom value")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
                 TextField("Notes (optional)", text: $details)
             }
             if selectedCompEntryMode != nil {
@@ -1910,11 +1868,10 @@ private struct WatchUpdateTierSheet: View {
                 tierPresetButton(500)
                 tierPresetButton(1000)
             }
-            TextField("Custom points", text: $customTierDeltaText)
-                .onChange(of: customTierDeltaText) { new in
-                    let digits = new.filter { $0.isNumber }
-                    if digits != new { customTierDeltaText = digits }
-                }
+            Text("Custom points")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            WatchNumericDigitPad(text: $customTierDeltaText, allowSpace: false, maxLength: 8)
             Button("Update Tier") {
                 showConfirmUpdateTier = true
             }
