@@ -183,6 +183,64 @@ struct LocalizedLabel: View {
     }
 }
 
+// MARK: - Chip stack icon (shared iOS / watchOS)
+
+/// Use with APIs that only accept an SF Symbol name `String` but should show a poker chip image (e.g. `WatchQuickMetricLabel`).
+enum TierTapLabelIcon {
+    static let chipStackSentinel = "__TierTapChipStack__"
+}
+
+/// Coin-style SF Symbol icon that can be tinted by parent foreground color.
+struct TierTapChipStackIcon: View {
+    /// Square frame for the icon.
+    var side: CGFloat = 22
+    var currencySymbol: String = "$"
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.green.opacity(0.95))
+            Circle()
+                .stroke(Color.green.opacity(0.7), lineWidth: max(1, side * 0.08))
+            Text(currencySymbol)
+                .font(.system(size: side * 0.46, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .foregroundColor(.black.opacity(0.75))
+                .offset(y: -0.2)
+        }
+            .frame(width: side, height: side)
+            .accessibilityLabel("Coin icon")
+    }
+}
+
+/// Same as `LocalizedLabel` but with a poker-chip icon instead of an SF Symbol.
+struct LocalizedChipStackLabel: View {
+    let title: String
+    @Environment(\.appLanguage) private var language
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var currencySymbol: String {
+        let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
+
+    var body: some View {
+        Label {
+            Text(L10n.tr(title, language: language))
+        } icon: {
+            TierTapChipStackIcon(side: 22, currencySymbol: currencySymbol)
+        }
+    }
+}
+
 // MARK: - Gemini (client + edge)
 
 enum GeminiPromptLanguage {

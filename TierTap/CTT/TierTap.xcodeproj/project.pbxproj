@@ -81,6 +81,8 @@
 		SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */; };
 		STRAT1E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */; };
 		STRAT3E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */; };
+		SUFB01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = SUFR01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift */; };
+		SUFB02E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */ = {isa = PBXBuildFile; fileRef = SUFR01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift */; };
 		SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */; };
 		SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
@@ -224,6 +226,7 @@
 		SQ3_2E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		STRAT2E2F3A4B5C6D7E8F9A0B1 /* StrategyDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyDatabase.swift; sourceTree = "<group>"; };
 		STRAT4E2F3A4B5C6D7E8F9A0B1 /* StrategyOddsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyOddsSheet.swift; sourceTree = "<group>"; };
+		SUFR01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackUpdateConfetti.swift; sourceTree = "<group>"; };
 		SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SupabaseKeys.plist; sourceTree = "<group>"; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
@@ -305,6 +308,7 @@
 				VADAPT1E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift */,
 				2E9D7B8F2F646A05004015F4 /* TierTapPaywallView 2.swift */,
 				B89A89EFB8A3238E20A9044B /* SharedComponents.swift */,
+				SUFR01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift */,
 				RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */,
 				PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */,
 				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
@@ -745,6 +749,7 @@
 				TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */,
 				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
+				SUFB01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,
 				UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */,
 				UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */,
@@ -804,6 +809,7 @@
 				WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */,
 				WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */,
 				WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */,
+				SUFB02E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */,
 				WCHV2E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift in Sources */,
 				WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */,
 				WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */,

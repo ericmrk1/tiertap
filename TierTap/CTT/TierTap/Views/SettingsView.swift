@@ -854,6 +854,7 @@ struct SettingsView: View {
                     .tint(.green)
 
                 Picker("Default quick action tile", selection: $settingsStore.watchQuickAction) {
+                    Text("Update Stack").tag(SettingsStore.WatchQuickAction.updateStack)
                     Text("Add Buy-In").tag(SettingsStore.WatchQuickAction.addBuyIn)
                     Text("Add Comp").tag(SettingsStore.WatchQuickAction.addComp)
                     Text("Update Tier").tag(SettingsStore.WatchQuickAction.updateTier)

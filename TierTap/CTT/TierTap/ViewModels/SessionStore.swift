@@ -109,6 +109,11 @@ class SessionStore: ObservableObject {
                 guard let amount = params["amount"] as? Int else { return nil }
                 self.addBuyIn(amount)
                 return self.watchConnectivityReply()
+            case "updateLiveStack":
+                let raw = (params["stack"] as? NSNumber)?.intValue ?? params["stack"] as? Int
+                guard let stack = raw else { return nil }
+                self.updateLiveTrackedStack(stack)
+                return self.watchConnectivityReply()
             case "addComp":
                 guard let amount = params["amount"] as? Int else { return nil }
                 let kind = (params["kind"] as? String).flatMap { CompKind(rawValue: $0) } ?? .dollarsCredits
@@ -180,6 +185,7 @@ class SessionStore: ObservableObject {
         let sessionId = s.id
         if s.endTime == nil { s.endTime = Date() }
         s.isLive = false
+        s.liveTrackedStackAmount = nil
         s.cashOut = nil
         s.status = .requiringMoreInfo
         sessions.insert(s, at: 0)
@@ -218,6 +224,7 @@ class SessionStore: ObservableObject {
             endingTier = 0
         }
         s.cashOut = co
+        s.liveTrackedStackAmount = nil
         s.endingTierPoints = endingTier
         s.tierPointsVerification = .unverified
         s.avgBetActual = nil
@@ -321,6 +328,8 @@ class SessionStore: ObservableObject {
             startTime: Date(),
             startingTierPoints: startingTier,
             buyInEvents: [ev],
+            liveTrackedStackAmount: initialBuyIn,
+            stackUpdateEvents: [StackUpdateEvent(amount: initialBuyIn, timestamp: Date())],
             isLive: true,
             rewardsProgramName: rewardsProgramName,
             linkedRewardWalletCardId: linkedRewardWalletCardId
@@ -345,9 +354,34 @@ class SessionStore: ObservableObject {
         #endif
         guard var s = liveSession else { return }
         s.buyInEvents.append(BuyInEvent(amount: amount, timestamp: Date()))
+        if let currentStack = s.liveTrackedStackAmount {
+            let updatedStack = max(0, currentStack + amount)
+            s.liveTrackedStackAmount = updatedStack
+            s.stackUpdateEvents.append(StackUpdateEvent(amount: updatedStack, timestamp: Date()))
+        }
         liveSession = s; saveLive()
         #if os(iOS)
         LiveActivityManager.shared.update(totalBuyIn: s.totalBuyIn)
+        pushContext()
+        #endif
+    }
+
+    /// Records your current chip stack while live; session win/loss vs buy-ins updates until close-out.
+    func updateLiveTrackedStack(_ stackAmount: Int) {
+        let clamped = max(0, stackAmount)
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("updateLiveStack", params: ["stack": clamped]) { [weak self] sessions, liveSession, _ in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard var s = liveSession else { return }
+        s.liveTrackedStackAmount = clamped
+        s.stackUpdateEvents.append(StackUpdateEvent(amount: clamped, timestamp: Date()))
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        LiveActivityManager.shared.update(for: s)
         pushContext()
         #endif
     }
@@ -454,7 +488,7 @@ class SessionStore: ObservableObject {
         return
         #endif
         guard var s = liveSession else { return }
-        let defaultCashOut = s.totalBuyIn
+        let defaultCashOut = s.liveTrackedStackAmount ?? s.totalBuyIn
         let cashOut = max(0, cashOutOverride ?? defaultCashOut)
         let endingTier: Int
         if s.startingTierPoints > 0 {
@@ -482,6 +516,7 @@ class SessionStore: ObservableObject {
     ) {
         guard var s = liveSession else { return }
         s.cashOut = cashOut
+        s.liveTrackedStackAmount = nil
         s.avgBetActual = nil
         s.avgBetRated = nil
         s.endingTierPoints = endingTier
@@ -625,6 +660,7 @@ class SessionStore: ObservableObject {
         #endif
         guard var s = liveSession else { return }
         s.cashOut = cashOut
+        s.liveTrackedStackAmount = nil
         s.endTime = Date()
         s.isLive = false
         s.status = .requiringMoreInfo

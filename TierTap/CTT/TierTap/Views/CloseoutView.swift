@@ -47,6 +47,11 @@ struct CloseoutView: View {
         return base.isEmpty ? [25, 50, 100, 200, 500, 1000] : base
     }
 
+    /// Default close-out cash amount: most recent tracked stack, falling back to total buy-in.
+    private var defaultCloseoutCashOut: Int {
+        s.liveTrackedStackAmount ?? s.totalBuyIn
+    }
+
     var isValid: Bool {
         Int(cashOut) != nil && Int(endingTier) != nil
     }
@@ -223,7 +228,7 @@ struct CloseoutView: View {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
                                             Button("+\(settingsStore.currencySymbol)\(amt)") {
-                                                let current = Int(cashOut) ?? s.totalBuyIn
+                                                let current = Int(cashOut) ?? defaultCloseoutCashOut
                                                 cashOut = String(current + amt)
                                             }
                                             .font(.caption)
@@ -239,7 +244,7 @@ struct CloseoutView: View {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
                                             Button("−\(settingsStore.currencySymbol)\(amt)") {
-                                                let current = Int(cashOut) ?? s.totalBuyIn
+                                                let current = Int(cashOut) ?? defaultCloseoutCashOut
                                                 cashOut = String(max(0, current - amt))
                                             }
                                             .font(.caption)
@@ -608,7 +613,7 @@ struct CloseoutView: View {
         .onAppear {
             privateNotes = s.privateNotes ?? ""
             if cashOut.isEmpty {
-                cashOut = "\(s.totalBuyIn)"
+                cashOut = "\(defaultCloseoutCashOut)"
             }
             // Default ending tier to this session's starting tier if available,
             // falling back to recent history for this casino.

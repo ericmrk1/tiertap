@@ -106,7 +106,7 @@ private struct WatchSettingsView: View {
     @State private var watchSessionPulseMinutes = 20
     @State private var watchWristRaiseSummaryEnabled = true
     @State private var watchHapticProfile = "classic"
-    @State private var watchQuickAction = "addBuyIn"
+    @State private var watchQuickAction = "updateStack"
     @State private var watchBuyInCashDefaults = "20 100 200 500"
     @State private var watchCompCashDefaults = "20 50 100 500"
     @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
@@ -134,6 +134,7 @@ private struct WatchSettingsView: View {
             }
             Toggle("Wrist-raise summary", isOn: $watchWristRaiseSummaryEnabled)
             Picker("Quick action", selection: $watchQuickAction) {
+                Text("Update Stack").tag("updateStack")
                 Text("Add Buy-In").tag("addBuyIn")
                 Text("Add Comp").tag("addComp")
                 Text("Update Tier").tag("updateTier")
@@ -176,7 +177,7 @@ private struct WatchSettingsView: View {
         watchSessionPulseMinutes = max(1, pulse)
         watchWristRaiseSummaryEnabled = groupDefaults?.object(forKey: "ctt_watch_wrist_raise_summary_enabled") as? Bool ?? true
         watchHapticProfile = groupDefaults?.string(forKey: "ctt_watch_haptic_profile") ?? "classic"
-        watchQuickAction = groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "addBuyIn"
+        watchQuickAction = groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "updateStack"
         watchBuyInCashDefaults = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") ?? "20 100 200 500"
         watchCompCashDefaults = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") ?? "20 50 100 500"
         watchCompContextOptions = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") ?? "Cocktail, Beer, Food, Cash"

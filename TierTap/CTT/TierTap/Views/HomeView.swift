@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var showCheckIn = false
     @State private var showLive = false
     @State private var showBuyInSheet = false
+    @State private var showUpdateStackSheet = false
     @State private var showCompSheet = false
     @State private var showAddPast = false
     @State private var showHistory = false
@@ -115,28 +116,48 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                     .background(GameCategoryBubbleBackground(cornerRadius: 14))
                             }
-                            HStack(spacing: 12) {
+                            HStack(spacing: 10) {
                                 Button {
                                     showCompSheet = true
                                 } label: {
-                                    LocalizedLabel(title: "Add Comp", systemImage: "gift.fill")
+                                    LocalizedLabel(title: "Comp", systemImage: "gift.fill")
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 18)
-                                        .padding(.horizontal)
+                                        .padding(.horizontal, 4)
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.green)
-                                        .cornerRadius(16).font(.title3.bold())
+                                        .cornerRadius(16)
+                                        .font(.body.weight(.semibold))
+                                        .minimumScaleFactor(0.75)
+                                        .lineLimit(1)
+                                }
+                                Button {
+                                    showUpdateStackSheet = true
+                                } label: {
+                                    LocalizedChipStackLabel(title: "Stack")
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 18)
+                                        .padding(.horizontal, 4)
+                                        .background(Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(.green)
+                                        .cornerRadius(16)
+                                        .font(.body.weight(.semibold))
+                                        .minimumScaleFactor(0.75)
+                                        .lineLimit(1)
                                 }
                                 Button {
                                     showBuyInSheet = true
                                 } label: {
-                                    LocalizedLabel(title: "Add Buy-In", systemImage: "plus.circle")
+                                    LocalizedLabel(title: "Buy-In", systemImage: "plus.circle")
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 18)
-                                        .padding(.horizontal)
+                                        .padding(.horizontal, 4)
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .foregroundColor(.green)
-                                        .cornerRadius(16).font(.title3.bold())
+                                        .cornerRadius(16)
+                                        .font(.body.weight(.semibold))
+                                        .minimumScaleFactor(0.75)
+                                        .lineLimit(1)
                                 }
                             }
                         } else {
@@ -293,6 +314,17 @@ struct HomeView: View {
             }
             .environmentObject(settingsStore)
         }
+        .adaptiveSheet(isPresented: $showUpdateStackSheet) {
+            if let live = store.liveSession {
+                UpdateStackSheet(
+                    totalBuyIn: live.totalBuyIn,
+                    currentTrackedStack: live.liveTrackedStackAmount,
+                    hoursPlayed: live.hoursPlayed,
+                    onUpdate: { store.updateLiveTrackedStack($0) }
+                )
+                .environmentObject(settingsStore)
+            }
+        }
         .adaptiveSheet(isPresented: $showCompSheet) {
             CompQuickAddSheet(
                 existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
@@ -380,6 +412,11 @@ struct LiveNowCard: View {
                 Text("Total buy-in \(settingsStore.currencySymbol)\(currentSession.totalBuyIn.formatted(.number.grouping(.automatic)))")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.75))
+                if let stack = currentSession.liveTrackedStackAmount {
+                    Text("Stack: \(settingsStore.currencySymbol)\(stack.formatted(.number.grouping(.automatic)))")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.75))
+                }
                 if currentSession.totalComp > 0 {
                     Text("Total comps \(settingsStore.currencySymbol)\(currentSession.totalComp.formatted(.number.grouping(.automatic)))")
                         .font(.caption2)

@@ -43,6 +43,27 @@ struct WatchVisualsView: View {
     private var buyIns: Int { live?.totalBuyIn ?? 0 }
     private var rebuys: Int { max(0, buyIns - (live?.initialBuyIn ?? buyIns)) }
     private var comps: Int { live?.totalComp ?? 0 }
+    private var currentStack: Int { live?.liveTrackedStackAmount ?? buyIns }
+
+    private var currencySymbol: String {
+        let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
+
+    private var stackHistoryPoints: [StackUpdateEvent] {
+        let points = (live?.stackUpdateEvents ?? []).sorted { $0.timestamp < $1.timestamp }
+        if points.isEmpty, let stack = live?.liveTrackedStackAmount {
+            return [StackUpdateEvent(amount: stack, timestamp: live?.startTime ?? Date())]
+        }
+        return points
+    }
 
     var body: some View {
         TabView(selection: $selectedCard) {
@@ -220,6 +241,20 @@ struct WatchVisualsView: View {
                 miniMetric(title: "Buy-Ins", value: "$\(buyIns)")
                 miniMetric(title: "Re-Buys", value: "$\(rebuys)")
                 miniMetric(title: "Comps", value: "$\(comps)")
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Stack trend")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                if stackHistoryPoints.count <= 1 {
+                    Text("\(currencySymbol)\(currentStack.formatted(.number.grouping(.automatic)))")
+                        .font(.headline.monospacedDigit().bold())
+                        .foregroundColor(.green)
+                } else {
+                    WatchStackTrendGraph(points: stackHistoryPoints, lineColor: .green)
+                        .frame(height: 56)
+                }
             }
         }
         .padding(10)
@@ -454,6 +489,47 @@ private struct WatchVisualChipStackNudgeModifier: ViewModifier {
                     }
                 }
             }
+    }
+}
+
+private struct WatchStackTrendGraph: View {
+    let points: [StackUpdateEvent]
+    var lineColor: Color = .green
+
+    var body: some View {
+        GeometryReader { geo in
+            let sorted = points.sorted { $0.timestamp < $1.timestamp }
+            let amounts = sorted.map(\.amount)
+            let minY = amounts.min() ?? 0
+            let maxY = amounts.max() ?? 0
+            let range = max(maxY - minY, 1)
+            let stepX = sorted.count > 1 ? geo.size.width / CGFloat(sorted.count - 1) : 0
+
+            Path { path in
+                for (idx, point) in sorted.enumerated() {
+                    let x = CGFloat(idx) * stepX
+                    let normalized = CGFloat(point.amount - minY) / CGFloat(range)
+                    let y = geo.size.height - (normalized * geo.size.height)
+                    if idx == 0 {
+                        path.move(to: CGPoint(x: x, y: y))
+                    } else {
+                        path.addLine(to: CGPoint(x: x, y: y))
+                    }
+                }
+            }
+            .stroke(lineColor, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+
+            ForEach(Array(sorted.enumerated()), id: \.element.id) { idx, point in
+                let x = CGFloat(idx) * stepX
+                let normalized = CGFloat(point.amount - minY) / CGFloat(range)
+                let y = geo.size.height - (normalized * geo.size.height)
+                Circle()
+                    .fill(lineColor)
+                    .frame(width: 4, height: 4)
+                    .position(x: x, y: y)
+            }
+        }
+        .padding(.vertical, 2)
     }
 }
 

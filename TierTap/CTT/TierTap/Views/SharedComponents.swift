@@ -1208,6 +1208,7 @@ private struct TierPointsQuickPickSheet: View {
 enum BuyInGridSheetMode: Equatable {
     case initialBuyIn
     case compAmount
+    case stackAmount
 }
 
 struct BuyInGridSheet: View {
@@ -1226,6 +1227,7 @@ struct BuyInGridSheet: View {
         switch mode {
         case .initialBuyIn: return "Initial Buy-In"
         case .compAmount: return "Comp amount"
+        case .stackAmount: return "Stack"
         }
     }
 
@@ -1239,6 +1241,10 @@ struct BuyInGridSheet: View {
         case .compAmount:
             return totalSelected > 0
                 ? "Comp amount: \(sym)\(totalSelected)"
+                : "Select one or more amounts."
+        case .stackAmount:
+            return totalSelected > 0
+                ? "Stack total: \(sym)\(totalSelected)"
                 : "Select one or more amounts."
         }
     }
@@ -1254,6 +1260,10 @@ struct BuyInGridSheet: View {
             return totalSelected > 0
                 ? "Use \(sym)\(totalSelected)"
                 : "Set amount"
+        case .stackAmount:
+            return totalSelected > 0
+                ? "Use \(sym)\(totalSelected)"
+                : "Set stack"
         }
     }
 
@@ -1486,6 +1496,206 @@ struct BuyInQuickAddSheet: View {
                 pendingTotal = settingsStore.lastAddOnBuyInAmount
             }
         }
+    }
+}
+
+/// Enter current chip stack while live; session win/loss vs buy-ins and $/hr update until close-out.
+struct UpdateStackSheet: View {
+    let totalBuyIn: Int
+    let currentTrackedStack: Int?
+    let hoursPlayed: Double
+    let onUpdate: (Int) -> Void
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @State private var pendingStack = 0
+    @State private var customAmount = ""
+    @State private var showBuyInGrid = false
+    @State private var gridAmountScratch = ""
+    @State private var stackWinConfettiBurst = 0
+
+    private var isCustomValid: Bool {
+        (Int(customAmount) ?? 0) > 0
+    }
+
+    private var previewWinLoss: Int {
+        pendingStack - totalBuyIn
+    }
+
+    private var previewRatePerHour: Double? {
+        let wl = previewWinLoss
+        guard hoursPlayed > 1e-6 else { return nil }
+        return Double(wl) / hoursPlayed
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 24) {
+                    VStack(spacing: 8) {
+                        L10nText("Update Stack")
+                            .font(.title2.bold())
+                            .foregroundColor(.white)
+                        Text("Win/loss is stack minus total buy-in of \(settingsStore.currencySymbol)\(totalBuyIn.formatted(.number.grouping(.automatic))).")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 8)
+
+                    Button {
+                        gridAmountScratch = ""
+                        showBuyInGrid = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "square.grid.2x2.fill")
+                            Text(
+                                pendingStack > 0
+                                    ? "\(settingsStore.currencySymbol)\(pendingStack.formatted(.number.grouping(.automatic))) — chip grid"
+                                    : "Choose stack on chip grid"
+                            )
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+
+                    VStack(spacing: 12) {
+                        NumericEntryWithDialPad(
+                            placeholder: "Custom amount",
+                            text: $customAmount,
+                            dialPadNavigationTitle: "Stack"
+                        )
+                        Button {
+                            if let a = Int(customAmount), a > 0 {
+                                pendingStack += a
+                                customAmount = ""
+                            }
+                        } label: {
+                            Group {
+                                if let a = Int(customAmount.trimmingCharacters(in: .whitespacesAndNewlines)), a > 0 {
+                                    Text(
+                                        "Add \(settingsStore.currencySymbol)\(a.formatted(.number.grouping(.automatic))) to stack"
+                                    )
+                                } else {
+                                    Text("Add custom amount to stack")
+                                }
+                            }
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(isCustomValid ? Color.green : Color.gray)
+                            .foregroundColor(isCustomValid ? .black : .white)
+                            .cornerRadius(14)
+                        }
+                        .disabled(!isCustomValid)
+
+                        VStack(spacing: 10) {
+                            Text("Stack total: \(settingsStore.currencySymbol)\(pendingStack.formatted(.number.grouping(.automatic)))")
+                                .font(.subheadline.bold())
+                                .foregroundColor(.white)
+
+                            VStack(spacing: 6) {
+                                Text("Session (vs buy-in)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                Text(formatSignedCurrency(previewWinLoss))
+                                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                                    .monospacedDigit()
+                                    .foregroundColor(previewWinLoss >= 0 ? .green : .red)
+                                if let rate = previewRatePerHour {
+                                    Text(formatRatePerHour(rate))
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+
+                            Button {
+                                let showConfetti = previewWinLoss > 0 && !accessibilityReduceMotion
+                                onUpdate(pendingStack)
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
+                                if showConfetti {
+                                    stackWinConfettiBurst += 1
+                                    Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 950_000_000)
+                                        dismiss()
+                                    }
+                                } else {
+                                    dismiss()
+                                }
+                            } label: {
+                                L10nText("Update Stack")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.green)
+                                    .foregroundColor(.black)
+                                    .cornerRadius(14)
+                            }
+
+                            Button("Clear") {
+                                pendingStack = 0
+                                customAmount = ""
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.red)
+                            .padding(.top, 4)
+                        }
+                    }
+                }
+                .padding()
+
+                StackWinConfettiBurst(burstID: stackWinConfettiBurst, enabled: !accessibilityReduceMotion)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
+            }
+            .localizedNavigationTitle("Stack")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.foregroundColor(.green)
+                }
+            }
+            .sheet(isPresented: $showBuyInGrid) {
+                BuyInGridSheet(
+                    amounts: settingsStore.buyInGridAmounts,
+                    selected: $gridAmountScratch,
+                    mode: .stackAmount
+                )
+                .environmentObject(settingsStore)
+                .presentationDetents([.fraction(0.7), .large])
+                .presentationDragIndicator(.visible)
+            }
+            .onChange(of: gridAmountScratch) { newVal in
+                if let v = Int(newVal), v > 0 {
+                    pendingStack = v
+                }
+            }
+        }
+        .onAppear {
+            pendingStack = max(0, currentTrackedStack ?? totalBuyIn)
+        }
+    }
+
+    private func formatSignedCurrency(_ value: Int) -> String {
+        let sign = value > 0 ? "+" : (value < 0 ? "-" : "")
+        return "\(sign)\(settingsStore.currencySymbol)\(abs(value).formatted(.number.grouping(.automatic)))"
+    }
+
+    private func formatRatePerHour(_ rate: Double) -> String {
+        let rounded = rate.rounded()
+        let sign = rounded > 0 ? "+" : (rounded < 0 ? "-" : "")
+        let mag = abs(rounded)
+        return "\(sign)\(settingsStore.currencySymbol)\(Int(mag).formatted(.number.grouping(.automatic)))/hr"
     }
 }
 

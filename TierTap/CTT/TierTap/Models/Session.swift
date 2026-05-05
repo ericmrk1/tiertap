@@ -53,6 +53,13 @@ struct BuyInEvent: Identifiable, Codable, Hashable {
     var timestamp: Date
 }
 
+/// Manual checkpoint of the current chip stack while a session is live.
+struct StackUpdateEvent: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var amount: Int
+    var timestamp: Date
+}
+
 /// Category of complimentary value (for logging; does not affect win/loss math).
 enum CompKind: String, Codable, CaseIterable {
     case dollarsCredits
@@ -241,6 +248,10 @@ struct Session: Identifiable, Codable, Equatable {
     var endingTierPoints: Int?
     var buyInEvents: [BuyInEvent] = []
     var compEvents: [CompEvent] = []
+    /// While live: last chip stack total counted at the table (currency units). Used with buy-ins for in-session P&L; cleared when the session is no longer live.
+    var liveTrackedStackAmount: Int?
+    /// Timestamped stack checkpoints to visualize stack trend during the live session.
+    var stackUpdateEvents: [StackUpdateEvent] = []
     var cashOut: Int?
     var avgBetActual: Int?
     var avgBetRated: Int?
@@ -294,7 +305,7 @@ struct Session: Identifiable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, compEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
+        case buyInEvents, compEvents, liveTrackedStackAmount, stackUpdateEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
         case chipEstimatorImageFilename
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
@@ -314,6 +325,8 @@ struct Session: Identifiable, Codable, Equatable {
         endingTierPoints = try c.decodeIfPresent(Int.self, forKey: .endingTierPoints)
         buyInEvents = try c.decodeIfPresent([BuyInEvent].self, forKey: .buyInEvents) ?? []
         compEvents = try c.decodeIfPresent([CompEvent].self, forKey: .compEvents) ?? []
+        liveTrackedStackAmount = try c.decodeIfPresent(Int.self, forKey: .liveTrackedStackAmount)
+        stackUpdateEvents = try c.decodeIfPresent([StackUpdateEvent].self, forKey: .stackUpdateEvents) ?? []
         cashOut = try c.decodeIfPresent(Int.self, forKey: .cashOut)
         avgBetActual = try c.decodeIfPresent(Int.self, forKey: .avgBetActual)
         avgBetRated = try c.decodeIfPresent(Int.self, forKey: .avgBetRated)
@@ -347,6 +360,8 @@ struct Session: Identifiable, Codable, Equatable {
          startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
          compEvents: [CompEvent] = [],
+         liveTrackedStackAmount: Int? = nil,
+         stackUpdateEvents: [StackUpdateEvent] = [],
          cashOut: Int? = nil, avgBetActual: Int? = nil, avgBetRated: Int? = nil, isLive: Bool = false,
          status: SessionStatus = .complete, sessionMood: SessionMood? = nil, privateNotes: String? = nil,
          rewardsProgramName: String? = nil,
@@ -380,6 +395,8 @@ struct Session: Identifiable, Codable, Equatable {
         self.endingTierPoints = endingTierPoints
         self.buyInEvents = buyInEvents
         self.compEvents = compEvents
+        self.liveTrackedStackAmount = liveTrackedStackAmount
+        self.stackUpdateEvents = stackUpdateEvents
         self.cashOut = cashOut
         self.avgBetActual = avgBetActual
         self.avgBetRated = avgBetRated
@@ -422,6 +439,8 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(endingTierPoints, forKey: .endingTierPoints)
         try c.encode(buyInEvents, forKey: .buyInEvents)
         try c.encode(compEvents, forKey: .compEvents)
+        try c.encodeIfPresent(liveTrackedStackAmount, forKey: .liveTrackedStackAmount)
+        try c.encode(stackUpdateEvents, forKey: .stackUpdateEvents)
         try c.encodeIfPresent(cashOut, forKey: .cashOut)
         try c.encodeIfPresent(avgBetActual, forKey: .avgBetActual)
         try c.encodeIfPresent(avgBetRated, forKey: .avgBetRated)
@@ -482,6 +501,18 @@ struct Session: Identifiable, Codable, Equatable {
     /// Net result per hour (win rate) in currency units, if both win/loss and hours are available.
     var winRatePerHour: Double? {
         guard let wl = winLoss, hoursPlayed > 0 else { return nil }
+        return Double(wl) / hoursPlayed
+    }
+
+    /// While live: net result implied by the last stack count vs total buy-in. Nil until stack is updated at least once.
+    var liveSessionRunningWinLoss: Int? {
+        guard isLive, let stack = liveTrackedStackAmount else { return nil }
+        return stack - totalBuyIn
+    }
+
+    /// In-session win (or loss) rate per hour from stack tracking. Nil until stack is set and play time is positive.
+    var liveSessionWinRatePerHour: Double? {
+        guard let wl = liveSessionRunningWinLoss, hoursPlayed > 0 else { return nil }
         return Double(wl) / hoursPlayed
     }
     /// Initial buy-in amount for the session (first buy-in event), if available.

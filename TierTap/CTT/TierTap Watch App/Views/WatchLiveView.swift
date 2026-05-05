@@ -12,6 +12,7 @@ enum WatchLivePane: Hashable {
 private struct WatchCloseoutSheetRef: Identifiable, Hashable {
     let id: UUID
     let totalBuyIn: Int
+    let initialCashOut: Int
 }
 
 /// Fast close-out, regular close-out (cash-out on watch), or cancel (discard) live session — complements pause/unpause on the timer tab.
@@ -88,8 +89,14 @@ private struct WatchEndSessionOptionsView: View {
                         statusColor = .orange
                         playWatchEndFlowHaptic(success: false)
                     } else if let sessionId {
-                        let buyIn = store.sessions.first(where: { $0.id == sessionId })?.totalBuyIn ?? 0
-                        closeoutSheetRef = WatchCloseoutSheetRef(id: sessionId, totalBuyIn: buyIn)
+                        let session = store.sessions.first(where: { $0.id == sessionId })
+                        let buyIn = session?.totalBuyIn ?? 0
+                        let initialCashOut = session?.liveTrackedStackAmount ?? buyIn
+                        closeoutSheetRef = WatchCloseoutSheetRef(
+                            id: sessionId,
+                            totalBuyIn: buyIn,
+                            initialCashOut: initialCashOut
+                        )
                         statusLine = "Enter cash-out on the next screen."
                         statusColor = .green
                         playWatchEndFlowHaptic(success: SessionSyncManager.shared.isReachable)
@@ -158,6 +165,8 @@ struct WatchLiveView: View {
     @State private var buyInSuccessPulse = 0
     @State private var compSuccessPulse = 0
     @State private var tierSuccessPulse = 0
+    @State private var stackSuccessPulse = 0
+    @State private var lastObservedStack: Int?
 
     private var s: Session? { store.liveSession }
     private var hasLiveSession: Bool { store.liveSession != nil }
@@ -226,6 +235,12 @@ struct WatchLiveView: View {
                 tierSuccessPulse += 1
             }
             lastObservedTier = newPoints
+        }
+        .onChange(of: s?.liveTrackedStackAmount) { _, newStack in
+            if watchAnimationsAllowMotion, newStack != lastObservedStack, newStack != nil {
+                stackSuccessPulse += 1
+            }
+            lastObservedStack = newStack
         }
     }
 
@@ -471,7 +486,24 @@ struct WatchLiveView: View {
     }
 
     private var watchQuickAction: String {
-        groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "addBuyIn"
+        groupDefaults?.string(forKey: "ctt_watch_quick_action") ?? "updateStack"
+    }
+
+    private var currencySymbol: String {
+        let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
+
+    private var quickStackTileValue: String {
+        let stack = s?.liveTrackedStackAmount ?? s?.totalBuyIn ?? 0
+        return "\(currencySymbol)\(stack.formatted(.number.grouping(.automatic)))"
     }
 
     @ViewBuilder
@@ -496,11 +528,23 @@ struct WatchLiveView: View {
             } label: {
                 metricButton(title: "TierTap", value: "End", icon: "flag.checkered", accent: .orange, successPulse: 0)
             }
-        default:
+        case "addBuyIn":
             NavigationLink {
                 WatchAddBuyInSheet().environmentObject(store)
             } label: {
                 metricButton(title: "Quick", value: "Add Buy-In", icon: "plus.circle.fill", accent: .blue, successPulse: buyInSuccessPulse)
+            }
+        default:
+            NavigationLink {
+                WatchUpdateStackSheet().environmentObject(store)
+            } label: {
+                metricButton(
+                    title: "Stack",
+                    value: quickStackTileValue,
+                    icon: TierTapLabelIcon.chipStackSentinel,
+                    accent: .green,
+                    successPulse: stackSuccessPulse
+                )
             }
         }
     }
@@ -646,6 +690,7 @@ private struct WatchCloseoutCashSheet: View {
     @State private var winLossDelta: Double = 0
 
     private var buyIn: Int { max(0, ref.totalBuyIn) }
+    private var initialCashOut: Int { max(0, ref.initialCashOut) }
 
     private var estimatedCashOut: Int {
         max(0, buyIn + Int(winLossDelta.rounded(.toNearestOrAwayFromZero)))
@@ -704,6 +749,9 @@ private struct WatchCloseoutCashSheet: View {
                     Button("Done") { confirmAndSave() }
                 }
             }
+        }
+        .onAppear {
+            winLossDelta = Double(initialCashOut - buyIn)
         }
     }
 
@@ -771,6 +819,19 @@ private struct WatchQuickMetricLabel: View {
     let successPulse: Int
     @State private var rippleScale: CGFloat = 1
     @State private var rippleOpacity: Double = 0
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var currencySymbol: String {
+        let code = groupDefaults?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -819,7 +880,9 @@ private struct WatchQuickMetricLabel: View {
 
     @ViewBuilder
     private var iconImage: some View {
-        if motionEnabled {
+        if icon == TierTapLabelIcon.chipStackSentinel {
+            TierTapChipStackIcon(side: 15, currencySymbol: currencySymbol)
+        } else if motionEnabled {
             Image(systemName: icon)
                 .font(.caption2)
                 .symbolEffect(.bounce, value: successPulse)
@@ -1143,6 +1206,198 @@ private struct WatchAddBuyInSheet: View {
         .foregroundColor(.black)
         .padding(.vertical, 4)
         .background(Color.green)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func quickAmountRows(_ values: [Int]) -> some View {
+        let chunkSize = 2
+        let totalRows = Int(ceil(Double(values.count) / Double(chunkSize)))
+        ForEach(0..<max(totalRows, 1), id: \.self) { row in
+            HStack {
+                let firstIndex = row * chunkSize
+                if firstIndex < values.count {
+                    quickAmountButton(values[firstIndex])
+                }
+                let secondIndex = firstIndex + 1
+                if secondIndex < values.count {
+                    quickAmountButton(values[secondIndex])
+                }
+            }
+        }
+    }
+
+    private func parseFlexibleSeparatedIntegers(_ raw: String) -> [Int] {
+        raw
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            .filter { $0 > 0 }
+    }
+
+    private func playSuccessHaptic() {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(.success)
+        #endif
+    }
+
+    private func playClickHaptic() {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(.click)
+        #endif
+    }
+}
+
+private struct WatchUpdateStackSheet: View {
+    @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @State private var amount: Double = 100
+    @State private var customAmountText: String = "100"
+    @State private var statusMessage: String?
+    @State private var statusColor: Color = .green
+    @State private var pendingExpectedStack: Int?
+    @State private var showConfirmUpdate = false
+    @State private var stackChipNudge = 0
+    @State private var stackWinConfettiBurst = 0
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var stackMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
+
+    private var totalBuyIn: Int {
+        store.liveSession?.totalBuyIn ?? 0
+    }
+
+    private var selectedStack: Int {
+        let custom = Int(customAmountText.filter { $0.isNumber }) ?? 0
+        if custom > 0 { return custom }
+        return max(0, Int(amount))
+    }
+
+    private var sessionWinLossPreview: Int {
+        selectedStack - totalBuyIn
+    }
+
+    private var amountPresetValues: [Int] {
+        let defaults = [100, 200, 500, 1_000]
+        guard let raw = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") else {
+            return defaults
+        }
+        let parsed = parseFlexibleSeparatedIntegers(raw)
+        return parsed.isEmpty ? defaults : parsed
+    }
+
+    private var stackConfirmationSummary: String {
+        let typedDigits = customAmountText.filter { $0.isNumber }
+        let entryMode = typedDigits.isEmpty ? "Digital Crown / preset" : "Typed amount"
+        let wl = sessionWinLossPreview
+        let wlLine = wl >= 0 ? "Session win: $\(wl)" : "Session loss: $\(abs(wl))"
+        return "Stack: $\(selectedStack)\nEntry: \(entryMode)\nTotal buy-in: $\(totalBuyIn)\n\(wlLine)"
+    }
+
+    var body: some View {
+        ZStack {
+            StackWinConfettiBurst(burstID: stackWinConfettiBurst, enabled: stackMotionOK)
+                .allowsHitTesting(false)
+            Form {
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.caption2.bold())
+                    .foregroundColor(statusColor)
+            }
+            Text("Total buy-in: $\(totalBuyIn)")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .contentTransition(.numericText())
+                .animation(stackMotionOK ? .snappy : nil, value: totalBuyIn)
+            HStack(alignment: .center, spacing: 8) {
+                Text("Stack: $\(selectedStack)")
+                    .font(.headline.monospacedDigit())
+                    .contentTransition(.numericText())
+                    .animation(stackMotionOK ? .snappy : nil, value: selectedStack)
+            }
+            Text(sessionWinLossPreview >= 0 ? "Session win: $\(sessionWinLossPreview)" : "Session loss: $\(abs(sessionWinLossPreview))")
+                .font(.caption2)
+                .foregroundColor(sessionWinLossPreview >= 0 ? .green : .red)
+                .contentTransition(.numericText())
+                .animation(stackMotionOK ? .snappy : nil, value: sessionWinLossPreview)
+            quickAmountRows(amountPresetValues)
+            TextField("Custom stack", text: $customAmountText)
+                .onChange(of: customAmountText) { new in
+                    let digits = new.filter { $0.isNumber }
+                    if digits != new { customAmountText = digits }
+                }
+            Button("Update Stack") {
+                showConfirmUpdate = true
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .foregroundColor(.black)
+            .padding(.vertical, 6)
+            .background(Color.teal)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+        }
+        .focusable(true)
+        .digitalCrownRotation(
+            $amount,
+            from: 0,
+            through: 20_000,
+            by: 5,
+            sensitivity: .low,
+            isContinuous: false,
+            isHapticFeedbackEnabled: true
+        )
+        .localizedNavigationTitle("Update Stack")
+        .alert("Update stack?", isPresented: $showConfirmUpdate) {
+            Button("No", role: .cancel) {}
+            Button("Yes") {
+                let stack = selectedStack
+                let immediate = SessionSyncManager.shared.isReachable
+                pendingExpectedStack = stack
+                store.updateLiveTrackedStack(stack)
+                statusMessage = immediate ? "Stack sent" : "Stack queued"
+                statusColor = immediate ? .green : .orange
+                if immediate { playSuccessHaptic() } else { playClickHaptic() }
+            }
+        } message: {
+            Text("Update stack?\n\n\(stackConfirmationSummary)")
+        }
+        .onChange(of: store.liveSession?.liveTrackedStackAmount) { _, newVal in
+            guard let expected = pendingExpectedStack, let newVal else { return }
+            guard newVal == expected else { return }
+            pendingExpectedStack = nil
+            let wl = newVal - (store.liveSession?.totalBuyIn ?? 0)
+            statusMessage = wl >= 0 ? "Session win $\(wl)" : "Session loss $\(abs(wl))"
+            statusColor = .green
+            playSuccessHaptic()
+            if stackMotionOK {
+                stackChipNudge += 1
+            }
+            if wl > 0, stackMotionOK {
+                stackWinConfettiBurst += 1
+            }
+        }
+        .onAppear {
+            let seed = store.liveSession?.liveTrackedStackAmount ?? store.liveSession?.totalBuyIn ?? 100
+            let s = max(0, seed)
+            amount = Double(s)
+            customAmountText = s > 0 ? "\(s)" : "100"
+        }
+    }
+
+    private func quickAmountButton(_ value: Int) -> some View {
+        Button("$\(value)") {
+            amount = Double(value)
+            customAmountText = "\(value)"
+        }
+        .buttonStyle(WatchQuickTilePressStyle(enabled: stackMotionOK))
+        .frame(maxWidth: .infinity, alignment: .center)
+        .foregroundColor(.black)
+        .padding(.vertical, 4)
+        .background(Color.teal)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 

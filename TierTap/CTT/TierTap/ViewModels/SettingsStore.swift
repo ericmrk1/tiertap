@@ -598,6 +598,7 @@ final class SettingsStore: ObservableObject {
     }
 
     enum WatchQuickAction: String, CaseIterable, Identifiable, Codable {
+        case updateStack
         case addBuyIn
         case addComp
         case updateTier
@@ -877,7 +878,7 @@ final class SettingsStore: ObservableObject {
            let quick = WatchQuickAction(rawValue: raw) {
             self.watchQuickAction = quick
         } else {
-            self.watchQuickAction = .addBuyIn
+            self.watchQuickAction = .updateStack
         }
         self.watchBuyInCashDefaultsText =
             UserDefaults.standard.string(forKey: keyWatchBuyInCashDefaults)
