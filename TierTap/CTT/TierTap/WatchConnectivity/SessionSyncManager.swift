@@ -370,6 +370,9 @@ final class SessionSyncManager: NSObject, ObservableObject {
         if let end = session.endTime {
             summary["endTime"] = end.timeIntervalSince1970
         }
+        if let stack = session.liveTrackedStackAmount {
+            summary["liveTrackedStackAmount"] = stack
+        }
         return summary
     }
 
@@ -388,6 +391,7 @@ final class SessionSyncManager: NSObject, ObservableObject {
         let totalBuyIn = max(0, summary["totalBuyIn"] as? Int ?? 0)
         let totalComp = max(0, summary["totalComp"] as? Int ?? 0)
         let isLive = summary["isLive"] as? Bool ?? (endTime == nil)
+        let liveStack = summary["liveTrackedStackAmount"] as? Int
         let buyIns: [BuyInEvent] = totalBuyIn > 0 ? [BuyInEvent(amount: totalBuyIn, timestamp: startTime)] : []
         let comps: [CompEvent] = totalComp > 0 ? [CompEvent(amount: totalComp, timestamp: startTime)] : []
         return Session(
@@ -399,6 +403,7 @@ final class SessionSyncManager: NSObject, ObservableObject {
             startingTierPoints: startingTier,
             buyInEvents: buyIns,
             compEvents: comps,
+            liveTrackedStackAmount: liveStack,
             isLive: isLive
         )
     }

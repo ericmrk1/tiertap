@@ -36,13 +36,6 @@ struct WatchContentView: View {
                 }
 
                 NavigationLink {
-                    WatchVisualsView()
-                        .environmentObject(store)
-                } label: {
-                    Label("Visuals", systemImage: "swatchpalette")
-                }
-
-                NavigationLink {
                     WatchHistoryView()
                         .environmentObject(store)
                 } label: {
@@ -109,8 +102,6 @@ private struct WatchSettingsView: View {
     @State private var watchBuyInCashDefaults = "20 100 200 500"
     @State private var watchCompCashDefaults = "20 50 100 500"
     @State private var watchCompContextOptions = "Cocktail, Beer, Food, Cash"
-    @State private var watchVisualsAutoScrollEnabled = false
-    @State private var watchVisualsAutoScrollSeconds = 6
     @State private var watchAnimationsEnabled = true
 
     var body: some View {
@@ -141,15 +132,6 @@ private struct WatchSettingsView: View {
                 .foregroundStyle(.secondary)
             WatchNumericDigitPad(text: $watchCompCashDefaults, allowSpace: true, maxLength: 48)
             TextField("Comp type options", text: $watchCompContextOptions)
-            Toggle("Visuals auto-scroll", isOn: $watchVisualsAutoScrollEnabled)
-            Picker("Visuals scroll every", selection: $watchVisualsAutoScrollSeconds) {
-                Text("3 sec").tag(3)
-                Text("4 sec").tag(4)
-                Text("5 sec").tag(5)
-                Text("6 sec").tag(6)
-                Text("8 sec").tag(8)
-                Text("10 sec").tag(10)
-            }
         }
         .localizedNavigationTitle("Watch Settings")
         .onAppear(perform: load)
@@ -162,8 +144,6 @@ private struct WatchSettingsView: View {
         .onChange(of: watchBuyInCashDefaults) { _ in save() }
         .onChange(of: watchCompCashDefaults) { _ in save() }
         .onChange(of: watchCompContextOptions) { _ in save() }
-        .onChange(of: watchVisualsAutoScrollEnabled) { _ in save() }
-        .onChange(of: watchVisualsAutoScrollSeconds) { _ in save() }
     }
 
     private func load() {
@@ -177,9 +157,6 @@ private struct WatchSettingsView: View {
         watchBuyInCashDefaults = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") ?? "20 100 200 500"
         watchCompCashDefaults = groupDefaults?.string(forKey: "ctt_watch_comp_cash_defaults") ?? "20 50 100 500"
         watchCompContextOptions = groupDefaults?.string(forKey: "ctt_watch_comp_context_options") ?? "Cocktail, Beer, Food, Cash"
-        watchVisualsAutoScrollEnabled = groupDefaults?.object(forKey: "ctt_watch_visuals_auto_scroll_enabled") as? Bool ?? false
-        let visualsSeconds = groupDefaults?.integer(forKey: "ctt_watch_visuals_auto_scroll_seconds") ?? 6
-        watchVisualsAutoScrollSeconds = max(3, visualsSeconds)
     }
 
     private func save() {
@@ -197,8 +174,6 @@ private struct WatchSettingsView: View {
         groupDefaults?.set(normalizedBuyInDefaults, forKey: "ctt_watch_buyin_cash_defaults")
         groupDefaults?.set(normalizedCashDefaults, forKey: "ctt_watch_comp_cash_defaults")
         groupDefaults?.set(watchCompContextOptions, forKey: "ctt_watch_comp_context_options")
-        groupDefaults?.set(watchVisualsAutoScrollEnabled, forKey: "ctt_watch_visuals_auto_scroll_enabled")
-        groupDefaults?.set(max(3, watchVisualsAutoScrollSeconds), forKey: "ctt_watch_visuals_auto_scroll_seconds")
     }
 
     private func normalizeNumbersDelimiter(_ raw: String) -> String {
@@ -410,11 +385,8 @@ private struct WatchSessionDetailView: View {
             }
         }
         .localizedNavigationTitle("Session")
-        .confirmationDialog(
-            "Publish to Community?",
-            isPresented: $confirmCommunityPublish,
-            titleVisibility: .visible
-        ) {
+        .alert("Publish to Community?", isPresented: $confirmCommunityPublish) {
+            Button("Cancel", role: .cancel) {}
             Button("Publish") {
                 let immediate = syncManager.isReachable
                 store.requestWatchCommunityPublishFromWatch(sessionId: resolvedSession.id) { ok, message in
@@ -426,7 +398,6 @@ private struct WatchSessionDetailView: View {
                     }
                 }
             }
-            Button("Cancel", role: .cancel) {}
         } message: {
             Text("Uses your Community screen name and tier/hour only (no wins, comps, or comment). TierTap on iPhone publishes in the background — no share sheet on the phone.")
         }

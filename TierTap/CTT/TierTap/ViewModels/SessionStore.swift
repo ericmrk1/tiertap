@@ -474,7 +474,8 @@ class SessionStore: ObservableObject {
     /// `cashOutOverride` (e.g. from Watch after an estimated win/loss sheet) replaces the default of total buy-in.
     func fastCloseSessionWithDefaultsUnverified(
         presentPostCloseoutSharePrompt: Bool = true,
-        cashOutOverride: Int? = nil
+        cashOutOverride: Int? = nil,
+        afterWatchCloseSync: (([Session], Session?) -> Void)? = nil
     ) {
         #if os(watchOS)
         var params: [String: Any] = [:]
@@ -482,10 +483,14 @@ class SessionStore: ObservableObject {
             params["cashOut"] = c
         }
         SessionSyncManager.shared.sendAction("fastCloseOut", params: params) { [weak self] sessions, liveSession, _ in
-            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+            DispatchQueue.main.async {
+                self?.applySyncedState(sessions: sessions, liveSession: liveSession)
+                afterWatchCloseSync?(sessions, liveSession)
+            }
         }
         return
         #endif
+        _ = afterWatchCloseSync
         guard var s = liveSession else { return }
         let defaultCashOut = s.liveTrackedStackAmount ?? s.totalBuyIn
         let cashOut = max(0, cashOutOverride ?? defaultCashOut)

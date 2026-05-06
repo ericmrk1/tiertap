@@ -504,6 +504,15 @@ struct Session: Identifiable, Codable, Equatable {
         return Double(wl) / hoursPlayed
     }
 
+    /// Single value to show as “current stack” while live: the explicit tracked field, else the newest stack checkpoint, else total buy-in.
+    var resolvedLiveStackAmount: Int {
+        if let stack = liveTrackedStackAmount { return stack }
+        if let latest = stackUpdateEvents.max(by: { $0.timestamp < $1.timestamp }) {
+            return latest.amount
+        }
+        return totalBuyIn
+    }
+
     /// While live: net result implied by the last stack count vs total buy-in. Nil until stack is updated at least once.
     var liveSessionRunningWinLoss: Int? {
         guard isLive, let stack = liveTrackedStackAmount else { return nil }

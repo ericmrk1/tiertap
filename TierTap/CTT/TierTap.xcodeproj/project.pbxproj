@@ -109,7 +109,7 @@
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
 		WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */; };
 		WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */; };
-		WCHV2E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCHV1E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift */; };
+		WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */; };
 		WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
 		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
@@ -253,7 +253,7 @@
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
 		WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLiveView.swift; sourceTree = "<group>"; };
 		WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNumericKeypad.swift; sourceTree = "<group>"; };
-		WCHV1E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchVisualsView.swift; sourceTree = "<group>"; };
+		WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRainingCoinsOverlay.swift; sourceTree = "<group>"; };
 		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -511,7 +511,7 @@
 				WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */,
 				WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */,
 				WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */,
-				WCHV1E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift */,
+				WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -813,8 +813,8 @@
 				WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */,
 				WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */,
 				WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */,
+				WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */,
 				SUFB02E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */,
-				WCHV2E2F3A4B5C6D7E8F9A0B /* WatchVisualsView.swift in Sources */,
 				WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */,
 				WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */,
 				WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */,

@@ -9,6 +9,79 @@ enum WatchLivePane: Hashable {
     case options
 }
 
+/// Full-screen amount celebration (buy-in, stack) — mirrors comp celebration UX.
+private struct WatchAmountFullscreenCelebration: Equatable {
+    var emoji: String
+    var title: String
+    /// Main metric (e.g. new total buy-in or stack).
+    var primaryValue: String
+    var caption: String?
+    var gradientColors: [Color]
+}
+
+@ViewBuilder
+private func watchAmountFullscreenCelebrationView(
+    _ model: WatchAmountFullscreenCelebration,
+    onDismiss: @escaping () -> Void
+) -> some View {
+    ZStack {
+        LinearGradient(
+            colors: model.gradientColors,
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+        VStack(spacing: 8) {
+            Text(model.emoji)
+                .font(.system(size: 48))
+                .accessibilityHidden(true)
+            Text(model.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.92))
+                .multilineTextAlignment(.center)
+            Text(model.primaryValue)
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .minimumScaleFactor(0.55)
+                .lineLimit(1)
+            if let caption = model.caption, !caption.isEmpty {
+                Text(caption)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .padding(.horizontal, 8)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .contentShape(Rectangle())
+    .onTapGesture(perform: onDismiss)
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("\(model.title). \(model.primaryValue). \(model.caption ?? "")")
+}
+
+private func emojiForBuyInAmount(_ amount: Int) -> String {
+    switch amount {
+    case ..<50: return "🪙"
+    case 50..<200: return "💵"
+    case 200..<500: return "💰"
+    case 500..<1_000: return "✨"
+    default: return "🎰"
+    }
+}
+
+private func emojiForStackSessionResult(winLoss: Int) -> String {
+    switch winLoss {
+    case ..<(-1): return "🎯"
+    case -1...1: return "⚖️"
+    case 2..<200: return "📈"
+    default: return "🚀"
+    }
+}
+
 private struct WatchCloseoutSheetRef: Identifiable, Hashable {
     let id: UUID
     let totalBuyIn: Int
@@ -18,17 +91,25 @@ private struct WatchCloseoutSheetRef: Identifiable, Hashable {
 /// Fast close-out, regular close-out (cash-out on watch), or cancel (discard) live session — complements pause/unpause on the timer tab.
 private struct WatchEndSessionOptionsView: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var showConfirmFastClose = false
     @State private var showConfirmRegularClose = false
     @State private var showConfirmDiscard = false
     @State private var statusLine: String?
     @State private var statusColor: Color = .green
     @State private var closeoutSheetRef: WatchCloseoutSheetRef?
+    @State private var profitRainPlayToken = 0
 
     private var hasLive: Bool { store.liveSession != nil }
 
+    private var celebrationMotionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
+
     var body: some View {
-        List {
+        ZStack {
+            List {
             if let statusLine {
                 Text(statusLine)
                     .font(.caption2.bold())
@@ -66,13 +147,21 @@ private struct WatchEndSessionOptionsView: View {
                     Text("Discard")
                 }
             }
+            }
+            WatchRainingCoinsOverlay(playToken: profitRainPlayToken, enabled: celebrationMotionOK)
         }
         .navigationTitle("End session")
         .alert("Fast close-out?", isPresented: $showConfirmFastClose) {
             Button("No", role: .cancel) {}
             Button("Yes") {
                 let immediate = SessionSyncManager.shared.isReachable
-                store.fastCloseSessionWithDefaultsUnverified()
+                store.fastCloseSessionWithDefaultsUnverified(afterWatchCloseSync: { sessions, _ in
+                    guard celebrationMotionOK else { return }
+                    guard let s = sessions.first else { return }
+                    if (s.winLoss ?? 0) > 0 {
+                        profitRainPlayToken += 1
+                    }
+                })
                 statusLine = immediate ? "Fast close-out sent" : "Fast close-out queued"
                 statusColor = immediate ? .green : .orange
                 playWatchEndFlowHaptic(success: immediate)
@@ -91,7 +180,7 @@ private struct WatchEndSessionOptionsView: View {
                     } else if let sessionId {
                         let session = store.sessions.first(where: { $0.id == sessionId })
                         let buyIn = session?.totalBuyIn ?? 0
-                        let initialCashOut = session?.liveTrackedStackAmount ?? buyIn
+                        let initialCashOut = session?.resolvedLiveStackAmount ?? buyIn
                         closeoutSheetRef = WatchCloseoutSheetRef(
                             id: sessionId,
                             totalBuyIn: buyIn,
@@ -123,7 +212,7 @@ private struct WatchEndSessionOptionsView: View {
             Text("Permanently deletes this live session on iPhone. It will not appear in history.")
         }
         .sheet(item: $closeoutSheetRef) { ref in
-            WatchCloseoutCashSheet(ref: ref) { err in
+            WatchCloseoutCashSheet(ref: ref) { err, closedInProfit in
                 if let err {
                     statusLine = err
                     statusColor = .orange
@@ -132,6 +221,9 @@ private struct WatchEndSessionOptionsView: View {
                     statusLine = "Close-out complete"
                     statusColor = .green
                     playWatchEndFlowHaptic(success: true)
+                    if closedInProfit, celebrationMotionOK {
+                        profitRainPlayToken += 1
+                    }
                 }
             }
             .environmentObject(store)
@@ -236,8 +328,8 @@ struct WatchLiveView: View {
             }
             lastObservedTier = newPoints
         }
-        .onChange(of: s?.liveTrackedStackAmount) { _, newStack in
-            if watchAnimationsAllowMotion, newStack != lastObservedStack, newStack != nil {
+        .onChange(of: s?.resolvedLiveStackAmount) { _, newStack in
+            if watchAnimationsAllowMotion, newStack != lastObservedStack {
                 stackSuccessPulse += 1
             }
             lastObservedStack = newStack
@@ -348,6 +440,7 @@ struct WatchLiveView: View {
                         )
                     }
                     .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
+                    .id("watch-quick-buyin")
 
                     NavigationLink {
                         WatchAddCompSheet()
@@ -362,6 +455,7 @@ struct WatchLiveView: View {
                         )
                     }
                     .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
+                    .id("watch-quick-comp")
 
                     NavigationLink {
                         WatchUpdateTierSheet()
@@ -376,9 +470,11 @@ struct WatchLiveView: View {
                         )
                     }
                     .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
+                    .id("watch-quick-tier")
 
                     quickActionTile
                         .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
+                        .id("watch-quick-stack")
                 }
             }
             .padding()
@@ -498,7 +594,7 @@ struct WatchLiveView: View {
     }
 
     private var quickStackTileValue: String {
-        let stack = s?.liveTrackedStackAmount ?? s?.totalBuyIn ?? 0
+        let stack = s?.resolvedLiveStackAmount ?? 0
         return "\(currencySymbol)\(stack.formatted(.number.grouping(.automatic)))"
     }
 
@@ -511,7 +607,8 @@ struct WatchLiveView: View {
                 value: quickStackTileValue,
                 icon: TierTapLabelIcon.chipStackSentinel,
                 accent: .green,
-                successPulse: stackSuccessPulse
+                successPulse: stackSuccessPulse,
+                animateValueDigits: false
             )
         }
     }
@@ -532,14 +629,22 @@ struct WatchLiveView: View {
         }
     }
 
-    private func metricButton(title: String, value: String, icon: String, accent: Color, successPulse: Int) -> some View {
+    private func metricButton(
+        title: String,
+        value: String,
+        icon: String,
+        accent: Color,
+        successPulse: Int,
+        animateValueDigits: Bool = true
+    ) -> some View {
         WatchQuickMetricLabel(
             title: title,
             value: value,
             icon: icon,
             accent: accent,
             motionEnabled: watchAnimationsAllowMotion,
-            successPulse: successPulse
+            successPulse: successPulse,
+            animateValueDigits: animateValueDigits
         )
     }
 
@@ -651,8 +756,8 @@ private struct WatchCloseoutCashSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let ref: WatchCloseoutSheetRef
-    /// Called with `nil` on success, or an error message from the phone.
-    let onFinished: (String?) -> Void
+    /// Called after save: `nil` success, or an error message. `closedInProfit` is true only on success when cash-out exceeds buy-in.
+    let onFinished: (_ error: String?, _ closedInProfit: Bool) -> Void
 
     @State private var winLossDelta: Double = 0
 
@@ -724,8 +829,9 @@ private struct WatchCloseoutCashSheet: View {
 
     private func confirmAndSave() {
         let cashOut = estimatedCashOut
+        let profit = estimatedWinLoss > 0
         store.watchApplyCloseoutCashOut(sessionId: ref.id, cashOut: cashOut) { err in
-            onFinished(err)
+            onFinished(err, err == nil && profit)
             dismiss()
         }
     }
@@ -759,6 +865,21 @@ private struct WatchCloseoutCrownModifier: ViewModifier {
 
 // MARK: - Quick metric tiles & press feedback
 
+private struct WatchMetricValueDigitTransitionModifier: ViewModifier {
+    var animate: Bool
+    var value: String
+
+    func body(content: Content) -> some View {
+        if animate {
+            content
+                .contentTransition(.numericText())
+                .animation(.snappy, value: value)
+        } else {
+            content
+        }
+    }
+}
+
 private struct WatchQuickTilePressStyle: ButtonStyle {
     var enabled: Bool
     func makeBody(configuration: Configuration) -> some View {
@@ -784,6 +905,8 @@ private struct WatchQuickMetricLabel: View {
     let accent: Color
     let motionEnabled: Bool
     let successPulse: Int
+    /// When false, stack amounts update instantly (avoids digit transitions that can look like stepping through history).
+    var animateValueDigits: Bool = true
     @State private var rippleScale: CGFloat = 1
     @State private var rippleOpacity: Double = 0
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
@@ -814,8 +937,10 @@ private struct WatchQuickMetricLabel: View {
                 Text(value)
                     .font(.footnote.monospacedDigit().bold())
                     .foregroundColor(accent)
-                    .contentTransition(.numericText())
-                    .animation(motionEnabled ? .snappy : nil, value: value)
+                    .modifier(WatchMetricValueDigitTransitionModifier(
+                        animate: motionEnabled && animateValueDigits,
+                        value: value
+                    ))
                     .lineLimit(1)
                 Text("+")
                     .font(.caption2)
@@ -1041,8 +1166,10 @@ private struct WatchAddBuyInSheet: View {
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
     @State private var pendingExpectedTotal: Int?
+    @State private var pendingBuyInBaselineTotal: Int?
     @State private var showConfirmAdd = false
     @State private var addOnChipNudge = 0
+    @State private var buyInCelebration: WatchAmountFullscreenCelebration?
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
 
     private var buyInMotionOK: Bool {
@@ -1079,7 +1206,8 @@ private struct WatchAddBuyInSheet: View {
     }
 
     var body: some View {
-        Form {
+        ZStack {
+            Form {
             if let statusMessage {
                 Text(statusMessage)
                     .font(.caption2.bold())
@@ -1115,7 +1243,17 @@ private struct WatchAddBuyInSheet: View {
             .padding(.vertical, 6)
             .background(Color.green)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            if let celebration = buyInCelebration {
+                watchAmountFullscreenCelebrationView(
+                    celebration,
+                    onDismiss: { buyInCelebration = nil }
+                )
+                .transition(.opacity)
+                .zIndex(2)
+            }
         }
+        .animation(buyInMotionOK ? .easeOut(duration: 0.22) : nil, value: buyInCelebration)
         .focusable(true)
         .digitalCrownRotation(
             $amount,
@@ -1132,6 +1270,7 @@ private struct WatchAddBuyInSheet: View {
             Button("Yes") {
                 let selected = selectedAmount
                 let immediate = SessionSyncManager.shared.isReachable
+                pendingBuyInBaselineTotal = currentTotalBuyIn
                 pendingExpectedTotal = currentTotalBuyIn + selected
                 store.addBuyIn(selected)
                 statusMessage = immediate ? "Buy-in sent" : "Buy-in queued"
@@ -1139,17 +1278,31 @@ private struct WatchAddBuyInSheet: View {
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
             }
         } message: {
-            Text("Add buy-in?\n\n\(buyInConfirmationSummary)")
+            Text("\n\(buyInConfirmationSummary)")
         }
         .onChange(of: store.liveSession?.totalBuyIn) { newTotal in
             guard let expected = pendingExpectedTotal, let newTotal else { return }
             guard newTotal >= expected else { return }
             pendingExpectedTotal = nil
+            let baseline = pendingBuyInBaselineTotal ?? newTotal
+            pendingBuyInBaselineTotal = nil
+            let added = max(0, newTotal - baseline)
             statusMessage = "Buy-in updated on iPhone"
             statusColor = .green
             playSuccessHaptic()
             if buyInMotionOK {
                 addOnChipNudge += 1
+            }
+            buyInCelebration = WatchAmountFullscreenCelebration(
+                emoji: emojiForBuyInAmount(added),
+                title: "Buy-in added",
+                primaryValue: "$\(newTotal)",
+                caption: added > 0 ? "+$\(added) this add" : nil,
+                gradientColors: [Color.green.opacity(0.5), Color.black.opacity(0.94)]
+            )
+            let dismissDelay: TimeInterval = buyInMotionOK ? 2.2 : 1.6
+            DispatchQueue.main.asyncAfter(deadline: .now() + dismissDelay) {
+                buyInCelebration = nil
             }
         }
         .onAppear {
@@ -1220,7 +1373,8 @@ private struct WatchUpdateStackSheet: View {
     @State private var pendingExpectedStack: Int?
     @State private var showConfirmUpdate = false
     @State private var stackChipNudge = 0
-    @State private var stackWinConfettiBurst = 0
+    @State private var stackRainPlayToken = 0
+    @State private var stackAmountCelebration: WatchAmountFullscreenCelebration?
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
 
     private var stackMotionOK: Bool {
@@ -1260,8 +1414,6 @@ private struct WatchUpdateStackSheet: View {
 
     var body: some View {
         ZStack {
-            StackWinConfettiBurst(burstID: stackWinConfettiBurst, enabled: stackMotionOK)
-                .allowsHitTesting(false)
             Form {
             if let statusMessage {
                 Text(statusMessage)
@@ -1299,7 +1451,17 @@ private struct WatchUpdateStackSheet: View {
             .background(Color.teal)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
+            WatchRainingCoinsOverlay(playToken: stackRainPlayToken, enabled: stackMotionOK)
+            if let celebration = stackAmountCelebration {
+                watchAmountFullscreenCelebrationView(
+                    celebration,
+                    onDismiss: { stackAmountCelebration = nil }
+                )
+                .transition(.opacity)
+                .zIndex(3)
+            }
         }
+        .animation(stackMotionOK ? .easeOut(duration: 0.22) : nil, value: stackAmountCelebration)
         .focusable(true)
         .digitalCrownRotation(
             $amount,
@@ -1337,11 +1499,34 @@ private struct WatchUpdateStackSheet: View {
                 stackChipNudge += 1
             }
             if wl > 0, stackMotionOK {
-                stackWinConfettiBurst += 1
+                stackRainPlayToken += 1
+            }
+            let caption: String
+            let gradient: [Color]
+            if wl > 0 {
+                caption = "Up $\(wl) vs buy-in"
+                gradient = [Color.green.opacity(0.48), Color.black.opacity(0.94)]
+            } else if wl < 0 {
+                caption = "Down $\(abs(wl)) vs buy-in"
+                gradient = [Color.orange.opacity(0.42), Color.black.opacity(0.94)]
+            } else {
+                caption = "Even with buy-in"
+                gradient = [Color.teal.opacity(0.45), Color.black.opacity(0.94)]
+            }
+            stackAmountCelebration = WatchAmountFullscreenCelebration(
+                emoji: emojiForStackSessionResult(winLoss: wl),
+                title: "Stack updated",
+                primaryValue: "$\(newVal)",
+                caption: caption,
+                gradientColors: gradient
+            )
+            let dismissDelay: TimeInterval = stackMotionOK ? 2.2 : 1.6
+            DispatchQueue.main.asyncAfter(deadline: .now() + dismissDelay) {
+                stackAmountCelebration = nil
             }
         }
         .onAppear {
-            let seed = store.liveSession?.liveTrackedStackAmount ?? store.liveSession?.totalBuyIn ?? 100
+            let seed = store.liveSession?.resolvedLiveStackAmount ?? 100
             let s = max(0, seed)
             amount = Double(s)
             customAmountText = s > 0 ? "\(s)" : "100"
@@ -1401,6 +1586,12 @@ private struct WatchUpdateStackSheet: View {
 }
 
 private struct WatchAddCompSheet: View {
+    private struct AddedCompCelebration: Equatable {
+        var title: String
+        var emoji: String
+        var newCompTotal: Int
+    }
+
     @EnvironmentObject var store: SessionStore
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
@@ -1414,7 +1605,7 @@ private struct WatchAddCompSheet: View {
     @State private var pendingExpectedCompTotal: Int?
     @State private var showConfirmAdd = false
     @State private var compCelebrationToken = 0
-    @State private var foodToastText: String?
+    @State private var addedCompCelebration: AddedCompCelebration?
     @State private var categoryWobbleDegrees: Double = 0
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
     private let contextGridColumns: [GridItem] = [GridItem(.flexible()), GridItem(.flexible())]
@@ -1484,7 +1675,8 @@ private struct WatchAddCompSheet: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack {
+            ZStack(alignment: .top) {
             Form {
             if let statusMessage {
                 Text(statusMessage)
@@ -1605,18 +1797,14 @@ private struct WatchAddCompSheet: View {
             .background(Color.green)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            if compMotionOK, let toast = foodToastText {
-                Text(toast)
-                    .font(.caption2.bold())
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Capsule().fill(Color.cyan.opacity(0.92)))
-                    .padding(.top, 4)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            if let celebration = addedCompCelebration {
+                addedCompFullscreenCelebration(celebration)
+                    .transition(.opacity)
+                    .zIndex(2)
             }
         }
-        .animation(compMotionOK ? .spring(response: 0.35, dampingFraction: 0.82) : nil, value: foodToastText)
+        .animation(compMotionOK ? .easeOut(duration: 0.22) : nil, value: addedCompCelebration)
         .focusable(true)
         .digitalCrownRotation(
             $amount,
@@ -1656,17 +1844,29 @@ private struct WatchAddCompSheet: View {
                 statusMessage = immediate ? "Comp sent" : "Comp queued"
                 statusColor = immediate ? .green : .orange
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
-                if compMotionOK, mode == .foodBeverage {
-                    let label = compContextLabel
-                    foodToastText = label
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.65) {
-                        foodToastText = nil
-                    }
+                let celebrationTitle: String
+                let celebrationEmoji: String
+                switch mode {
+                case .foodBeverage:
+                    celebrationTitle = compContextLabel
+                    celebrationEmoji = emojiForCompLabel(compContextLabel)
+                case .cashValue:
+                    celebrationTitle = trimmed.isEmpty ? "Cash Value" : trimmed
+                    celebrationEmoji = trimmed.isEmpty ? "💵" : fallbackCashEmojiIfGeneric(emojiForCompLabel(trimmed))
+                }
+                let newCompTotal = currentCompTotal + selected
+                addedCompCelebration = AddedCompCelebration(
+                    title: celebrationTitle,
+                    emoji: celebrationEmoji,
+                    newCompTotal: newCompTotal
+                )
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    addedCompCelebration = nil
                 }
                 details = ""
             }
         } message: {
-            Text("Add comp?\n\n\(compConfirmationSummary)")
+            Text("\n\(compConfirmationSummary)")
         }
         .onChange(of: store.liveSession?.totalComp) { newTotal in
             guard let expected = pendingExpectedCompTotal, let newTotal else { return }
@@ -1746,6 +1946,82 @@ private struct WatchAddCompSheet: View {
         return .other
     }
 
+    /// Keyword-based emoji for comp category or freeform context (e.g. cocktail → martini glass).
+    private func emojiForCompLabel(_ label: String) -> String {
+        let n = label.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if n.contains("cocktail") || n.contains("martini") { return "🍸" }
+        if n.contains("beer") || n.contains("ale") || n.contains("lager") { return "🍺" }
+        if n.contains("wine") { return "🍷" }
+        if n.contains("champagne") || n.contains("sparkling") { return "🍾" }
+        if n.contains("coffee") || n.contains("espresso") { return "☕" }
+        if n.contains("tea") { return "🍵" }
+        if n.contains("whiskey") || n.contains("whisky") || n.contains("bourbon") || n.contains("scotch") {
+            return "🥃"
+        }
+        if n.contains("pizza") { return "🍕" }
+        if n.contains("burger") { return "🍔" }
+        if n.contains("sushi") { return "🍣" }
+        if n.contains("dessert") || n.contains("cake") || n.contains("sweet") { return "🍰" }
+        if n.contains("food") || n.contains("meal") || n.contains("dinner") || n.contains("lunch")
+            || n.contains("breakfast") || n.contains("snack")
+        {
+            return "🍽️"
+        }
+        if n.contains("drink") || n.contains("beverage") || n.contains("soda") || n.contains("juice") {
+            return "🥤"
+        }
+        if n.contains("cash") || n.contains("credit") || n.contains("money") || n.contains("chip") {
+            return "💵"
+        }
+        return "🎁"
+    }
+
+    private func fallbackCashEmojiIfGeneric(_ emoji: String) -> String {
+        emoji == "🎁" ? "💵" : emoji
+    }
+
+    @ViewBuilder
+    private func addedCompFullscreenCelebration(_ celebration: AddedCompCelebration) -> some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color.cyan.opacity(0.42), Color.black.opacity(0.94)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            VStack(spacing: 8) {
+                Text(celebration.emoji)
+                    .font(.system(size: 44))
+                    .accessibilityHidden(true)
+                Text(celebration.title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.75)
+                Text("$\(celebration.newCompTotal)")
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+                    .minimumScaleFactor(0.65)
+                    .lineLimit(1)
+                Text("comps total")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.78))
+            }
+            .padding(.horizontal, 6)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                "Comp added, \(celebration.title), new comps total \(celebration.newCompTotal) dollars"
+            )
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            addedCompCelebration = nil
+        }
+    }
+
     private func playSuccessHaptic() {
         #if os(watchOS)
         WKInterfaceDevice.current().play(.success)
@@ -1805,6 +2081,8 @@ private struct WatchUpdateTierSheet: View {
     @State private var pendingTierPoints: Int?
     @State private var showConfirmUpdateTier = false
     @State private var tierLadderPulse = 0
+    @State private var tierRainPlayToken = 0
+    @State private var tierBaselineAtSend: Int?
 
     private var tierMotionOK: Bool {
         tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
@@ -1825,7 +2103,8 @@ private struct WatchUpdateTierSheet: View {
     }
 
     var body: some View {
-        Form {
+        ZStack {
+            Form {
             if let statusMessage {
                 Text(statusMessage)
                     .font(.caption2.bold())
@@ -1881,6 +2160,8 @@ private struct WatchUpdateTierSheet: View {
             .padding(.vertical, 6)
             .background(Color.green)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            WatchRainingCoinsOverlay(playToken: tierRainPlayToken, enabled: tierMotionOK)
         }
         .focusable(true)
         .digitalCrownRotation(
@@ -1897,6 +2178,7 @@ private struct WatchUpdateTierSheet: View {
             Button("No", role: .cancel) {}
             Button("Yes") {
                 let selected = proposedTierPoints
+                tierBaselineAtSend = store.liveSession?.startingTierPoints ?? 0
                 let immediate = SessionSyncManager.shared.isReachable
                 pendingTierPoints = selected
                 store.updateLiveSessionStartingTier(selected)
@@ -1911,10 +2193,14 @@ private struct WatchUpdateTierSheet: View {
             pointsDelta = 0
             customTierDeltaText = "0"
         }
-        .onChange(of: store.liveSession?.startingTierPoints) { newPoints in
+        .onChange(of: store.liveSession?.startingTierPoints) { _, newPoints in
             guard let expected = pendingTierPoints, let newPoints else { return }
             guard newPoints == expected else { return }
             pendingTierPoints = nil
+            if tierMotionOK, let baseline = tierBaselineAtSend, newPoints > baseline {
+                tierRainPlayToken += 1
+            }
+            tierBaselineAtSend = nil
             statusMessage = "Tier updated on iPhone"
             statusColor = .green
             playSuccessHaptic()
