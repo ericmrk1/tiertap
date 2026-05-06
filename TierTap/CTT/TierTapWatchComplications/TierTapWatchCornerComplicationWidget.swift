@@ -26,6 +26,10 @@ private struct TierTapLiveSessionSnapshot: Codable {
         guard let stack = liveTrackedStackAmount else { return nil }
         return stack - totalBuyIn
     }
+
+    var resolvedStackAmount: Int {
+        liveTrackedStackAmount ?? totalBuyIn
+    }
 }
 
 private struct TierTapWatchComplicationProvider: TimelineProvider {
@@ -77,21 +81,95 @@ private struct TierTapWatchComplicationProvider: TimelineProvider {
     }
 }
 
+private enum TierTapComplicationFocus {
+    case liveResult
+    case stackSize
+    case stackAndWinLoss
+    case buyIn
+
+    var kind: String {
+        switch self {
+        case .liveResult: return "TierTapWatchCornerComplication"
+        case .stackSize: return "TierTapWatchStackComplication"
+        case .stackAndWinLoss: return "TierTapWatchStackWinLossComplication"
+        case .buyIn: return "TierTapWatchBuyInComplication"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .liveResult: return "TierTap Live"
+        case .stackSize: return "TierTap Stack"
+        case .stackAndWinLoss: return "TierTap Stack + W/L"
+        case .buyIn: return "TierTap Buy-in"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .liveResult: return "Live timer and running result for watch faces."
+        case .stackSize: return "Shows live stack size as the primary value."
+        case .stackAndWinLoss: return "Shows stack size and running win/loss."
+        case .buyIn: return "Shows live total buy-in as the primary value."
+        }
+    }
+}
+
 struct TierTapWatchCornerComplicationWidget: Widget {
-    private let kind = "TierTapWatchCornerComplication"
+    private let focus: TierTapComplicationFocus = .liveResult
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: TierTapWatchComplicationProvider()) { entry in
-            TierTapWatchCornerComplicationView(entry: entry)
+        StaticConfiguration(kind: focus.kind, provider: TierTapWatchComplicationProvider()) { entry in
+            TierTapWatchCornerComplicationView(entry: entry, focus: focus)
         }
-        .configurationDisplayName("TierTap Live")
-        .description("Live timer and running result for watch faces.")
+        .configurationDisplayName(focus.displayName)
+        .description(focus.description)
+        .supportedFamilies([.accessoryInline, .accessoryCircular, .accessoryRectangular, .accessoryCorner])
+    }
+}
+
+struct TierTapWatchStackComplicationWidget: Widget {
+    private let focus: TierTapComplicationFocus = .stackSize
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: focus.kind, provider: TierTapWatchComplicationProvider()) { entry in
+            TierTapWatchCornerComplicationView(entry: entry, focus: focus)
+        }
+        .configurationDisplayName(focus.displayName)
+        .description(focus.description)
+        .supportedFamilies([.accessoryInline, .accessoryCircular, .accessoryRectangular, .accessoryCorner])
+    }
+}
+
+struct TierTapWatchStackWinLossComplicationWidget: Widget {
+    private let focus: TierTapComplicationFocus = .stackAndWinLoss
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: focus.kind, provider: TierTapWatchComplicationProvider()) { entry in
+            TierTapWatchCornerComplicationView(entry: entry, focus: focus)
+        }
+        .configurationDisplayName(focus.displayName)
+        .description(focus.description)
+        .supportedFamilies([.accessoryInline, .accessoryCircular, .accessoryRectangular, .accessoryCorner])
+    }
+}
+
+struct TierTapWatchBuyInComplicationWidget: Widget {
+    private let focus: TierTapComplicationFocus = .buyIn
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: focus.kind, provider: TierTapWatchComplicationProvider()) { entry in
+            TierTapWatchCornerComplicationView(entry: entry, focus: focus)
+        }
+        .configurationDisplayName(focus.displayName)
+        .description(focus.description)
         .supportedFamilies([.accessoryInline, .accessoryCircular, .accessoryRectangular, .accessoryCorner])
     }
 }
 
 private struct TierTapWatchCornerComplicationView: View {
     let entry: TierTapWatchComplicationEntry
+    let focus: TierTapComplicationFocus
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
@@ -100,37 +178,44 @@ private struct TierTapWatchCornerComplicationView: View {
         let start = snap?.startTime ?? entry.date
         let running = snap?.runningWinLoss
         let buyIn = snap?.totalBuyIn ?? 0
+        let stack = snap?.resolvedStackAmount ?? 0
+        let primary = primaryText(running: running, buyIn: buyIn, stack: stack)
+        let secondary = secondaryText(start: start, running: running)
 
         Group {
             if isLive {
                 switch family {
                 case .accessoryCorner:
-                    Text(money(running))
+                    Text(primary)
                         .widgetLabel {
-                            Text(start, style: .timer)
+                            Text(secondary)
                         }
                 case .accessoryInline:
-                    Text("TierTap \(money(running)) \(start, style: .timer)")
+                    Text("TierTap \(primary) \(secondary)")
                 case .accessoryCircular:
                     ZStack {
                         AccessoryWidgetBackground()
                         VStack(spacing: 1) {
-                            Text(start, style: .timer)
-                                .font(.system(.caption2, design: .monospaced))
-                                .monospacedDigit()
-                            Text(money(running))
+                            Text(primary)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                            Text(shortSecondaryText(start: start, running: running))
                                 .font(.system(size: 10, weight: .bold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                         }
                     }
                 default:
                     VStack(alignment: .leading, spacing: 2) {
                         Text("TierTap")
                             .font(.caption2.weight(.semibold))
-                        Text(start, style: .timer)
-                            .font(.system(.caption2, design: .monospaced))
-                            .monospacedDigit()
-                        Text("Buy-in $\(buyIn)  \(money(running))")
+                        Text(primary)
+                            .font(.caption2.weight(.bold))
+                            .lineLimit(1)
+                        Text(secondary)
                             .font(.caption2)
+                            .lineLimit(1)
                     }
                 }
             } else {
@@ -152,6 +237,48 @@ private struct TierTapWatchCornerComplicationView: View {
             }
         }
         .widgetURL(URL(string: isLive ? "com.app.tiertap://watch/live" : "com.app.tiertap://watch"))
+    }
+
+    private func primaryText(running: Int?, buyIn: Int, stack: Int) -> String {
+        switch focus {
+        case .liveResult:
+            return money(running)
+        case .stackSize:
+            return "$\(stack)"
+        case .stackAndWinLoss:
+            return "$\(stack) \(money(running))"
+        case .buyIn:
+            return "$\(buyIn)"
+        }
+    }
+
+    private func secondaryText(start: Date, running: Int?) -> String {
+        switch focus {
+        case .liveResult:
+            return timerText(start)
+        case .stackSize:
+            return timerText(start)
+        case .stackAndWinLoss:
+            return timerText(start)
+        case .buyIn:
+            return money(running)
+        }
+    }
+
+    private func shortSecondaryText(start: Date, running: Int?) -> String {
+        switch focus {
+        case .buyIn:
+            return money(running)
+        default:
+            return timerText(start)
+        }
+    }
+
+    private func timerText(_ start: Date) -> String {
+        let elapsed = max(0, Int(Date().timeIntervalSince(start)))
+        let h = elapsed / 3600
+        let m = (elapsed % 3600) / 60
+        return h > 0 ? String(format: "%02dh %02dm", h, m) : String(format: "%02dm", m)
     }
 
     private func money(_ amount: Int?) -> String {

@@ -5,5 +5,8 @@ import SwiftUI
 struct TierTapWatchComplicationsBundle: WidgetBundle {
     var body: some Widget {
         TierTapWatchCornerComplicationWidget()
+        TierTapWatchStackComplicationWidget()
+        TierTapWatchStackWinLossComplicationWidget()
+        TierTapWatchBuyInComplicationWidget()
     }
 }

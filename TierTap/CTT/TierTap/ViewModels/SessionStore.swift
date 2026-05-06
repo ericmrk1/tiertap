@@ -947,6 +947,9 @@ class SessionStore: ObservableObject {
     private func reloadTierTapComplicationTimelines() {
         #if canImport(WidgetKit)
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchCornerComplication")
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchStackComplication")
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchStackWinLossComplication")
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchBuyInComplication")
         #endif
     }
 
