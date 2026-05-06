@@ -25,6 +25,10 @@
 		2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
+		AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */; };
+		AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */; };
+		AA0000000000000000000003 /* TierTapWatchComplications.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000035 /* TierTapWatchComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA0000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */; };
 		5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282155DBCB51F96C8840E98B /* SessionDetailView.swift */; };
@@ -131,6 +135,13 @@
 			remoteGlobalIDString = WCHJ1B2C3D4E5F6A7B8C9D0;
 			remoteInfo = "TierTap Watch App";
 		};
+		AA0000000000000000000010 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07F404DF93F9889DBB33E522 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0000000000000000000060;
+			remoteInfo = TierTapWatchComplications;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -143,6 +154,17 @@
 				667E48382A9F58F593FD6471 /* CasinoTimerWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000020 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA0000000000000000000003 /* TierTapWatchComplications.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -158,6 +180,12 @@
 		2E1876452FA0036A009D42A3 /* TierTapRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapRelease.entitlements; sourceTree = "<group>"; };
 		2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTap.entitlements; sourceTree = "<group>"; };
 		2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch App.entitlements"; sourceTree = "<group>"; };
+		AA0000000000000000000030 /* TierTapWatchComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplications.entitlements; sourceTree = "<group>"; };
+		AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplicationsRelease.entitlements; sourceTree = "<group>"; };
+		AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchComplicationsBundle.swift; sourceTree = "<group>"; };
+		AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchCornerComplicationWidget.swift; sourceTree = "<group>"; };
+		AA0000000000000000000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000035 /* TierTapWatchComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TierTapWatchComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCalendarView.swift; sourceTree = "<group>"; };
 		2E255D0E2F5FC0FB00CAF0D7 /* Sensitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensitive.swift; sourceTree = "<group>"; };
 		2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = boodoodaloop.wav; sourceTree = "<group>"; };
@@ -286,6 +314,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0000000000000000000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -296,6 +331,7 @@
 				F83566B140DB1139A064E7D0 /* TierTap */,
 				884F94035CBDFFAC738CD223 /* CasinoTimerWidget */,
 				WCHF1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */,
+				AA0000000000000000000050 /* TierTapWatchComplications */,
 				7BB2D6A268E0AEBFFAF0C87B /* Products */,
 				2E255C1A2F5E726A00CAF0D7 /* Recovered References */,
 				2E255D282F61F5D300CAF0D7 /* Sounds */,
@@ -398,6 +434,7 @@
 				50E24F578992717D666E68F1 /* TierTap.app */,
 				6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */,
 				WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */,
+				AA0000000000000000000035 /* TierTapWatchComplications.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -516,6 +553,18 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		AA0000000000000000000050 /* TierTapWatchComplications */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */,
+				AA0000000000000000000030 /* TierTapWatchComplications.entitlements */,
+				AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */,
+				AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */,
+				AA0000000000000000000034 /* Info.plist */,
+			);
+			path = TierTapWatchComplications;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -571,15 +620,34 @@
 				WCHM1B2C3D4E5F6A7B8C9D0 /* Sources */,
 				WCHN1B2C3D4E5F6A7B8C9D0 /* Frameworks */,
 				WCHO1B2C3D4E5F6A7B8C9D0 /* Resources */,
+				AA0000000000000000000020 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA0000000000000000000090 /* PBXTargetDependency */,
 			);
 			name = "TierTap Watch App";
 			productName = "TierTap Watch App";
 			productReference = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AA0000000000000000000060 /* TierTapWatchComplications */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00000000000000000000B0 /* Build configuration list for PBXNativeTarget "TierTapWatchComplications" */;
+			buildPhases = (
+				AA0000000000000000000080 /* Sources */,
+				AA0000000000000000000040 /* Frameworks */,
+				AA0000000000000000000070 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TierTapWatchComplications;
+			productName = TierTapWatchComplications;
+			productReference = AA0000000000000000000035 /* TierTapWatchComplications.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -595,6 +663,9 @@
 						CreatedOnToolsVersion = 15.3;
 					};
 					F72D60A227DE777C5EC16A58 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					AA0000000000000000000060 = {
 						CreatedOnToolsVersion = 15.3;
 					};
 				};
@@ -628,6 +699,7 @@
 				F72D60A227DE777C5EC16A58 /* TierTap */,
 				03F1CD5F275B834E8C24AFB1 /* CasinoTimerWidget */,
 				WCHJ1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */,
+				AA0000000000000000000060 /* TierTapWatchComplications */,
 			);
 		};
 /* End PBXProject section */
@@ -665,6 +737,14 @@
 			files = (
 				WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */,
 				L10NB4E2F3A4B5C6D7E8F9A0B1 /* Strings.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000070 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000004 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -823,6 +903,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0000000000000000000080 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */,
+				AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -835,6 +924,11 @@
 			isa = PBXTargetDependency;
 			target = WCHJ1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */;
 			targetProxy = WCHI1B2C3D4E5F6A7B8C9D0 /* PBXContainerItemProxy */;
+		};
+		AA0000000000000000000090 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0000000000000000000060 /* TierTapWatchComplications */;
+			targetProxy = AA0000000000000000000010 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1135,6 +1229,50 @@
 			};
 			name = Release;
 		};
+		AA00000000000000000000A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplications.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AA00000000000000000000A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplicationsRelease.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1170,6 +1308,15 @@
 			buildConfigurations = (
 				WCHP1B2C3D4E5F6A7B8C9D0 /* Debug */,
 				WCHQ1B2C3D4E5F6A7B8C9D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00000000000000000000B0 /* Build configuration list for PBXNativeTarget "TierTapWatchComplications" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00000000000000000000A0 /* Debug */,
+				AA00000000000000000000A1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
