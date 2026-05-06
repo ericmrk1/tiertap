@@ -3,6 +3,9 @@ import Combine
 #if os(iOS) || os(watchOS)
 import UserNotifications
 #endif
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 /// Shown app-wide after closeout when ending tier points changed for a session linked to a wallet card.
 struct WalletTierCloseoutToast: Equatable {
@@ -927,14 +930,25 @@ class SessionStore: ObservableObject {
         #if os(iOS)
         SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
         #endif
+        reloadTierTapComplicationTimelines()
     }
     private func saveLive() {
         if let d = try? JSONEncoder().encode(liveSession) { defaults.set(d, forKey: liveKey) }
         #if os(iOS)
         SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
         #endif
+        reloadTierTapComplicationTimelines()
     }
-    private func clearLive() { defaults.removeObject(forKey: liveKey) }
+    private func clearLive() {
+        defaults.removeObject(forKey: liveKey)
+        reloadTierTapComplicationTimelines()
+    }
+
+    private func reloadTierTapComplicationTimelines() {
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchCornerComplication")
+        #endif
+    }
 
     // MARK: - Defaults / Helpers
 

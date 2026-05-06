@@ -31,6 +31,7 @@ private struct TierTapLiveSessionSnapshot: Codable {
 private struct TierTapWatchComplicationProvider: TimelineProvider {
     private let appGroupSuiteName = "group.com.app.tiertap"
     private let liveSnapshotKey = "ctt_wc_live_snapshot"
+    private let watchLiveKey = "ctt_live_v2"
 
     func placeholder(in context: Context) -> TierTapWatchComplicationEntry {
         TierTapWatchComplicationEntry(
@@ -57,12 +58,22 @@ private struct TierTapWatchComplicationProvider: TimelineProvider {
     }
 
     private func loadLiveSnapshot() -> TierTapLiveSessionSnapshot? {
-        guard let defaults = UserDefaults(suiteName: appGroupSuiteName),
-              let data = defaults.data(forKey: liveSnapshotKey),
-              !data.isEmpty else {
-            return nil
+        guard let defaults = UserDefaults(suiteName: appGroupSuiteName) else { return nil }
+
+        if let data = defaults.data(forKey: liveSnapshotKey),
+           !data.isEmpty,
+           let snap = try? JSONDecoder().decode(TierTapLiveSessionSnapshot.self, from: data) {
+            return snap
         }
-        return try? JSONDecoder().decode(TierTapLiveSessionSnapshot.self, from: data)
+
+        // Fallback for watch-originated updates persisted locally by SessionStore.
+        if let data = defaults.data(forKey: watchLiveKey),
+           !data.isEmpty,
+           let snap = try? JSONDecoder().decode(TierTapLiveSessionSnapshot.self, from: data) {
+            return snap
+        }
+
+        return nil
     }
 }
 
