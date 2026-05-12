@@ -1,6 +1,15 @@
 import SwiftUI
+import Charts
+import StoreKit
 
 struct SettingsView: View {
+    private enum TokensChartMetric: Int, CaseIterable, Identifiable {
+        case sessionsPerDay
+        case tokensPerDay
+        case aiFeaturesPerDay
+        var id: Int { rawValue }
+    }
+
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
@@ -20,12 +29,15 @@ struct SettingsView: View {
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
     @State private var isTierTapAIExpanded: Bool = false
-    @State private var isAccountExpanded: Bool = true
+    @State private var isTokensExpanded: Bool = false
+    @State private var tokensChartMetric: TokensChartMetric = .sessionsPerDay
+    @State private var isAccountExpanded: Bool = false
     @State private var isPresentingShareSheet: Bool = false
     @State private var isShowingGamePicker: Bool = false
     @State private var isShowingSlotGamePicker: Bool = false
     @State private var isShowingCasinoPicker: Bool = false
     @State private var isShowingSubscriptionPaywall: Bool = false
+    @State private var isPurchasingCreditsPack: Bool = false
     @State private var exportFileURL: URL?
     @State private var isExporting: Bool = false
     @State private var exportErrorMessage: String?
@@ -33,7 +45,6 @@ struct SettingsView: View {
     @State private var gamePickerSelection: String = ""
     @State private var slotGamePickerSelection: String = ""
     @State private var casinoPickerSelection: String = ""
-    @State private var subscriptionOverrideText: String = ""
     @State private var exportGameCategory: SessionGameCategory = .table
     @State private var showDenominationDialPad = false
     @State private var denominationDialPadDraft = ""
@@ -47,13 +58,14 @@ struct SettingsView: View {
                     VStack(spacing: 24) {
                         aboutSection
                         accountSection
+                        tierTapAISection
+                        tokensSection
                         bankrollSection
                         riskOfRuinSection
                         favoritesSection
                         sessionsSection
                         themeSection
                         watchExperienceSection
-                        tierTapAISection
                         dataExportSection
                     }
                     .padding()
@@ -74,7 +86,6 @@ struct SettingsView: View {
                 denominationsText = settingsStore.commonDenominations.map { "\($0)" }.joined(separator: ", ")
                 primaryColorSelection = settingsStore.primaryColor
                 secondaryColorSelection = settingsStore.secondaryColor
-                subscriptionOverrideText = settingsStore.subscriptionOverrideCode
                 exportGameCategory = settingsStore.defaultGameCategory
             }
             .onChange(of: gamePickerSelection) { new in
@@ -347,6 +358,283 @@ struct SettingsView: View {
         }
     }
 
+    private var tokensSection: some View {
+        SettingsSection(
+            title: "TierTap Plus",
+            useTierTapPlusBrandTitle: true,
+            systemImage: "chart.bar.fill",
+            isExpanded: $isTokensExpanded
+        ) {
+            VStack(alignment: .leading, spacing: 12) {
+                tierTapPlusPurchaseRow
+
+                Picker("Chart metric", selection: $tokensChartMetric) {
+                    Text(L10n.tr("Sessions", language: settingsStore.appLanguage)).tag(TokensChartMetric.sessionsPerDay)
+                    Text(L10n.tr("Tokens", language: settingsStore.appLanguage)).tag(TokensChartMetric.tokensPerDay)
+                    Text(L10n.tr("TierTap AI", language: settingsStore.appLanguage)).tag(TokensChartMetric.aiFeaturesPerDay)
+                }
+                .pickerStyle(.segmented)
+
+                Text(tokensChartMonthTitle())
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+
+                Chart {
+                    ForEach(tokensChartDayRows(for: tokensChartMetric)) { row in
+                        if tokensChartMetric == .tokensPerDay && row.plusPurchased > 0 {
+                            BarMark(
+                                x: .value("Day", row.day),
+                                y: .value("API", row.value)
+                            )
+                            .foregroundStyle(Color.green.opacity(0.85))
+                            BarMark(
+                                x: .value("Day", row.day),
+                                y: .value("Plus", row.plusPurchased)
+                            )
+                            .foregroundStyle(Color.cyan.opacity(0.88))
+                        } else {
+                            BarMark(
+                                x: .value("Day", row.day),
+                                y: .value("Value", row.value)
+                            )
+                            .foregroundStyle(Color.green.opacity(0.85))
+                        }
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(
+                        values: tokensChartDayRows(for: tokensChartMetric)
+                            .map(\.day)
+                            .filter { $0.isMultiple(of: 5) }
+                    ) { axisValue in
+                        AxisGridLine()
+                        AxisTick()
+                        AxisValueLabel {
+                            if let day = axisValue.as(Int.self) {
+                                Text("\(day)")
+                            }
+                        }
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading)
+                }
+                .frame(height: 200)
+
+                if tokensChartMetric == .tokensPerDay {
+                    HStack(spacing: 12) {
+                        HStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color.green.opacity(0.85))
+                                .frame(width: 10, height: 10)
+                            L10nText("API tokens used")
+                                .font(.caption2)
+                                .foregroundColor(.white.opacity(0.85))
+                        }
+                        HStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 2)
+                                .fill(Color.cyan.opacity(0.88))
+                                .frame(width: 10, height: 10)
+                            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                                TierTapPlusMark(
+                                    font: .caption2,
+                                    weight: .medium,
+                                    foreground: .white.opacity(0.85),
+                                    accessibilitySummarySuppressed: true
+                                )
+                                Text(L10n.tr("purchased", language: settingsStore.appLanguage))
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.85))
+                            }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(L10n.tr("TierTap Plus purchased", language: settingsStore.appLanguage))
+                        }
+                    }
+                    .padding(.top, 2)
+                }
+
+                tokensMetricTotalsFooter(metric: tokensChartMetric)
+            }
+        }
+    }
+
+    private func tokensChartMonthTitle() -> String {
+        let cal = Calendar.current
+        let df = DateFormatter()
+        df.locale = settingsStore.appLanguage.locale
+        df.setLocalizedDateFormatFromTemplate("MMMM yyyy")
+        return df.string(from: Date())
+    }
+
+    private func tokensIntegerString(_ value: Int) -> String {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.locale = settingsStore.appLanguage.locale
+        return f.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    /// Single-day value for the Tokens charts (must match sum across a month for totals).
+    private func tokensDailyValue(for metric: TokensChartMetric, on dayStart: Date, calendar: Calendar) -> Int {
+        let sod = calendar.startOfDay(for: dayStart)
+        let key = SettingsStore.telemetryDayKey(for: sod, calendar: calendar)
+        switch metric {
+        case .sessionsPerDay:
+            return sessionStore.sessions.filter { calendar.isDate($0.startTime, inSameDayAs: sod) }.count
+        case .tokensPerDay:
+            return settingsStore.aiDayTelemetry[key]?.tokens ?? 0
+        case .aiFeaturesPerDay:
+            return settingsStore.aiDayTelemetry[key]?.aiFeaturesUsed ?? 0
+        }
+    }
+
+    /// Sum of daily values for every day in the calendar month containing `reference`.
+    private func tokensMetricMonthTotal(_ metric: TokensChartMetric, monthContaining reference: Date) -> Int {
+        let cal = Calendar.current
+        guard let interval = cal.dateInterval(of: .month, for: reference) else { return 0 }
+        var sum = 0
+        var d = cal.startOfDay(for: interval.start)
+        let end = interval.end
+        while d < end {
+            sum += tokensDailyValue(for: metric, on: d, calendar: cal)
+            guard let next = cal.date(byAdding: .day, value: 1, to: d) else { break }
+            d = next
+        }
+        return sum
+    }
+
+    /// Sum of ``AIDayTelemetry/plusTokensPurchased`` for each day in the calendar month containing `reference`.
+    private func tokensPlusPurchasedMonthTotal(monthContaining reference: Date) -> Int {
+        let cal = Calendar.current
+        guard let interval = cal.dateInterval(of: .month, for: reference) else { return 0 }
+        var sum = 0
+        var d = cal.startOfDay(for: interval.start)
+        let end = interval.end
+        while d < end {
+            let key = SettingsStore.telemetryDayKey(for: d, calendar: cal)
+            sum += settingsStore.aiDayTelemetry[key]?.plusTokensPurchased ?? 0
+            guard let next = cal.date(byAdding: .day, value: 1, to: d) else { break }
+            d = next
+        }
+        return sum
+    }
+
+    @ViewBuilder
+    private func tokensMetricTotalsFooter(metric: TokensChartMetric) -> some View {
+        let now = Date()
+        let cal = Calendar.current
+        let currentTotal = tokensMetricMonthTotal(metric, monthContaining: now)
+        let prevAnchor = cal.date(byAdding: .month, value: -1, to: now) ?? now
+        let previousTotal = tokensMetricMonthTotal(metric, monthContaining: prevAnchor)
+        let momText = tokensMonthOverMonthLabel(current: currentTotal, previous: previousTotal)
+
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                L10nText("This month (total)")
+                    .foregroundColor(.white.opacity(0.9))
+                Spacer()
+                Text(tokensMetricTotalCaption(metric: metric, total: currentTotal))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+            }
+            .font(.subheadline)
+
+            HStack {
+                L10nText("Previous month (total)")
+                    .foregroundColor(.white.opacity(0.9))
+                Spacer()
+                Text(tokensMetricTotalCaption(metric: metric, total: previousTotal))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white.opacity(0.95))
+            }
+            .font(.subheadline)
+
+            HStack {
+                L10nText("MoM change")
+                    .foregroundColor(.white.opacity(0.9))
+                Spacer()
+                Text(momText.text)
+                    .fontWeight(.semibold)
+                    .foregroundColor(momText.color)
+            }
+            .font(.subheadline)
+
+            if metric == .tokensPerDay {
+                let curPlus = tokensPlusPurchasedMonthTotal(monthContaining: now)
+                let prevPlus = tokensPlusPurchasedMonthTotal(monthContaining: prevAnchor)
+                HStack {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        TierTapPlusMark(
+                            font: .subheadline,
+                            weight: .semibold,
+                            foreground: .white.opacity(0.9),
+                            accessibilitySummarySuppressed: true
+                        )
+                        Text(L10n.tr("tokens purchased", language: settingsStore.appLanguage))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(L10n.tr("TierTap Plus tokens purchased", language: settingsStore.appLanguage))
+                    Spacer()
+                    Text(tokensIntegerString(curPlus))
+                        .fontWeight(.semibold)
+                        .foregroundColor(.cyan.opacity(0.95))
+                }
+                .font(.subheadline)
+            }
+        }
+        .padding(.top, 4)
+    }
+
+    private func tokensMetricTotalCaption(metric: TokensChartMetric, total: Int) -> String {
+        let n = tokensIntegerString(total)
+        switch metric {
+        case .sessionsPerDay:
+            return n + " " + L10n.tr("sessions", language: settingsStore.appLanguage)
+        case .tokensPerDay:
+            return n + " " + L10n.tr("tokens", language: settingsStore.appLanguage)
+        case .aiFeaturesPerDay:
+            return n + " " + L10n.tr("AI uses", language: settingsStore.appLanguage)
+        }
+    }
+
+    private func tokensMonthOverMonthLabel(current: Int, previous: Int) -> (text: String, color: Color) {
+        if previous == 0 {
+            if current == 0 {
+                return ("—", .gray)
+            }
+            return (L10n.tr("New", language: settingsStore.appLanguage), .green.opacity(0.95))
+        }
+        let ratio = Double(current - previous) / Double(previous)
+        let pct = ratio * 100
+        let formatted = String(format: "%+.1f%%", pct)
+        if pct > 0.05 {
+            return (formatted, .green.opacity(0.95))
+        }
+        if pct < -0.05 {
+            return (formatted, .orange.opacity(0.95))
+        }
+        return (formatted, .gray)
+    }
+
+    private func tokensChartDayRows(for metric: TokensChartMetric) -> [TokensChartDay] {
+        let cal = Calendar.current
+        let now = Date()
+        guard let interval = cal.dateInterval(of: .month, for: now) else { return [] }
+        var out: [TokensChartDay] = []
+        var d = cal.startOfDay(for: interval.start)
+        let end = interval.end
+        while d < end {
+            let dayNum = cal.component(.day, from: d)
+            let value = tokensDailyValue(for: metric, on: d, calendar: cal)
+            let key = SettingsStore.telemetryDayKey(for: d, calendar: cal)
+            let plus = settingsStore.aiDayTelemetry[key]?.plusTokensPurchased ?? 0
+            out.append(TokensChartDay(id: key, day: dayNum, value: value, plusPurchased: plus))
+            guard let next = cal.date(byAdding: .day, value: 1, to: d) else { break }
+            d = next
+        }
+        return out
+    }
+
     private var accountSection: some View {
         SettingsSection(
             title: "Account",
@@ -389,32 +677,6 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
 
-                    L10nText("AI Play Analysis, Chip Estimator at close-out, and the Community feed all require an active TierTap Pro subscription and a signed-in TierTap account.")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-
-                    VStack(alignment: .leading, spacing: 6) {
-                        L10nText("Developer subscription override")
-                            .font(.caption.bold())
-                            .foregroundColor(.gray)
-                        NumericEntryWithDialPad(
-                            placeholder: "Enter override code",
-                            text: $subscriptionOverrideText,
-                            dialPadNavigationTitle: "Subscription override"
-                        )
-                            .onChange(of: subscriptionOverrideText) { new in
-                                let digitsOnly = new.filter { $0.isNumber }
-                                if digitsOnly != new {
-                                    subscriptionOverrideText = digitsOnly
-                                }
-                                settingsStore.subscriptionOverrideCode = digitsOnly
-                            }
-                        if settingsStore.isSubscriptionOverrideActive {
-                            L10nText("Override is active for this build; subscription checks are bypassed.")
-                                .font(.caption2)
-                                .foregroundColor(.green)
-                        }
-                    }
                 }
 
                 Divider().background(Color.gray.opacity(0.3))
@@ -893,6 +1155,69 @@ struct SettingsView: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
+    private var tierTapPlusPurchaseRow: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let product = subscriptionStore.creditsProduct {
+                Button {
+                    Task { await purchaseTierTapPlusTokensPack(product) }
+                } label: {
+                    HStack(alignment: .center, spacing: 8) {
+                        if isPurchasingCreditsPack {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "cart.fill")
+                        }
+                        let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                        TierTapPlusTokenPackPurchaseLabel(
+                            language: settingsStore.appLanguage,
+                            tokenCountFormatted: packCount,
+                            displayPrice: product.displayPrice,
+                            font: .caption.weight(.semibold)
+                        )
+                    }
+                    .tierTapPlusPurchaseButtonChrome(compact: false)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 2)
+                .accessibilityLabel(
+                    String(
+                        format: L10n.tr(
+                            "Buy TierTap Plus Tokens (%@) — %@",
+                            language: settingsStore.appLanguage
+                        ),
+                        TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                        product.displayPrice
+                    )
+                )
+                .disabled(!hasProAccess || isPurchasingCreditsPack || subscriptionStore.isLoading)
+            } else {
+                L10nText("Token packs aren’t available in the store yet.")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.75))
+            }
+
+            if !hasProAccess {
+                L10nText("Subscribe to TierTap Pro to use AI, then you can buy token packs here.")
+                    .font(.caption2)
+                    .foregroundColor(.orange.opacity(0.95))
+            }
+        }
+    }
+
+    private func purchaseTierTapPlusTokensPack(_ product: Product) async {
+        guard hasProAccess else { return }
+        guard !isPurchasingCreditsPack, !subscriptionStore.isLoading else { return }
+        isPurchasingCreditsPack = true
+        if let tid = await subscriptionStore.purchase(product) {
+            await settingsStore.grantTierTapSessionCreditsPack(
+                storeTransactionId: tid,
+                supabaseUserId: authStore.session?.user.id
+            )
+        }
+        isPurchasingCreditsPack = false
+    }
+
     private var dataExportSection: some View {
         SettingsSection(
             title: "Data & Export",
@@ -1203,8 +1528,17 @@ struct SettingsView: View {
     }
 }
 
+private struct TokensChartDay: Identifiable {
+    let id: String
+    let day: Int
+    let value: Int
+    let plusPurchased: Int
+}
+
 private struct SettingsSection<Content: View>: View {
     let title: String
+    /// When `true`, shows the **TierTap+** wordmark instead of localizing `title` (keep `title` for parity / future use).
+    var useTierTapPlusBrandTitle: Bool = false
     let systemImage: String
     @Binding var isExpanded: Bool
     @ViewBuilder let content: () -> Content
@@ -1219,7 +1553,11 @@ private struct SettingsSection<Content: View>: View {
             } label: {
                 HStack {
                     Label {
-                        Text(L10n.tr(title, language: appLanguage))
+                        if useTierTapPlusBrandTitle {
+                            TierTapPlusMark(font: .headline, weight: .semibold, foreground: .white)
+                        } else {
+                            Text(L10n.tr(title, language: appLanguage))
+                        }
                     } icon: {
                         Image(systemName: systemImage)
                     }

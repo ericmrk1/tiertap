@@ -152,6 +152,85 @@ struct L10nText: View {
     }
 }
 
+// MARK: - TierTap+ brand (Disney+-style raised plus)
+
+/// Renders **TierTap** with a raised **+** (not the word “Plus”).
+struct TierTapPlusMark: View {
+    var font: Font = .body
+    var weight: Font.Weight = .regular
+    var foreground: Color?
+    /// Hide this sub-brand from VoiceOver when a parent control provides a full phrase (e.g. purchase button).
+    var accessibilitySummarySuppressed: Bool = false
+    @Environment(\.appLanguage) private var appLanguage
+    @ScaledMetric(relativeTo: .body) private var raisedPlusOffset: CGFloat = 3.5
+
+    private var wordmark: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+            Text("TierTap")
+                .font(font)
+                .fontWeight(weight)
+            Text("+")
+                .font(font)
+                .fontWeight(.bold)
+                .scaleEffect(0.76, anchor: UnitPoint(x: 0.5, y: 1.0))
+                .baselineOffset(raisedPlusOffset)
+        }
+        .modifier(TierTapPlusMarkForeground(foreground: foreground))
+    }
+
+    var body: some View {
+        Group {
+            if accessibilitySummarySuppressed {
+                wordmark.accessibilityHidden(true)
+            } else {
+                wordmark
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(L10n.tr("TierTap Plus", language: appLanguage))
+            }
+        }
+    }
+}
+
+private struct TierTapPlusMarkForeground: ViewModifier {
+    let foreground: Color?
+
+    func body(content: Content) -> some View {
+        if let foreground {
+            content.foregroundStyle(foreground)
+        } else {
+            content
+        }
+    }
+}
+
+/// **Buy TierTap+ Tokens (n) — price** for token-pack purchase buttons.
+struct TierTapPlusTokenPackPurchaseLabel: View {
+    let language: AppLanguage
+    let tokenCountFormatted: String
+    let displayPrice: String
+    var font: Font = .caption.weight(.semibold)
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Text(L10n.tr("Buy", language: language))
+                .font(font)
+            TierTapPlusMark(font: font, weight: .semibold, accessibilitySummarySuppressed: true)
+                .environment(\.appLanguage, language)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Color.white.opacity(0.28))
+                .clipShape(Capsule())
+            Text(String(format: L10n.tr("Tokens (%@) — %@", language: language), tokenCountFormatted, displayPrice))
+                .font(font)
+                .multilineTextAlignment(.center)
+        }
+        .lineLimit(2)
+        .minimumScaleFactor(0.78)
+        .multilineTextAlignment(.center)
+        .environment(\.appLanguage, language)
+    }
+}
+
 extension View {
     /// Localized navigation title using `Strings.json` and `\.appLanguage`.
     func localizedNavigationTitle(_ english: String) -> some View {

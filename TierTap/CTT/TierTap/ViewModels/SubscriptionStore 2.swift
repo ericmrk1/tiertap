@@ -1,14 +1,29 @@
 import Foundation
 import StoreKit
 
-/// Product identifiers for TierTap subscriptions (must match App Store Connect).
+/// Product identifiers for TierTap subscriptions and consumables (must match App Store Connect / `.storekit`).
 enum TierTapProductId: String, CaseIterable {
     case monthly = "com.app.subs.tiertap.monthly"
     case quarterly = "com.app.subs.tiertap.quarterly"
     case yearly = "com.app.subs.tiertap.yearly"
+    /// TierTapSession consumable — adds purchasable AI token balance (`SettingsStore.grantTierTapSessionCreditsPack`).
+    case credits = "Credits"
 
-    /// Subscription group identifier.
+    /// Subscription group identifier (subscriptions only; unused for consumables).
     var subscriptionGroupId: String { "com.app.subs.tiertap" }
+
+    var isSubscription: Bool {
+        switch self {
+        case .monthly, .quarterly, .yearly: return true
+        case .credits: return false
+        }
+    }
+
+    /// Tokens credited to the user for one successful **Credits** purchase.
+    static let creditsPackTokenAmount: Int = 250_000
+
+    /// TierTap Pro “included” Gemini token allowance per calendar month before **purchased** TierTap Plus pack balance is drawn down.
+    static let proPlanIncludedTokensPerCalendarMonth: Int = 1_000_000
 }
 
 @MainActor
@@ -34,6 +49,16 @@ final class SubscriptionStore: ObservableObject {
     /// Pro is unlocked without a StoreKit purchase (TestFlight / sandbox receipt). Used for UI that hides IAP when the catalog is empty.
     var hasComplimentaryBetaProAccess: Bool {
         Self.isTestFlightOrSandboxBuild
+    }
+
+    /// Subscription products only (excludes consumables like **Credits**).
+    var subscriptionProducts: [Product] {
+        products.filter { TierTapProductId(rawValue: $0.id)?.isSubscription == true }
+    }
+
+    /// **TierTapSession** consumable when returned by StoreKit.
+    var creditsProduct: Product? {
+        products.first { $0.id == TierTapProductId.credits.rawValue }
     }
 
     init() {
@@ -80,7 +105,8 @@ final class SubscriptionStore: ObservableObject {
         isLoading = false
     }
 
-    func purchase(_ product: Product) async -> Bool {
+    /// - Returns: StoreKit transaction id string on verified success, or `nil` otherwise.
+    func purchase(_ product: Product) async -> String? {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
@@ -89,20 +115,21 @@ final class SubscriptionStore: ObservableObject {
             switch result {
             case .success(let verification):
                 let transaction = try checkVerified(verification)
+                let id = String(transaction.id)
                 await transaction.finish()
                 await updatePurchasedState()
-                return true
+                return id
             case .userCancelled:
-                return false
+                return nil
             case .pending:
                 errorMessage = "Purchase is pending approval."
-                return false
+                return nil
             @unknown default:
-                return false
+                return nil
             }
         } catch {
             errorMessage = error.localizedDescription
-            return false
+            return nil
         }
     }
 

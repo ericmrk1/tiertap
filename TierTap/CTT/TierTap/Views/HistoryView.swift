@@ -5,14 +5,6 @@ private enum HistoryPanelTab: String, CaseIterable {
     case tools
 }
 
-#if os(iOS)
-/// Presents `PostCloseoutShareFlowView` from `HistoryView` (not from app root) so the sheet appears above the History modal.
-private struct HistoryToolsPostCloseoutItem: Identifiable, Hashable {
-    let sessionId: UUID
-    var id: UUID { sessionId }
-}
-#endif
-
 /// Tax prep geography: fixed US list + international; session matching uses the last ", XX" token when `XX` is two letters.
 private enum TaxPrepGeography {
     static let allStatesLabel = "All States"
@@ -63,12 +55,6 @@ struct HistoryView: View {
     @State private var isHistoryDateSectionExpanded: Bool = false
     @State private var isHistoryGameSectionExpanded: Bool = false
     @State private var isHistoryLocationSectionExpanded: Bool = false
-    @State private var isHistoryToolsSharePickerPresented: Bool = false
-    #if os(iOS)
-    /// Set when the user confirms a session in the Tools share picker; consumed when that sheet dismisses.
-    @State private var queuedPostCloseoutSessionIdFromTools: UUID?
-    @State private var presentedPostCloseoutFromTools: HistoryToolsPostCloseoutItem?
-    #endif
     /// Single choice below Filters; legacy sessions without stored verification count as verified.
     @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
     @State private var selectedHistoryTab: HistoryPanelTab = .sessions
@@ -90,11 +76,6 @@ struct HistoryView: View {
     /// Sessions for the scrolling list: date, location, game, search, **tier-points segment**, and tax-prep filters when active.
     private var filteredSessions: [Session] {
         sessionsApplyingHistoryFilters(includeTierPointsVerification: true)
-    }
-
-    /// Same as `filteredSessions` but without the tier-points filter — used for Tools and share so the tier segment (only on the Sessions tab) does not gray out actions while sessions still exist.
-    private var sessionsMatchingHistoryBulkFilters: [Session] {
-        sessionsApplyingHistoryFilters(includeTierPointsVerification: false)
     }
 
     private func sessionsApplyingHistoryFilters(includeTierPointsVerification: Bool) -> [Session] {
@@ -563,61 +544,53 @@ struct HistoryView: View {
     private var historyToolsContent: some View {
         GeometryReader { geo in
             let horizontalPadding: CGFloat = 16
-            let verticalSpacing: CGFloat = 10
-            let rowCount: CGFloat = 3
-            let totalSpacing = verticalSpacing * (rowCount - 1)
-            let cellHeight = max(0, (geo.size.height - totalSpacing) / rowCount)
+            let bottomPadding: CGFloat = 20
+            let interButtonSpacing: CGFloat = 12
+            let contentWidth = geo.size.width - horizontalPadding * 2 - interButtonSpacing
+            // Compact square tiles: capped size, side-by-side at the bottom.
+            let bubbleSide = min(112, max(76, contentWidth / 2))
 
-            VStack(spacing: verticalSpacing) {
-                historyToolButton(
-                    title: "Delete Sessions",
-                    systemImage: "trash",
-                    tint: .red,
-                    isDisabled: store.sessions.isEmpty
-                ) {
-                    if settingsStore.enableCasinoFeedback {
-                        CelebrationPlayer.shared.playQuickChime()
-                    }
-                    isDeleteSelectorPresented = true
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: cellHeight)
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                HStack {
+                    Spacer(minLength: 0)
+                    HStack(spacing: interButtonSpacing) {
+                        historyToolButton(
+                            title: "Delete Sessions",
+                            systemImage: "trash",
+                            tint: .red,
+                            isDisabled: store.sessions.isEmpty,
+                            isCompact: true
+                        ) {
+                            if settingsStore.enableCasinoFeedback {
+                                CelebrationPlayer.shared.playQuickChime()
+                            }
+                            isDeleteSelectorPresented = true
+                        }
+                        .frame(width: bubbleSide, height: bubbleSide)
 
-                historyToolButton(
-                    title: "Tax Prep",
-                    systemImage: "doc.text.magnifyingglass",
-                    tint: .white,
-                    isDisabled: false
-                ) {
-                    if settingsStore.enableCasinoFeedback {
-                        CelebrationPlayer.shared.playQuickChime()
+                        historyToolButton(
+                            title: "Tax Prep",
+                            systemImage: "doc.text.magnifyingglass",
+                            tint: .white,
+                            isDisabled: false,
+                            isCompact: true
+                        ) {
+                            if settingsStore.enableCasinoFeedback {
+                                CelebrationPlayer.shared.playQuickChime()
+                            }
+                            withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
+                                taxPrepComingSoonVisible = true
+                            }
+                        }
+                        .frame(width: bubbleSide, height: bubbleSide)
                     }
-                    withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
-                        taxPrepComingSoonVisible = true
-                    }
+                    Spacer(minLength: 0)
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: cellHeight)
-
-                historyToolButton(
-                    title: "Share Sessions",
-                    systemImage: "square.and.arrow.up",
-                    tint: .green,
-                    isDisabled: sessionsMatchingHistoryBulkFilters.isEmpty
-                ) {
-                    if settingsStore.enableCasinoFeedback {
-                        CelebrationPlayer.shared.playQuickChime()
-                    }
-                    #if os(iOS)
-                    isHistoryToolsSharePickerPresented = true
-                    #endif
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: cellHeight)
+                .padding(.horizontal, horizontalPadding)
+                .padding(.bottom, bottomPadding)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.horizontal, horizontalPadding)
-            .padding(.top, 10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -675,18 +648,19 @@ struct HistoryView: View {
         .transition(.scale(scale: 0.9).combined(with: .opacity))
     }
 
-    private func historyToolButton(title: String, systemImage: String, tint: Color, isDisabled: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
+    private func historyToolButton(title: String, systemImage: String, tint: Color, isDisabled: Bool, isCompact: Bool = false, action: @escaping () -> Void) -> some View {
+        let corner: CGFloat = isCompact ? 12 : 14
+        return Button(action: action) {
+            VStack(spacing: isCompact ? 5 : 8) {
                 Image(systemName: systemImage)
-                    .font(.title2.weight(.bold))
+                    .font(isCompact ? .body.weight(.bold) : .title2.weight(.bold))
                 Text(title)
-                    .font(.subheadline.weight(.bold))
+                    .font(isCompact ? .caption.weight(.bold) : .subheadline.weight(.bold))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.75)
+                    .minimumScaleFactor(0.7)
             }
-            .padding(6)
+            .padding(isCompact ? 4 : 6)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 LinearGradient(
@@ -699,12 +673,12 @@ struct HistoryView: View {
                 )
             )
             .foregroundColor(isDisabled ? .gray : tint)
-            .cornerRadius(14)
+            .cornerRadius(corner)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: corner, style: .continuous)
                     .stroke(Color.white.opacity(0.16), lineWidth: 1)
             )
-            .shadow(color: .black.opacity(0.22), radius: 6, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.22), radius: isCompact ? 4 : 6, x: 0, y: isCompact ? 3 : 4)
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
@@ -900,30 +874,6 @@ struct HistoryView: View {
             } message: {
                 L10nText("This session will be permanently removed. This cannot be undone.")
             }
-            #if os(iOS)
-            .adaptiveSheet(isPresented: $isHistoryToolsSharePickerPresented) {
-                HistoryToolsSingleSessionShareSheet(
-                    sessions: sessionsMatchingHistoryBulkFilters,
-                    onPickSession: { sessionId in
-                        queuedPostCloseoutSessionIdFromTools = sessionId
-                    }
-                )
-                .environmentObject(settingsStore)
-            }
-            .sheet(item: $presentedPostCloseoutFromTools) { item in
-                PostCloseoutShareFlowView(sessionId: item.sessionId)
-                    .environmentObject(store)
-                    .environmentObject(settingsStore)
-                    .environmentObject(authStore)
-            }
-            .onChange(of: isHistoryToolsSharePickerPresented) { isShowingPicker in
-                guard !isShowingPicker, let sessionId = queuedPostCloseoutSessionIdFromTools else { return }
-                queuedPostCloseoutSessionIdFromTools = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    presentedPostCloseoutFromTools = HistoryToolsPostCloseoutItem(sessionId: sessionId)
-                }
-            }
-            #endif
             .onAppear {
                 clampTaxYearSelectionIfNeeded()
             }
@@ -988,115 +938,6 @@ extension HistoryView {
         }
     }
 }
-
-#if os(iOS)
-/// One session at a time; continues into the app-wide post-closeout share flow (`PostCloseoutShareFlowView`).
-private struct HistoryToolsSingleSessionShareSheet: View {
-    let sessions: [Session]
-    let onPickSession: (UUID) -> Void
-
-    @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedSessionID: UUID?
-
-    private var sortedSessions: [Session] {
-        sessions.sorted { $0.startTime > $1.startTime }
-    }
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                if sessions.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 40))
-                            .foregroundColor(.gray)
-                        L10nText("No sessions available to share.")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                } else {
-                    List {
-                        Section {
-                            L10nText("Choose one session, then Session Art or Community Publish (same as after a live close-out).")
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.78))
-                                .listRowBackground(Color(.systemGray6).opacity(0.12))
-                        }
-
-                        Section(header: L10nText("Session").foregroundColor(.gray)) {
-                            ForEach(sortedSessions) { session in
-                                Button {
-                                    selectedSessionID = session.id
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: selectedSessionID == session.id ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(selectedSessionID == session.id ? .green : .gray)
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            HStack {
-                                                Text(session.casino)
-                                                    .font(.subheadline.bold())
-                                                    .foregroundColor(.white)
-                                                Spacer()
-                                                if let wl = session.winLoss {
-                                                    Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
-                                                        .font(.caption.bold())
-                                                        .foregroundColor(wl >= 0 ? .green : .red)
-                                                }
-                                            }
-                                            HStack(spacing: 6) {
-                                                Text(session.game)
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                                L10nText("•")
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                                Text(session.startTime, style: .date)
-                                                    .font(.caption2)
-                                                    .foregroundColor(.gray)
-                                            }
-                                        }
-                                    }
-                                    .padding(.vertical, 4)
-                                }
-                                .buttonStyle(.plain)
-                                .listRowBackground(Color(.systemGray6).opacity(0.15))
-                            }
-                        }
-                    }
-                    .listStyle(.insetGrouped)
-                    .scrollContentBackground(.hidden)
-                }
-            }
-            .localizedNavigationTitle("Share Session")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.green)
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Continue") {
-                        guard let id = selectedSessionID else { return }
-                        if settingsStore.enableCasinoFeedback {
-                            CelebrationPlayer.shared.playQuickChime()
-                        }
-                        onPickSession(id)
-                        dismiss()
-                    }
-                    .foregroundColor(selectedSessionID == nil ? .gray : .green)
-                    .disabled(selectedSessionID == nil)
-                }
-            }
-        }
-    }
-}
-#endif
 
 struct SessionRow: View {
     let session: Session

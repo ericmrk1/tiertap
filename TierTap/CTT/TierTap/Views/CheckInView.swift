@@ -1005,10 +1005,6 @@ struct CheckInView: View {
         struct GeminiImageRequest: Encodable {
             let contents: [GeminiContentImage]
         }
-        struct GeminiPart: Decodable { let text: String? }
-        struct GeminiContent: Decodable { let parts: [GeminiPart]? }
-        struct GeminiCandidate: Decodable { let content: GeminiContent? }
-        struct GeminiRouterResponse: Decodable { let candidates: [GeminiCandidate]? }
         struct SlotScanPayload: Decodable {
             let game_name: String?
             let details: String?
@@ -1057,10 +1053,17 @@ struct CheckInView: View {
                 await MainActor.run { settingsStore.registerAICall() }
             }
 
-            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
                     options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
                 )
             }
 

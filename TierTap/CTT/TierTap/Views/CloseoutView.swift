@@ -27,6 +27,7 @@ struct CloseoutView: View {
     @State private var showSubscriptionPaywall = false
     @State private var showLinkedWalletFromCloseout = false
     @State private var linkedWalletFocusCardId: UUID?
+    @State private var showCashOutDialPad = false
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
@@ -53,7 +54,7 @@ struct CloseoutView: View {
     }
 
     var isValid: Bool {
-        Int(cashOut) != nil && Int(endingTier) != nil
+        Int(cashOutDigitsOnly(cashOut)) != nil && Int(endingTier) != nil
     }
 
     var previewTierEarned: Int? { Int(endingTier).map { $0 - s.startingTierPoints } }
@@ -62,7 +63,7 @@ struct CloseoutView: View {
         guard let e = previewTierEarned, previewHours > 0 else { return nil }
         return Double(e) / previewHours
     }
-    var previewWL: Int? { Int(cashOut).map { $0 - s.totalBuyIn } }
+    var previewWL: Int? { Int(cashOutDigitsOnly(cashOut)).map { $0 - s.totalBuyIn } }
     /// Hourly win/loss rate based on total W/L and hours played.
     /// Requires a meaningful duration so we never divide by ~0 (which happens briefly after
     /// `closeSession` clears `liveSession` and `s` falls back to a placeholder session).
@@ -84,9 +85,35 @@ struct CloseoutView: View {
 
     /// Cash-out field: green when walking away with a positive amount, red at zero (bust).
     private var cashOutFieldColors: (text: Color, accent: Color) {
-        guard let n = Int(cashOut) else { return (.white, .green) }
+        guard let n = Int(cashOutDigitsOnly(cashOut)) else { return (.white, .green) }
         if n > 0 { return (.green, .green) }
         return (.red, .red)
+    }
+
+    private let cashOutMaxDigits = 12
+
+    private func cashOutDigitsOnly(_ s: String) -> String {
+        s.filter { $0.isNumber }
+    }
+
+    /// `cashOut` is stored digits-only; the field shows thousands separators.
+    private var cashOutFormattedBinding: Binding<String> {
+        Binding(
+            get: {
+                let digits = cashOutDigitsOnly(cashOut)
+                guard !digits.isEmpty else { return "" }
+                guard let n = Int(digits) else { return cashOut }
+                return n.formatted(.number.grouping(.automatic))
+            },
+            set: { newValue in
+                let digits = cashOutDigitsOnly(newValue)
+                if digits.count > cashOutMaxDigits {
+                    cashOut = String(digits.prefix(cashOutMaxDigits))
+                } else {
+                    cashOut = digits
+                }
+            }
+        )
     }
 
     var timerStopped: Bool { s.endTime != nil }
@@ -126,6 +153,47 @@ struct CloseoutView: View {
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(12)
+    }
+
+    @ViewBuilder
+    private var closeoutSummaryBubble: some View {
+        if isValid {
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    if let wl = previewWL {
+                        L10nText("W/L").font(.caption2).foregroundColor(.gray)
+                        Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
+                            .font(.subheadline.bold())
+                            .foregroundColor(wl >= 0 ? .green : .red)
+                    }
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
+                    Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
+                }
+                if let hourly = previewHourlyWinLoss,
+                   let amount = Int(exactly: round(hourly)) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        L10nText("Hourly W/L").font(.caption2).foregroundColor(.gray)
+                        Text("\(amount >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(amount))")
+                            .font(.subheadline)
+                            .foregroundColor(amount >= 0 ? .green : .red)
+                    }
+                }
+                if let roi = previewROI {
+                    VStack(alignment: .leading, spacing: 4) {
+                        L10nText("ROI %").font(.caption2).foregroundColor(.gray)
+                        Text(String(format: "%.1f%%", roi))
+                            .font(.subheadline)
+                            .foregroundColor(roi >= 0 ? .green : .red)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(12)
+            .background(Color(.systemGray6).opacity(0.15))
+            .cornerRadius(12)
+        }
     }
 
     var body: some View {
@@ -205,17 +273,20 @@ struct CloseoutView: View {
                                     .font(.subheadline.bold())
                                     .foregroundColor(.white)
                                     .fixedSize(horizontal: true, vertical: false)
-                                TextField("Amount leaving with", text: $cashOut)
-                                    .keyboardType(.numberPad)
-                                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                                    .multilineTextAlignment(.center)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                                    .frame(maxWidth: .infinity)
-                                    .textFieldStyle(DarkTextFieldStyle(
-                                        textColor: cashOutFieldColors.text,
-                                        accentColor: cashOutFieldColors.accent
-                                    ))
+                                HStack(spacing: 8) {
+                                    TextField("Amount leaving with", text: cashOutFormattedBinding)
+                                        .keyboardType(.numberPad)
+                                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                        .frame(maxWidth: .infinity)
+                                        .textFieldStyle(DarkTextFieldStyle(
+                                            textColor: cashOutFieldColors.text,
+                                            accentColor: cashOutFieldColors.accent
+                                        ))
+                                    DialPadLaunchButton { showCashOutDialPad = true }
+                                }
                             }
                             .padding()
                             .background(Color(.systemGray6).opacity(0.15))
@@ -228,7 +299,7 @@ struct CloseoutView: View {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
                                             Button("+\(settingsStore.currencySymbol)\(amt)") {
-                                                let current = Int(cashOut) ?? defaultCloseoutCashOut
+                                                let current = Int(cashOutDigitsOnly(cashOut)) ?? defaultCloseoutCashOut
                                                 cashOut = String(current + amt)
                                             }
                                             .font(.caption)
@@ -244,7 +315,7 @@ struct CloseoutView: View {
                                     HStack(spacing: 8) {
                                         ForEach(cashOutQuickAmounts, id: \.self) { amt in
                                             Button("−\(settingsStore.currencySymbol)\(amt)") {
-                                                let current = Int(cashOut) ?? defaultCloseoutCashOut
+                                                let current = Int(cashOutDigitsOnly(cashOut)) ?? defaultCloseoutCashOut
                                                 cashOut = String(max(0, current - amt))
                                             }
                                             .font(.caption)
@@ -288,6 +359,7 @@ struct CloseoutView: View {
                                     .cornerRadius(8)
                                 }
                             }
+                            closeoutSummaryBubble
                             endingTierPointsRow
                             VStack(alignment: .leading, spacing: 8) {
                                 L10nText("Tier points")
@@ -315,47 +387,6 @@ struct CloseoutView: View {
                                 .background(Color.orange.opacity(0.15))
                                 .cornerRadius(6)
                             }
-                        }
-
-                        // Summary inline when valid (compact)
-                        if isValid {
-                            HStack(alignment: .top, spacing: 16) {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    if let wl = previewWL {
-                                        L10nText("W/L").font(.caption2).foregroundColor(.gray)
-                                        Text(wl >= 0 ? "+\(settingsStore.currencySymbol)\(wl)" : "-\(settingsStore.currencySymbol)\(abs(wl))")
-                                            .font(.subheadline.bold())
-                                            .foregroundColor(wl >= 0 ? .green : .red)
-                                    }
-                                }
-                                VStack(alignment: .leading, spacing: 4) {
-                                    L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
-                                    Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
-                                }
-                                if let hourly = previewHourlyWinLoss,
-                                   let amount = Int(exactly: round(hourly)) {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        L10nText("Hourly W/L").font(.caption2).foregroundColor(.gray)
-                                        Text("\(amount >= 0 ? "+" : "-")\(settingsStore.currencySymbol)\(abs(amount))")
-                                            .font(.subheadline)
-                                            .foregroundColor(amount >= 0 ? .green : .red)
-                                    }
-                                }
-                                if let roi = previewROI {
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        L10nText("ROI %").font(.caption2).foregroundColor(.gray)
-                                        Text(String(format: "%.1f%%", roi))
-                                            .font(.subheadline)
-                                            .foregroundColor(roi >= 0 ? .green : .red)
-                                    }
-                                }
-                                Spacer(minLength: 0)
-                            }
-                            .padding(12)
-                            .background(Color(.systemGray6).opacity(0.15))
-                            .cornerRadius(12)
-
-                            // Removed house edge comparison since avg bet inputs are no longer collected at closeout.
                         }
 
                         // Private notes (local only, not shared)
@@ -494,7 +525,7 @@ struct CloseoutView: View {
                                 .font(.subheadline.bold())
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
-                                .background(Color.blue.opacity(0.9))
+                                .background(Color.black)
                                 .foregroundColor(.white)
                                 .cornerRadius(20)
                                 .shadow(radius: 5)
@@ -509,6 +540,11 @@ struct CloseoutView: View {
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .sheet(isPresented: $showCashOutDialPad) {
+                NumericDialPadSheet(value: $cashOut, navigationTitle: "Cash out", formatPreviewWithGrouping: true)
+                    .environmentObject(settingsStore)
+                    .environment(\.appLanguage, settingsStore.appLanguage)
+            }
             .alert("Chip estimator error", isPresented: Binding<Bool>(
                 get: { chipEstimatorError != nil },
                 set: { if !$0 { chipEstimatorError = nil } }
@@ -537,7 +573,7 @@ struct CloseoutView: View {
                 Text("Ending tier (\(endingTier)) is lower than starting tier (\(s.startingTierPoints)). Save anyway?")
             }
             .adaptiveSheet(isPresented: $showEmotionPicker, onDismiss: {
-                if closedSessionId != nil, let co = Int(cashOut),
+                if closedSessionId != nil, let co = Int(cashOutDigitsOnly(cashOut)),
                    let et = Int(endingTier) {
                     let notes = privateNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : privateNotes
                     let walletToastDelay = closeSessionPersistingLastGameDefaults(cashOut: co, endingTier: et, privateNotes: notes)
@@ -546,7 +582,7 @@ struct CloseoutView: View {
                 }
             }) {
                 SessionMoodPickerView { mood in
-                    guard let co = Int(cashOut),
+                    guard let co = Int(cashOutDigitsOnly(cashOut)),
                           let et = Int(endingTier),
                           let id = closedSessionId else {
                         closedSessionId = nil
@@ -610,6 +646,8 @@ struct CloseoutView: View {
             privateNotes = s.privateNotes ?? ""
             if cashOut.isEmpty {
                 cashOut = "\(defaultCloseoutCashOut)"
+            } else {
+                cashOut = cashOutDigitsOnly(cashOut)
             }
             // Default ending tier to this session's starting tier if available,
             // falling back to recent history for this casino.
@@ -663,7 +701,7 @@ struct CloseoutView: View {
     }
 
     func save() {
-        guard let co = Int(cashOut), let et = Int(endingTier) else { return }
+        guard let co = Int(cashOutDigitsOnly(cashOut)), let et = Int(endingTier) else { return }
         let sessionId = s.id
         let netPositive = (co - s.totalBuyIn) > 0
 
@@ -1054,22 +1092,6 @@ struct ChipEstimatorSheetView: View {
             let contents: [GeminiContentImage]
         }
 
-        struct GeminiPart: Decodable {
-            let text: String?
-        }
-
-        struct GeminiContent: Decodable {
-            let parts: [GeminiPart]?
-        }
-
-        struct GeminiCandidate: Decodable {
-            let content: GeminiContent?
-        }
-
-        struct GeminiRouterResponse: Decodable {
-            let candidates: [GeminiCandidate]?
-        }
-
         guard let imageData = image.jpegData(compressionQuality: 0.9)?.base64EncodedString() else {
             isEstimating = false
             errorMessage = "Unable to process image."
@@ -1180,12 +1202,16 @@ struct ChipEstimatorSheetView: View {
                 settingsStore.registerAICall()
             }
 
-            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
                     options: FunctionInvokeOptions(body: routerBody)
                 )
             }
+            settingsStore.recordAITelemetry(
+                invocationTokens: response.telemetryTokenTotal,
+                hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+            )
             let text = response.candidates?
                 .first?
                 .content?

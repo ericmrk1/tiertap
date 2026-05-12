@@ -4033,7 +4033,7 @@ struct SessionArtGeneratorView: View {
 
     private var textShareOptionsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Story text matches History → Tools → Share sessions (plain text).")
+            Text("Story text matches the plain-text session share template (same as post close-out).")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.85))
             Toggle("Include buy-in, cash-out, and result lines", isOn: $publishWinLoss)
@@ -5020,6 +5020,10 @@ struct SessionArtGeneratorView: View {
             isExportingImage = false
             aiGeneratedImage = image
             showAIReviewSheet = true
+            settingsStore.recordAITelemetry(
+                invocationTokens: 0,
+                hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+            )
         } catch {
             print("[TierTap] [session-imagen] invoke failed: \(error.localizedDescription)")
             exportProgressTask?.cancel()

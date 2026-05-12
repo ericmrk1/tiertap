@@ -69,3 +69,38 @@ actor GeminiRouterThrottle {
         throw lastError ?? NSError(domain: "GeminiRouterThrottle", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unknown error calling Gemini."])
     }
 }
+
+// MARK: - Gemini `generateContent` response (Supabase gemini-router forwards JSON from Google)
+
+/// Shared decode shape for every `gemini-router` invoke so call sites can read `usageMetadata` for telemetry.
+struct GeminiRouterAPIResponse: Decodable {
+    struct UsageMetadata: Decodable {
+        let promptTokenCount: Int?
+        let candidatesTokenCount: Int?
+        let totalTokenCount: Int?
+    }
+
+    struct Part: Decodable {
+        let text: String?
+    }
+
+    struct Content: Decodable {
+        let parts: [Part]?
+    }
+
+    struct Candidate: Decodable {
+        let content: Content?
+    }
+
+    let candidates: [Candidate]?
+    let usageMetadata: UsageMetadata?
+
+    /// Best-effort total tokens for billing/telemetry when the API returns usage metadata.
+    var telemetryTokenTotal: Int {
+        if let t = usageMetadata?.totalTokenCount, t > 0 { return t }
+        let p = usageMetadata?.promptTokenCount ?? 0
+        let c = usageMetadata?.candidatesTokenCount ?? 0
+        let sum = p + c
+        return max(0, sum)
+    }
+}

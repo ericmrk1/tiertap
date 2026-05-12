@@ -70,6 +70,42 @@ struct FilterPanelPillButton: View {
     }
 }
 
+/// Strong primary styling for TierTap Plus token purchase so it reads as a tappable CTA vs stat chips.
+struct TierTapPlusPurchaseButtonChrome: ViewModifier {
+    var compact: Bool = false
+
+    func body(content: Content) -> some View {
+        let corner: CGFloat = compact ? 11 : 12
+        content
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, compact ? 10 : 12)
+            .padding(.horizontal, 10)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.22, green: 0.78, blue: 0.48),
+                        Color(red: 0.05, green: 0.48, blue: 0.28)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: corner, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.32), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.42), radius: compact ? 4 : 6, x: 0, y: compact ? 2 : 3)
+    }
+}
+
+extension View {
+    func tierTapPlusPurchaseButtonChrome(compact: Bool = false) -> some View {
+        modifier(TierTapPlusPurchaseButtonChrome(compact: compact))
+    }
+}
+
 // MARK: - Date + time split for compact filter pickers
 
 extension Binding where Value == Date {
@@ -883,6 +919,8 @@ private enum StartingTierAuxSheet: String, Identifiable {
 struct NumericDialPadSheet: View {
     @Binding var value: String
     let navigationTitle: String
+    /// When true, the large preview uses locale-aware thousands grouping (e.g. 1,234).
+    var formatPreviewWithGrouping: Bool = false
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var digits: String = ""
@@ -890,7 +928,11 @@ struct NumericDialPadSheet: View {
     private let maxDigits = 12
 
     private var previewText: String {
-        digits.isEmpty ? "0" : digits
+        let digitRun = digits.isEmpty ? "0" : digits
+        if formatPreviewWithGrouping, let n = Int(digitRun) {
+            return n.formatted(.number.grouping(.automatic))
+        }
+        return digitRun
     }
 
     private func appendDigit(_ d: String) {
@@ -2118,21 +2160,13 @@ struct CompQuickAddSheet: View {
                         .font(.subheadline.bold())
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
-                        .background(Color.blue.opacity(0.9))
+                        .background(Color.black)
                         .foregroundColor(.white)
                         .cornerRadius(20)
                         .shadow(radius: 5)
                 }
                 .padding(.trailing, 16)
                 .padding(.bottom, 16)
-                .confirmationDialog("Add comp photo", isPresented: $showCompPhotoOptions, titleVisibility: .visible) {
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        Button("Take photo") { compPhotoSource = .camera }
-                    }
-                    Button("Choose from library") { compPhotoSource = .photoLibrary }
-                    Button("Cancel", role: .cancel) {}
-                }
-
                 if isEstimatingCompValue {
                     Color.black.opacity(0.45)
                         .ignoresSafeArea()
@@ -2163,6 +2197,59 @@ struct CompQuickAddSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }.foregroundColor(.green)
                 }
+            }
+            .adaptiveSheet(isPresented: $showCompPhotoOptions) {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("Add comp photo")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("Capture your comp slip, receipt, or screen and TierTap will attach it to this entry.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button {
+                            showCompPhotoOptions = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                compPhotoSource = .camera
+                            }
+                        } label: {
+                            LocalizedLabel(title: "Take photo", systemImage: "camera")
+                                .font(.subheadline.bold())
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(Color(.systemGray6).opacity(0.3))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                    }
+
+                    Button {
+                        showCompPhotoOptions = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            compPhotoSource = .photoLibrary
+                        }
+                    } label: {
+                        LocalizedLabel(title: "Choose from library", systemImage: "photo")
+                            .font(.subheadline.bold())
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color(.systemGray6).opacity(0.3))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Button("Cancel", role: .cancel) {
+                        showCompPhotoOptions = false
+                    }
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 2)
+                }
+                .padding(16)
+                .background(settingsStore.primaryGradient)
+                .presentationDetents([.fraction(0.33)])
+                .presentationDragIndicator(.visible)
             }
             .adaptiveSheet(item: $compPhotoSource) { source in
                 switch source {
@@ -2334,11 +2421,6 @@ struct CompQuickAddSheet: View {
             }
             let contents: [Content]
         }
-        struct GeminiPart: Decodable { let text: String? }
-        struct GeminiContent: Decodable { let parts: [GeminiPart]? }
-        struct GeminiCandidate: Decodable { let content: GeminiContent? }
-        struct GeminiRouterResponse: Decodable { let candidates: [GeminiCandidate]? }
-
         struct CompEstimatePayload: Decodable {
             let estimate_dollars: Int?
             let reason: String?
@@ -2413,7 +2495,7 @@ struct CompQuickAddSheet: View {
                 await MainActor.run { settingsStore.registerAICall() }
             }
 
-            let response: GeminiRouterResponse
+            let response: GeminiRouterAPIResponse
             if let imgData = imageData {
                 let inner = GeminiImageRequest(
                     contents: [
@@ -2452,6 +2534,12 @@ struct CompQuickAddSheet: View {
                         options: FunctionInvokeOptions(body: routerBody)
                     )
                 }
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                )
             }
             let text = response.candidates?
                 .first?

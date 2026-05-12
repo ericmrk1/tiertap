@@ -1483,19 +1483,6 @@ struct AIAnalyticsSheet: View {
             ],
             language: settingsStore.appLanguage
         )
-        struct GeminiPart: Decodable {
-            let text: String?
-        }
-        struct GeminiContent: Decodable {
-            let parts: [GeminiPart]?
-        }
-        struct GeminiCandidate: Decodable {
-            let content: GeminiContent?
-        }
-        struct GeminiRouterResponse: Decodable {
-            let candidates: [GeminiCandidate]?
-        }
-        
         do {
             // Record usage only when we actually call the Gemini router (cache hits do not consume quota).
             if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
@@ -1503,10 +1490,16 @@ struct AIAnalyticsSheet: View {
                     settingsStore.registerAICall()
                 }
             }
-            let response: GeminiRouterResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
                     options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
                 )
             }
             let text = response.candidates?

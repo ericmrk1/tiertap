@@ -4,6 +4,38 @@ import StoreKit
 private let appleEULAURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 private let privacyPolicyURL = URL(string: "https://travelzork.com/privacy-policy/")!
 
+/// Rounded percent saved vs paying the monthly plan each month for the same duration (`monthsInPlan`).
+private func subscriptionSavingsPercentComparedToMonthly(
+    planPrice: Decimal,
+    monthlyPrice: Decimal,
+    monthsInPlan: Int
+) -> Int? {
+    guard monthsInPlan > 0, monthlyPrice > 0 else { return nil }
+    let baseline = monthlyPrice * Decimal(monthsInPlan)
+    guard baseline > 0, planPrice < baseline else { return nil }
+    let pctDecimal = (baseline - planPrice) / baseline * 100
+    let pct = NSDecimalNumber(decimal: pctDecimal).doubleValue
+    guard pct.isFinite else { return nil }
+    let rounded = Int(pct.rounded())
+    return rounded > 0 ? rounded : nil
+}
+
+private func subscriptionSavingsPercent(plan: Product, monthlyProduct: Product?) -> Int? {
+    guard let monthlyProduct, monthlyProduct.id == TierTapProductId.monthly.rawValue else { return nil }
+    let months: Int?
+    switch TierTapProductId(rawValue: plan.id) {
+    case .quarterly: months = 3
+    case .yearly: months = 12
+    default: months = nil
+    }
+    guard let months else { return nil }
+    return subscriptionSavingsPercentComparedToMonthly(
+        planPrice: plan.price,
+        monthlyPrice: monthlyProduct.price,
+        monthsInPlan: months
+    )
+}
+
 /// Subscription paywall for TierTap Pro.
 struct TierTapPaywallView: View {
     @EnvironmentObject var subscriptionStore: SubscriptionStore
@@ -15,6 +47,7 @@ struct TierTapPaywallView: View {
     @State private var showConfetti = false
     @State private var showAccountSheet = false
     @State private var emailInput: String = ""
+    @State private var isPurchasingCreditsPack = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -32,6 +65,7 @@ struct TierTapPaywallView: View {
                         requirementsSection
                         benefitsSection
                         productsSection
+                        tierTapPlusSection
                         restoreSection
                         legalSection
 
@@ -158,11 +192,6 @@ struct TierTapPaywallView: View {
                     subtitle: "Ask TierTap to analyze your sessions and patterns."
                 )
                 ProBenefitRow(
-                    icon: "photo.badge.sparkles",
-                    title: "AI Session Image Generation",
-                    subtitle: "Create premium session share images with TierTap AI."
-                )
-                ProBenefitRow(
                     icon: "camera.viewfinder",
                     title: "Chip Estimator at Close Out",
                     subtitle: "Estimate chip stacks from a photo with AI before you cash out."
@@ -246,9 +275,10 @@ struct TierTapPaywallView: View {
                         .foregroundColor(.white)
 
                     HStack(alignment: .top, spacing: 8) {
-                        ForEach(sortedProducts, id: \.id) { product in
+                        ForEach(sortedSubscriptionProducts, id: \.id) { product in
                             PaywallPlanBox(
                                 product: product,
+                                savingsPercent: subscriptionSavingsPercent(plan: product, monthlyProduct: monthlySubscriptionProduct),
                                 isCurrent: subscriptionStore.purchasedProductIds.contains(product.id),
                                 isPurchasing: purchasingProductId == product.id,
                                 isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
@@ -266,9 +296,86 @@ struct TierTapPaywallView: View {
         }
     }
 
-    private var sortedProducts: [Product] {
-        subscriptionStore.products.sorted { lhs, rhs in
+    private var sortedSubscriptionProducts: [Product] {
+        subscriptionStore.subscriptionProducts.sorted { lhs, rhs in
             productSortOrder(lhs.id) < productSortOrder(rhs.id)
+        }
+    }
+
+    private var monthlySubscriptionProduct: Product? {
+        sortedSubscriptionProducts.first { $0.id == TierTapProductId.monthly.rawValue }
+    }
+
+    private var tierTapPlusSection: some View {
+        Group {
+            TierTapPlusMark(font: .subheadline.weight(.semibold), weight: .semibold, foreground: .white)
+
+            VStack(alignment: .leading, spacing: 10) {
+                L10nText("Need more AI power? Add token packs to extend usage beyond your TierTap Pro plan.")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let creditsProduct = subscriptionStore.creditsProduct {
+                    TierTapPlusTokenStatBubbles(
+                        packBalance: settingsStore.aiPurchasedTokenBalance,
+                        lifetimePurchased: settingsStore.lifetimeTierTapPlusTokensPurchased,
+                        packUsage: settingsStore.tierTapPlusTokensConsumedFromPurchases,
+                        compact: true
+                    )
+
+                    Button {
+                        purchaseCreditsPack(creditsProduct)
+                    } label: {
+                        HStack(alignment: .center, spacing: 8) {
+                            if isPurchasingCreditsPack {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Image(systemName: "sparkles")
+                            }
+                            let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                            TierTapPlusTokenPackPurchaseLabel(
+                                language: settingsStore.appLanguage,
+                                tokenCountFormatted: packCount,
+                                displayPrice: creditsProduct.displayPrice,
+                                font: .caption.weight(.semibold)
+                            )
+                        }
+                        .tierTapPlusPurchaseButtonChrome(compact: true)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 2)
+                    .accessibilityLabel(
+                        String(
+                            format: L10n.tr(
+                                "Buy TierTap Plus Tokens (%@) — %@",
+                                language: settingsStore.appLanguage
+                            ),
+                            TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                            creditsProduct.displayPrice
+                        )
+                    )
+                    .disabled(!hasProAccess || isPurchasingCreditsPack || purchasingProductId != nil || subscriptionStore.isLoading)
+                } else {
+                    L10nText("Token packs aren’t available in the store yet. Check back after the Credits product is configured.")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.75))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if !hasProAccess {
+                    L10nText("Subscribe to TierTap Pro to use AI features, then you can buy token packs here.")
+                        .font(.caption2)
+                        .foregroundColor(.orange.opacity(0.95))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white.opacity(0.15))
+            .cornerRadius(12)
         }
     }
 
@@ -324,12 +431,30 @@ struct TierTapPaywallView: View {
             let success = await subscriptionStore.purchase(product)
             await MainActor.run {
                 purchasingProductId = nil
-                if success {
+                if success != nil {
                     showConfetti = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                         dismiss()
                     }
                 }
+            }
+        }
+    }
+
+    private func purchaseCreditsPack(_ product: Product) {
+        guard hasProAccess else { return }
+        guard purchasingProductId == nil, !subscriptionStore.isLoading, !isPurchasingCreditsPack else { return }
+        isPurchasingCreditsPack = true
+        Task {
+            let success = await subscriptionStore.purchase(product)
+            await MainActor.run {
+                isPurchasingCreditsPack = false
+            }
+            if let tid = success {
+                await settingsStore.grantTierTapSessionCreditsPack(
+                    storeTransactionId: tid,
+                    supabaseUserId: authStore.session?.user.id
+                )
             }
         }
     }
@@ -360,6 +485,7 @@ private struct ProBenefitRow: View {
 
 private struct PaywallPlanBox: View {
     let product: Product
+    let savingsPercent: Int?
     let isCurrent: Bool
     let isPurchasing: Bool
     let isBusy: Bool
@@ -378,13 +504,21 @@ private struct PaywallPlanBox: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(periodLabel)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
             Text(product.displayPrice)
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.9))
+
+            if let savingsPercent {
+                Text("Save \(savingsPercent)% vs monthly")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.green.opacity(0.95))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel("Save \(savingsPercent) percent compared to paying monthly")
+            }
 
             Spacer(minLength: 0)
 
@@ -418,8 +552,8 @@ private struct PaywallPlanBox: View {
                 .disabled(isBusy)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 130, alignment: .topLeading)
-        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
+        .padding(9)
         .background(isCurrent ? accentColor.opacity(0.34) : Color.white.opacity(0.15))
         .cornerRadius(12)
         .overlay(

@@ -144,6 +144,11 @@ enum SupabaseTables {
     static var userScreenNames: String {
         return shouldUseTestSupabaseTables() ? "UserScreenNames_Test" : "UserScreenNames"
     }
+
+    /// TierTap Plus (`Credits`) token pack purchases — one row per StoreKit transaction. Mirrors `_Test` in simulator / TestFlight.
+    static var tierTapPlusTokenPurchases: String {
+        return shouldUseTestSupabaseTables() ? "TierTapPlusTokenPurchases_Test" : "TierTapPlusTokenPurchases"
+    }
 }
 
 // MARK: - User screen names (Community)
@@ -239,6 +244,114 @@ enum UserScreenNamesAPI {
         if let pe = error as? PostgrestError, pe.code == "23505" { return true }
         let m = error.localizedDescription.lowercased()
         return m.contains("duplicate key") || m.contains("unique constraint")
+    }
+}
+
+// MARK: - TierTap AI token balances (authoritative on Supabase)
+
+/// Snapshot returned by `tier_tap_get_ai_token_balances` / grant / apply RPCs (must match SQL `jsonb_build_object` keys).
+struct AIUserTokenBalancesPayload: Codable, Equatable {
+    let purchased_balance_remaining: Int
+    let lifetime_plus_tokens_purchased: Int
+    let consumed_from_packs: Int
+    let pro_plan_tokens_consumed_month: Int
+    let pro_plan_month_key: String
+}
+
+private struct GrantPlusRPCParams: Encodable {
+    let p_tokens: Int
+    let p_product_id: String
+    let p_store_transaction_id: String
+}
+
+private struct ApplyGeminiUsageRPCParams: Encodable {
+    let p_invocation_tokens: Int
+}
+
+enum TierTapUserAITokenBalancesAPI {
+    private static func getFn() -> String {
+        shouldUseTestSupabaseTables() ? "tier_tap_get_ai_token_balances_test" : "tier_tap_get_ai_token_balances"
+    }
+
+    private static func grantFn() -> String {
+        shouldUseTestSupabaseTables() ? "tier_tap_grant_plus_tokens_test" : "tier_tap_grant_plus_tokens"
+    }
+
+    private static func applyFn() -> String {
+        shouldUseTestSupabaseTables() ? "tier_tap_apply_gemini_token_usage_test" : "tier_tap_apply_gemini_token_usage"
+    }
+
+    static func fetchCurrentUserBalances() async throws -> AIUserTokenBalancesPayload {
+        guard let client = supabase else {
+            throw TierTapUserAITokenBalancesError.supabaseNotConfigured
+        }
+        return try await client.database
+            .rpc(getFn())
+            .execute()
+            .value
+    }
+
+    static func grantPlusPack(tokensGranted: Int, productId: String, storeTransactionId: String) async throws -> AIUserTokenBalancesPayload {
+        guard let client = supabase else {
+            throw TierTapUserAITokenBalancesError.supabaseNotConfigured
+        }
+        let params = GrantPlusRPCParams(
+            p_tokens: tokensGranted,
+            p_product_id: productId,
+            p_store_transaction_id: storeTransactionId
+        )
+        return try await client.database
+            .rpc(grantFn(), params: params)
+            .execute()
+            .value
+    }
+
+    static func applyGeminiTokenUsage(invocationTokens: Int) async throws -> AIUserTokenBalancesPayload {
+        guard let client = supabase else {
+            throw TierTapUserAITokenBalancesError.supabaseNotConfigured
+        }
+        let params = ApplyGeminiUsageRPCParams(p_invocation_tokens: invocationTokens)
+        return try await client.database
+            .rpc(applyFn(), params: params)
+            .execute()
+            .value
+    }
+}
+
+enum TierTapUserAITokenBalancesError: Error {
+    case supabaseNotConfigured
+}
+
+// MARK: - TierTap Plus token purchases (Supabase)
+
+private struct TierTapPlusTokenPurchaseInsertRow: Encodable {
+    let user_id: UUID
+    let tokens_granted: Int
+    let product_id: String
+    let store_transaction_id: String
+}
+
+enum TierTapPlusPurchasesAPI {
+    /// Inserts a purchase row for analytics and support. Duplicate `store_transaction_id` for the same user is ignored.
+    static func recordPurchase(userId: UUID, tokensGranted: Int, productId: String, storeTransactionId: String) async {
+        guard let client = supabase else { return }
+        let row = TierTapPlusTokenPurchaseInsertRow(
+            user_id: userId,
+            tokens_granted: tokensGranted,
+            product_id: productId,
+            store_transaction_id: storeTransactionId
+        )
+        do {
+            try await client.database
+                .from(SupabaseTables.tierTapPlusTokenPurchases)
+                .insert(row)
+                .execute()
+        } catch {
+            if let pe = error as? PostgrestError, pe.code == "23505" { return }
+            let m = error.localizedDescription.lowercased()
+            if m.contains("duplicate key") || m.contains("unique constraint") { return }
+            print("[TierTapPlusPurchasesAPI] insert failed: \(error.localizedDescription)")
+        }
     }
 }
 

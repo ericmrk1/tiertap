@@ -104,6 +104,10 @@ private struct TierTapAppRoot: View {
         .animation(.easeOut(duration: 0.4), value: showSplash)
         .animation(.easeOut(duration: 0.35), value: showWelcome)
         .animation(.easeOut(duration: 0.25), value: shouldShowLockGate)
+        .task(id: authStore.session?.user.id) {
+            guard authStore.isSignedIn else { return }
+            await settingsStore.syncAITokenBalancesFromSupabaseSession()
+        }
         .onAppear {
             store.watchActionAuthStore = authStore
             store.watchActionSettingsStore = settingsStore

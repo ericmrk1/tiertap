@@ -647,11 +647,6 @@ struct TripMagicWandView: View {
             }
             let contents: [Content]
         }
-        struct GeminiPart: Decodable { let text: String? }
-        struct GeminiContent: Decodable { let parts: [GeminiPart]? }
-        struct GeminiCandidate: Decodable { let content: GeminiContent? }
-        struct GeminiRouterResponse: Decodable { let candidates: [GeminiCandidate]? }
-
         do {
             if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
                 await MainActor.run { settingsStore.registerAICall() }
@@ -663,10 +658,16 @@ struct TripMagicWandView: View {
                 ],
                 language: settingsStore.appLanguage
             )
-            let response: GeminiRouterResponse = try await GeminiRouterThrottle.tripSuggestions.executeWithRetries {
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.tripSuggestions.executeWithRetries {
                 try await client.functions.invoke(
                     "gemini-router",
                     options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
                 )
             }
             let rawText = response.candidates?

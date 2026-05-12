@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import StoreKit
 import UIKit
 
 enum MainTab: Hashable {
@@ -469,6 +470,7 @@ struct CommunityAuthSheet: View {
     @State private var isShowingCameraPicker = false
     @State private var isShowingLibraryPicker = false
     @State private var showSubscriptionPaywall = false
+    @State private var isPurchasingCreditsPack = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -492,9 +494,94 @@ struct CommunityAuthSheet: View {
             return L10n.tr("TierTap Pro — Quarterly", language: appLanguage)
         case TierTapProductId.yearly.rawValue:
             return L10n.tr("TierTap Pro — Yearly", language: appLanguage)
+        case TierTapProductId.credits.rawValue:
+            return L10n.tr("AI token pack (Credits)", language: appLanguage)
         default:
             return L10n.tr("TierTap Pro", language: appLanguage)
         }
+    }
+
+    private var aiTokenPacksAccountCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            LocalizedLabel(title: "AI token packs", systemImage: "sparkles")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+
+            TierTapPlusTokenStatBubbles(
+                packBalance: settingsStore.aiPurchasedTokenBalance,
+                lifetimePurchased: settingsStore.lifetimeTierTapPlusTokensPurchased,
+                packUsage: settingsStore.tierTapPlusTokensConsumedFromPurchases
+            )
+
+            Text(
+                String(
+                    format: L10n.tr("Pro plan tokens left this month: %@", language: appLanguage),
+                    settingsStore.proPlanIncludedTokensRemainingThisMonth.formatted(.number.grouping(.automatic))
+                )
+            )
+            .font(.caption2)
+            .foregroundColor(.white.opacity(0.78))
+
+            if let product = subscriptionStore.creditsProduct {
+                Button {
+                    Task { await purchaseCreditsPackFromAccount(product) }
+                } label: {
+                    HStack(alignment: .center, spacing: 8) {
+                        if isPurchasingCreditsPack {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "cart.fill")
+                        }
+                        let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                        TierTapPlusTokenPackPurchaseLabel(
+                            language: appLanguage,
+                            tokenCountFormatted: packCount,
+                            displayPrice: product.displayPrice,
+                            font: .caption.weight(.semibold)
+                        )
+                    }
+                    .tierTapPlusPurchaseButtonChrome(compact: false)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 2)
+                .accessibilityLabel(
+                    String(
+                        format: L10n.tr("Buy TierTap Plus Tokens (%@) — %@", language: appLanguage),
+                        TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                        product.displayPrice
+                    )
+                )
+                .disabled(!hasProAccess || isPurchasingCreditsPack || subscriptionStore.isLoading)
+            } else {
+                L10nText("Token packs aren’t available in the store yet.")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.75))
+            }
+
+            if !hasProAccess {
+                L10nText("Subscribe to TierTap Pro to use AI, then you can buy token packs here.")
+                    .font(.caption2)
+                    .foregroundColor(.orange.opacity(0.95))
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.12))
+        .cornerRadius(14)
+    }
+
+    private func purchaseCreditsPackFromAccount(_ product: Product) async {
+        guard hasProAccess else { return }
+        guard !isPurchasingCreditsPack, !subscriptionStore.isLoading else { return }
+        isPurchasingCreditsPack = true
+        if let tid = await subscriptionStore.purchase(product) {
+            await settingsStore.grantTierTapSessionCreditsPack(
+                storeTransactionId: tid,
+                supabaseUserId: authStore.session?.user.id
+            )
+        }
+        isPurchasingCreditsPack = false
     }
 
     private var subscriptionAccessRow: some View {
@@ -583,6 +670,9 @@ struct CommunityAuthSheet: View {
                 .environmentObject(subscriptionStore)
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+        }
+        .task {
+            await subscriptionStore.loadProducts()
         }
         .presentationDetents([.large])
     }
@@ -763,6 +853,8 @@ struct CommunityAuthSheet: View {
             }
 
             subscriptionAccessRow
+
+            aiTokenPacksAccountCard
 
             if !SupabaseConfig.isConfigured {
                 L10nText("Add SUPABASE_URL and SUPABASE_ANON_KEY to SupabaseKeys.plist to enable sign-in. You can still use TierTap without an account.")

@@ -1,14 +1,23 @@
 import Foundation
 import StoreKit
 
-/// Product identifiers for TierTap subscriptions (must match App Store Connect).
+/// Product identifiers for TierTap subscriptions and consumables (must match App Store Connect / `.storekit`).
 enum TierTapProductId: String, CaseIterable {
     case monthly = "com.app.subs.tiertap.monthly"
     case quarterly = "com.app.subs.tiertap.quarterly"
     case yearly = "com.app.subs.tiertap.yearly"
+    case credits = "Credits"
 
-    /// Subscription group identifier.
     var subscriptionGroupId: String { "com.app.subs.tiertap" }
+
+    var isSubscription: Bool {
+        switch self {
+        case .monthly, .quarterly, .yearly: return true
+        case .credits: return false
+        }
+    }
+
+    static let creditsPackTokenAmount: Int = 250_000
 }
 
 @MainActor
@@ -34,6 +43,14 @@ final class SubscriptionStore: ObservableObject {
     /// Pro is unlocked without a StoreKit purchase (TestFlight / sandbox receipt). Used for UI that hides IAP when the catalog is empty.
     var hasComplimentaryBetaProAccess: Bool {
         Self.isTestFlightOrSandboxBuild
+    }
+
+    var subscriptionProducts: [Product] {
+        products.filter { TierTapProductId(rawValue: $0.id)?.isSubscription == true }
+    }
+
+    var creditsProduct: Product? {
+        products.first { $0.id == TierTapProductId.credits.rawValue }
     }
 
     init() {

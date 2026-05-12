@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Supabase
 #if os(iOS)
 import UIKit
 #endif
@@ -27,6 +28,46 @@ private let keyAITone = "ctt_ai_tone"
 private let keyAITypingSpeed = "ctt_ai_typing_speed"
 private let keyAICallsDate = "ctt_ai_calls_date"
 private let keyAICallsCount = "ctt_ai_calls_count"
+private let keyAIDayTelemetry = "ctt_ai_day_telemetry_v1"
+private let keyAIPurchasedTokenBalance = "ctt_ai_purchased_token_balance"
+private let keyAITierTapPlusTokensConsumedFromPacks = "ctt_ai_tiertap_plus_tokens_consumed_from_packs"
+private let keyAILifetimeTierTapPlusTokensPurchased = "ctt_ai_lifetime_tiertap_plus_tokens_purchased"
+private let keyAIProPlanTokenMonth = "ctt_ai_pro_plan_token_month"
+private let keyAIProPlanTokensConsumed = "ctt_ai_pro_plan_tokens_consumed"
+
+/// Per-calendar-day aggregates for Settings “Tokens” charts (persisted).
+struct AIDayTelemetry: Codable, Equatable {
+    var tokens: Int = 0
+    var aiFeaturesUsed: Int = 0
+    /// TierTap Plus (`Credits`) tokens granted from IAP on this calendar day (for charts).
+    var plusTokensPurchased: Int = 0
+
+    enum CodingKeys: String, CodingKey {
+        case tokens
+        case aiFeaturesUsed
+        case plusTokensPurchased
+    }
+
+    init(tokens: Int = 0, aiFeaturesUsed: Int = 0, plusTokensPurchased: Int = 0) {
+        self.tokens = tokens
+        self.aiFeaturesUsed = aiFeaturesUsed
+        self.plusTokensPurchased = plusTokensPurchased
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        tokens = try c.decodeIfPresent(Int.self, forKey: .tokens) ?? 0
+        aiFeaturesUsed = try c.decodeIfPresent(Int.self, forKey: .aiFeaturesUsed) ?? 0
+        plusTokensPurchased = try c.decodeIfPresent(Int.self, forKey: .plusTokensPurchased) ?? 0
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(tokens, forKey: .tokens)
+        try c.encode(aiFeaturesUsed, forKey: .aiFeaturesUsed)
+        try c.encode(plusTokensPurchased, forKey: .plusTokensPurchased)
+    }
+}
 private let keyEnableCasinoFeedback = "ctt_enable_casino_feedback"
 private let keySoundProfile = "ctt_sound_profile"
 private let keySubscriptionOverrideCode = "ctt_subscription_override_code"
@@ -680,9 +721,29 @@ final class SettingsStore: ObservableObject {
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
 
+    /// Per-day AI token usage and feature invocations (all tiers), for Settings charts.
+    @Published private(set) var aiDayTelemetry: [String: AIDayTelemetry] = [:]
+
+    /// Remaining TierTap Plus token balance from **Credits** consumable IAP. Drawn down only after the monthly Pro plan allowance is used (see ``consumeAIPurchasedTokensIfNeeded``).
+    @Published private(set) var aiPurchasedTokenBalance: Int = 0
+
+    /// Lifetime total of TierTap Plus (`Credits`) tokens granted from IAP (running sum of pack sizes).
+    @Published private(set) var lifetimeTierTapPlusTokensPurchased: Int = 0
+
+    /// Tokens charged against the purchasable balance after the Pro plan monthly allowance was exhausted.
+    @Published private(set) var tierTapPlusTokensConsumedFromPurchases: Int = 0
+
+    /// TierTap Pro included-token usage for the calendar month in ``proPlanTokenUsageMonthKey``.
+    @Published private(set) var proPlanTokensConsumedThisMonth: Int = 0
+
     /// Maximum number of AI calls allowed per day on the free tier. Higher on TestFlight for testers.
     var maxAICallsPerDay: Int {
         SupabaseConfig.isTestFlight ? 20 : 5
+    }
+
+    /// Remaining TierTap Pro included Gemini tokens for the current calendar month (before pack balance is used).
+    var proPlanIncludedTokensRemainingThisMonth: Int {
+        max(0, TierTapProductId.proPlanIncludedTokensPerCalendarMonth - proPlanTokensConsumedThisMonth)
     }
 
     /// Remaining AI calls the user can make today on the free tier.
@@ -896,6 +957,35 @@ final class SettingsStore: ObservableObject {
             UserDefaults.standard.set(today, forKey: keyAICallsDate)
             UserDefaults.standard.set(0, forKey: keyAICallsCount)
         }
+
+        if let data = UserDefaults.standard.data(forKey: keyAIDayTelemetry),
+           let decoded = try? JSONDecoder().decode([String: AIDayTelemetry].self, from: data) {
+            self.aiDayTelemetry = decoded
+        } else {
+            self.aiDayTelemetry = [:]
+        }
+
+        self.aiPurchasedTokenBalance = max(0, UserDefaults.standard.integer(forKey: keyAIPurchasedTokenBalance))
+
+        self.tierTapPlusTokensConsumedFromPurchases = max(0, UserDefaults.standard.integer(forKey: keyAITierTapPlusTokensConsumedFromPacks))
+
+        let planMonth = Self.proPlanMonthKey(for: Date())
+        let storedPlanMonth = UserDefaults.standard.string(forKey: keyAIProPlanTokenMonth) ?? ""
+        if storedPlanMonth == planMonth {
+            self.proPlanTokensConsumedThisMonth = max(0, UserDefaults.standard.integer(forKey: keyAIProPlanTokensConsumed))
+        } else {
+            self.proPlanTokensConsumedThisMonth = 0
+            UserDefaults.standard.set(planMonth, forKey: keyAIProPlanTokenMonth)
+            UserDefaults.standard.set(0, forKey: keyAIProPlanTokensConsumed)
+        }
+
+        var lifetimePurchased = max(0, UserDefaults.standard.integer(forKey: keyAILifetimeTierTapPlusTokensPurchased))
+        if lifetimePurchased == 0 && self.aiPurchasedTokenBalance > 0 {
+            lifetimePurchased = self.aiPurchasedTokenBalance
+            UserDefaults.standard.set(lifetimePurchased, forKey: keyAILifetimeTierTapPlusTokensPurchased)
+        }
+        self.lifetimeTierTapPlusTokensPurchased = lifetimePurchased
+
         if self.themePresets.isEmpty {
             let defaults: [ThemePreset] = [
                 ThemePreset(id: UUID(), name: "Royal Blue & Gold", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .yellow)),
@@ -987,6 +1077,207 @@ final class SettingsStore: ObservableObject {
         UserDefaults.standard.set(aiCallsDate, forKey: keyAICallsDate)
         UserDefaults.standard.set(aiCallsToday, forKey: keyAICallsCount)
         #endif
+    }
+
+    /// Stable `yyyy-MM` key for TierTap Pro included-token monthly bucket.
+    static func proPlanMonthKey(for date: Date, calendar: Calendar = .current) -> String {
+        let sod = calendar.startOfDay(for: date)
+        let c = calendar.dateComponents([.year, .month], from: sod)
+        guard let y = c.year, let m = c.month else { return "" }
+        return String(format: "%04d-%02d", y, m)
+    }
+
+    /// Stable `yyyy-MM-dd` key in the user's calendar for telemetry buckets.
+    static func telemetryDayKey(for date: Date, calendar: Calendar = .current) -> String {
+        let sod = calendar.startOfDay(for: date)
+        let c = calendar.dateComponents([.year, .month, .day], from: sod)
+        guard let y = c.year, let m = c.month, let d = c.day else { return "" }
+        return String(format: "%04d-%02d-%02d", y, m, d)
+    }
+
+    /// Credits from a successful **TierTapSession** (`Credits`) consumable purchase.
+    /// When Supabase is configured and `supabaseUserId` is set, the server row is updated (and the purchase is recorded there). Otherwise updates are local only.
+    @MainActor
+    func grantTierTapSessionCreditsPack(
+        amount: Int = TierTapProductId.creditsPackTokenAmount,
+        storeTransactionId: String? = nil,
+        supabaseUserId: UUID? = nil
+    ) async {
+        let add = max(0, amount)
+        guard add > 0 else { return }
+        let txn = storeTransactionId ?? "local-\(UUID().uuidString)"
+
+        if SupabaseConfig.isConfigured, supabaseUserId != nil {
+            do {
+                let payload = try await TierTapUserAITokenBalancesAPI.grantPlusPack(
+                    tokensGranted: add,
+                    productId: TierTapProductId.credits.rawValue,
+                    storeTransactionId: txn
+                )
+                applyAITokenBalancesFromServer(payload)
+                addPlusPurchaseToLocalCharts(amount: add)
+            } catch {
+                print("[SettingsStore] grantPlusPack server failed, using local balances: \(error.localizedDescription)")
+                applyLocalTierTapPlusGrant(amount: add)
+                addPlusPurchaseToLocalCharts(amount: add)
+                if let uid = supabaseUserId {
+                    await TierTapPlusPurchasesAPI.recordPurchase(
+                        userId: uid,
+                        tokensGranted: add,
+                        productId: TierTapProductId.credits.rawValue,
+                        storeTransactionId: txn
+                    )
+                }
+            }
+        } else {
+            applyLocalTierTapPlusGrant(amount: add)
+            addPlusPurchaseToLocalCharts(amount: add)
+            if let uid = supabaseUserId {
+                await TierTapPlusPurchasesAPI.recordPurchase(
+                    userId: uid,
+                    tokensGranted: add,
+                    productId: TierTapProductId.credits.rawValue,
+                    storeTransactionId: txn
+                )
+            }
+        }
+    }
+
+    /// Loads authoritative balances from Supabase for the signed-in user and mirrors them to `UserDefaults`.
+    @MainActor
+    func syncAITokenBalancesFromSupabaseSession() async {
+        guard SupabaseConfig.isConfigured, let client = supabase else { return }
+        guard (try? await client.auth.session) != nil else { return }
+        do {
+            let payload = try await TierTapUserAITokenBalancesAPI.fetchCurrentUserBalances()
+            applyAITokenBalancesFromServer(payload)
+        } catch {
+            print("[SettingsStore] syncAITokenBalancesFromSupabaseSession failed: \(error.localizedDescription)")
+        }
+    }
+
+    @MainActor
+    private func applyAITokenBalancesFromServer(_ p: AIUserTokenBalancesPayload) {
+        aiPurchasedTokenBalance = max(0, p.purchased_balance_remaining)
+        lifetimeTierTapPlusTokensPurchased = max(0, p.lifetime_plus_tokens_purchased)
+        tierTapPlusTokensConsumedFromPurchases = max(0, p.consumed_from_packs)
+        proPlanTokensConsumedThisMonth = max(0, p.pro_plan_tokens_consumed_month)
+        UserDefaults.standard.set(aiPurchasedTokenBalance, forKey: keyAIPurchasedTokenBalance)
+        UserDefaults.standard.set(lifetimeTierTapPlusTokensPurchased, forKey: keyAILifetimeTierTapPlusTokensPurchased)
+        UserDefaults.standard.set(tierTapPlusTokensConsumedFromPurchases, forKey: keyAITierTapPlusTokensConsumedFromPacks)
+        UserDefaults.standard.set(proPlanTokensConsumedThisMonth, forKey: keyAIProPlanTokensConsumed)
+        let month = p.pro_plan_month_key.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !month.isEmpty {
+            UserDefaults.standard.set(month, forKey: keyAIProPlanTokenMonth)
+        }
+    }
+
+    @MainActor
+    private func applyLocalTierTapPlusGrant(amount: Int) {
+        let add = max(0, amount)
+        guard add > 0 else { return }
+        aiPurchasedTokenBalance += add
+        UserDefaults.standard.set(aiPurchasedTokenBalance, forKey: keyAIPurchasedTokenBalance)
+        lifetimeTierTapPlusTokensPurchased += add
+        UserDefaults.standard.set(lifetimeTierTapPlusTokensPurchased, forKey: keyAILifetimeTierTapPlusTokensPurchased)
+    }
+
+    @MainActor
+    private func addPlusPurchaseToLocalCharts(amount: Int) {
+        let add = max(0, amount)
+        guard add > 0 else { return }
+        let dayKey = Self.telemetryDayKey(for: Date())
+        var next = aiDayTelemetry
+        var day = next[dayKey] ?? AIDayTelemetry()
+        day.plusTokensPurchased += add
+        next[dayKey] = day
+        Self.pruneAIDayTelemetry(&next)
+        aiDayTelemetry = next
+        if let data = try? JSONEncoder().encode(aiDayTelemetry) {
+            UserDefaults.standard.set(data, forKey: keyAIDayTelemetry)
+        }
+    }
+
+    /// Called after each successful remote AI request (Gemini text/image or Imagen). Adds token totals when known.
+    /// When `hasProAccess` is true, usage counts against the monthly Pro included allowance first, then against ``aiPurchasedTokenBalance``.
+    func recordAITelemetry(invocationTokens: Int, hasProAccess: Bool = false) {
+        let key = Self.telemetryDayKey(for: Date())
+        var next = aiDayTelemetry
+        var day = next[key] ?? AIDayTelemetry()
+        day.tokens += max(0, invocationTokens)
+        day.aiFeaturesUsed += 1
+        next[key] = day
+        Self.pruneAIDayTelemetry(&next)
+        aiDayTelemetry = next
+        if let data = try? JSONEncoder().encode(aiDayTelemetry) {
+            UserDefaults.standard.set(data, forKey: keyAIDayTelemetry)
+        }
+        if SupabaseConfig.isConfigured, hasProAccess, max(0, invocationTokens) > 0 {
+            Task { @MainActor in
+                await applyGeminiServerOrLocalSpend(invocationTokens: invocationTokens)
+            }
+        } else {
+            applyProAndPurchasedGeminiTokenSpend(invocationTokens: invocationTokens, hasProAccess: hasProAccess)
+        }
+    }
+
+    @MainActor
+    private func applyGeminiServerOrLocalSpend(invocationTokens: Int) async {
+        let t = max(0, invocationTokens)
+        guard t > 0 else { return }
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            applyProAndPurchasedGeminiTokenSpend(invocationTokens: t, hasProAccess: true)
+            return
+        }
+        guard (try? await client.auth.session) != nil else {
+            applyProAndPurchasedGeminiTokenSpend(invocationTokens: t, hasProAccess: true)
+            return
+        }
+        do {
+            let payload = try await TierTapUserAITokenBalancesAPI.applyGeminiTokenUsage(invocationTokens: t)
+            applyAITokenBalancesFromServer(payload)
+        } catch {
+            print("[SettingsStore] applyGeminiTokenUsage server failed, using local spend: \(error.localizedDescription)")
+            applyProAndPurchasedGeminiTokenSpend(invocationTokens: t, hasProAccess: true)
+        }
+    }
+
+    private func applyProAndPurchasedGeminiTokenSpend(invocationTokens: Int, hasProAccess: Bool) {
+        guard hasProAccess else { return }
+        let tokens = max(0, invocationTokens)
+        guard tokens > 0 else { return }
+
+        let monthKey = Self.proPlanMonthKey(for: Date())
+        let storedMonth = UserDefaults.standard.string(forKey: keyAIProPlanTokenMonth) ?? ""
+        if storedMonth != monthKey {
+            proPlanTokensConsumedThisMonth = 0
+            UserDefaults.standard.set(monthKey, forKey: keyAIProPlanTokenMonth)
+            UserDefaults.standard.set(0, forKey: keyAIProPlanTokensConsumed)
+        }
+
+        let allowance = TierTapProductId.proPlanIncludedTokensPerCalendarMonth
+        let allowanceRemaining = max(0, allowance - proPlanTokensConsumedThisMonth)
+        let fromPlan = min(tokens, allowanceRemaining)
+        if fromPlan > 0 {
+            proPlanTokensConsumedThisMonth += fromPlan
+            UserDefaults.standard.set(proPlanTokensConsumedThisMonth, forKey: keyAIProPlanTokensConsumed)
+        }
+
+        let fromPurchasedNeed = tokens - fromPlan
+        guard fromPurchasedNeed > 0 else { return }
+        let take = min(fromPurchasedNeed, aiPurchasedTokenBalance)
+        guard take > 0 else { return }
+        aiPurchasedTokenBalance -= take
+        tierTapPlusTokensConsumedFromPurchases += take
+        UserDefaults.standard.set(aiPurchasedTokenBalance, forKey: keyAIPurchasedTokenBalance)
+        UserDefaults.standard.set(tierTapPlusTokensConsumedFromPurchases, forKey: keyAITierTapPlusTokensConsumedFromPacks)
+    }
+
+    private static func pruneAIDayTelemetry(_ dict: inout [String: AIDayTelemetry]) {
+        let cal = Calendar.current
+        guard let cutoff = cal.date(byAdding: .day, value: -180, to: cal.startOfDay(for: Date())) else { return }
+        let cutoffKey = telemetryDayKey(for: cutoff, calendar: cal)
+        dict = dict.filter { $0.key >= cutoffKey }
     }
 
     /// Record a bankroll reset to a new value (e.g. from Bankroll screen). Updates `bankroll` and persists to SQLite.

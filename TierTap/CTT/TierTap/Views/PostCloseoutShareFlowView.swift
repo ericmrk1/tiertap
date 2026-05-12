@@ -66,7 +66,7 @@ struct PostCloseoutShareFlowView: View {
     }
 
     private var pickActionPanel: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack {
             settingsStore.primaryGradient.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 10) {
@@ -122,11 +122,6 @@ struct PostCloseoutShareFlowView: View {
                     .padding(.bottom, 6)
                 }
             }
-            Button("Close") { dismiss() }
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.green)
-                .padding(.top, 6)
-                .padding(.trailing, 12)
         }
     }
 }

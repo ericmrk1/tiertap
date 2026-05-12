@@ -114,8 +114,13 @@ struct LockDownTierTapSection: View {
 struct TierTapAccountView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
 
     @State private var isConfirmingSignOut = false
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
 
     var body: some View {
         ZStack {
@@ -123,6 +128,9 @@ struct TierTapAccountView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     accountCard
+                    if authStore.isSignedIn, hasProAccess {
+                        tierTapPlusBalancesCard
+                    }
                     LockDownTierTapSection()
                 }
                 .padding()
@@ -193,6 +201,47 @@ struct TierTapAccountView: View {
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private var tierTapPlusBalancesCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    TierTapPlusMark(
+                        font: .headline,
+                        weight: .bold,
+                        foreground: .white,
+                        accessibilitySummarySuppressed: true
+                    )
+                    Text(L10n.tr("tokens", language: settingsStore.appLanguage))
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(L10n.tr("TierTap Plus tokens", language: settingsStore.appLanguage))
+            } icon: {
+                Image(systemName: "sparkles")
+                    .foregroundStyle(settingsStore.primaryGradient)
+            }
+            TierTapPlusTokenStatBubbles(
+                packBalance: settingsStore.aiPurchasedTokenBalance,
+                lifetimePurchased: settingsStore.lifetimeTierTapPlusTokensPurchased,
+                packUsage: settingsStore.tierTapPlusTokensConsumedFromPurchases
+            )
+
+            Text(
+                String(
+                    format: L10n.tr("Pro plan tokens left this month: %@", language: settingsStore.appLanguage),
+                    settingsStore.proPlanIncludedTokensRemainingThisMonth.formatted(.number.grouping(.automatic))
+                )
+            )
+            .font(.caption2)
+            .foregroundColor(.gray)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
