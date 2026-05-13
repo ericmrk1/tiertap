@@ -46,6 +46,26 @@
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchLiveView.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchLiveView~partial.swiftmodule"
   },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchNumericKeypad.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchNumericKeypad~partial.swiftmodule"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchRainingCoinsOverlay.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchRainingCoinsOverlay~partial.swiftmodule"
+  },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap Watch App/Views/WatchStartView.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchStartView.swiftconstvalues",
     "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/WatchStartView.d",
@@ -95,6 +115,16 @@
     "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/SessionStore.o",
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/SessionStore.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/SessionStore~partial.swiftmodule"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StackUpdateConfetti.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/StackUpdateConfetti~partial.swiftmodule"
   },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/WatchConnectivity/SessionSyncManager.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-watchsimulator/TierTap Watch App.build/Objects-normal/arm64/SessionSyncManager.swiftconstvalues",

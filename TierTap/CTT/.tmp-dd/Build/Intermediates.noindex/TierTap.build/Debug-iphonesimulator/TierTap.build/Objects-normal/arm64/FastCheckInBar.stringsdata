@@ -4,18 +4,26 @@
     "Localizable": [
       {
         "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 406
+        }
+      },
+      {
+        "comment": "",
         "key": "Active Session",
         "location": {
           "startingColumn": 16,
-          "startingLine": 398
+          "startingLine": 561
         }
       },
       {
         "comment": "",
         "key": "",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 377
+          "startingColumn": 27,
+          "startingLine": 523
         }
       },
       {
@@ -23,7 +31,7 @@
         "key": "Resume Existing",
         "location": {
           "startingColumn": 20,
-          "startingLine": 399
+          "startingLine": 562
         }
       },
       {
@@ -31,7 +39,7 @@
         "key": "End & Start New",
         "location": {
           "startingColumn": 20,
-          "startingLine": 402
+          "startingLine": 565
         }
       },
       {
@@ -39,7 +47,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 20,
-          "startingLine": 417
+          "startingLine": 580
         }
       },
       {
@@ -47,7 +55,7 @@
         "key": "Start anyway",
         "location": {
           "startingColumn": 20,
-          "startingLine": 418
+          "startingLine": 581
         }
       }
     ]

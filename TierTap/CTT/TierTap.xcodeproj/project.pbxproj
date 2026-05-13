@@ -25,6 +25,10 @@
 		2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */; };
 		2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */; };
 		2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */; };
+		2E9D7BC32F650003004015F4 /* SessionPhotoRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC02F650000004015F4 /* SessionPhotoRef.swift */; };
+		2E9D7BC42F650004004015F4 /* SessionAttachedPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */; };
+		2E9D7BC52F650005004015F4 /* SessionPhotosSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC22F650002004015F4 /* SessionPhotosSheet.swift */; };
+		2E9D7BC62F650006004015F4 /* HistoryPhotoFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */; };
@@ -202,6 +206,10 @@
 		2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubscriptionStore 2.swift"; sourceTree = "<group>"; };
 		2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TierTapStoreKitConfig.storekit; sourceTree = "<group>"; };
 		2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompPhotoStorage.swift; sourceTree = "<group>"; };
+		2E9D7BC02F650000004015F4 /* SessionPhotoRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPhotoRef.swift; sourceTree = "<group>"; };
+		2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAttachedPhotoStorage.swift; sourceTree = "<group>"; };
+		2E9D7BC22F650002004015F4 /* SessionPhotosSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPhotosSheet.swift; sourceTree = "<group>"; };
+		2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPhotoFeedView.swift; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -374,9 +382,11 @@
 				TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
 				TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */,
+				2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */,
 				ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */,
 				2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */,
 				EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */,
+				2E9D7BC22F650002004015F4 /* SessionPhotosSheet.swift */,
 				CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */,
 				282155DBCB51F96C8840E98B /* SessionDetailView.swift */,
 				CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */,
@@ -405,6 +415,8 @@
 				APRT2E2F3A4B5C6D7E8F9A0B1 /* AirportCatalog.swift */,
 				3F66565AB34E6CAAC5CF584C /* Session.swift */,
 				2E9D7BA02F622100004015F4 /* CompPhotoStorage.swift */,
+				2E9D7BC02F650000004015F4 /* SessionPhotoRef.swift */,
+				2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */,
 				TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */,
 				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
@@ -862,6 +874,10 @@
 				E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */,
 				2E9D7B8A2F6211AD004015F4 /* ChipEstimatorPhotoStorage.swift in Sources */,
 				2E9D7BA12F622100004015F4 /* CompPhotoStorage.swift in Sources */,
+				2E9D7BC32F650003004015F4 /* SessionPhotoRef.swift in Sources */,
+				2E9D7BC42F650004004015F4 /* SessionAttachedPhotoStorage.swift in Sources */,
+				2E9D7BC52F650005004015F4 /* SessionPhotosSheet.swift in Sources */,
+				2E9D7BC62F650006004015F4 /* HistoryPhotoFeedView.swift in Sources */,
 				TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,

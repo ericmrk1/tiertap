@@ -20,6 +20,15 @@ private func subscriptionSavingsPercentComparedToMonthly(
     return rounded > 0 ? rounded : nil
 }
 
+private func subscriptionSavingsPercent(
+    plan: TierTapProductId,
+    product: Product?,
+    monthlyProduct: Product?
+) -> Int? {
+    guard let product else { return nil }
+    return subscriptionSavingsPercent(plan: product, monthlyProduct: monthlyProduct)
+}
+
 private func subscriptionSavingsPercent(plan: Product, monthlyProduct: Product?) -> Int? {
     guard let monthlyProduct, monthlyProduct.id == TierTapProductId.monthly.rawValue else { return nil }
     let months: Int?
@@ -257,78 +266,65 @@ struct TierTapPaywallView: View {
         .padding(.horizontal, -16)
     }
 
+    private struct PaywallSubscriptionPlanRow: Identifiable {
+        let plan: TierTapProductId
+        let product: Product?
+
+        var id: String { plan.rawValue }
+
+        var displayPrice: String {
+            product?.displayPrice ?? plan.catalogDisplayPrice
+        }
+    }
+
+    private var paywallSubscriptionPlanRows: [PaywallSubscriptionPlanRow] {
+        TierTapProductId.subscriptionPlans.map { plan in
+            PaywallSubscriptionPlanRow(
+                plan: plan,
+                product: subscriptionStore.subscriptionProducts.first { $0.id == plan.rawValue }
+            )
+        }
+    }
+
     private var productsSection: some View {
-        Group {
-            if subscriptionStore.isLoading && subscriptionStore.products.isEmpty {
+        VStack(alignment: .leading, spacing: 10) {
+            L10nText("Choose your plan")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+
+            if subscriptionStore.isLoading && subscriptionStore.subscriptionProducts.isEmpty {
                 HStack {
                     Spacer()
                     ProgressView()
                         .tint(.white)
                     Spacer()
                 }
-                .padding()
-            } else if subscriptionStore.products.isEmpty {
-                if hasProAccess {
-                    if subscriptionStore.hasComplimentaryBetaProAccess {
-                        L10nText("TierTap Pro is included on this TestFlight build.")
-                            .font(.footnote)
-                            .foregroundColor(.white.opacity(0.95))
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white.opacity(0.12))
-                            .cornerRadius(12)
-                    }
-                } else {
-                    VStack(spacing: 12) {
-                        L10nText("No plans loaded yet.")
-                            .font(.footnote)
-                            .foregroundColor(.white.opacity(0.95))
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity)
-                        Button {
-                            Task { await subscriptionStore.loadProducts() }
-                        } label: {
-                            Text("Retry")
-                                .font(.subheadline.weight(.semibold))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
-                                .background(settingsStore.primaryColor.opacity(0.85))
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding()
-                    .background(Color.white.opacity(0.12))
-                    .cornerRadius(12)
-                }
-            } else {
-                VStack(alignment: .leading, spacing: 10) {
-                    L10nText("Choose your plan")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(.white)
+                .padding(.vertical, 8)
+            }
 
-                    HStack(alignment: .top, spacing: 8) {
-                        ForEach(sortedSubscriptionProducts, id: \.id) { product in
-                            PaywallPlanBox(
-                                product: product,
-                                savingsPercent: subscriptionSavingsPercent(plan: product, monthlyProduct: monthlySubscriptionProduct),
-                                isCurrent: subscriptionStore.purchasedProductIds.contains(product.id),
-                                isPurchasing: purchasingProductId == product.id,
-                                isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
-                                hasProAccess: hasProAccess,
-                                accentColor: settingsStore.primaryColor
-                            ) {
-                                purchase(product)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .top)
-                        }
+            HStack(alignment: .top, spacing: 8) {
+                ForEach(paywallSubscriptionPlanRows) { row in
+                    PaywallPlanBox(
+                        plan: row.plan,
+                        displayPrice: row.displayPrice,
+                        savingsPercent: subscriptionSavingsPercent(
+                            plan: row.plan,
+                            product: row.product,
+                            monthlyProduct: monthlySubscriptionProduct
+                        ),
+                        isCurrent: subscriptionStore.purchasedProductIds.contains(row.id),
+                        isPurchasing: purchasingProductId == row.id,
+                        isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
+                        hasProAccess: hasProAccess,
+                        accentColor: settingsStore.primaryColor
+                    ) {
+                        purchaseSubscriptionPlan(row)
                     }
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
-                .frame(maxWidth: .infinity)
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var sortedSubscriptionProducts: [Product] {
@@ -459,6 +455,14 @@ struct TierTapPaywallView: View {
         .cornerRadius(12)
     }
 
+    private func purchaseSubscriptionPlan(_ row: PaywallSubscriptionPlanRow) {
+        guard let product = row.product else {
+            Task { await subscriptionStore.loadProducts() }
+            return
+        }
+        purchase(product)
+    }
+
     private func purchase(_ product: Product) {
         guard !isPurchaseDisabled(for: product) else { return }
         purchasingProductId = product.id
@@ -519,7 +523,8 @@ private struct ProBenefitRow: View {
 }
 
 private struct PaywallPlanBox: View {
-    let product: Product
+    let plan: TierTapProductId
+    let displayPrice: String
     let savingsPercent: Int?
     let isCurrent: Bool
     let isPurchasing: Bool
@@ -529,9 +534,7 @@ private struct PaywallPlanBox: View {
     let action: () -> Void
 
     private var periodLabel: String {
-        if product.id.contains("yearly") { return "Yearly" }
-        if product.id.contains("quarterly") { return "3 Months" }
-        return "Monthly"
+        plan.paywallPeriodTitle
     }
 
     private var actionTitle: String {
@@ -543,7 +546,7 @@ private struct PaywallPlanBox: View {
             Text(periodLabel)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
-            Text(product.displayPrice)
+            Text(displayPrice)
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.9))
 

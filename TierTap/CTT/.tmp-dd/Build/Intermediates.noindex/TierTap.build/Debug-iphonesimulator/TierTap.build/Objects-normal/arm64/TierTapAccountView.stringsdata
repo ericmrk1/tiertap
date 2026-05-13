@@ -47,7 +47,7 @@
         "key": "Sign out of TierTap?",
         "location": {
           "startingColumn": 13,
-          "startingLine": 136
+          "startingLine": 144
         }
       },
       {
@@ -55,7 +55,7 @@
         "key": "Sign out",
         "location": {
           "startingColumn": 20,
-          "startingLine": 140
+          "startingLine": 148
         }
       },
       {
@@ -63,7 +63,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 20,
-          "startingLine": 143
+          "startingLine": 151
         }
       },
       {
@@ -71,7 +71,7 @@
         "key": "Sign out",
         "location": {
           "startingColumn": 28,
-          "startingLine": 185
+          "startingLine": 193
         }
       }
     ]

@@ -268,6 +268,10 @@ struct Session: Identifiable, Codable, Equatable {
     var tierPointsVerification: SessionTierPointsVerification?
     /// Optional filename for a locally stored chip estimator photo associated with this session.
     var chipEstimatorImageFilename: String?
+    /// User-attached session photos (camera / library) stored on disk by UUID.
+    var sessionAttachedPhotoIDs: [UUID] = []
+    /// Primary session photo across chip/table, comp receipts, and attachments.
+    var primarySessionPhotoRefKey: String?
 
     /// Optional structured metadata describing the type of game.
     /// Older sessions may have these unset; fall back to `game` string if needed.
@@ -307,6 +311,7 @@ struct Session: Identifiable, Codable, Equatable {
         case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
         case buyInEvents, compEvents, liveTrackedStackAmount, stackUpdateEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
         case chipEstimatorImageFilename
+        case sessionAttachedPhotoIDs, primarySessionPhotoRefKey
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
         case slotFormat, slotFormatOther, slotFeature, slotFeatureOther, slotNotes
@@ -338,6 +343,8 @@ struct Session: Identifiable, Codable, Equatable {
         linkedRewardWalletCardId = try c.decodeIfPresent(UUID.self, forKey: .linkedRewardWalletCardId)
         tierPointsVerification = try c.decodeIfPresent(SessionTierPointsVerification.self, forKey: .tierPointsVerification)
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
+        sessionAttachedPhotoIDs = try c.decodeIfPresent([UUID].self, forKey: .sessionAttachedPhotoIDs) ?? []
+        primarySessionPhotoRefKey = try c.decodeIfPresent(String.self, forKey: .primarySessionPhotoRefKey)
         gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
         pokerGameKind = try c.decodeIfPresent(SessionPokerGameKind.self, forKey: .pokerGameKind)
         pokerAllowsRebuy = try c.decodeIfPresent(Bool.self, forKey: .pokerAllowsRebuy)
@@ -368,6 +375,8 @@ struct Session: Identifiable, Codable, Equatable {
          linkedRewardWalletCardId: UUID? = nil,
          tierPointsVerification: SessionTierPointsVerification? = .unverified,
          chipEstimatorImageFilename: String? = nil,
+         sessionAttachedPhotoIDs: [UUID] = [],
+         primarySessionPhotoRefKey: String? = nil,
          gameCategory: SessionGameCategory? = nil,
          pokerGameKind: SessionPokerGameKind? = nil,
          pokerAllowsRebuy: Bool? = nil,
@@ -408,6 +417,8 @@ struct Session: Identifiable, Codable, Equatable {
         self.linkedRewardWalletCardId = linkedRewardWalletCardId
         self.tierPointsVerification = tierPointsVerification
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
+        self.sessionAttachedPhotoIDs = sessionAttachedPhotoIDs
+        self.primarySessionPhotoRefKey = primarySessionPhotoRefKey
         self.gameCategory = gameCategory
         self.pokerGameKind = pokerGameKind
         self.pokerAllowsRebuy = pokerAllowsRebuy
@@ -452,6 +463,8 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(linkedRewardWalletCardId, forKey: .linkedRewardWalletCardId)
         try c.encodeIfPresent(tierPointsVerification, forKey: .tierPointsVerification)
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
+        try c.encode(sessionAttachedPhotoIDs, forKey: .sessionAttachedPhotoIDs)
+        try c.encodeIfPresent(primarySessionPhotoRefKey, forKey: .primarySessionPhotoRefKey)
         try c.encodeIfPresent(gameCategory, forKey: .gameCategory)
         try c.encodeIfPresent(pokerGameKind, forKey: .pokerGameKind)
         try c.encodeIfPresent(pokerAllowsRebuy, forKey: .pokerAllowsRebuy)

@@ -33,5 +33,10 @@ enum ChipEstimatorPhotoStorage {
         let dir = documents.appendingPathComponent(directoryName, isDirectory: true)
         return dir.appendingPathComponent(fileName)
     }
+
+    static func deleteImage(fileName: String) {
+        guard let url = url(for: fileName) else { return }
+        try? FileManager.default.removeItem(at: url)
+    }
 }
 

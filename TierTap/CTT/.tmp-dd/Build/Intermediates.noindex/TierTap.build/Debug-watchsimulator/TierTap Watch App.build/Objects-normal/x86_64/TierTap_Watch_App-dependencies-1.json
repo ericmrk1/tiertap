@@ -6,6 +6,11 @@
   },
   {
     "isFramework" : true,
+    "moduleName" : "AppIntents",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/AppIntents.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
     "moduleName" : "Combine",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Combine.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
@@ -70,6 +75,16 @@
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Dispatch.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
+    "isFramework" : false,
+    "moduleName" : "Distributed",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Distributed.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "ExtensionFoundation",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/ExtensionFoundation.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
     "isFramework" : true,
     "moduleName" : "Foundation",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Foundation.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
@@ -85,6 +100,11 @@
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/HomeKit.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
+    "isFramework" : false,
+    "moduleName" : "Intents",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Intents.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
     "isFramework" : true,
     "moduleName" : "LocalAuthentication",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/LocalAuthentication.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
@@ -93,6 +113,11 @@
     "isFramework" : false,
     "moduleName" : "MapKit",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/MapKit.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Network",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Network.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
     "isFramework" : false,
@@ -108,6 +133,11 @@
     "isFramework" : false,
     "moduleName" : "Observation",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/Observation.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "RelevanceKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/RelevanceKit.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
     "isFramework" : false,
@@ -165,9 +195,19 @@
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/WatchKit.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
+    "isFramework" : true,
+    "moduleName" : "WidgetKit",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/WidgetKit.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
     "isFramework" : false,
     "moduleName" : "XPC",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/XPC.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "_AppIntents_SwiftUI",
+    "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/watchsimulator\/prebuilt-modules\/26.4\/_AppIntents_SwiftUI.swiftmodule\/x86_64-apple-watchos-simulator.swiftmodule"
   },
   {
     "isFramework" : false,
@@ -220,6 +260,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Accessibility"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/AppIntents.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/AppIntents-ZQKRLBT170NUFHJZ913W84WB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AppIntents"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
@@ -299,6 +346,13 @@
     "moduleName" : "Dispatch"
   },
   {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/ExtensionFoundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/ExtensionFoundation-763135B6479USVDDVJ0BE1OFG.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ExtensionFoundation"
+  },
+  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
     "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/Foundation-6Z6FMG9JZCCUDK68NMARTYAE8.pcm",
     "isBridgingHeaderDependency" : false,
@@ -311,6 +365,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "HomeKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/Intents.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/Intents-1FB9QVPK2ZOERANAD4MZAVXR8.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Intents"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/LocalAuthentication.framework\/Modules\/module.modulemap",
@@ -334,6 +395,13 @@
     "moduleName" : "MapKit"
   },
   {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/Network.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/Network-HHKI9EEJ2ERMFTP1866XVGVT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Network"
+  },
+  {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
     "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/OSLog-8Y38AXZ4QTE4UEZYWMA281ME7.pcm",
     "isBridgingHeaderDependency" : false,
@@ -353,6 +421,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "QuartzCore"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/RelevanceKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/RelevanceKit-1TSIMMDTVSGBGU28J8JJJPCW1.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "RelevanceKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/SceneKit.framework\/Modules\/module.modulemap",
@@ -444,6 +519,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "WatchKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/System\/Library\/Frameworks\/WidgetKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/WidgetKit-1OHONWQXKSJZECZZYKB9W18VQ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "WidgetKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/usr\/include\/xpc.modulemap",
@@ -563,6 +645,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_SwiftConcurrencyShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/usr\/include\/dnssd.modulemap",
+    "clangModulePath" : "\/Users\/emf76\/Dropbox\/Code\/TierTap\/CTT\/.tmp-dd\/ModuleCache.noindex\/dnssd-99VJPG5J7LFI5FP0FG4D059S6.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "dnssd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchSimulator.platform\/Developer\/SDKs\/WatchSimulator.sdk\/usr\/include\/os.modulemap",

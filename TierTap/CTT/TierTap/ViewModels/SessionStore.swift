@@ -1,5 +1,8 @@
 import Foundation
 import Combine
+#if os(iOS)
+import UIKit
+#endif
 #if os(iOS) || os(watchOS)
 import UserNotifications
 #endif
@@ -730,12 +733,107 @@ class SessionStore: ObservableObject {
     func setChipEstimatorImageFilename(_ fileName: String?) {
         guard var s = liveSession else { return }
         s.chipEstimatorImageFilename = fileName
+        #if os(iOS)
+        if fileName != nil, s.primarySessionPhotoRefKey == nil {
+            s.primarySessionPhotoRefKey = SessionPhotoRef.chipTable().storageKey
+        }
+        #endif
         liveSession = s
         saveLive()
         #if os(iOS)
         pushContext()
         #endif
     }
+
+    #if os(iOS)
+    func setPrimarySessionPhoto(sessionID: UUID, ref: SessionPhotoRef?) {
+        if var live = liveSession, live.id == sessionID {
+            live.primarySessionPhotoRefKey = ref?.storageKey
+            liveSession = live
+            saveLive()
+            pushContext()
+            return
+        }
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionID }) else { return }
+        var updated = sessions[idx]
+        updated.primarySessionPhotoRefKey = ref?.storageKey
+        sessions[idx] = updated
+        saveSessions()
+        pushContext()
+    }
+
+    @discardableResult
+    func addAttachedSessionPhoto(sessionID: UUID, image: UIImage) -> UUID? {
+        guard let photoID = SessionAttachedPhotoStorage.saveImage(image) else { return nil }
+        if var live = liveSession, live.id == sessionID {
+            live.sessionAttachedPhotoIDs.append(photoID)
+            if live.primarySessionPhotoRefKey == nil {
+                live.primarySessionPhotoRefKey = SessionPhotoRef.attached(photoID).storageKey
+            }
+            liveSession = live
+            saveLive()
+            pushContext()
+            return photoID
+        }
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionID }) else { return nil }
+        var updated = sessions[idx]
+        updated.sessionAttachedPhotoIDs.append(photoID)
+        if updated.primarySessionPhotoRefKey == nil {
+            updated.primarySessionPhotoRefKey = SessionPhotoRef.attached(photoID).storageKey
+        }
+        sessions[idx] = updated
+        saveSessions()
+        pushContext()
+        return photoID
+    }
+
+    func removeSessionPhoto(sessionID: UUID, ref: SessionPhotoRef) {
+        if var live = liveSession, live.id == sessionID {
+            applySessionPhotoRemoval(ref: ref, to: &live)
+            liveSession = live
+            saveLive()
+            pushContext()
+            return
+        }
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionID }) else { return }
+        var updated = sessions[idx]
+        applySessionPhotoRemoval(ref: ref, to: &updated)
+        sessions[idx] = updated
+        saveSessions()
+        pushContext()
+    }
+
+    private func applySessionPhotoRemoval(ref: SessionPhotoRef, to session: inout Session) {
+        switch ref.kind {
+        case .chipTable:
+            if let fileName = session.chipEstimatorImageFilename {
+                ChipEstimatorPhotoStorage.deleteImage(fileName: fileName)
+            }
+            session.chipEstimatorImageFilename = nil
+        case .comp:
+            if let uuid = UUID(uuidString: ref.objectID) {
+                CompPhotoStorage.deleteImage(compEventID: uuid)
+            }
+        case .attached:
+            if let uuid = UUID(uuidString: ref.objectID) {
+                SessionAttachedPhotoStorage.deleteImage(photoID: uuid)
+                session.sessionAttachedPhotoIDs.removeAll { $0 == uuid }
+            }
+        }
+
+        if session.primarySessionPhotoRefKey == ref.storageKey {
+            session.primarySessionPhotoRefKey = SessionPhotoCatalog.items(for: session).first?.ref.storageKey
+        }
+    }
+
+    private func deleteSessionPhotoFiles(for session: Session) {
+        if let fileName = session.chipEstimatorImageFilename {
+            ChipEstimatorPhotoStorage.deleteImage(fileName: fileName)
+        }
+        CompPhotoStorage.deleteImages(for: session.compEvents)
+        SessionAttachedPhotoStorage.deleteImages(photoIDs: session.sessionAttachedPhotoIDs)
+    }
+    #endif
 
     func discardLiveSession() {
         #if os(watchOS)
@@ -746,7 +844,7 @@ class SessionStore: ObservableObject {
         #endif
         #if os(iOS)
         if let s = liveSession {
-            CompPhotoStorage.deleteImages(for: s.compEvents)
+            deleteSessionPhotoFiles(for: s)
         }
         #endif
         liveSession = nil; clearLive()
@@ -872,7 +970,7 @@ class SessionStore: ObservableObject {
     func deleteSession(at offsets: IndexSet) {
         #if os(iOS)
         for idx in offsets {
-            CompPhotoStorage.deleteImages(for: sessions[idx].compEvents)
+            deleteSessionPhotoFiles(for: sessions[idx])
         }
         #endif
         sessions.remove(atOffsets: offsets)
@@ -884,7 +982,7 @@ class SessionStore: ObservableObject {
 
     func deleteSession(_ session: Session) {
         #if os(iOS)
-        CompPhotoStorage.deleteImages(for: session.compEvents)
+        deleteSessionPhotoFiles(for: session)
         #endif
         sessions.removeAll { $0.id == session.id }
         saveSessions()
@@ -898,7 +996,7 @@ class SessionStore: ObservableObject {
         #if os(iOS)
         let sessionsToDelete = sessions.filter { ids.contains($0.id) }
         for session in sessionsToDelete {
-            CompPhotoStorage.deleteImages(for: session.compEvents)
+            deleteSessionPhotoFiles(for: session)
         }
         #endif
         sessions.removeAll { ids.contains($0.id) }

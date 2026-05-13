@@ -250,6 +250,20 @@ struct HomeView: View {
                                 .foregroundColor(.white)
                         }
                         .accessibilityLabel("User guide")
+
+                        NavigationLink {
+                            HistoryPhotoFeedView()
+                                .environmentObject(store)
+                                .environmentObject(settingsStore)
+                                .environmentObject(rewardWalletStore)
+                                .environmentObject(subscriptionStore)
+                                .environmentObject(authStore)
+                        } label: {
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .font(.body.weight(.medium))
+                                .foregroundColor(.white)
+                        }
+                        .accessibilityLabel("Photo Feed")
                     }
                 }
                 if hasProAccess {
@@ -432,6 +446,7 @@ struct LiveNowCard: View {
     @State private var showPrivateNotes = false
     #if os(iOS)
     @State private var liveSessionShareRef: PostCloseoutSessionRef?
+    @State private var showSessionPhotos = false
     #endif
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -521,6 +536,10 @@ struct LiveNowCard: View {
                             .cornerRadius(8)
                         }
                         .accessibilityLabel("Share session")
+
+                        SessionPhotosEntryButton(compact: true) {
+                            showSessionPhotos = true
+                        }
                         #endif
                         
                         
@@ -556,6 +575,11 @@ struct LiveNowCard: View {
                 .environmentObject(store)
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $showSessionPhotos) {
+            SessionPhotosSheet(sessionID: currentSession.id)
+                .environmentObject(store)
+                .environmentObject(settingsStore)
         }
         #endif
     }

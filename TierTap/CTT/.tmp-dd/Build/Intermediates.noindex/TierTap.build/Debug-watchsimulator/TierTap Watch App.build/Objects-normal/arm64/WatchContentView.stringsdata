@@ -7,7 +7,7 @@
         "key": "Last sync %@",
         "location": {
           "startingColumn": 30,
-          "startingLine": 19
+          "startingLine": 22
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Live Remote",
         "location": {
           "startingColumn": 27,
-          "startingLine": 32
+          "startingLine": 35
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "History",
         "location": {
           "startingColumn": 27,
-          "startingLine": 39
+          "startingLine": 42
         }
       },
       {
@@ -31,7 +31,159 @@
         "key": "Remotes",
         "location": {
           "startingColumn": 27,
-          "startingLine": 45
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch Settings",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in quick picks",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp quick picks",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch haptics",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Animations",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Haptic profile",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session pulse reminders",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pulse every",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wrist-raise summary",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp type options",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "Classic",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "Subtle",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Assertive",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "10 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "15 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "20 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "30 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 121
+        }
+      },
+      {
+        "comment": "",
+        "key": "45 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "60 min",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 123
         }
       },
       {
@@ -39,7 +191,7 @@
         "key": "Sync Debug (Simulator)",
         "location": {
           "startingColumn": 18,
-          "startingLine": 97
+          "startingLine": 198
         }
       },
       {
@@ -47,7 +199,7 @@
         "key": "Activation: %lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 100
+          "startingLine": 201
         }
       },
       {
@@ -55,7 +207,7 @@
         "key": "Reachable: %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 103
+          "startingLine": 204
         }
       },
       {
@@ -63,7 +215,7 @@
         "key": "Paired: %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 106
+          "startingLine": 207
         }
       },
       {
@@ -71,7 +223,7 @@
         "key": "Companion app: %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 109
+          "startingLine": 210
         }
       },
       {
@@ -79,7 +231,7 @@
         "key": "Cached sessions: %lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 112
+          "startingLine": 213
         }
       },
       {
@@ -87,7 +239,7 @@
         "key": "Live session id: %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 115
+          "startingLine": 216
         }
       },
       {
@@ -95,7 +247,7 @@
         "key": "No session history yet",
         "location": {
           "startingColumn": 26,
-          "startingLine": 136
+          "startingLine": 237
         }
       },
       {
@@ -103,23 +255,119 @@
         "key": "Your iPhone session summaries will appear here.",
         "location": {
           "startingColumn": 26,
-          "startingLine": 138
+          "startingLine": 239
         }
       },
       {
         "comment": "",
         "key": "•",
         "location": {
-          "startingColumn": 38,
-          "startingLine": 156
+          "startingColumn": 42,
+          "startingLine": 261
         }
       },
       {
         "comment": "",
         "key": "W/L %@%lld",
         "location": {
-          "startingColumn": 38,
-          "startingLine": 157
+          "startingColumn": 42,
+          "startingLine": 262
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish to Community?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 388
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 360
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 21,
+          "startingLine": 369
+        }
+      },
+      {
+        "comment": "",
+        "key": "Duration",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 361
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 362
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comps",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 363
+        }
+      },
+      {
+        "comment": "",
+        "key": "W/L",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 365
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Text",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share to Community",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 377
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 389
+        }
+      },
+      {
+        "comment": "",
+        "key": "Publish",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 390
+        }
+      },
+      {
+        "comment": "",
+        "key": "Uses your Community screen name and tier/hour only (no wins, comps, or comment). TierTap on iPhone publishes in the background — no share sheet on the phone.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 402
         }
       },
       {
@@ -127,7 +375,7 @@
         "key": "No remote commands yet",
         "location": {
           "startingColumn": 26,
-          "startingLine": 204
+          "startingLine": 420
         }
       },
       {
@@ -135,7 +383,7 @@
         "key": "Commands sent from this watch will appear here.",
         "location": {
           "startingColumn": 26,
-          "startingLine": 206
+          "startingLine": 422
         }
       },
       {
@@ -143,7 +391,7 @@
         "key": "sent",
         "location": {
           "startingColumn": 60,
-          "startingLine": 219
+          "startingLine": 435
         }
       },
       {
@@ -151,7 +399,7 @@
         "key": "queued",
         "location": {
           "startingColumn": 69,
-          "startingLine": 219
+          "startingLine": 435
         }
       }
     ]

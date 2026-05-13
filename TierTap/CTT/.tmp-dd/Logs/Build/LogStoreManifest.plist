@@ -48,6 +48,48 @@
 			<key>uniqueIdentifier</key>
 			<string>890BB863-C144-4BC6-964E-31BC1F2F6353</string>
 		</dict>
+		<key>A77385C0-579B-4C88-A417-B0CE89B0EE52</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>A77385C0-579B-4C88-A417-B0CE89B0EE52.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>27</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>TierTap project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>TierTap</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project TierTap with scheme TierTap</string>
+			<key>timeStartedRecording</key>
+			<real>800397469.14667499</real>
+			<key>timeStoppedRecording</key>
+			<real>800397497.93909097</real>
+			<key>title</key>
+			<string>Building project TierTap with scheme TierTap</string>
+			<key>uniqueIdentifier</key>
+			<string>A77385C0-579B-4C88-A417-B0CE89B0EE52</string>
+		</dict>
 	</dict>
 </dict>
 </plist>

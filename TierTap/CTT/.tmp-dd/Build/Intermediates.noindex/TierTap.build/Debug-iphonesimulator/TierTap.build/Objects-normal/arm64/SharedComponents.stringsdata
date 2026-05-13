@@ -7,7 +7,7 @@
         "key": "Denom, room, machine notes…",
         "location": {
           "startingColumn": 23,
-          "startingLine": 227
+          "startingLine": 263
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 28,
-          "startingLine": 422
+          "startingLine": 458
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "Search or type a custom name",
         "location": {
           "startingColumn": 65,
-          "startingLine": 553
+          "startingLine": 589
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Search games",
         "location": {
           "startingColumn": 98,
-          "startingLine": 553
+          "startingLine": 589
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "Select Slot Game",
         "location": {
           "startingColumn": 47,
-          "startingLine": 554
+          "startingLine": 590
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Select Game",
         "location": {
           "startingColumn": 68,
-          "startingLine": 554
+          "startingLine": 590
         }
       },
       {
@@ -55,7 +55,7 @@
         "key": "Loading games…",
         "location": {
           "startingColumn": 38,
-          "startingLine": 504
+          "startingLine": 540
         }
       },
       {
@@ -63,7 +63,7 @@
         "key": "Favorites",
         "location": {
           "startingColumn": 33,
-          "startingLine": 539
+          "startingLine": 575
         }
       },
       {
@@ -71,7 +71,7 @@
         "key": "Slot games",
         "location": {
           "startingColumn": 75,
-          "startingLine": 545
+          "startingLine": 581
         }
       },
       {
@@ -79,7 +79,7 @@
         "key": "Games",
         "location": {
           "startingColumn": 90,
-          "startingLine": 545
+          "startingLine": 581
         }
       },
       {
@@ -87,7 +87,7 @@
         "key": "All slot games",
         "location": {
           "startingColumn": 119,
-          "startingLine": 545
+          "startingLine": 581
         }
       },
       {
@@ -95,7 +95,7 @@
         "key": "All games",
         "location": {
           "startingColumn": 138,
-          "startingLine": 545
+          "startingLine": 581
         }
       },
       {
@@ -103,7 +103,7 @@
         "key": "Use “%@”",
         "location": {
           "startingColumn": 42,
-          "startingLine": 516
+          "startingLine": 552
         }
       },
       {
@@ -111,7 +111,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 28,
-          "startingLine": 570
+          "startingLine": 606
         }
       },
       {
@@ -119,7 +119,7 @@
         "key": "Win rate: %@ over %lld sessions",
         "location": {
           "startingColumn": 22,
-          "startingLine": 759
+          "startingLine": 795
         }
       },
       {
@@ -127,7 +127,7 @@
         "key": "Tier points",
         "location": {
           "startingColumn": 20,
-          "startingLine": 851
+          "startingLine": 887
         }
       },
       {
@@ -135,7 +135,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 853
+          "startingLine": 889
         }
       },
       {
@@ -143,7 +143,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 991
+          "startingLine": 1033
         }
       },
       {
@@ -151,7 +151,7 @@
         "key": "Number pad",
         "location": {
           "startingColumn": 29,
-          "startingLine": 1027
+          "startingLine": 1069
         }
       },
       {
@@ -159,7 +159,7 @@
         "key": "%@ pts",
         "location": {
           "startingColumn": 34,
-          "startingLine": 1083
+          "startingLine": 1125
         }
       },
       {
@@ -167,7 +167,7 @@
         "key": "Exact value",
         "location": {
           "startingColumn": 27,
-          "startingLine": 1099
+          "startingLine": 1141
         }
       },
       {
@@ -175,7 +175,7 @@
         "key": "Exact value",
         "location": {
           "startingColumn": 39,
-          "startingLine": 1140
+          "startingLine": 1182
         }
       },
       {
@@ -183,7 +183,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1180
+          "startingLine": 1222
         }
       },
       {
@@ -191,7 +191,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 42,
-          "startingLine": 1287
+          "startingLine": 1339
         }
       },
       {
@@ -199,7 +199,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1334
+          "startingLine": 1386
         }
       },
       {
@@ -207,7 +207,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 38,
-          "startingLine": 1397
+          "startingLine": 1449
         }
       },
       {
@@ -215,7 +215,7 @@
         "key": "Add %@%@ to total",
         "location": {
           "startingColumn": 41,
-          "startingLine": 1422
+          "startingLine": 1474
         }
       },
       {
@@ -223,7 +223,7 @@
         "key": "Current buy-in total: %@%lld",
         "location": {
           "startingColumn": 53,
-          "startingLine": 1438
+          "startingLine": 1490
         }
       },
       {
@@ -231,7 +231,7 @@
         "key": "Tap amounts to build a buy-in, then confirm.",
         "location": {
           "startingColumn": 126,
-          "startingLine": 1438
+          "startingLine": 1490
         }
       },
       {
@@ -239,7 +239,7 @@
         "key": "Clear",
         "location": {
           "startingColumn": 36,
-          "startingLine": 1462
+          "startingLine": 1514
         }
       },
       {
@@ -247,7 +247,7 @@
         "key": "Add %@%lld",
         "location": {
           "startingColumn": 57,
-          "startingLine": 1452
+          "startingLine": 1504
         }
       },
       {
@@ -255,7 +255,7 @@
         "key": "Add Buy-In",
         "location": {
           "startingColumn": 112,
-          "startingLine": 1452
+          "startingLine": 1504
         }
       },
       {
@@ -263,119 +263,79 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1480
+          "startingLine": 1532
         }
       },
       {
         "comment": "",
-        "key": "e.g. host name, promo…",
-        "location": {
-          "startingColumn": 23,
-          "startingLine": 1712
-        }
-      },
-      {
-        "comment": "",
-        "key": "All comps: %@%@",
-        "location": {
-          "startingColumn": 22,
-          "startingLine": 1725
-        }
-      },
-      {
-        "comment": "",
-        "key": "After this entry, session comps total: %@%@",
+        "key": "Chip estimator error",
         "location": {
           "startingColumn": 20,
-          "startingLine": 1730
+          "startingLine": 1764
         }
       },
       {
         "comment": "",
-        "key": "Set a value to see the new session comps total.",
-        "location": {
-          "startingColumn": 20,
-          "startingLine": 1731
-        }
-      },
-      {
-        "comment": "",
-        "key": "Add %@%lld",
+        "key": "Win/loss is stack minus total buy-in of %@%@.",
         "location": {
           "startingColumn": 30,
-          "startingLine": 1756
+          "startingLine": 1595
         }
       },
       {
         "comment": "",
-        "key": "Add comp",
+        "key": "%@%@ — chip grid",
         "location": {
-          "startingColumn": 93,
-          "startingLine": 1756
+          "startingColumn": 39,
+          "startingLine": 1610
         }
       },
       {
         "comment": "",
-        "key": "Comp estimator",
+        "key": "Choose stack on chip grid",
         "location": {
-          "startingColumn": 20,
-          "startingLine": 1969
+          "startingColumn": 39,
+          "startingLine": 1611
         }
       },
       {
         "comment": "",
-        "key": "Add comp photo",
+        "key": "Add %@%@ to stack",
         "location": {
-          "startingColumn": 37,
-          "startingLine": 1918
+          "startingColumn": 41,
+          "startingLine": 1638
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add custom amount to stack",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 1641
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stack total: %@%@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1654
         }
       },
       {
         "comment": "",
         "key": "Clear",
         "location": {
-          "startingColumn": 32,
-          "startingLine": 1889
+          "startingColumn": 36,
+          "startingLine": 1698
         }
       },
       {
         "comment": "",
-        "key": "%@%@",
+        "key": "Session (vs buy-in)",
         "location": {
           "startingColumn": 38,
-          "startingLine": 1778
-        }
-      },
-      {
-        "comment": "",
-        "key": "Est. value (%@)",
-        "location": {
-          "startingColumn": 42,
-          "startingLine": 1850
-        }
-      },
-      {
-        "comment": "",
-        "key": "Take photo",
-        "location": {
-          "startingColumn": 32,
-          "startingLine": 1920
-        }
-      },
-      {
-        "comment": "",
-        "key": "Choose from library",
-        "location": {
-          "startingColumn": 28,
-          "startingLine": 1922
-        }
-      },
-      {
-        "comment": "",
-        "key": "Cancel",
-        "location": {
-          "startingColumn": 28,
-          "startingLine": 1923
+          "startingLine": 1659
         }
       },
       {
@@ -383,7 +343,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1954
+          "startingLine": 1746
         }
       },
       {
@@ -391,7 +351,127 @@
         "key": "OK",
         "location": {
           "startingColumn": 24,
-          "startingLine": 1973
+          "startingLine": 1768
+        }
+      },
+      {
+        "comment": "",
+        "key": "e.g. host name, promo…",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 2038
+        }
+      },
+      {
+        "comment": "",
+        "key": "All comps: %@%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2051
+        }
+      },
+      {
+        "comment": "",
+        "key": "After this entry, session comps total: %@%@",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 2056
+        }
+      },
+      {
+        "comment": "",
+        "key": "Set a value to see the new session comps total.",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 2057
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add %@%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 2082
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add comp",
+        "location": {
+          "startingColumn": 93,
+          "startingLine": 2082
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp estimator",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 2340
+        }
+      },
+      {
+        "comment": "",
+        "key": "Clear",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 2215
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 2104
+        }
+      },
+      {
+        "comment": "",
+        "key": "Est. value (%@)",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 2176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2272
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add comp photo",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2277
+        }
+      },
+      {
+        "comment": "",
+        "key": "Capture your comp slip, receipt, or screen and TierTap will attach it to this entry.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2280
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 2316
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 2344
         }
       },
       {
@@ -399,7 +479,7 @@
         "key": "Choose cash",
         "location": {
           "startingColumn": 59,
-          "startingLine": 2300
+          "startingLine": 2672
         }
       },
       {
@@ -407,7 +487,7 @@
         "key": "%@%@",
         "location": {
           "startingColumn": 75,
-          "startingLine": 2300
+          "startingLine": 2672
         }
       },
       {
@@ -415,7 +495,7 @@
         "key": "Comp type (e.g. buffet)",
         "location": {
           "startingColumn": 27,
-          "startingLine": 2374
+          "startingLine": 2746
         }
       }
     ]

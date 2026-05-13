@@ -7,7 +7,7 @@
         "key": "Comp receipt · %@%lld · %@",
         "location": {
           "startingColumn": 50,
-          "startingLine": 84
+          "startingLine": 85
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Tiers per 100 %@ metric requires rated avg bet ≥ 100",
         "location": {
           "startingColumn": 42,
-          "startingLine": 174
+          "startingLine": 187
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "",
         "location": {
           "startingColumn": 40,
-          "startingLine": 185
+          "startingLine": 198
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Verified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 186
+          "startingLine": 199
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "Unverified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 187
+          "startingLine": 200
         }
       },
       {
@@ -47,7 +47,23 @@
         "key": "Edit session information",
         "location": {
           "startingColumn": 40,
-          "startingLine": 331
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open session share options",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 355
         }
       },
       {
@@ -55,7 +71,7 @@
         "key": "Done",
         "location": {
           "startingColumn": 28,
-          "startingLine": 334
+          "startingLine": 358
         }
       }
     ]

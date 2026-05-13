@@ -456,6 +456,16 @@
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/GASupportSheet.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/GASupportSheet~partial.swiftmodule"
   },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryTaxPrepView.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView~partial.swiftmodule"
+  },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryView.swiftconstvalues",
     "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryView.d",
@@ -606,6 +616,16 @@
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/SharedComponents.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/SharedComponents~partial.swiftmodule"
   },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StackUpdateConfetti.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti~partial.swiftmodule"
+  },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StrategyOddsSheet.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.swiftconstvalues",
     "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.d",
@@ -615,6 +635,16 @@
     "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.o",
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StrategyOddsSheet.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StrategyOddsSheet~partial.swiftmodule"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TaxPrepZipArchive.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive~partial.swiftmodule"
   },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapAccountView.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapAccountView.swiftconstvalues",
@@ -635,6 +665,16 @@
     "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.o",
     "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.swiftdeps",
     "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2~partial.swiftmodule"
+  },
+  "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPlusTokenStatBubbles.swift" : {
+    "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.swiftconstvalues",
+    "dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.d",
+    "diagnostics" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.dia",
+    "index-unit-output-path" : "/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.o",
+    "llvm-bc" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.bc",
+    "object" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.o",
+    "swift-dependencies" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.swiftdeps",
+    "swiftmodule" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles~partial.swiftmodule"
   },
   "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapWalletView.swift" : {
     "const-values" : "/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapWalletView.swiftconstvalues",

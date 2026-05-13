@@ -19,6 +19,27 @@ enum TierTapProductId: String, CaseIterable {
         }
     }
 
+    static let subscriptionPlans: [TierTapProductId] = [.monthly, .quarterly, .yearly]
+
+    var paywallPeriodTitle: String {
+        switch self {
+        case .monthly: return "Monthly"
+        case .quarterly: return "3 Months"
+        case .yearly: return "Yearly"
+        case .credits: return ""
+        }
+    }
+
+    /// Display-only fallback when StoreKit has not returned a live `Product` yet (matches `TierTapStoreKitConfig.storekit`).
+    var catalogDisplayPrice: String {
+        switch self {
+        case .monthly: return "$14.99"
+        case .quarterly: return "$39.99"
+        case .yearly: return "$149.00"
+        case .credits: return "$4.99"
+        }
+    }
+
     /// Tokens credited to the user for one successful **Credits** purchase (bundled fallback; live value is ``SettingsStore/effectiveCreditsPackTokenAmount``).
     static let creditsPackTokenAmount: Int = TierTapRemoteDefaultFallbacks.creditsPackTokenAmount
 
@@ -41,14 +62,9 @@ final class SubscriptionStore: ObservableObject {
         Self.isTestFlightOrSandboxBuild || !purchasedProductIds.isEmpty
     }
 
-    /// TestFlight and Xcode installs use a sandbox receipt; production App Store uses `receipt`.
+    /// Pro is unlocked without a StoreKit purchase on TestFlight / sandbox builds. Used for feature gating.
     private static var isTestFlightOrSandboxBuild: Bool {
         Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
-    }
-
-    /// Pro is unlocked without a StoreKit purchase (TestFlight / sandbox receipt). Used for UI that hides IAP when the catalog is empty.
-    var hasComplimentaryBetaProAccess: Bool {
-        Self.isTestFlightOrSandboxBuild
     }
 
     /// Subscription products only (excludes consumables like **Credits**).
@@ -76,33 +92,47 @@ final class SubscriptionStore: ObservableObject {
     func loadProducts() async {
         isLoading = true
         errorMessage = nil
-        let ids = TierTapProductId.allCases.map(\.rawValue)
+        let subscriptionIds = TierTapProductId.subscriptionPlans.map(\.rawValue)
+        let consumableIds = [TierTapProductId.credits.rawValue]
         let bundleId = Bundle.main.bundleIdentifier ?? "nil"
         let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "nil"
         let build = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "nil"
-        print("[SubscriptionStore] loadProducts bundleId=\(bundleId) version=\(version) (\(build)) requestedIds=\(ids)")
+        print(
+            "[SubscriptionStore] loadProducts bundleId=\(bundleId) version=\(version) (\(build)) "
+            + "subscriptionIds=\(subscriptionIds) consumableIds=\(consumableIds)"
+        )
+        defer { isLoading = false }
         do {
-            products = try await Product.products(for: ids)
-            // Sort by price, but keep stable ordering otherwise.
+            if Self.isTestFlightOrSandboxBuild {
+                try? await AppStore.sync()
+            }
+            async let subscriptionProductsRequest = Product.products(for: subscriptionIds)
+            async let consumableProductsRequest = Product.products(for: consumableIds)
+            let loadedSubscriptionProducts = try await subscriptionProductsRequest
+            let loadedConsumableProducts = try await consumableProductsRequest
+            products = loadedSubscriptionProducts + loadedConsumableProducts
             products.sort { p1, p2 in
                 (p1.price as Decimal) < (p2.price as Decimal)
             }
             let loadedIds = products.map(\.id)
-            print("[SubscriptionStore] loadProducts OK count=\(products.count) loadedIds=\(loadedIds)")
+            let loadedSubscriptionIds = loadedSubscriptionProducts.map(\.id)
+            print(
+                "[SubscriptionStore] loadProducts OK count=\(products.count) loadedIds=\(loadedIds) "
+                + "subscriptionIds=\(loadedSubscriptionIds)"
+            )
             // StoreKit returns [] (without throwing) for unknown IDs — typical when App Store Connect
             // product IDs don’t match the app, or subscriptions aren’t cleared for sale yet.
-            if products.isEmpty, !Self.isTestFlightOrSandboxBuild {
+            if loadedSubscriptionIds.isEmpty {
                 errorMessage =
                     "Couldn’t load subscription plans. Check your connection and try again. "
                     + "If this persists, confirm in App Store Connect that these product IDs exist for this app: "
-                    + ids.joined(separator: ", ")
+                    + subscriptionIds.joined(separator: ", ")
             }
         } catch {
             errorMessage = error.localizedDescription
             print("[SubscriptionStore] loadProducts failed error=\(error.localizedDescription)")
             products = []
         }
-        isLoading = false
     }
 
     /// - Returns: StoreKit transaction id string on verified success, or `nil` otherwise.

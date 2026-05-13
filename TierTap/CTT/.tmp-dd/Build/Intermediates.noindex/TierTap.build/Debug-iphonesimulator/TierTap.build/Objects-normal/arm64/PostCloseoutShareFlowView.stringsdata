@@ -4,18 +4,10 @@
     "Localizable": [
       {
         "comment": "",
-        "key": "Close",
-        "location": {
-          "startingColumn": 20,
-          "startingLine": 122
-        }
-      },
-      {
-        "comment": "",
         "key": "Generate Session Art",
         "location": {
           "startingColumn": 35,
-          "startingLine": 81
+          "startingLine": 84
         }
       },
       {
@@ -23,7 +15,7 @@
         "key": "Community Publish",
         "location": {
           "startingColumn": 35,
-          "startingLine": 94
+          "startingLine": 97
         }
       },
       {
@@ -31,7 +23,7 @@
         "key": "Not now",
         "location": {
           "startingColumn": 34,
-          "startingLine": 107
+          "startingLine": 110
         }
       }
     ]

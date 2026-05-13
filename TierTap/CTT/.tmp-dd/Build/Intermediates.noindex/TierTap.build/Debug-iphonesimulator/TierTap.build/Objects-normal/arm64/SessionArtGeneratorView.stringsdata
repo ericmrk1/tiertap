@@ -4,10 +4,82 @@
     "Localizable": [
       {
         "comment": "",
+        "key": "Session Graph",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Graph Preview",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap AI Image",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review AI image",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save to Photos",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 126
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 138
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 155
+        }
+      },
+      {
+        "comment": "",
         "key": "Preview text",
         "location": {
           "startingColumn": 52,
-          "startingLine": 2606
+          "startingLine": 2792
         }
       },
       {
@@ -15,7 +87,7 @@
         "key": "Preview",
         "location": {
           "startingColumn": 69,
-          "startingLine": 2606
+          "startingLine": 2792
         }
       },
       {
@@ -23,7 +95,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 28,
-          "startingLine": 2610
+          "startingLine": 2796
         }
       },
       {
@@ -31,7 +103,7 @@
         "key": "Template group",
         "location": {
           "startingColumn": 28,
-          "startingLine": 2678
+          "startingLine": 2864
         }
       },
       {
@@ -39,7 +111,7 @@
         "key": "%@ preset%@",
         "location": {
           "startingColumn": 29,
-          "startingLine": 3068
+          "startingLine": 3254
         }
       },
       {
@@ -47,7 +119,7 @@
         "key": "Font",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2784
+          "startingLine": 2970
         }
       },
       {
@@ -55,7 +127,7 @@
         "key": "Scale",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2815
+          "startingLine": 3001
         }
       },
       {
@@ -63,7 +135,7 @@
         "key": "Applies to text background only",
         "location": {
           "startingColumn": 18,
-          "startingLine": 2849
+          "startingLine": 3035
         }
       },
       {
@@ -71,7 +143,7 @@
         "key": "Font background opacity",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2839
+          "startingLine": 3025
         }
       },
       {
@@ -79,7 +151,7 @@
         "key": "Same story as Share in History (Tools): edit before sending.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2904
+          "startingLine": 3090
         }
       },
       {
@@ -87,7 +159,7 @@
         "key": "Share text",
         "location": {
           "startingColumn": 23,
-          "startingLine": 2928
+          "startingLine": 3114
         }
       },
       {
@@ -95,7 +167,7 @@
         "key": "Share media",
         "location": {
           "startingColumn": 23,
-          "startingLine": 2940
+          "startingLine": 3126
         }
       },
       {
@@ -103,7 +175,7 @@
         "key": "%lld%%",
         "location": {
           "startingColumn": 30,
-          "startingLine": 2995
+          "startingLine": 3181
         }
       },
       {
@@ -111,7 +183,7 @@
         "key": "Generating overlay...",
         "location": {
           "startingColumn": 47,
-          "startingLine": 2988
+          "startingLine": 3174
         }
       },
       {
@@ -119,7 +191,23 @@
         "key": "Generating image...",
         "location": {
           "startingColumn": 73,
-          "startingLine": 2988
+          "startingLine": 3174
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 3579
+        }
+      },
+      {
+        "comment": "",
+        "key": "Time",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 3681
         }
       },
       {
@@ -127,7 +215,7 @@
         "key": "Session Art",
         "location": {
           "startingColumn": 26,
-          "startingLine": 3446
+          "startingLine": 3861
         }
       },
       {
@@ -135,7 +223,7 @@
         "key": "Export",
         "location": {
           "startingColumn": 16,
-          "startingLine": 3454
+          "startingLine": 3869
         }
       },
       {
@@ -143,7 +231,7 @@
         "key": "Session not found.",
         "location": {
           "startingColumn": 30,
-          "startingLine": 3393
+          "startingLine": 3801
         }
       },
       {
@@ -151,7 +239,7 @@
         "key": "%lld%%",
         "location": {
           "startingColumn": 26,
-          "startingLine": 3427
+          "startingLine": 3842
         }
       },
       {
@@ -159,7 +247,7 @@
         "key": "Cancel render",
         "location": {
           "startingColumn": 28,
-          "startingLine": 3430
+          "startingLine": 3845
         }
       },
       {
@@ -167,7 +255,7 @@
         "key": "Back",
         "location": {
           "startingColumn": 24,
-          "startingLine": 3450
+          "startingLine": 3865
         }
       },
       {
@@ -175,15 +263,15 @@
         "key": "OK",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3458
+          "startingLine": 3873
         }
       },
       {
         "comment": "",
-        "key": "Story text matches History → Tools → Share sessions (plain text).",
+        "key": "Story text matches the plain-text session share template (same as post close-out).",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3577
+          "startingLine": 4036
         }
       },
       {
@@ -191,7 +279,31 @@
         "key": "Include buy-in, cash-out, and result lines",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3580
+          "startingLine": 4039
+        }
+      },
+      {
+        "comment": "",
+        "key": "Graph metric",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4050
+        }
+      },
+      {
+        "comment": "",
+        "key": "Creates a share-ready graph image with session header and TierTap logo.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4059
+        }
+      },
+      {
+        "comment": "",
+        "key": "Metric",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 4053
         }
       },
       {
@@ -199,7 +311,7 @@
         "key": "Output",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3591
+          "startingLine": 4070
         }
       },
       {
@@ -207,7 +319,7 @@
         "key": "",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3594
+          "startingLine": 4073
         }
       },
       {
@@ -215,7 +327,7 @@
         "key": "Style",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3605
+          "startingLine": 4084
         }
       },
       {
@@ -223,7 +335,7 @@
         "key": "",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3608
+          "startingLine": 4087
         }
       },
       {
@@ -231,7 +343,7 @@
         "key": "Metrics & optional footnote",
         "location": {
           "startingColumn": 30,
-          "startingLine": 3628
+          "startingLine": 4107
         }
       },
       {
@@ -239,7 +351,7 @@
         "key": "Choose what appears on session art (tap to expand)",
         "location": {
           "startingColumn": 30,
-          "startingLine": 3631
+          "startingLine": 4110
         }
       },
       {
@@ -247,7 +359,7 @@
         "key": "Include on the image",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3663
+          "startingLine": 4142
         }
       },
       {
@@ -255,7 +367,7 @@
         "key": "Tier / hour",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3666
+          "startingLine": 4145
         }
       },
       {
@@ -263,7 +375,7 @@
         "key": "Buy-in & cash-out",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3669
+          "startingLine": 4148
         }
       },
       {
@@ -271,7 +383,7 @@
         "key": "Publish wins / losses",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3672
+          "startingLine": 4151
         }
       },
       {
@@ -279,7 +391,7 @@
         "key": "Comp details",
         "location": {
           "startingColumn": 20,
-          "startingLine": 3675
+          "startingLine": 4154
         }
       },
       {
@@ -287,7 +399,7 @@
         "key": "Extra footnote on the image",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3687
+          "startingLine": 4166
         }
       },
       {
@@ -295,7 +407,7 @@
         "key": "e.g. 🔥 heater · booked win",
         "location": {
           "startingColumn": 23,
-          "startingLine": 3690
+          "startingLine": 4169
         }
       },
       {
@@ -303,7 +415,7 @@
         "key": "Underlay photo",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3702
+          "startingLine": 4181
         }
       },
       {
@@ -311,7 +423,7 @@
         "key": "Upload a picture",
         "location": {
           "startingColumn": 23,
-          "startingLine": 3749
+          "startingLine": 4228
         }
       },
       {
@@ -319,7 +431,7 @@
         "key": "Remove uploaded picture",
         "location": {
           "startingColumn": 27,
-          "startingLine": 3762
+          "startingLine": 4241
         }
       },
       {
@@ -327,7 +439,7 @@
         "key": "Clear selected underlay",
         "location": {
           "startingColumn": 27,
-          "startingLine": 3773
+          "startingLine": 4252
         }
       },
       {
@@ -335,7 +447,7 @@
         "key": "Photo used for image export",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3785
+          "startingLine": 4264
         }
       },
       {
@@ -343,7 +455,7 @@
         "key": "No underlay selected yet.",
         "location": {
           "startingColumn": 30,
-          "startingLine": 3804
+          "startingLine": 4283
         }
       },
       {
@@ -351,7 +463,7 @@
         "key": "Share media (image or video)",
         "location": {
           "startingColumn": 18,
-          "startingLine": 3820
+          "startingLine": 4299
         }
       },
       {
@@ -359,7 +471,7 @@
         "key": "No video selected. Share will export a single image.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 3860
+          "startingLine": 4339
         }
       },
       {
@@ -367,7 +479,7 @@
         "key": "Video mode is active. Share will export a new video with your selected template, fonts, and metrics overlaid.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 3856
+          "startingLine": 4335
         }
       },
       {
@@ -375,7 +487,7 @@
         "key": "Use a video instead of image",
         "location": {
           "startingColumn": 54,
-          "startingLine": 3829
+          "startingLine": 4308
         }
       },
       {
@@ -383,7 +495,7 @@
         "key": "Replace selected video",
         "location": {
           "startingColumn": 87,
-          "startingLine": 3829
+          "startingLine": 4308
         }
       },
       {
@@ -391,7 +503,71 @@
         "key": "Remove",
         "location": {
           "startingColumn": 28,
-          "startingLine": 3847
+          "startingLine": 4326
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap AI Image",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4396
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generate one custom image from this session using your selected metrics.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4399
+        }
+      },
+      {
+        "comment": "",
+        "key": "Daily images remaining: %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 4403
+        }
+      },
+      {
+        "comment": "",
+        "key": "Include screen name (%@)",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 4436
+        }
+      },
+      {
+        "comment": "",
+        "key": "Emphasis",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 4408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Go",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 4446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Player traits (saved)",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pick default traits to guide player-focused images.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 4471
         }
       }
     ]

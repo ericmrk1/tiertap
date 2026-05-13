@@ -127,7 +127,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1643
+          "startingLine": 1636
         }
       },
       {
@@ -135,7 +135,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1693
+          "startingLine": 1686
         }
       },
       {
@@ -143,7 +143,7 @@
         "key": "%lld of %lld sessions",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1708
+          "startingLine": 1701
         }
       },
       {
@@ -151,7 +151,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 1753
+          "startingLine": 1746
         }
       },
       {
@@ -159,7 +159,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 1766
+          "startingLine": 1759
         }
       },
       {
@@ -167,7 +167,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 1777
+          "startingLine": 1770
         }
       },
       {
@@ -175,7 +175,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1817
+          "startingLine": 1810
         }
       },
       {
@@ -183,7 +183,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1847
+          "startingLine": 1840
         }
       },
       {
@@ -191,7 +191,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 1892
+          "startingLine": 1885
         }
       },
       {
@@ -199,7 +199,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 34,
-          "startingLine": 1965
+          "startingLine": 1958
         }
       },
       {
@@ -207,7 +207,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2022
+          "startingLine": 2015
         }
       },
       {
@@ -215,7 +215,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 34,
-          "startingLine": 2002
+          "startingLine": 1995
         }
       },
       {
@@ -223,7 +223,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2091
+          "startingLine": 2084
         }
       },
       {
@@ -231,7 +231,7 @@
         "key": "%lldx",
         "location": {
           "startingColumn": 34,
-          "startingLine": 2071
+          "startingLine": 2064
         }
       },
       {
@@ -239,7 +239,7 @@
         "key": "Date range: %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 2195
+          "startingLine": 2188
         }
       },
       {
@@ -247,7 +247,7 @@
         "key": "%lld pts",
         "location": {
           "startingColumn": 34,
-          "startingLine": 2175
+          "startingLine": 2168
         }
       },
       {
@@ -255,7 +255,7 @@
         "key": "Bet Rating vs Actual",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2548
+          "startingLine": 2541
         }
       },
       {
@@ -263,7 +263,7 @@
         "key": "Win vs. Tier Gain (Venn)",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2549
+          "startingLine": 2542
         }
       },
       {
@@ -271,7 +271,7 @@
         "key": "Win/Loss Distribution",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2550
+          "startingLine": 2543
         }
       },
       {
@@ -279,7 +279,7 @@
         "key": "Tier Progress Over Time",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2551
+          "startingLine": 2544
         }
       },
       {
@@ -287,7 +287,7 @@
         "key": "Sessions by Game",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2553
+          "startingLine": 2546
         }
       },
       {
@@ -295,7 +295,7 @@
         "key": "Tier Points by Loyalty Program",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2554
+          "startingLine": 2547
         }
       },
       {
@@ -303,7 +303,7 @@
         "key": "Session moods",
         "location": {
           "startingColumn": 32,
-          "startingLine": 2556
+          "startingLine": 2549
         }
       },
       {
@@ -311,7 +311,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 28,
-          "startingLine": 2576
+          "startingLine": 2569
         }
       },
       {
@@ -319,7 +319,7 @@
         "key": "Share",
         "location": {
           "startingColumn": 28,
-          "startingLine": 2582
+          "startingLine": 2575
         }
       }
     ]

@@ -7,7 +7,7 @@
         "key": "Ending Tier Points",
         "location": {
           "startingColumn": 22,
-          "startingLine": 92
+          "startingLine": 124
         }
       },
       {
@@ -15,7 +15,39 @@
         "key": "Open linked TierTap wallet card",
         "location": {
           "startingColumn": 41,
-          "startingLine": 109
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%@%lld",
+        "location": {
+          "startingColumn": 40,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "-%@%lld",
+        "location": {
+          "startingColumn": 82,
+          "startingLine": 165
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 172
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 178
         }
       },
       {
@@ -23,7 +55,7 @@
         "key": "Chip estimator error",
         "location": {
           "startingColumn": 20,
-          "startingLine": 511
+          "startingLine": 548
         }
       },
       {
@@ -31,7 +63,7 @@
         "key": "Tier Points Decreased",
         "location": {
           "startingColumn": 20,
-          "startingLine": 532
+          "startingLine": 569
         }
       },
       {
@@ -39,7 +71,7 @@
         "key": "Resume Timer",
         "location": {
           "startingColumn": 58,
-          "startingLine": 145
+          "startingLine": 218
         }
       },
       {
@@ -47,7 +79,7 @@
         "key": "Stop Timer",
         "location": {
           "startingColumn": 75,
-          "startingLine": 145
+          "startingLine": 218
         }
       },
       {
@@ -55,7 +87,7 @@
         "key": "Open Uber",
         "location": {
           "startingColumn": 61,
-          "startingLine": 163
+          "startingLine": 236
         }
       },
       {
@@ -63,7 +95,7 @@
         "key": "Open OpenTable",
         "location": {
           "startingColumn": 61,
-          "startingLine": 171
+          "startingLine": 244
         }
       },
       {
@@ -71,7 +103,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 38,
-          "startingLine": 189
+          "startingLine": 262
         }
       },
       {
@@ -79,15 +111,15 @@
         "key": "Cash Out (%@)",
         "location": {
           "startingColumn": 38,
-          "startingLine": 199
+          "startingLine": 272
         }
       },
       {
         "comment": "",
         "key": "Amount leaving with",
         "location": {
-          "startingColumn": 43,
-          "startingLine": 203
+          "startingColumn": 47,
+          "startingLine": 277
         }
       },
       {
@@ -95,7 +127,7 @@
         "key": "+%@%lld",
         "location": {
           "startingColumn": 52,
-          "startingLine": 225
+          "startingLine": 301
         }
       },
       {
@@ -103,7 +135,7 @@
         "key": "−%@%lld",
         "location": {
           "startingColumn": 52,
-          "startingLine": 241
+          "startingLine": 317
         }
       },
       {
@@ -111,7 +143,7 @@
         "key": "Lost everything",
         "location": {
           "startingColumn": 44,
-          "startingLine": 255
+          "startingLine": 331
         }
       },
       {
@@ -119,7 +151,7 @@
         "key": "Double or nothing",
         "location": {
           "startingColumn": 44,
-          "startingLine": 265
+          "startingLine": 341
         }
       },
       {
@@ -127,7 +159,7 @@
         "key": "Triple",
         "location": {
           "startingColumn": 44,
-          "startingLine": 275
+          "startingLine": 351
         }
       },
       {
@@ -135,7 +167,7 @@
         "key": "",
         "location": {
           "startingColumn": 40,
-          "startingLine": 291
+          "startingLine": 368
         }
       },
       {
@@ -143,7 +175,7 @@
         "key": "Verified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 295
+          "startingLine": 372
         }
       },
       {
@@ -151,7 +183,7 @@
         "key": "Unverified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 296
+          "startingLine": 373
         }
       },
       {
@@ -159,39 +191,7 @@
         "key": "Exceeds unit %@%lld.",
         "location": {
           "startingColumn": 42,
-          "startingLine": 306
-        }
-      },
-      {
-        "comment": "",
-        "key": "+%@%lld",
-        "location": {
-          "startingColumn": 56,
-          "startingLine": 321
-        }
-      },
-      {
-        "comment": "",
-        "key": "-%@%lld",
-        "location": {
-          "startingColumn": 98,
-          "startingLine": 321
-        }
-      },
-      {
-        "comment": "",
-        "key": "%@%lld",
-        "location": {
-          "startingColumn": 42,
-          "startingLine": 328
-        }
-      },
-      {
-        "comment": "",
-        "key": "%@%@%lld",
-        "location": {
-          "startingColumn": 46,
-          "startingLine": 338
+          "startingLine": 383
         }
       },
       {
@@ -199,7 +199,7 @@
         "key": "OK",
         "location": {
           "startingColumn": 24,
-          "startingLine": 515
+          "startingLine": 552
         }
       },
       {
@@ -207,7 +207,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 24,
-          "startingLine": 533
+          "startingLine": 570
         }
       },
       {
@@ -215,7 +215,7 @@
         "key": "Save Anyway",
         "location": {
           "startingColumn": 24,
-          "startingLine": 534
+          "startingLine": 571
         }
       },
       {
@@ -223,7 +223,7 @@
         "key": "Ending tier (%@) is lower than starting tier (%lld). Save anyway?",
         "location": {
           "startingColumn": 22,
-          "startingLine": 536
+          "startingLine": 573
         }
       },
       {
@@ -231,7 +231,7 @@
         "key": "Estimating…",
         "location": {
           "startingColumn": 57,
-          "startingLine": 873
+          "startingLine": 935
         }
       },
       {
@@ -239,7 +239,7 @@
         "key": "Estimate with AI",
         "location": {
           "startingColumn": 75,
-          "startingLine": 873
+          "startingLine": 935
         }
       },
       {
@@ -247,7 +247,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 42,
-          "startingLine": 889
+          "startingLine": 951
         }
       },
       {
@@ -255,7 +255,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 962
+          "startingLine": 1024
         }
       }
     ]

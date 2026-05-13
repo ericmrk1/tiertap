@@ -7,7 +7,7 @@
         "key": "Export Failed",
         "location": {
           "startingColumn": 20,
-          "startingLine": 109
+          "startingLine": 122
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "OK",
         "location": {
           "startingColumn": 24,
-          "startingLine": 110
+          "startingLine": 123
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "",
         "location": {
           "startingColumn": 28,
-          "startingLine": 178
+          "startingLine": 191
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "%@ %@ — %@",
         "location": {
           "startingColumn": 34,
-          "startingLine": 181
+          "startingLine": 194
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "App language",
         "location": {
           "startingColumn": 28,
-          "startingLine": 198
+          "startingLine": 211
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Every %lldm",
         "location": {
           "startingColumn": 34,
-          "startingLine": 266
+          "startingLine": 279
         }
       },
       {
@@ -55,7 +55,71 @@
         "key": "Tone of voice",
         "location": {
           "startingColumn": 24,
-          "startingLine": 302
+          "startingLine": 315
+        }
+      },
+      {
+        "comment": "",
+        "key": "Chart metric",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "Day",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 386
+        }
+      },
+      {
+        "comment": "",
+        "key": "API",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 387
+        }
+      },
+      {
+        "comment": "",
+        "key": "Day",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 391
+        }
+      },
+      {
+        "comment": "",
+        "key": "Plus",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "Day",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 397
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 398
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 414
         }
       },
       {
@@ -63,7 +127,7 @@
         "key": "Manage TierTap Pro",
         "location": {
           "startingColumn": 49,
-          "startingLine": 365
+          "startingLine": 655
         }
       },
       {
@@ -71,7 +135,7 @@
         "key": "Upgrade to TierTap Pro",
         "location": {
           "startingColumn": 72,
-          "startingLine": 365
+          "startingLine": 655
         }
       },
       {
@@ -79,7 +143,7 @@
         "key": "When enabled, quick buttons use each denomination ×18 (e.g. 20 → 360) for %@18-style bets.",
         "location": {
           "startingColumn": 26,
-          "startingLine": 675
+          "startingLine": 939
         }
       },
       {
@@ -87,7 +151,7 @@
         "key": "Use %@18 increment mode",
         "location": {
           "startingColumn": 28,
-          "startingLine": 673
+          "startingLine": 937
         }
       },
       {
@@ -95,7 +159,7 @@
         "key": "e.g. 20, 100, 500, 1000, 10000",
         "location": {
           "startingColumn": 35,
-          "startingLine": 643
+          "startingLine": 907
         }
       },
       {
@@ -103,7 +167,7 @@
         "key": "Casino chimes & haptics",
         "location": {
           "startingColumn": 28,
-          "startingLine": 683
+          "startingLine": 947
         }
       },
       {
@@ -111,7 +175,7 @@
         "key": "Sound profile",
         "location": {
           "startingColumn": 28,
-          "startingLine": 688
+          "startingLine": 952
         }
       },
       {
@@ -119,7 +183,7 @@
         "key": "Primary color",
         "location": {
           "startingColumn": 41,
-          "startingLine": 776
+          "startingLine": 1040
         }
       },
       {
@@ -127,7 +191,127 @@
         "key": "Secondary color",
         "location": {
           "startingColumn": 41,
-          "startingLine": 786
+          "startingLine": 1050
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in quick picks. Accepts comma or space delimiters.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1121
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp value quick picks. Accepts comma or space delimiters.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Example: Cocktail, Beer, Food, Cash. These appear under Add Food/Beverage on watch.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1135
+        }
+      },
+      {
+        "comment": "",
+        "key": "These controls sync to Apple Watch and customize haptics, animations, pulse nudges, wrist-raise summary cards, and quick-pick defaults.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch haptics",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1085
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch animations",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1087
+        }
+      },
+      {
+        "comment": "",
+        "key": "Haptic profile",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1089
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session pulse reminders (watch)",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1098
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wrist-raise live summary",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch buy-in cash defaults (e.g. 20, 100 200, 500)",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch comp cash defaults (e.g. 20 50 100 500)",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1125
+        }
+      },
+      {
+        "comment": "",
+        "key": "Watch comp type options (comma-delimited)",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Classic",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1090
+        }
+      },
+      {
+        "comment": "",
+        "key": "Subtle",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1091
+        }
+      },
+      {
+        "comment": "",
+        "key": "Assertive",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1092
         }
       },
       {
@@ -135,7 +319,7 @@
         "key": "Reminder message",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1224
+          "startingLine": 1632
         }
       },
       {
@@ -143,7 +327,7 @@
         "key": "Optional custom reminder message",
         "location": {
           "startingColumn": 31,
-          "startingLine": 1242
+          "startingLine": 1650
         }
       },
       {
@@ -151,7 +335,7 @@
         "key": "Done",
         "location": {
           "startingColumn": 28,
-          "startingLine": 1267
+          "startingLine": 1675
         }
       }
     ]

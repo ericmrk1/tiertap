@@ -359,12 +359,14 @@ private enum SessionUnderlaySource: Hashable, Identifiable {
     case uploaded
     case chipEstimator
     case compPhoto(UUID)
+    case attachedPhoto(UUID)
 
     var id: String {
         switch self {
         case .uploaded: return "uploaded"
         case .chipEstimator: return "chip"
         case .compPhoto(let u): return u.uuidString
+        case .attachedPhoto(let u): return "attached-\(u.uuidString)"
         }
     }
 
@@ -373,6 +375,7 @@ private enum SessionUnderlaySource: Hashable, Identifiable {
         case .uploaded: return "Uploaded photo"
         case .chipEstimator: return "Session chip photo"
         case .compPhoto: return "Comp receipt"
+        case .attachedPhoto: return "Session photo"
         }
     }
 }
@@ -4216,6 +4219,17 @@ struct SessionArtGeneratorView: View {
                                 chooseUnderlay(.compPhoto(ev.id))
                             }
                         }
+                        ForEach(s.sessionAttachedPhotoIDs, id: \.self) { photoID in
+                            let attachedURL = SessionAttachedPhotoStorage.url(for: photoID)
+                            let attachedImage = attachedURL.flatMap { UIImage(contentsOfFile: $0.path) }
+                            underlayThumb(
+                                title: "Session",
+                                image: attachedImage,
+                                selected: selectedUnderlay == .attachedPhoto(photoID)
+                            ) {
+                                chooseUnderlay(.attachedPhoto(photoID))
+                            }
+                        }
                     }
                 }
             }
@@ -5120,6 +5134,9 @@ struct SessionArtGeneratorView: View {
             return UIImage(contentsOfFile: url.path)
         case .compPhoto(let id):
             guard let url = CompPhotoStorage.url(for: id) else { return nil }
+            return UIImage(contentsOfFile: url.path)
+        case .attachedPhoto(let id):
+            guard let url = SessionAttachedPhotoStorage.url(for: id) else { return nil }
             return UIImage(contentsOfFile: url.path)
         }
     }

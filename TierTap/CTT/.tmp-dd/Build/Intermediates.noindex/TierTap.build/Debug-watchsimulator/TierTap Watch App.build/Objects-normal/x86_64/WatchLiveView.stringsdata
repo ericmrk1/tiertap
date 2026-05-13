@@ -4,10 +4,218 @@
     "Localizable": [
       {
         "comment": "",
-        "key": "Fast close out session?",
+        "key": "%@. %@. %@",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 63
+        }
+      },
+      {
+        "comment": "",
+        "key": "End session",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 153
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fast close-out?",
         "location": {
           "startingColumn": 16,
-          "startingLine": 187
+          "startingLine": 154
+        }
+      },
+      {
+        "comment": "",
+        "key": "Regular close-out?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 172
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel session?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 202
+        }
+      },
+      {
+        "comment": "",
+        "key": "No live session on iPhone. Start one from the phone or use Fast Start on the timer tab.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pause and unpause the timer from the first Live Remote tab.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close-out",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Fast close-out",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Regular close-out",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel session",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "Discard",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 147
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 155
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 156
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stops the timer and closes the session on iPhone with default cash-out and ending tier. No extra questions here.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 170
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 173
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 174
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stops the timer and ends the live session on iPhone, then asks for cash-out on the watch. You can add avg bet, ending tier, and other details later on the phone if needed.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 200
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 203
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "Permanently deletes this live session on iPhone. It will not appear in history.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 212
+        }
+      },
+      {
+        "comment": "",
+        "key": "Swipe for quick grid and options",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 407
+        }
+      },
+      {
+        "comment": "",
+        "key": "Live Summary",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 367
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-In: $%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 370
+        }
+      },
+      {
+        "comment": "",
+        "key": "Comp: $%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 372
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tier: %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 374
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quick Actions",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 425
         }
       },
       {
@@ -15,39 +223,71 @@
         "key": "Last sync %@",
         "location": {
           "startingColumn": 26,
-          "startingLine": 173
+          "startingLine": 545
         }
       },
       {
         "comment": "",
-        "key": "No",
+        "key": "Cash-out",
         "location": {
-          "startingColumn": 20,
-          "startingLine": 188
+          "startingColumn": 30,
+          "startingLine": 815
         }
       },
       {
         "comment": "",
-        "key": "Yes",
+        "key": "Turn the Digital Crown to adjust cash-out vs buy-in, then tap Done to save to this session on iPhone.",
         "location": {
-          "startingColumn": 20,
-          "startingLine": 189
+          "startingColumn": 26,
+          "startingLine": 799
         }
       },
       {
         "comment": "",
-        "key": "This will end the live session immediately using default close-out values.",
+        "key": "No buy-in was logged. Done saves $0 cash-out on iPhone; you can fix totals there.",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 195
+          "startingColumn": 26,
+          "startingLine": 803
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 793
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cash-out: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 794
+        }
+      },
+      {
+        "comment": "",
+        "key": "Win/loss: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 795
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 821
         }
       },
       {
         "comment": "",
         "key": "+",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 239
+          "startingColumn": 22,
+          "startingLine": 945
         }
       },
       {
@@ -55,15 +295,15 @@
         "key": "Start session?",
         "location": {
           "startingColumn": 16,
-          "startingLine": 347
+          "startingLine": 1087
         }
       },
       {
         "comment": "",
-        "key": "Options execute on iPhone history; unavailable categories are ignored.",
+        "key": "No fast start templates available yet. Start a session on iPhone first.",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 328
+          "startingColumn": 22,
+          "startingLine": 1067
         }
       },
       {
@@ -71,7 +311,7 @@
         "key": "No",
         "location": {
           "startingColumn": 20,
-          "startingLine": 348
+          "startingLine": 1088
         }
       },
       {
@@ -79,7 +319,7 @@
         "key": "Yes",
         "location": {
           "startingColumn": 20,
-          "startingLine": 349
+          "startingLine": 1089
         }
       },
       {
@@ -87,7 +327,7 @@
         "key": "Confirm fast start using your most recent template for this game category.",
         "location": {
           "startingColumn": 18,
-          "startingLine": 354
+          "startingLine": 1094
         }
       },
       {
@@ -95,7 +335,7 @@
         "key": "Add buy-in?",
         "location": {
           "startingColumn": 16,
-          "startingLine": 468
+          "startingLine": 1268
         }
       },
       {
@@ -103,15 +343,7 @@
         "key": "Current total: $%lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 432
-        }
-      },
-      {
-        "comment": "",
-        "key": "Amount: $%lld",
-        "location": {
-          "startingColumn": 18,
-          "startingLine": 435
+          "startingLine": 1216
         }
       },
       {
@@ -119,15 +351,15 @@
         "key": "Proposed total: $%lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 437
+          "startingLine": 1227
         }
       },
       {
         "comment": "",
         "key": "Custom amount",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 448
+          "startingColumn": 18,
+          "startingLine": 1233
         }
       },
       {
@@ -135,15 +367,15 @@
         "key": "Add Buy-In",
         "location": {
           "startingColumn": 20,
-          "startingLine": 453
+          "startingLine": 1237
         }
       },
       {
         "comment": "",
-        "key": "$%lld",
+        "key": "Amount: $%lld",
         "location": {
-          "startingColumn": 16,
-          "startingLine": 496
+          "startingColumn": 22,
+          "startingLine": 1222
         }
       },
       {
@@ -151,7 +383,7 @@
         "key": "No",
         "location": {
           "startingColumn": 20,
-          "startingLine": 469
+          "startingLine": 1269
         }
       },
       {
@@ -159,15 +391,111 @@
         "key": "Yes",
         "location": {
           "startingColumn": 20,
-          "startingLine": 470
+          "startingLine": 1270
         }
       },
       {
         "comment": "",
-        "key": "Add $%lld buy-in? New total will be $%lld.",
+        "key": "\n%@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 480
+          "startingLine": 1281
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 1314
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update stack?",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 1476
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total buy-in: $%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1423
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom stack",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1440
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session win: $%lld",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 1434
+        }
+      },
+      {
+        "comment": "",
+        "key": "Session loss: $%lld",
+        "location": {
+          "startingColumn": 90,
+          "startingLine": 1434
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update Stack",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stack: $%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1429
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1477
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1478
+        }
+      },
+      {
+        "comment": "",
+        "key": "Update stack?\n\n%@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1488
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 1537
         }
       },
       {
@@ -175,47 +503,103 @@
         "key": "Add comp?",
         "location": {
           "startingColumn": 16,
-          "startingLine": 584
+          "startingLine": 1819
         }
       },
       {
         "comment": "",
-        "key": "Current comps: $%lld",
+        "key": "Add comp as:",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 547
+          "startingColumn": 22,
+          "startingLine": 1701
         }
       },
       {
         "comment": "",
         "key": "Comp: $%lld",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 550
-        }
-      },
-      {
-        "comment": "",
-        "key": "Proposed comps: $%lld",
-        "location": {
-          "startingColumn": 18,
-          "startingLine": 552
+          "startingColumn": 22,
+          "startingLine": 1715
         }
       },
       {
         "comment": "",
         "key": "Custom comp",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 563
+          "startingColumn": 22,
+          "startingLine": 1734
         }
       },
       {
         "comment": "",
-        "key": "Details (optional)",
+        "key": "Category",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 568
+          "startingColumn": 22,
+          "startingLine": 1740
+        }
+      },
+      {
+        "comment": "",
+        "key": "Estimated value: $%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1766
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed comps: $%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1770
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom value",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1777
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Food/Beverage",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1704
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Cash Value",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1710
+        }
+      },
+      {
+        "comment": "",
+        "key": "Context (optional)",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1738
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes (optional)",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1781
+        }
+      },
+      {
+        "comment": "",
+        "key": "Change Type",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1784
         }
       },
       {
@@ -223,7 +607,55 @@
         "key": "Add Comp",
         "location": {
           "startingColumn": 20,
-          "startingLine": 569
+          "startingLine": 1789
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current comps: $%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1687
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proposed comps: $%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1720
+        }
+      },
+      {
+        "comment": "",
+        "key": "+%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1726
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1820
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1821
+        }
+      },
+      {
+        "comment": "",
+        "key": "\n%@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1869
         }
       },
       {
@@ -231,31 +663,31 @@
         "key": "$%lld",
         "location": {
           "startingColumn": 16,
-          "startingLine": 614
+          "startingLine": 1918
         }
       },
       {
         "comment": "",
-        "key": "No",
+        "key": "Comp added, %@, new comps total %lld dollars",
         "location": {
-          "startingColumn": 20,
-          "startingLine": 585
+          "startingColumn": 17,
+          "startingLine": 2015
         }
       },
       {
         "comment": "",
-        "key": "Yes",
+        "key": "$%lld",
         "location": {
-          "startingColumn": 20,
-          "startingLine": 586
+          "startingColumn": 22,
+          "startingLine": 2002
         }
       },
       {
         "comment": "",
-        "key": "Add $%lld comp? New comp total will be $%lld.",
+        "key": "comps total",
         "location": {
-          "startingColumn": 18,
-          "startingLine": 598
+          "startingColumn": 22,
+          "startingLine": 2008
         }
       },
       {
@@ -263,7 +695,7 @@
         "key": "Update tier points?",
         "location": {
           "startingColumn": 16,
-          "startingLine": 700
+          "startingLine": 2177
         }
       },
       {
@@ -271,15 +703,7 @@
         "key": "Current tier: %lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 664
-        }
-      },
-      {
-        "comment": "",
-        "key": "Add points: %lld",
-        "location": {
-          "startingColumn": 18,
-          "startingLine": 667
+          "startingLine": 2113
         }
       },
       {
@@ -287,15 +711,15 @@
         "key": "Proposed tier: %lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 669
+          "startingLine": 2136
         }
       },
       {
         "comment": "",
         "key": "Custom points",
         "location": {
-          "startingColumn": 23,
-          "startingLine": 680
+          "startingColumn": 18,
+          "startingLine": 2150
         }
       },
       {
@@ -303,7 +727,15 @@
         "key": "Update Tier",
         "location": {
           "startingColumn": 20,
-          "startingLine": 685
+          "startingLine": 2154
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add points: %lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2130
         }
       },
       {
@@ -311,7 +743,7 @@
         "key": "%lld",
         "location": {
           "startingColumn": 16,
-          "startingLine": 731
+          "startingLine": 2216
         }
       },
       {
@@ -319,7 +751,7 @@
         "key": "No",
         "location": {
           "startingColumn": 20,
-          "startingLine": 701
+          "startingLine": 2178
         }
       },
       {
@@ -327,7 +759,7 @@
         "key": "Yes",
         "location": {
           "startingColumn": 20,
-          "startingLine": 702
+          "startingLine": 2179
         }
       },
       {
@@ -335,7 +767,7 @@
         "key": "Set current tier points to %lld?",
         "location": {
           "startingColumn": 18,
-          "startingLine": 712
+          "startingLine": 2190
         }
       }
     ]

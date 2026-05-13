@@ -7,7 +7,7 @@
         "key": "Restore Purchases",
         "location": {
           "startingColumn": 16,
-          "startingLine": 284
+          "startingLine": 427
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Close",
         "location": {
           "startingColumn": 28,
-          "startingLine": 57
+          "startingLine": 102
         }
       },
       {
@@ -23,15 +23,7 @@
         "key": "Account",
         "location": {
           "startingColumn": 28,
-          "startingLine": 63
-        }
-      },
-      {
-        "comment": "",
-        "key": "Retry",
-        "location": {
-          "startingColumn": 34,
-          "startingLine": 223
+          "startingLine": 108
         }
       },
       {
@@ -39,7 +31,7 @@
         "key": "Apple EULA",
         "location": {
           "startingColumn": 22,
-          "startingLine": 302
+          "startingLine": 445
         }
       },
       {
@@ -47,7 +39,15 @@
         "key": "Privacy Policy",
         "location": {
           "startingColumn": 22,
-          "startingLine": 305
+          "startingLine": 448
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save %lld%% vs monthly",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 554
         }
       },
       {
@@ -55,7 +55,15 @@
         "key": "Current plan",
         "location": {
           "startingColumn": 22,
-          "startingLine": 387
+          "startingLine": 564
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save %lld percent compared to paying monthly",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 558
         }
       }
     ]

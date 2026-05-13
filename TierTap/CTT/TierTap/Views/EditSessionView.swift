@@ -43,19 +43,12 @@ struct EditSessionView: View {
     @State private var compEvents: [CompEvent] = []
     @State private var showCompSheet = false
     @State private var compToEdit: CompEvent?
+    @State private var showSessionPhotos = false
 
     private var compTotal: Int { compEvents.reduce(0) { $0 + $1.amount } }
 
-    // Session photo attachment
-    @State private var sessionPhoto: UIImage?
-    @State private var chipPhotoFilename: String?
-    @State private var sessionPhotoSource: SessionPhotoSource?
-
-    private enum SessionPhotoSource: Identifiable {
-        case camera
-        case photoLibrary
-
-        var id: Int { hashValue }
+    private var photoSessionState: Session {
+        store.sessions.first(where: { $0.id == session.id }) ?? session
     }
 
     var isValid: Bool {
@@ -308,95 +301,16 @@ struct EditSessionView: View {
                                 .font(.headline)
                                 .foregroundColor(.white)
 
-                            VStack(alignment: .leading, spacing: 6) {
-                                L10nText("Session")
-                                    .font(.caption.bold())
+                            if SessionPhotoCatalog.hasPhotos(for: photoSessionState) {
+                                SessionPhotosPrimarySelector(session: photoSessionState) {
+                                    showSessionPhotos = true
+                                }
+                            } else {
+                                L10nText("Add photos from the camera or photo library.")
+                                    .font(.caption)
                                     .foregroundColor(.gray)
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .strokeBorder(Color.white.opacity(0.25), style: StrokeStyle(lineWidth: 1, dash: [6]))
-                                        .background(Color(.systemGray6).opacity(0.2))
-                                        .cornerRadius(12)
-
-                                    if let image = sessionPhoto {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .cornerRadius(10)
-                                            .padding(4)
-                                    } else {
-                                        VStack(spacing: 6) {
-                                            Image(systemName: "camera.viewfinder")
-                                                .font(.system(size: 24))
-                                                .foregroundColor(.gray)
-                                            L10nText("Add a photo from this session")
-                                                .font(.caption)
-                                                .foregroundColor(.gray)
-                                        }
-                                        .padding(16)
-                                    }
-                                }
-                                .frame(maxHeight: 220)
-
-                                HStack(spacing: 12) {
-                                    Button {
-                                        sessionPhotoSource = .camera
-                                    } label: {
-                                        LocalizedLabel(title: "Camera", systemImage: "camera")
-                                            .font(.caption.bold())
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
-                                            .background(Color.blue.opacity(0.9))
-                                            .foregroundColor(.white)
-                                            .cornerRadius(16)
-                                    }
-
-                                    Button {
-                                        sessionPhotoSource = .photoLibrary
-                                    } label: {
-                                        LocalizedLabel(title: "Photo Library", systemImage: "photo")
-                                            .font(.caption.bold())
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
-                                            .background(Color(.systemGray6).opacity(0.35))
-                                            .foregroundColor(.white)
-                                            .cornerRadius(16)
-                                    }
-
-                                    if sessionPhoto != nil {
-                                        Spacer()
-                                        Button(role: .destructive) {
-                                            sessionPhoto = nil
-                                            chipPhotoFilename = nil
-                                        } label: {
-                                            Image(systemName: "trash")
-                                                .font(.caption)
-                                                .foregroundColor(.red)
-                                                .padding(8)
-                                        }
-                                    }
-                                }
-                            }
-
-                            if compEvents.contains(where: { compHasReceiptPhoto($0.id) }) {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    L10nText("Comp receipts")
-                                        .font(.caption.bold())
-                                        .foregroundColor(.gray)
-                                    ForEach(compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
-                                        HStack(alignment: .center, spacing: 10) {
-                                            CompEventPhotoThumbnail(compEventID: ev.id, side: 52)
-                                            VStack(alignment: .leading, spacing: 2) {
-                                                Text("\(ev.kind.title) · \(settingsStore.currencySymbol)\(ev.amount)")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.white)
-                                                Text(ev.timestamp, style: .time)
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                            }
-                                            Spacer()
-                                        }
-                                    }
+                                SessionPhotosEntryButton {
+                                    showSessionPhotos = true
                                 }
                             }
                         }
@@ -483,25 +397,10 @@ struct EditSessionView: View {
                     .environmentObject(subscriptionStore)
                     .gamePickerSheetPresentation()
             }
-            .adaptiveSheet(item: $sessionPhotoSource) { source in
-                switch source {
-                case .camera:
-                    #if os(iOS)
-                    CameraPicker(selectedImage: .constant(nil)) { image in
-                        handlePickedSessionPhoto(image)
-                    }
-                    #else
-                    EmptyView()
-                    #endif
-                case .photoLibrary:
-                    #if os(iOS)
-                    ImagePicker(selectedImage: .constant(nil)) { image in
-                        handlePickedSessionPhoto(image)
-                    }
-                    #else
-                    EmptyView()
-                    #endif
-                }
+            .adaptiveSheet(isPresented: $showSessionPhotos) {
+                SessionPhotosSheet(sessionID: session.id)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
             }
         }
     }
@@ -535,13 +434,6 @@ struct EditSessionView: View {
         slotNotes = session.slotNotes ?? ""
 
         compEvents = session.compEvents
-
-        chipPhotoFilename = session.chipEstimatorImageFilename
-        if let fileName = chipPhotoFilename,
-           let url = ChipEstimatorPhotoStorage.url(for: fileName),
-           let uiImage = UIImage(contentsOfFile: url.path) {
-            sessionPhoto = uiImage
-        }
     }
 
     private func save() {
@@ -589,6 +481,7 @@ struct EditSessionView: View {
             featureOther: "",
             notes: slotNotes
         )
+        let photoState = photoSessionState
         var updated = Session(
             id: session.id,
             game: selectedGame,
@@ -611,7 +504,9 @@ struct EditSessionView: View {
             rewardsProgramName: session.rewardsProgramName,
             linkedRewardWalletCardId: session.linkedRewardWalletCardId,
             tierPointsVerification: tierPointsVerification,
-            chipEstimatorImageFilename: chipPhotoFilename,
+            chipEstimatorImageFilename: photoState.chipEstimatorImageFilename,
+            sessionAttachedPhotoIDs: photoState.sessionAttachedPhotoIDs,
+            primarySessionPhotoRefKey: photoState.primarySessionPhotoRefKey,
             gameCategory: gameCategory,
             pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,
             pokerAllowsRebuy: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsRebuy : nil,
@@ -667,18 +562,6 @@ struct EditSessionView: View {
                     .cornerRadius(8)
             }
         }
-    }
-
-    private func handlePickedSessionPhoto(_ image: UIImage) {
-        sessionPhoto = image
-        if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: session.id) {
-            chipPhotoFilename = fileName
-        }
-    }
-
-    private func compHasReceiptPhoto(_ id: UUID) -> Bool {
-        guard let url = CompPhotoStorage.url(for: id) else { return false }
-        return FileManager.default.fileExists(atPath: url.path)
     }
 
     private func removeComp(_ ev: CompEvent) {

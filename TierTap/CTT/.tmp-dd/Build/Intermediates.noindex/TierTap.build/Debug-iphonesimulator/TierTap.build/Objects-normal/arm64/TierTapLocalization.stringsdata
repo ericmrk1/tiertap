@@ -1,5 +1,32 @@
 {
   "source": "/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Localization/TierTapLocalization.swift",
-  "tables": {},
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "TierTap",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 169
+        }
+      },
+      {
+        "comment": "",
+        "key": "+",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 172
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coin icon",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 292
+        }
+      }
+    ]
+  },
   "version": 1
 }

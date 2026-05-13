@@ -17,6 +17,7 @@ struct LiveSessionView: View {
     @State private var showMissingInfoAlert = false
     #if os(iOS)
     @State private var liveSessionShareRef: PostCloseoutSessionRef?
+    @State private var showSessionPhotos = false
     #endif
 
     let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -100,6 +101,10 @@ struct LiveSessionView: View {
                                     .cornerRadius(10)
                                 }
                                 .accessibilityLabel("Share session")
+
+                                SessionPhotosEntryButton {
+                                    showSessionPhotos = true
+                                }
                             #endif
                             
                         }
@@ -390,6 +395,11 @@ struct LiveSessionView: View {
                     .environmentObject(store)
                     .environmentObject(settingsStore)
                     .environmentObject(authStore)
+            }
+            .adaptiveSheet(isPresented: $showSessionPhotos) {
+                SessionPhotosSheet(sessionID: s.id)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
             }
             #endif
             .onChange(of: store.liveSession) { newVal in if newVal == nil { dismiss() } }

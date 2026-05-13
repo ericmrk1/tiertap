@@ -443,7 +443,7 @@ struct CloseoutView: View {
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(Color.blue.opacity(0.9))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(16)
                                 }
@@ -455,7 +455,7 @@ struct CloseoutView: View {
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(16)
                                 }

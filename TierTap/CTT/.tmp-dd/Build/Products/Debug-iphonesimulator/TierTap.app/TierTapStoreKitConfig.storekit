@@ -14,7 +14,21 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "E7A41C82",
+      "localizations" : [
+        {
+          "description" : "Adds 250,000 AI tokens to your balance. Tokens are spent as you use AI features and can be replenished by purchasing again.",
+          "displayName" : "TierTapSession",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "Credits",
+      "referenceName" : "TierTapSession",
+      "type" : "Consumable"
+    }
   ],
   "settings" : {
     "_askToBuyEnabled" : false,
@@ -45,7 +59,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "8.99",
+          "displayPrice" : "39.99",
           "familyShareable" : true,
           "groupNumber" : 1,
           "internalID" : "FA3CB639",
@@ -73,7 +87,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "19.99",
+          "displayPrice" : "149.00",
           "familyShareable" : true,
           "groupNumber" : 1,
           "internalID" : "8BFDDB4C",
@@ -101,7 +115,7 @@
           "codeOffers" : [
 
           ],
-          "displayPrice" : "0.99",
+          "displayPrice" : "14.99",
           "familyShareable" : true,
           "groupNumber" : 1,
           "internalID" : "B412DB5E",

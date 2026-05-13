@@ -7,7 +7,7 @@
         "key": "Missing Information",
         "location": {
           "startingColumn": 20,
-          "startingLine": 351
+          "startingLine": 396
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Started %@",
         "location": {
           "startingColumn": 34,
-          "startingLine": 54
+          "startingLine": 55
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "Private notes",
         "location": {
           "startingColumn": 53,
-          "startingLine": 74
+          "startingLine": 75
         }
       },
       {
@@ -31,15 +31,23 @@
         "key": "Share session",
         "location": {
           "startingColumn": 53,
-          "startingLine": 101
+          "startingLine": 102
         }
       },
       {
         "comment": "",
         "key": "Total: %@%lld",
         "location": {
-          "startingColumn": 42,
-          "startingLine": 118
+          "startingColumn": 46,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@%@%@/hr",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 126
         }
       },
       {
@@ -47,7 +55,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 46,
-          "startingLine": 125
+          "startingLine": 136
         }
       },
       {
@@ -55,7 +63,7 @@
         "key": "Total: %@%lld",
         "location": {
           "startingColumn": 42,
-          "startingLine": 166
+          "startingLine": 193
         }
       },
       {
@@ -63,7 +71,7 @@
         "key": "· %@",
         "location": {
           "startingColumn": 62,
-          "startingLine": 185
+          "startingLine": 212
         }
       },
       {
@@ -71,7 +79,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 58,
-          "startingLine": 189
+          "startingLine": 216
         }
       },
       {
@@ -79,7 +87,7 @@
         "key": "",
         "location": {
           "startingColumn": 40,
-          "startingLine": 237
+          "startingLine": 264
         }
       },
       {
@@ -87,7 +95,7 @@
         "key": "Verified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 241
+          "startingLine": 268
         }
       },
       {
@@ -95,7 +103,7 @@
         "key": "Unverified",
         "location": {
           "startingColumn": 42,
-          "startingLine": 242
+          "startingLine": 269
         }
       },
       {
@@ -103,7 +111,7 @@
         "key": "Back",
         "location": {
           "startingColumn": 28,
-          "startingLine": 295
+          "startingLine": 322
         }
       },
       {
@@ -111,7 +119,7 @@
         "key": "OK",
         "location": {
           "startingColumn": 24,
-          "startingLine": 352
+          "startingLine": 397
         }
       },
       {
@@ -119,7 +127,7 @@
         "key": "Please complete the following before closing out: %@. You can add buy-ins here, but game and location must be set when you check in.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 354
+          "startingLine": 399
         }
       },
       {
@@ -127,7 +135,7 @@
         "key": "Done",
         "location": {
           "startingColumn": 28,
-          "startingLine": 392
+          "startingLine": 437
         }
       }
     ]

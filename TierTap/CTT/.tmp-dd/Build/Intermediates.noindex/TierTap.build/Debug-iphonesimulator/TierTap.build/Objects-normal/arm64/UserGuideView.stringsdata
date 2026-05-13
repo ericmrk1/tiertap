@@ -4,10 +4,18 @@
     "Localizable": [
       {
         "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 17,
+          "startingLine": 197
+        }
+      },
+      {
+        "comment": "",
         "key": "•",
         "location": {
           "startingColumn": 22,
-          "startingLine": 163
+          "startingLine": 260
         }
       }
     ]

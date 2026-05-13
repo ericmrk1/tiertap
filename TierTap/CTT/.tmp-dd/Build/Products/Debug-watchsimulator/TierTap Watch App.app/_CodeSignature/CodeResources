@@ -16,13 +16,101 @@
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon108x108@2x.png</key>
+		<data>
+		TtC7xMuNKlN1yzxUzmnv/rbYkmc=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon117x117@2x.png</key>
+		<data>
+		OG2ly6vHb1NEGS+WnuiEEF5YeL0=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon129x129@2x.png</key>
+		<data>
+		z4uho+S9RGU0cqOvXZ2m8KuJm4k=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon24x24@2x.png</key>
+		<data>
+		jFZwtSFYPJ3ks6Q87yczKbj5T5M=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon27.5x27.5@2x.png</key>
+		<data>
+		W9HPXiPztsn7dPLDz2ozM1Oe6Sw=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon29x29@2x.png</key>
+		<data>
+		kBuP1GLvrYlLTgOQujWmj1fpHuA=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon29x29@3x.png</key>
+		<data>
+		eSE+SWv5tbYeL8XhGWV/vg52tj0=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon33x33@2x.png</key>
+		<data>
+		sFT7NTXD8KyejmXWhy0ekFWttlI=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon40x40@2x.png</key>
+		<data>
+		e6sFxFLaa5f8rAN4e4jwnb4oqQM=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon44x44@2x.png</key>
+		<data>
+		WhWG6laKLpi62VmuqiR6kgg2yDw=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon46x46@2x.png</key>
+		<data>
+		quSX0O3SrOinkjTjihTmqdWgaL4=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon50x50@2x.png</key>
+		<data>
+		7CtjQ4go4N48AgFCMQiQtAed7V4=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon51x51@2x.png</key>
+		<data>
+		LrvKCsz4AqwxO7+4kQNdCkokaig=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon54x54@2x.png</key>
+		<data>
+		1F4LH3r6KZTn0aGB2aNes1ciYAE=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon86x86@2x.png</key>
+		<data>
+		l2f9sUuI63q7ckhBtFWXDzgtWs0=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon98x98@2x.png</key>
+		<data>
+		QJ8xu5YEzZ2CGSf8FHvh/DcUYFE=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/Assets.car</key>
+		<data>
+		3qDmyQPgWUiz2yx2sGm/aJqkgIA=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/Info.plist</key>
+		<data>
+		UH0Oj3itEd98wFdn4kfn8/K/iPA=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/TierTapWatchComplications</key>
+		<data>
+		h7YoImVuEmwIc8uC3m6ucliuGcA=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/TierTapWatchComplications.debug.dylib</key>
+		<data>
+		V3zoqItpyAIVh7PZVn26BZHe2aI=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/_CodeSignature/CodeResources</key>
+		<data>
+		6Lk0uftZcuAk6S/7ljEjz7lr0uE=
+		</data>
+		<key>PlugIns/TierTapWatchComplications.appex/__preview.dylib</key>
+		<data>
+		NNnecHwYZ3i5fE1z56P7OXOKGGg=
+		</data>
 		<key>Strings.json</key>
 		<data>
-		sZ1aYLo4kYViiwNDBQtPeoWZIXc=
+		whFWruTpO5t9UByGuJzbMcNUIpw=
 		</data>
 		<key>TierTap Watch App.debug.dylib</key>
 		<data>
-		S1PqtrguNuJfnvoX3gMQIRTNZOE=
+		YHWMrrHv8p5Wuf7u4HtZMRJt/CI=
 		</data>
 		<key>__preview.dylib</key>
 		<data>
@@ -38,18 +126,172 @@
 			Roc63NiFUa+tIYHcQnjeKDaEgnGPQNQ1fh1Bb9NAxP4=
 			</data>
 		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon108x108@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			gWeFcbpehS/Se5CCWIGRZs9KLc0Mo1+c0J5kEfVhm8o=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon117x117@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			YOzFbN5GTK/3Km9AxTw9b9vS4u0sF2n7/XKCjr4Z2KU=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon129x129@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			f8vY6dGcRKcH0QNyOGkTdgtrUNARFVEOGQGmciSOSYM=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon24x24@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QckN9YZK4Njw1rGGoeE8jYneOdzwD23XYo2UIrYj3B8=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon27.5x27.5@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			htSxD3qmi6Z+gugSS0eDTqaXvIOZOOz4DbcEANH9RKI=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon29x29@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			41utXy2cO+JzsHkT4aQaiNmaXvxz9MP0UibVYcLLe7Y=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon29x29@3x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			gVGJzjDaioxbS+fJd0rWa11MSwos5nvMRjaGd6gpP3I=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon33x33@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			th1iE0jQOyBUq70+L9ohho98sZcO2ZTFR6nykhSmYOo=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon40x40@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			epZDEnECPYHVrmfuZhGN10qecBPyhirRxT8FPm+kzV8=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon44x44@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			cFpC3Me7nYJz577lkd/N/9ooZCcJgsEnDTM/61A42As=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon46x46@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			YSrzkxPmq72mvMPIStg6rJXaz+QsAyrGA0sSw3pL9f4=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon50x50@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			FB2pKvbeSrSjAdKxqyt4vZ9L/sFg7RJqa3qimRpko/w=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon51x51@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MHbNGcbpolWb9kc6/EAwZsEDp/izIjrj5FsAf2jjB2E=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon54x54@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			q+2C3Wj5TBa+/2l+98lIuTXq9TpJjJSFUtPN/1PFLQI=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon86x86@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			7tugmgPYGqHyMOLCfZCBXM39N9DUZcxRwx6xYUag7k0=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/AppIcon98x98@2x.png</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			7AZALvzdN2mlQxCRnnOSM5Y5xyXm0XUMoOCw87yxjco=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Roc63NiFUa+tIYHcQnjeKDaEgnGPQNQ1fh1Bb9NAxP4=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			rHPnUhrdz4l6+YSC+7djDheWZ5wewM/xdJ2wB8DSHJ8=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/TierTapWatchComplications</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ftPqruTqiUz7V2JfqzXt05wp9gtrH9r4vjNMBJhH1FE=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/TierTapWatchComplications.debug.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QSnx/Tyd+1UHp0gbDCTzwGEh8UryTEMhsEmIJRs5J8Q=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5/ZQTS5wlTITQuxmIXveKKrERD/Y1oSuZLT3S56dfqs=
+			</data>
+		</dict>
+		<key>PlugIns/TierTapWatchComplications.appex/__preview.dylib</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			a+6FKGawDLHFbFXJW+2PxwEdiB2gVe/4uvYw/EdERUE=
+			</data>
+		</dict>
 		<key>Strings.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			WPhIyjij84c8czdh6bBGr50PDOnduidXXNwQfF0tl/k=
+			KgjdRYM/2pdmwsW8001tB7oyebnCtfD8qp0RSF+TS/U=
 			</data>
 		</dict>
 		<key>TierTap Watch App.debug.dylib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			bT3HXUpCVn7oBxyXs2uC1DBKthJOU4p2DhyH7Bi+Ab0=
+			eiLouLAIoM0c3TonPJOaYW94/Zh/Vxj/eonMbYsShRc=
 			</data>
 		</dict>
 		<key>__preview.dylib</key>

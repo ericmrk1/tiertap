@@ -2,6 +2,7 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/AppLockService.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapLocalization.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RootTabView.o
+/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPlusTokenStatBubbles.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TripsView.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/MapPlacePickerView.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/FlightRouteMapView.o
@@ -24,6 +25,7 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TripStore.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TierTapPaywallView 2.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/SharedComponents.o
+/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/StackUpdateConfetti.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HomeView.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideContent.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/UserGuideView.o
@@ -46,6 +48,8 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/RewardWalletCardModels.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/Sensitive.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryView.o
+/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/HistoryTaxPrepView.o
+/Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/TaxPrepZipArchive.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/SessionCalendarView.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/EditSessionView.o
 /Users/emf76/Dropbox/Code/TierTap/CTT/.tmp-dd/Build/Intermediates.noindex/TierTap.build/Debug-iphonesimulator/TierTap.build/Objects-normal/arm64/SessionDetailView.o

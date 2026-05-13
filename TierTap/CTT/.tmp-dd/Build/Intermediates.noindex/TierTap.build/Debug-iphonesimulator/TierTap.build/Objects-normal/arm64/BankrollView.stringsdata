@@ -23,7 +23,7 @@
         "key": "%@%lld",
         "location": {
           "startingColumn": 18,
-          "startingLine": 217
+          "startingLine": 218
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "%@%@",
         "location": {
           "startingColumn": 34,
-          "startingLine": 242
+          "startingLine": 243
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "Bankroll after: %@%lld",
         "location": {
           "startingColumn": 42,
-          "startingLine": 315
+          "startingLine": 316
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Current: %@%lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 352
+          "startingLine": 353
         }
       }
     ]

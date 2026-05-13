@@ -7,7 +7,7 @@
         "key": "",
         "location": {
           "startingColumn": 30,
-          "startingLine": 198
+          "startingLine": 230
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Play Reminders",
         "location": {
           "startingColumn": 45,
-          "startingLine": 210
+          "startingLine": 242
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "User guide",
         "location": {
           "startingColumn": 45,
-          "startingLine": 220
+          "startingLine": 252
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "TierTap Pro subscription",
         "location": {
           "startingColumn": 45,
-          "startingLine": 232
+          "startingLine": 264
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "PRO",
         "location": {
           "startingColumn": 34,
-          "startingLine": 228
+          "startingLine": 260
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Starting tier %@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 371
+          "startingLine": 451
         }
       },
       {
@@ -55,7 +55,15 @@
         "key": "Total buy-in %@%@",
         "location": {
           "startingColumn": 22,
-          "startingLine": 380
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stack: %@%@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 464
         }
       },
       {
@@ -63,7 +71,7 @@
         "key": "Total comps %@%@",
         "location": {
           "startingColumn": 26,
-          "startingLine": 384
+          "startingLine": 469
         }
       },
       {
@@ -71,7 +79,7 @@
         "key": "Share session",
         "location": {
           "startingColumn": 45,
-          "startingLine": 438
+          "startingLine": 523
         }
       },
       {
@@ -79,7 +87,7 @@
         "key": "Private notes",
         "location": {
           "startingColumn": 49,
-          "startingLine": 411
+          "startingLine": 496
         }
       },
       {
@@ -87,15 +95,15 @@
         "key": "Tap Level %lld",
         "location": {
           "startingColumn": 26,
-          "startingLine": 496
+          "startingLine": 588
         }
       },
       {
         "comment": "",
-        "key": "%lld sessions · %@",
+        "key": "%lld sessions",
         "location": {
           "startingColumn": 26,
-          "startingLine": 502
+          "startingLine": 594
         }
       },
       {
@@ -103,7 +111,7 @@
         "key": "Levels explained",
         "location": {
           "startingColumn": 41,
-          "startingLine": 515
+          "startingLine": 607
         }
       },
       {
@@ -111,7 +119,63 @@
         "key": "Share level",
         "location": {
           "startingColumn": 41,
-          "startingLine": 524
+          "startingLine": 616
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Preview",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 657
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 673
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 690
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share Overlay",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 723
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom stats (up to 4)",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 752
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preview Share Image",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 783
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 801
         }
       },
       {
@@ -119,23 +183,47 @@
         "key": "Tap Level %lld!",
         "location": {
           "startingColumn": 22,
-          "startingLine": 623
+          "startingLine": 946
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap Level Progress",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 988
         }
       },
       {
         "comment": "",
         "key": "Tap Level %lld",
         "location": {
-          "startingColumn": 22,
-          "startingLine": 668
+          "startingColumn": 26,
+          "startingLine": 1007
         }
       },
       {
         "comment": "",
-        "key": "%lld sessions · %@",
+        "key": "%lld sessions",
         "location": {
-          "startingColumn": 22,
-          "startingLine": 674
+          "startingColumn": 26,
+          "startingLine": 1015
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1047
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1056
         }
       },
       {
@@ -143,7 +231,7 @@
         "key": "%lld sessions logged",
         "location": {
           "startingColumn": 38,
-          "startingLine": 710
+          "startingLine": 1159
         }
       },
       {
@@ -151,7 +239,7 @@
         "key": "Current batch: %@",
         "location": {
           "startingColumn": 38,
-          "startingLine": 713
+          "startingLine": 1162
         }
       },
       {
@@ -159,7 +247,7 @@
         "key": "%lld sessions",
         "location": {
           "startingColumn": 42,
-          "startingLine": 731
+          "startingLine": 1180
         }
       },
       {
@@ -167,7 +255,7 @@
         "key": "Levels %lld–%lld",
         "location": {
           "startingColumn": 42,
-          "startingLine": 750
+          "startingLine": 1199
         }
       },
       {
@@ -175,7 +263,7 @@
         "key": "· %@",
         "location": {
           "startingColumn": 42,
-          "startingLine": 753
+          "startingLine": 1202
         }
       },
       {
@@ -183,7 +271,7 @@
         "key": "Done",
         "location": {
           "startingColumn": 28,
-          "startingLine": 774
+          "startingLine": 1223
         }
       }
     ]

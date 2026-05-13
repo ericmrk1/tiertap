@@ -12,6 +12,7 @@ struct SessionDetailView: View {
     @State private var showCompleteSession = false
     @State private var showEditSession = false
     @State private var showShareFlow = false
+    @State private var showSessionPhotos = false
     @State private var privateNotes: String = ""
     @State private var tierPointsVerification: SessionTierPointsVerification = .verified
 
@@ -60,44 +61,10 @@ struct SessionDetailView: View {
                         .frame(maxWidth: .infinity)
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
 
-                        if hasSessionPhotosContent {
+                        if SessionPhotoCatalog.hasPhotos(for: displaySession) {
                             DetailSection(title: "Session Photos", icon: "photo.on.rectangle.angled") {
-                                VStack(alignment: .leading, spacing: 16) {
-                                    if let fileName = displaySession.chipEstimatorImageFilename,
-                                       let url = ChipEstimatorPhotoStorage.url(for: fileName),
-                                       let uiImage = UIImage(contentsOfFile: url.path) {
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            L10nText("Session")
-                                                .font(.caption.bold())
-                                                .foregroundColor(.gray)
-                                            Image(uiImage: uiImage)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .cornerRadius(12)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                                )
-                                        }
-                                    }
-                                    ForEach(displaySession.compEvents.filter { compHasReceiptPhoto($0.id) }) { ev in
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            Text("Comp receipt · \(settingsStore.currencySymbol)\(ev.amount) · \(ev.timestamp.formatted(date: .omitted, time: .shortened))")
-                                                .font(.caption.bold())
-                                                .foregroundColor(.gray)
-                                            if let url = CompPhotoStorage.url(for: ev.id),
-                                               let ui = UIImage(contentsOfFile: url.path) {
-                                                Image(uiImage: ui)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .cornerRadius(12)
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 12)
-                                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                                    )
-                                            }
-                                        }
-                                    }
+                                SessionPhotosPrimarySelector(session: displaySession) {
+                                    showSessionPhotos = true
                                 }
                             }
                         }
@@ -378,21 +345,12 @@ struct SessionDetailView: View {
                     .environmentObject(authStore)
                     .environmentObject(subscriptionStore)
             }
+            .adaptiveSheet(isPresented: $showSessionPhotos) {
+                SessionPhotosSheet(sessionID: displaySession.id, mode: .selectPrimary)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+            }
         }
-    }
-
-    private func compHasReceiptPhoto(_ id: UUID) -> Bool {
-        guard let url = CompPhotoStorage.url(for: id) else { return false }
-        return FileManager.default.fileExists(atPath: url.path)
-    }
-
-    private var hasSessionPhotosContent: Bool {
-        if let fileName = displaySession.chipEstimatorImageFilename,
-           let url = ChipEstimatorPhotoStorage.url(for: fileName),
-           FileManager.default.fileExists(atPath: url.path) {
-            return true
-        }
-        return displaySession.compEvents.contains { compHasReceiptPhoto($0.id) }
     }
 }
 

@@ -2,6 +2,7 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/AppLockService.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Localization/TierTapLocalization.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/RootTabView.swift
+/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPlusTokenStatBubbles.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TripsView.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/MapPlacePickerView.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/FlightRouteMapView.swift
@@ -24,6 +25,7 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/ViewModels/TripStore.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TierTapPaywallView\ 2.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SharedComponents.swift
+/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/StackUpdateConfetti.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HomeView.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideContent.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/UserGuideView.swift
@@ -46,6 +48,8 @@
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Models/RewardWalletCardModels.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Data/Sensitive.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryView.swift
+/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/HistoryTaxPrepView.swift
+/Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/TaxPrepZipArchive.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionCalendarView.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/EditSessionView.swift
 /Users/emf76/Dropbox/Code/TierTap/CTT/TierTap/Views/SessionDetailView.swift

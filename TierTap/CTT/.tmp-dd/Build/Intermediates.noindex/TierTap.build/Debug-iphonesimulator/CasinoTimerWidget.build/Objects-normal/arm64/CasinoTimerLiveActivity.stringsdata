@@ -7,7 +7,7 @@
         "key": "Starting tier %@",
         "location": {
           "startingColumn": 30,
-          "startingLine": 34
+          "startingLine": 35
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "Total buy-in $%@",
         "location": {
           "startingColumn": 30,
-          "startingLine": 43
+          "startingLine": 44
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "LIVE SESSION",
         "location": {
           "startingColumn": 34,
-          "startingLine": 22
+          "startingLine": 23
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Start %@",
         "location": {
           "startingColumn": 30,
-          "startingLine": 72
+          "startingLine": 73
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "In $%@",
         "location": {
           "startingColumn": 30,
-          "startingLine": 87
+          "startingLine": 88
         }
       },
       {
@@ -47,7 +47,55 @@
         "key": "TierTap · live",
         "location": {
           "startingColumn": 30,
-          "startingLine": 94
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Live Session",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 192
+        }
+      },
+      {
+        "comment": "",
+        "key": "Shows live session time and running result.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 193
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@ · %@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "Buy-in $%lld  %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "TierTap · No live session",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 240
+        }
+      },
+      {
+        "comment": "",
+        "key": "No live session",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 248
         }
       }
     ]

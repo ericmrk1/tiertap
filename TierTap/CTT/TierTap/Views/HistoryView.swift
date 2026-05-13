@@ -25,6 +25,7 @@ struct HistoryView: View {
     /// Single choice below Filters; legacy sessions without stored verification count as verified.
     @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
     @State private var showTaxPrep = false
+    @State private var showPhotoFeed = false
     @State private var isToolsMenuPresented = false
 
     private var showDeleteAlert: Binding<Bool> {
@@ -117,6 +118,19 @@ struct HistoryView: View {
                     Text("Tax Prep")
                 } icon: {
                     Image(systemName: "doc.text.magnifyingglass")
+                }
+                .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+
+            Button {
+                isToolsMenuPresented = false
+                showPhotoFeed = true
+            } label: {
+                Label {
+                    Text("Photo Feed")
+                } icon: {
+                    Image(systemName: "photo.on.rectangle.angled")
                 }
                 .foregroundStyle(.green)
             }
@@ -500,6 +514,14 @@ struct HistoryView: View {
                 HistoryTaxPrepView()
                     .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(authStore)
+            }
+            .navigationDestination(isPresented: $showPhotoFeed) {
+                HistoryPhotoFeedView()
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(rewardWalletStore)
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
             }
