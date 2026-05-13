@@ -1,38 +1,5 @@
 import SwiftUI
 
-private enum HistoryPanelTab: String, CaseIterable {
-    case sessions
-    case tools
-}
-
-/// Tax prep geography: fixed US list + international; session matching uses the last ", XX" token when `XX` is two letters.
-private enum TaxPrepGeography {
-    static let allStatesLabel = "All States"
-    static let internationalLabel = "International"
-
-    /// USPS abbreviations for the 50 U.S. states (D.C. not included).
-    static let usStateNamesByCode: [String: String] = [
-        "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
-        "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
-        "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
-        "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
-        "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
-        "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
-        "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
-        "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
-        "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
-        "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
-    ]
-
-    static let usStateCodeSet: Set<String> = Set(usStateNamesByCode.keys)
-
-    static var sortedUSStatePickerRows: [(code: String, name: String)] {
-        usStateNamesByCode
-            .map { (code: $0.key, name: $0.value) }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-    }
-}
-
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
@@ -57,14 +24,8 @@ struct HistoryView: View {
     @State private var isHistoryLocationSectionExpanded: Bool = false
     /// Single choice below Filters; legacy sessions without stored verification count as verified.
     @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
-    @State private var selectedHistoryTab: HistoryPanelTab = .sessions
-    @State private var isTaxPrepFlowActive = false
-    @State private var selectedTaxYear: Int = Calendar.current.component(.year, from: Date())
-    @State private var selectedTaxState: String = TaxPrepGeography.allStatesLabel
-    @State private var isTaxPrepGenerating = false
-    @State private var taxPrepProgress: Double = 0
-    @State private var taxPrepStatusMessage: String?
-    @State private var taxPrepComingSoonVisible: Bool = false
+    @State private var showTaxPrep = false
+    @State private var isToolsMenuPresented = false
 
     private var showDeleteAlert: Binding<Bool> {
         Binding(
@@ -73,7 +34,7 @@ struct HistoryView: View {
         )
     }
 
-    /// Sessions for the scrolling list: date, location, game, search, **tier-points segment**, and tax-prep filters when active.
+    /// Sessions for the scrolling list: date, location, game, search, and **tier-points segment**.
     private var filteredSessions: [Session] {
         sessionsApplyingHistoryFilters(includeTierPointsVerification: true)
     }
@@ -107,20 +68,6 @@ struct HistoryView: View {
             sessions = sessions.filter { $0.effectiveTierPointsVerification == historyTierPointsFilter }
         }
 
-        if isTaxPrepFlowActive {
-            sessions = sessions.filter { session in
-                let yStart = Calendar.current.component(.year, from: session.startTime)
-                if yStart == selectedTaxYear { return true }
-                if let end = session.endTime {
-                    return Calendar.current.component(.year, from: end) == selectedTaxYear
-                }
-                return false
-            }
-            if selectedTaxState != TaxPrepGeography.allStatesLabel {
-                sessions = sessions.filter { sessionMatchesTaxStateFilter($0) }
-            }
-        }
-
         return sessions
     }
 
@@ -130,23 +77,6 @@ struct HistoryView: View {
 
     private var availableGames: [String] {
         Array(Set(store.sessions.map { $0.game })).sorted()
-    }
-
-    /// Every calendar year that appears on any session (start or end time).
-    private var sessionTaxYears: [Int] {
-        var years = Set<Int>()
-        for s in store.sessions {
-            years.insert(Calendar.current.component(.year, from: s.startTime))
-            if let end = s.endTime {
-                years.insert(Calendar.current.component(.year, from: end))
-            }
-        }
-        return years.sorted(by: >)
-    }
-
-    /// Stable token so we can re-clamp the tax year when session dates change without relying on `Session` equality.
-    private var sessionTaxYearChangeToken: String {
-        "\(store.sessions.count)-\(sessionTaxYears.map(String.init).joined(separator: ","))"
     }
 
     private var historyFiltersActive: Bool {
@@ -161,6 +91,41 @@ struct HistoryView: View {
         selectedHistoryGames.removeAll()
         selectedHistoryLocations.removeAll()
         searchText = ""
+    }
+
+    private var historyToolsMenu: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Button {
+                isToolsMenuPresented = false
+                isDeleteSelectorPresented = true
+            } label: {
+                Label {
+                    Text("Delete Sessions")
+                } icon: {
+                    Image(systemName: "trash")
+                }
+                .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.sessions.isEmpty)
+
+            Button {
+                isToolsMenuPresented = false
+                showTaxPrep = true
+            } label: {
+                Label {
+                    Text("Tax Prep")
+                } icon: {
+                    Image(systemName: "doc.text.magnifyingglass")
+                }
+                .foregroundStyle(.green)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding()
+        .frame(minWidth: 220, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .modifier(HistoryToolsMenuPresentation())
     }
 
     private var emptyStateView: some View {
@@ -277,17 +242,6 @@ struct HistoryView: View {
         }
         .padding(.horizontal)
         .padding(.top, 10)
-    }
-
-    private var historyTabSegment: some View {
-        Picker("", selection: $selectedHistoryTab) {
-            Text("Sessions").tag(HistoryPanelTab.sessions)
-            Text("Tools").tag(HistoryPanelTab.tools)
-        }
-        .pickerStyle(.segmented)
-        .tint(.green)
-        .padding(.horizontal)
-        .padding(.top, 8)
     }
 
     private var historyDateRangeSection: some View {
@@ -525,253 +479,11 @@ struct HistoryView: View {
 
     private var historyContentView: some View {
         VStack(spacing: 0) {
-            historyTabSegment
-            if selectedHistoryTab == .sessions {
-                historyStickyFilterBubble
-                historyTierPointsVerificationSegment
-                if isTaxPrepFlowActive {
-                    taxPrepFilterPanel
-                }
-                sessionListContent
-                    .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            } else {
-                historyToolsContent
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            historyStickyFilterBubble
+            historyTierPointsVerificationSegment
+            sessionListContent
+                .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
-    }
-
-    private var historyToolsContent: some View {
-        GeometryReader { geo in
-            let horizontalPadding: CGFloat = 16
-            let bottomPadding: CGFloat = 20
-            let interButtonSpacing: CGFloat = 12
-            let contentWidth = geo.size.width - horizontalPadding * 2 - interButtonSpacing
-            // Compact square tiles: capped size, side-by-side at the bottom.
-            let bubbleSide = min(112, max(76, contentWidth / 2))
-
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-                HStack {
-                    Spacer(minLength: 0)
-                    HStack(spacing: interButtonSpacing) {
-                        historyToolButton(
-                            title: "Delete Sessions",
-                            systemImage: "trash",
-                            tint: .red,
-                            isDisabled: store.sessions.isEmpty,
-                            isCompact: true
-                        ) {
-                            if settingsStore.enableCasinoFeedback {
-                                CelebrationPlayer.shared.playQuickChime()
-                            }
-                            isDeleteSelectorPresented = true
-                        }
-                        .frame(width: bubbleSide, height: bubbleSide)
-
-                        historyToolButton(
-                            title: "Tax Prep",
-                            systemImage: "doc.text.magnifyingglass",
-                            tint: .white,
-                            isDisabled: false,
-                            isCompact: true
-                        ) {
-                            if settingsStore.enableCasinoFeedback {
-                                CelebrationPlayer.shared.playQuickChime()
-                            }
-                            withAnimation(.spring(response: 0.45, dampingFraction: 0.86)) {
-                                taxPrepComingSoonVisible = true
-                            }
-                        }
-                        .frame(width: bubbleSide, height: bubbleSide)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, horizontalPadding)
-                .padding(.bottom, bottomPadding)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private func dismissTaxPrepComingSoonOverlay() {
-        withAnimation(.easeOut(duration: 0.28)) {
-            taxPrepComingSoonVisible = false
-        }
-    }
-
-    /// Full-screen dimmed backdrop with a large centered “bubble” for the Tax Prep placeholder.
-    private var taxPrepComingSoonOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.52)
-                .ignoresSafeArea()
-                .onTapGesture { dismissTaxPrepComingSoonOverlay() }
-
-            VStack(spacing: 18) {
-                TimelineView(.animation(minimumInterval: 1 / 30, paused: false)) { timeline in
-                    let t = timeline.date.timeIntervalSinceReferenceDate
-                    let pulse = 0.62 + 0.38 * (0.5 + 0.5 * sin(t * 3.8))
-                    Text("Feature Coming Soon....")
-                        .font(.system(size: 32, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.white.opacity(pulse))
-                        .multilineTextAlignment(.center)
-                        .minimumScaleFactor(0.65)
-                        .lineLimit(3)
-                }
-
-                Text("Tap outside to close")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white.opacity(0.72))
-            }
-            .padding(.horizontal, 36)
-            .padding(.vertical, 44)
-            .frame(maxWidth: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.34),
-                        Color.white.opacity(0.16)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 32, style: .continuous)
-                    .stroke(Color.white.opacity(0.35), lineWidth: 1.5)
-            )
-            .shadow(color: .black.opacity(0.45), radius: 28, x: 0, y: 14)
-            .padding(.horizontal, 22)
-        }
-        .transition(.scale(scale: 0.9).combined(with: .opacity))
-    }
-
-    private func historyToolButton(title: String, systemImage: String, tint: Color, isDisabled: Bool, isCompact: Bool = false, action: @escaping () -> Void) -> some View {
-        let corner: CGFloat = isCompact ? 12 : 14
-        return Button(action: action) {
-            VStack(spacing: isCompact ? 5 : 8) {
-                Image(systemName: systemImage)
-                    .font(isCompact ? .body.weight(.bold) : .title2.weight(.bold))
-                Text(title)
-                    .font(isCompact ? .caption.weight(.bold) : .subheadline.weight(.bold))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-            }
-            .padding(isCompact ? 4 : 6)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.26),
-                        Color.white.opacity(0.14)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .foregroundColor(isDisabled ? .gray : tint)
-            .cornerRadius(corner)
-            .overlay(
-                RoundedRectangle(cornerRadius: corner, style: .continuous)
-                    .stroke(Color.white.opacity(0.16), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.22), radius: isCompact ? 4 : 6, x: 0, y: isCompact ? 3 : 4)
-        }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
-    }
-
-    private var taxPrepFilterPanel: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                L10nText("Tax Prep Filters")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                Spacer()
-                Button("Exit") {
-                    isTaxPrepFlowActive = false
-                    isTaxPrepGenerating = false
-                    taxPrepProgress = 0
-                    taxPrepStatusMessage = nil
-                }
-                .foregroundColor(.green)
-            }
-
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 6) {
-                    L10nText("Tax Year")
-                        .font(.caption.bold())
-                        .foregroundColor(.white.opacity(0.85))
-                    Picker(selection: $selectedTaxYear) {
-                        ForEach(sessionTaxYears, id: \.self) { year in
-                            Text(verbatim: String(year)).tag(year)
-                        }
-                    } label: {
-                        Text(verbatim: String(selectedTaxYear))
-                            .foregroundColor(.white)
-                    }
-                    .pickerStyle(.menu)
-                    .tint(.white)
-                    .accessibilityLabel("Tax Year")
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    L10nText("State")
-                        .font(.caption.bold())
-                        .foregroundColor(.white.opacity(0.85))
-                    Picker("State", selection: $selectedTaxState) {
-                        Text(TaxPrepGeography.allStatesLabel).tag(TaxPrepGeography.allStatesLabel)
-                        ForEach(TaxPrepGeography.sortedUSStatePickerRows, id: \.code) { row in
-                            Text("\(row.name) (\(row.code))").tag(row.code)
-                        }
-                        Text(TaxPrepGeography.internationalLabel).tag(TaxPrepGeography.internationalLabel)
-                    }
-                    .pickerStyle(.menu)
-                    .tint(.white)
-                }
-            }
-
-            Button {
-                startTaxPrepGeneration()
-            } label: {
-                Text("Continue with Tax Prep")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.green.opacity(0.9))
-                    .foregroundColor(.black)
-                    .cornerRadius(12)
-            }
-            .disabled(filteredSessions.isEmpty || isTaxPrepGenerating)
-
-            if isTaxPrepGenerating {
-                VStack(alignment: .leading, spacing: 8) {
-                    ProgressView(value: taxPrepProgress)
-                        .tint(.green)
-                    Text("Generating tax prep document... \(Int(taxPrepProgress * 100))%")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                }
-            }
-
-            if let status = taxPrepStatusMessage {
-                Text(status)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.9))
-            }
-        }
-        .padding(12)
-        .background(Color.black.opacity(0.26))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        )
-        .padding(.horizontal)
-        .padding(.top, 10)
     }
 
     var body: some View {
@@ -783,11 +495,13 @@ struct HistoryView: View {
                 } else {
                     historyContentView
                 }
-
-                if taxPrepComingSoonVisible {
-                    taxPrepComingSoonOverlay
-                        .zIndex(2)
-                }
+            }
+            .navigationDestination(isPresented: $showTaxPrep) {
+                HistoryTaxPrepView()
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(authStore)
             }
             .localizedNavigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
@@ -795,10 +509,24 @@ struct HistoryView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+                    HStack(spacing: 14) {
+                        Button {
+                            isToolsMenuPresented = true
+                        } label: {
+                            Image(systemName: "wrench.and.screwdriver")
+                                .font(.body.weight(.semibold))
+                                .foregroundColor(.green)
+                                .accessibilityLabel("Tools")
+                        }
+                        .popover(isPresented: $isToolsMenuPresented, arrowEdge: .top) {
+                            historyToolsMenu
+                        }
+
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                        .foregroundColor(.green)
                     }
-                    .foregroundColor(.green)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -874,67 +602,18 @@ struct HistoryView: View {
             } message: {
                 L10nText("This session will be permanently removed. This cannot be undone.")
             }
-            .onAppear {
-                clampTaxYearSelectionIfNeeded()
-            }
-            .onChange(of: sessionTaxYearChangeToken) { _ in
-                clampTaxYearSelectionIfNeeded()
-            }
-        }
-    }
-
-    /// When a specific U.S. state is selected, match sessions whose trailing ", XX" parses to that code. International = non‑U.S. or unknown.
-    private func sessionMatchesTaxStateFilter(_ session: Session) -> Bool {
-        switch selectedTaxState {
-        case TaxPrepGeography.allStatesLabel:
-            return true
-        case TaxPrepGeography.internationalLabel:
-            guard let code = inferredTwoLetterStateCode(for: session) else { return true }
-            return !TaxPrepGeography.usStateCodeSet.contains(code)
-        default:
-            return inferredTwoLetterStateCode(for: session) == selectedTaxState
         }
     }
 }
 
-extension HistoryView {
-    fileprivate func inferredTwoLetterStateCode(for session: Session) -> String? {
-        let casino = session.casino.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !casino.isEmpty else { return nil }
-        let parts = casino.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-        guard let last = parts.last, !last.isEmpty else { return nil }
-        if last.count == 2 {
-            return last.uppercased()
-        }
-        return nil
-    }
-
-    fileprivate func clampTaxYearSelectionIfNeeded() {
-        let years = sessionTaxYears
-        guard !years.isEmpty else { return }
-        if !years.contains(selectedTaxYear) {
-            selectedTaxYear = years[0]
-        }
-    }
-
-    fileprivate func startTaxPrepGeneration() {
-        guard !filteredSessions.isEmpty else { return }
-        isTaxPrepGenerating = true
-        taxPrepProgress = 0
-        taxPrepStatusMessage = nil
-
-        Task {
-            for step in 1...20 {
-                try? await Task.sleep(nanoseconds: 90_000_000)
-                await MainActor.run {
-                    taxPrepProgress = Double(step) / 20.0
-                }
-            }
-            await MainActor.run {
-                isTaxPrepGenerating = false
-                // Placeholder: actual tax document generation is intentionally left blank.
-                taxPrepStatusMessage = "Tax prep document generation is ready to implement."
-            }
+private struct HistoryToolsMenuPresentation: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.4, *) {
+            content.presentationCompactAdaptation(.popover)
+        } else {
+            content
+                .presentationDetents([.height(136)])
+                .presentationDragIndicator(.hidden)
         }
     }
 }

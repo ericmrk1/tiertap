@@ -4639,8 +4639,9 @@ struct SessionArtGeneratorView: View {
 
     private var remainingTierTapAIImagesToday: Int? {
         guard !canBypassTierTapAIImageLimits else { return nil }
+        let limit = max(1, settingsStore.effectiveTierTapAIImagesPerDay)
         let used = Self.imagesGeneratedToday(for: tierTapAIImageQuotaKey)
-        return max(0, 2 - used)
+        return max(0, limit - used)
     }
 
     private static func imagesGeneratedToday(for key: String) -> Int {

@@ -48,6 +48,8 @@ struct TierTapPaywallView: View {
     @State private var showAccountSheet = false
     @State private var emailInput: String = ""
     @State private var isPurchasingCreditsPack = false
+    @State private var isRequirementsExpanded = false
+    @State private var isBenefitsExpanded = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -129,11 +131,14 @@ struct TierTapPaywallView: View {
     }
 
     private var requirementsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        paywallCollapsibleSection(
+            isExpanded: $isRequirementsExpanded,
+            cornerRadius: 14
+        ) {
             LocalizedLabel(title: "Requirements", systemImage: "lock.circle.fill")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
-
+        } content: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Image(systemName: hasProAccess ? "checkmark.circle.fill" : "circle")
@@ -145,7 +150,7 @@ struct TierTapPaywallView: View {
                 HStack(spacing: 8) {
                     Image(systemName: authStore.isSignedIn ? "checkmark.circle.fill" : "circle")
                         .foregroundColor(authStore.isSignedIn ? .green : .white.opacity(0.8))
-                    L10nText("Signed in with a valid TierTap account (email, Apple, or Google).")
+                    L10nText("Signed in with a TierTap account (email, Apple, or Google).")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                 }
@@ -170,21 +175,17 @@ struct TierTapPaywallView: View {
                 }
             }
         }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white.opacity(0.15))
-        .cornerRadius(14)
-        // Extend the requirements card to the screen edges.
-        .padding(.horizontal, -16)
     }
 
     private var benefitsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        paywallCollapsibleSection(
+            isExpanded: $isBenefitsExpanded,
+            cornerRadius: 16
+        ) {
             L10nText("What you get")
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
-
+        } content: {
             VStack(alignment: .leading, spacing: 6) {
                 ProBenefitRow(
                     icon: "wand.and.stars",
@@ -193,7 +194,7 @@ struct TierTapPaywallView: View {
                 )
                 ProBenefitRow(
                     icon: "camera.viewfinder",
-                    title: "Chip Estimator at Close Out",
+                    title: "Chip Estimator",
                     subtitle: "Estimate chip stacks from a photo with AI before you cash out."
                 )
                 ProBenefitRow(
@@ -211,14 +212,48 @@ struct TierTapPaywallView: View {
                     title: "Community Feed",
                     subtitle: "See and share real-world sessions from other players."
                 )
+                ProBenefitRow(
+                    icon: "doc.text.fill",
+                    title: "Tax Preparation Documentation",
+                    subtitle: "Generate US-focused tax assistance for your records."
+                )
+            }
+        }
+    }
+
+    private func paywallCollapsibleSection<Header: View, Content: View>(
+        isExpanded: Binding<Bool>,
+        cornerRadius: CGFloat,
+        @ViewBuilder header: () -> Header,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: isExpanded.wrappedValue ? 8 : 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    isExpanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(alignment: .center, spacing: 8) {
+                    header()
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.bold))
+                        .foregroundColor(.white.opacity(0.8))
+                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded.wrappedValue {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white.opacity(0.15))
-        .cornerRadius(16)
-        // Extend the "What you get" card to the screen edges.
+        .cornerRadius(cornerRadius)
         .padding(.horizontal, -16)
     }
 
@@ -334,7 +369,7 @@ struct TierTapPaywallView: View {
                             } else {
                                 Image(systemName: "sparkles")
                             }
-                            let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                            let packCount = settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic))
                             TierTapPlusTokenPackPurchaseLabel(
                                 language: settingsStore.appLanguage,
                                 tokenCountFormatted: packCount,
@@ -352,7 +387,7 @@ struct TierTapPaywallView: View {
                                 "Buy TierTap Plus Tokens (%@) — %@",
                                 language: settingsStore.appLanguage
                             ),
-                            TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                            settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic)),
                             creditsProduct.displayPrice
                         )
                     )

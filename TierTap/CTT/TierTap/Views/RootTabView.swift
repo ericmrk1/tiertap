@@ -533,7 +533,7 @@ struct CommunityAuthSheet: View {
                         } else {
                             Image(systemName: "cart.fill")
                         }
-                        let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                        let packCount = settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic))
                         TierTapPlusTokenPackPurchaseLabel(
                             language: appLanguage,
                             tokenCountFormatted: packCount,
@@ -548,7 +548,7 @@ struct CommunityAuthSheet: View {
                 .accessibilityLabel(
                     String(
                         format: L10n.tr("Buy TierTap Plus Tokens (%@) — %@", language: appLanguage),
-                        TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                        settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic)),
                         product.displayPrice
                     )
                 )

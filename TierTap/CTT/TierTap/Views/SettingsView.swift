@@ -1168,7 +1168,7 @@ struct SettingsView: View {
                         } else {
                             Image(systemName: "cart.fill")
                         }
-                        let packCount = TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic))
+                        let packCount = settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic))
                         TierTapPlusTokenPackPurchaseLabel(
                             language: settingsStore.appLanguage,
                             tokenCountFormatted: packCount,
@@ -1186,7 +1186,7 @@ struct SettingsView: View {
                             "Buy TierTap Plus Tokens (%@) — %@",
                             language: settingsStore.appLanguage
                         ),
-                        TierTapProductId.creditsPackTokenAmount.formatted(.number.grouping(.automatic)),
+                        settingsStore.effectiveCreditsPackTokenAmount.formatted(.number.grouping(.automatic)),
                         product.displayPrice
                     )
                 )

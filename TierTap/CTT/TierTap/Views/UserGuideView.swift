@@ -15,78 +15,128 @@ struct UserGuideView: View {
     @State private var showPDFError = false
     @State private var expandedTopSectionIDs: Set<String> = []
     @State private var expandedSubsectionIDs: Set<String> = []
+    @State private var guideSearchQuery: String = ""
+    @FocusState private var isGuideSearchFieldFocused: Bool
 
-    private var guideSections: [UserGuideTopSection] {
+    private var allGuideSections: [UserGuideTopSection] {
         UserGuideContent.guideSections(for: appLanguage)
+    }
+
+    private var displayedGuideSections: [UserGuideTopSection] {
+        UserGuideContent.filteredGuideSections(allGuideSections, searchQuery: guideSearchQuery)
+    }
+
+    private var trimmedGuideSearchQuery: String {
+        guideSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     var body: some View {
         ZStack {
             settingsStore.primaryGradient.ignoresSafeArea()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(guideSections) { section in
-                        DisclosureGroup(
-                            isExpanded: Binding(
-                                get: { expandedTopSectionIDs.contains(section.id) },
-                                set: { expanded in
-                                    if expanded {
-                                        expandedTopSectionIDs.insert(section.id)
-                                    } else {
-                                        expandedTopSectionIDs.remove(section.id)
-                                    }
-                                }
-                            )
-                        ) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                ForEach(section.subsections) { subsection in
-                                    if let heading = subsection.heading {
-                                        DisclosureGroup(
-                                            isExpanded: Binding(
-                                                get: { expandedSubsectionIDs.contains(subsection.id) },
-                                                set: { expanded in
-                                                    if expanded {
-                                                        expandedSubsectionIDs.insert(subsection.id)
-                                                    } else {
-                                                        expandedSubsectionIDs.remove(subsection.id)
-                                                    }
-                                                }
-                                            )
-                                        ) {
-                                            subsectionBody(rows: subsection.rows)
-                                        } label: {
-                                            Text(heading)
-                                                .font(.headline)
-                                                .foregroundColor(.white)
-                                                .multilineTextAlignment(.leading)
-                                                .frame(maxWidth: .infinity, alignment: .leading)
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if displayedGuideSections.isEmpty, !trimmedGuideSearchQuery.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                L10nText("No matches in the user guide.")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                L10nText("Try different words or clear the search field.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.78))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 24)
+                        } else {
+                            ForEach(displayedGuideSections) { section in
+                                DisclosureGroup(
+                                    isExpanded: Binding(
+                                        get: { expandedTopSectionIDs.contains(section.id) },
+                                        set: { expanded in
+                                            if expanded {
+                                                expandedTopSectionIDs.insert(section.id)
+                                            } else {
+                                                expandedTopSectionIDs.remove(section.id)
+                                            }
                                         }
-                                        .tint(.green)
-                                        .padding(12)
-                                        .background(Color.black.opacity(0.22))
-                                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                    } else {
-                                        subsectionBody(rows: subsection.rows)
+                                    )
+                                ) {
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        ForEach(section.subsections) { subsection in
+                                            if let heading = subsection.heading {
+                                                DisclosureGroup(
+                                                    isExpanded: Binding(
+                                                        get: { expandedSubsectionIDs.contains(subsection.id) },
+                                                        set: { expanded in
+                                                            if expanded {
+                                                                expandedSubsectionIDs.insert(subsection.id)
+                                                            } else {
+                                                                expandedSubsectionIDs.remove(subsection.id)
+                                                            }
+                                                        }
+                                                    )
+                                                ) {
+                                                    subsectionBody(rows: subsection.rows)
+                                                } label: {
+                                                    Text(heading)
+                                                        .font(.headline)
+                                                        .foregroundColor(.white)
+                                                        .multilineTextAlignment(.leading)
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                }
+                                                .tint(.green)
+                                                .padding(12)
+                                                .background(Color.black.opacity(0.22))
+                                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                            } else {
+                                                subsectionBody(rows: subsection.rows)
+                                            }
+                                        }
                                     }
+                                    .padding(.top, 4)
+                                } label: {
+                                    Text(section.title)
+                                        .font(.title3.bold())
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .tint(.green)
+                                .padding(14)
+                                .background(Color.black.opacity(0.28))
+                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .id(section.id)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .padding(.bottom, 24)
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    guideSearchBubble
+                }
+                .onChange(of: guideSearchQuery) { newValue in
+                    let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let filtered = UserGuideContent.filteredGuideSections(
+                        UserGuideContent.guideSections(for: appLanguage),
+                        searchQuery: newValue
+                    )
+                    if trimmed.isEmpty {
+                        expandedTopSectionIDs = []
+                        expandedSubsectionIDs = []
+                    } else {
+                        expandedTopSectionIDs = Set(filtered.map(\.id))
+                        expandedSubsectionIDs = Set(filtered.flatMap { $0.subsections.map(\.id) })
+                        if let firstId = filtered.first?.id {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+                                withAnimation(.easeInOut(duration: 0.35)) {
+                                    scrollProxy.scrollTo(firstId, anchor: .top)
                                 }
                             }
-                            .padding(.top, 4)
-                        } label: {
-                            Text(section.title)
-                                .font(.title3.bold())
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.leading)
-                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .tint(.green)
-                        .padding(14)
-                        .background(Color.black.opacity(0.28))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .padding(.bottom, 24)
             }
         }
         .localizedNavigationTitle("User Guide")
@@ -136,6 +186,53 @@ struct UserGuideView: View {
                 L10nText("Unknown error.")
             }
         }
+    }
+
+    private var guideSearchBubble: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.body.weight(.semibold))
+                .foregroundColor(.white.opacity(0.88))
+            TextField(
+                "",
+                text: $guideSearchQuery,
+                prompt: Text(L10n.tr("Search user guide…", language: appLanguage))
+                    .foregroundColor(.white.opacity(0.45))
+            )
+            .focused($isGuideSearchFieldFocused)
+            .textFieldStyle(.plain)
+            .foregroundColor(.white)
+            .autocorrectionDisabled()
+            .textInputAutocapitalization(.never)
+            .submitLabel(.search)
+
+            if !guideSearchQuery.isEmpty {
+                Button {
+                    guideSearchQuery = ""
+                    isGuideSearchFieldFocused = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.75))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.tr("Clear user guide search", language: appLanguage))
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.black.opacity(0.48))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.white.opacity(0.14), lineWidth: 1)
+                )
+        )
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 4)
+        .accessibilityElement(children: .contain)
     }
 
     @ViewBuilder

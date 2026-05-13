@@ -558,7 +558,7 @@ struct CloseoutView: View {
                     sessionID: s.id,
                     game: s.game,
                     casino: s.casino,
-                    cashOut: $cashOut
+                    applyMode: .closeoutCashOut($cashOut)
                 )
                 .environmentObject(store)
                 .environmentObject(settingsStore)
@@ -772,11 +772,34 @@ struct CloseoutView: View {
     }
 }
 
+enum ChipEstimatorApplyMode {
+    case closeoutCashOut(Binding<String>)
+    case liveStack(Binding<Int>)
+
+    func apply(amount: Int) {
+        switch self {
+        case .closeoutCashOut(let binding):
+            binding.wrappedValue = String(amount)
+        case .liveStack(let binding):
+            binding.wrappedValue = amount
+        }
+    }
+
+    var acceptButtonTitle: String {
+        switch self {
+        case .closeoutCashOut:
+            return "Use as cash-out amount"
+        case .liveStack:
+            return "Use as stack amount"
+        }
+    }
+}
+
 struct ChipEstimatorSheetView: View {
     let sessionID: UUID
     let game: String
     let casino: String
-    @Binding var cashOut: String
+    let applyMode: ChipEstimatorApplyMode
 
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
@@ -931,10 +954,10 @@ struct ChipEstimatorSheetView: View {
 
                                     Button {
                                         recordChipEstimatorOutcome(accepted: true)
-                                        cashOut = String(estimatedAmount)
+                                        applyMode.apply(amount: estimatedAmount)
                                         dismiss()
                                     } label: {
-                                        L10nText("Use as cash-out amount")
+                                        L10nText(applyMode.acceptButtonTitle)
                                             .font(.subheadline.bold())
                                             .padding(.horizontal, 16)
                                             .padding(.vertical, 10)

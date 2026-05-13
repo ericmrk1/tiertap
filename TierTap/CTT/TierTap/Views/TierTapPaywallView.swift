@@ -176,6 +176,11 @@ struct TierTapPaywallView: View {
                     title: "Community Feed",
                     subtitle: "See and share real-world sessions from other players."
                 )
+                ProBenefitRow(
+                    icon: "doc.text.fill",
+                    title: "Tax Preparation Documentation",
+                    subtitle: "Generate US-focused tax assistance summaries and export PDF or CSV for your records."
+                )
             }
         }
         .padding(.vertical, 10)

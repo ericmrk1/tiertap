@@ -104,6 +104,9 @@ private struct TierTapAppRoot: View {
         .animation(.easeOut(duration: 0.4), value: showSplash)
         .animation(.easeOut(duration: 0.35), value: showWelcome)
         .animation(.easeOut(duration: 0.25), value: shouldShowLockGate)
+        .task {
+            await settingsStore.refreshRemoteAppDefaults()
+        }
         .task(id: authStore.session?.user.id) {
             guard authStore.isSignedIn else { return }
             await settingsStore.syncAITokenBalancesFromSupabaseSession()
@@ -127,6 +130,7 @@ private struct TierTapAppRoot: View {
                 appSessionUnlocked = false
             }
             if newPhase == .active {
+                Task { await settingsStore.refreshRemoteAppDefaults() }
                 // Ensure watch receives a fresh bootstrap snapshot whenever iPhone foregrounds.
                 SessionSyncManager.shared.pushContext(
                     sessions: store.sessions,

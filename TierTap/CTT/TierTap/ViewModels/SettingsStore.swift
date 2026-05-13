@@ -78,6 +78,7 @@ private let keyLastTableGame = "ctt_last_table_game"
 private let keyLastSlotGame = "ctt_last_slot_game"
 private let keyLastPokerDefaults = "ctt_last_poker_defaults"
 private let keyLastSlotDefaults = "ctt_last_slot_defaults"
+private let keyFastCheckInPresets = "ctt_fast_check_in_presets_v1"
 private let keyAnalyticsUseExpectedValue = "ctt_analytics_use_expected_value"
 private let keyAppLanguage = "ctt_app_language"
 private let keyAppLockEnabled = "ctt_app_lock_enabled"
@@ -117,6 +118,106 @@ struct LastPokerSessionDefaults: Codable, Equatable {
 /// Last slot notes; pre-fills check-in when game type is Slots.
 struct LastSlotSessionDefaults: Codable, Equatable {
     var slotNotes: String
+}
+
+/// User-saved fast check-in configuration (no live session). Takes precedence over “last session” when present.
+struct FastCheckInSavedPreset: Codable, Equatable {
+    var casino: String
+    var game: String
+    var startingTierPoints: Int
+    var initialBuyIn: Int
+    var rewardsProgramName: String?
+    var casinoLatitude: Double?
+    var casinoLongitude: Double?
+    var linkedRewardWalletCardId: UUID?
+    var pokerGameKind: SessionPokerGameKind?
+    var pokerAllowsRebuy: Bool?
+    var pokerAllowsAddOn: Bool?
+    var pokerHasFreeOut: Bool?
+    var pokerVariant: String?
+    var pokerSmallBlind: Int?
+    var pokerBigBlind: Int?
+    var pokerAnte: Int?
+    var pokerLevelMinutes: Int?
+    var pokerStartingStack: Int?
+    var pokerTournamentCostText: String
+    var slotFormat: SessionSlotFormat?
+    var slotFormatOther: String?
+    var slotFeature: SessionSlotFeature?
+    var slotFeatureOther: String?
+    var slotNotes: String?
+
+    /// In-memory template used by `FastCheckInHelper` (not written to session history).
+    func makeTemplateSession(for category: SessionGameCategory) -> Session {
+        let now = Date()
+        let buyIn = max(1, initialBuyIn)
+        let buyInEvent = BuyInEvent(amount: buyIn, timestamp: now)
+        switch category {
+        case .poker:
+            return Session(
+                game: game,
+                casino: casino,
+                casinoLatitude: casinoLatitude,
+                casinoLongitude: casinoLongitude,
+                startTime: now,
+                endTime: now,
+                startingTierPoints: startingTierPoints,
+                buyInEvents: [buyInEvent],
+                isLive: false,
+                status: .complete,
+                rewardsProgramName: rewardsProgramName,
+                linkedRewardWalletCardId: linkedRewardWalletCardId,
+                gameCategory: .poker,
+                pokerGameKind: pokerGameKind ?? .cash,
+                pokerAllowsRebuy: pokerAllowsRebuy,
+                pokerAllowsAddOn: pokerAllowsAddOn,
+                pokerHasFreeOut: pokerHasFreeOut,
+                pokerVariant: pokerVariant,
+                pokerSmallBlind: pokerSmallBlind,
+                pokerBigBlind: pokerBigBlind,
+                pokerAnte: pokerAnte,
+                pokerLevelMinutes: pokerLevelMinutes,
+                pokerStartingStack: pokerStartingStack
+            )
+        case .slots:
+            return Session(
+                game: game,
+                casino: casino,
+                casinoLatitude: casinoLatitude,
+                casinoLongitude: casinoLongitude,
+                startTime: now,
+                endTime: now,
+                startingTierPoints: startingTierPoints,
+                buyInEvents: [buyInEvent],
+                isLive: false,
+                status: .complete,
+                rewardsProgramName: rewardsProgramName,
+                linkedRewardWalletCardId: linkedRewardWalletCardId,
+                gameCategory: .slots,
+                slotFormat: slotFormat,
+                slotFormatOther: slotFormatOther,
+                slotFeature: slotFeature,
+                slotFeatureOther: slotFeatureOther,
+                slotNotes: slotNotes
+            )
+        case .table:
+            return Session(
+                game: game,
+                casino: casino,
+                casinoLatitude: casinoLatitude,
+                casinoLongitude: casinoLongitude,
+                startTime: now,
+                endTime: now,
+                startingTierPoints: startingTierPoints,
+                buyInEvents: [buyInEvent],
+                isLive: false,
+                status: .complete,
+                rewardsProgramName: rewardsProgramName,
+                linkedRewardWalletCardId: linkedRewardWalletCardId,
+                gameCategory: .table
+            )
+        }
+    }
 }
 
 struct ThemePreset: Identifiable, Codable, Equatable {
@@ -382,6 +483,32 @@ final class SettingsStore: ObservableObject {
                 UserDefaults.standard.removeObject(forKey: keyLastSlotDefaults)
             }
         }
+    }
+
+    /// Saved fast check-in rows per game type (from “Save fast check-in” on the check-in form).
+    @Published var fastCheckInSavedPresets: [SessionGameCategory: FastCheckInSavedPreset] = [:] {
+        didSet {
+            let encodable = Dictionary(uniqueKeysWithValues: fastCheckInSavedPresets.map { ($0.key.rawValue, $0.value) })
+            if encodable.isEmpty {
+                UserDefaults.standard.removeObject(forKey: keyFastCheckInPresets)
+            } else if let data = try? JSONEncoder().encode(encodable) {
+                UserDefaults.standard.set(data, forKey: keyFastCheckInPresets)
+            }
+        }
+    }
+
+    func fastCheckInSavedPreset(for category: SessionGameCategory) -> FastCheckInSavedPreset? {
+        fastCheckInSavedPresets[category]
+    }
+
+    func setFastCheckInSavedPreset(_ preset: FastCheckInSavedPreset?, for category: SessionGameCategory) {
+        var next = fastCheckInSavedPresets
+        if let preset {
+            next[category] = preset
+        } else {
+            next.removeValue(forKey: category)
+        }
+        fastCheckInSavedPresets = next
     }
 
     /// Optional shared location filter used across History/Analytics.
@@ -717,6 +844,9 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// Optional overrides from Supabase `TierTapAppDefaults` (see ``refreshRemoteAppDefaults``). Empty means use bundled fallbacks.
+    @Published private(set) var remoteAppNumericOverrides: [String: Int] = [:]
+
     /// Daily AI usage tracking for the free tier.
     @Published private(set) var aiCallsToday: Int
     @Published private(set) var aiCallsDate: Date
@@ -738,12 +868,29 @@ final class SettingsStore: ObservableObject {
 
     /// Maximum number of AI calls allowed per day on the free tier. Higher on TestFlight for testers.
     var maxAICallsPerDay: Int {
-        SupabaseConfig.isTestFlight ? 20 : 5
+        SupabaseConfig.isTestFlight
+            ? resolvedRemoteInt(for: .maxAICallsPerDayTestFlight, bundled: TierTapRemoteDefaultFallbacks.maxAICallsPerDayTestFlight)
+            : resolvedRemoteInt(for: .maxAICallsPerDay, bundled: TierTapRemoteDefaultFallbacks.maxAICallsPerDay)
+    }
+
+    /// TierTap Pro included Gemini token allowance for the calendar month (bundled default or Supabase `TierTapAppDefaults`).
+    var effectiveProPlanIncludedTokensPerCalendarMonth: Int {
+        resolvedRemoteInt(for: .proPlanIncludedTokensPerCalendarMonth, bundled: TierTapRemoteDefaultFallbacks.proPlanIncludedTokensPerCalendarMonth)
+    }
+
+    /// Tokens granted per successful **Credits** purchase (bundled default or Supabase `TierTapAppDefaults`).
+    var effectiveCreditsPackTokenAmount: Int {
+        resolvedRemoteInt(for: .creditsPackTokenAmount, bundled: TierTapRemoteDefaultFallbacks.creditsPackTokenAmount)
+    }
+
+    /// Max TierTap AI session-art images per calendar day when limits apply (bundled default or Supabase `TierTapAppDefaults`).
+    var effectiveTierTapAIImagesPerDay: Int {
+        resolvedRemoteInt(for: .tierTapAIImagesPerDay, bundled: TierTapRemoteDefaultFallbacks.tierTapAIImagesPerDay)
     }
 
     /// Remaining TierTap Pro included Gemini tokens for the current calendar month (before pack balance is used).
     var proPlanIncludedTokensRemainingThisMonth: Int {
-        max(0, TierTapProductId.proPlanIncludedTokensPerCalendarMonth - proPlanTokensConsumedThisMonth)
+        max(0, effectiveProPlanIncludedTokensPerCalendarMonth - proPlanTokensConsumedThisMonth)
     }
 
     /// Remaining AI calls the user can make today on the free tier.
@@ -810,6 +957,18 @@ final class SettingsStore: ObservableObject {
             self.lastSlotSessionDefaults = decoded
         } else {
             self.lastSlotSessionDefaults = nil
+        }
+        if let data = UserDefaults.standard.data(forKey: keyFastCheckInPresets),
+           let decoded = try? JSONDecoder().decode([String: FastCheckInSavedPreset].self, from: data) {
+            var m: [SessionGameCategory: FastCheckInSavedPreset] = [:]
+            for (raw, preset) in decoded {
+                if let c = SessionGameCategory(rawValue: raw) {
+                    m[c] = preset
+                }
+            }
+            self.fastCheckInSavedPresets = m
+        } else {
+            self.fastCheckInSavedPresets = [:]
         }
         self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "indigo"
         self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "yellow"
@@ -1027,6 +1186,19 @@ final class SettingsStore: ObservableObject {
         customRewardPrograms.append(t)
     }
 
+    private func resolvedRemoteInt(for key: TierTapRemoteDefaultKey, bundled: Int) -> Int {
+        if let o = remoteAppNumericOverrides[key.rawValue], o > 0 { return o }
+        return bundled
+    }
+
+    /// Loads optional numeric overrides from Supabase `TierTapAppDefaults`. On failure, leaves existing overrides unchanged.
+    @MainActor
+    func refreshRemoteAppDefaults() async {
+        guard SupabaseConfig.isConfigured else { return }
+        guard let next = await TierTapAppDefaultsAPI.fetchNumericOverrides() else { return }
+        remoteAppNumericOverrides = next
+    }
+
     // MARK: - AI usage helpers
 
     /// Count toward today's AI limit, treating a new calendar day as zero **without** mutating
@@ -1099,11 +1271,12 @@ final class SettingsStore: ObservableObject {
     /// When Supabase is configured and `supabaseUserId` is set, the server row is updated (and the purchase is recorded there). Otherwise updates are local only.
     @MainActor
     func grantTierTapSessionCreditsPack(
-        amount: Int = TierTapProductId.creditsPackTokenAmount,
+        amount: Int? = nil,
         storeTransactionId: String? = nil,
         supabaseUserId: UUID? = nil
     ) async {
-        let add = max(0, amount)
+        let grant = amount ?? effectiveCreditsPackTokenAmount
+        let add = max(0, grant)
         guard add > 0 else { return }
         let txn = storeTransactionId ?? "local-\(UUID().uuidString)"
 
@@ -1255,7 +1428,7 @@ final class SettingsStore: ObservableObject {
             UserDefaults.standard.set(0, forKey: keyAIProPlanTokensConsumed)
         }
 
-        let allowance = TierTapProductId.proPlanIncludedTokensPerCalendarMonth
+        let allowance = effectiveProPlanIncludedTokensPerCalendarMonth
         let allowanceRemaining = max(0, allowance - proPlanTokensConsumedThisMonth)
         let fromPlan = min(tokens, allowanceRemaining)
         if fromPlan > 0 {

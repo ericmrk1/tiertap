@@ -17,8 +17,16 @@ struct FastCheckInPlan {
 
 /// Shared fast check-in logic (used from the home screen).
 enum FastCheckInHelper {
-    static func canFastCheckIn(category: SessionGameCategory, store: SessionStore) -> Bool {
-        store.mostRecentSession(forGameCategory: category) != nil
+    /// Saved fast check-in preset, if any, otherwise the most recent finished session for that category.
+    static func effectiveTemplateSession(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore) -> Session? {
+        if let preset = settingsStore.fastCheckInSavedPreset(for: category) {
+            return preset.makeTemplateSession(for: category)
+        }
+        return store.mostRecentSession(forGameCategory: category)
+    }
+
+    static func canFastCheckIn(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore) -> Bool {
+        effectiveTemplateSession(category: category, store: store, settingsStore: settingsStore) != nil
     }
 
     static func composedPokerGameName(
@@ -90,7 +98,7 @@ enum FastCheckInHelper {
     }
 
     static func makePlan(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore) -> FastCheckInPlan {
-        let template = store.mostRecentSession(forGameCategory: category)
+        let template = effectiveTemplateSession(category: category, store: store, settingsStore: settingsStore)
 
         let casinoValue: String
         var gameName: String
@@ -168,7 +176,8 @@ enum FastCheckInHelper {
             initialBuyIn: plan.initialBuyIn,
             rewardsProgramName: plan.rewardsProgramName,
             casinoLatitude: plan.casinoLatitude,
-            casinoLongitude: plan.casinoLongitude
+            casinoLongitude: plan.casinoLongitude,
+            linkedRewardWalletCardId: template?.linkedRewardWalletCardId
         )
 
         if let t = template {
@@ -359,12 +368,149 @@ enum FastCheckInHelper {
             CelebrationPlayer.shared.playQuickChime()
         }
     }
+
+    /// One-line status for the fast check-in summary screen (localized).
+    static func fastCheckInStatusLabel(category: SessionGameCategory, store: SessionStore, settingsStore: SettingsStore, language: AppLanguage) -> String {
+        if canFastCheckIn(category: category, store: store, settingsStore: settingsStore) {
+            return L10n.tr("Ready", language: language)
+        }
+        return L10n.tr("Not set up yet", language: language)
+    }
+}
+
+/// Summaries for each game type on the fast check-in settings sheet.
+struct FastCheckInSettingsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    let onRequestOpenCheckIn: (SessionGameCategory) -> Void
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        L10nText("Fast check-in uses your last finished session for each game type. Check in once to enable a shortcut, or edit details below.")
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        fastCheckInSummaryCard(.poker, emoji: "♠️", title: "Poker")
+                        fastCheckInSummaryCard(.slots, emoji: "🎰", title: "Slots")
+                        fastCheckInSummaryCard(.table, emoji: "🎲", title: "Table Game")
+                    }
+                    .padding()
+                }
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    L10nText("Fast Check-In")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    .accessibilityLabel(Text(L10n.tr("Done", language: settingsStore.appLanguage)))
+                }
+            }
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+        }
+    }
+
+    @ViewBuilder
+    private func fastCheckInSummaryCard(_ category: SessionGameCategory, emoji: String, title: String) -> some View {
+        let plan = FastCheckInHelper.makePlan(category: category, store: store, settingsStore: settingsStore)
+        let ready = FastCheckInHelper.canFastCheckIn(category: category, store: store, settingsStore: settingsStore)
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Text(emoji).font(.title2)
+                L10nText(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer(minLength: 8)
+                Text(FastCheckInHelper.fastCheckInStatusLabel(category: category, store: store, settingsStore: settingsStore, language: settingsStore.appLanguage))
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(ready ? Color.green.opacity(0.35) : Color.orange.opacity(0.35))
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
+            }
+
+            Group {
+                summaryRow(L10n.tr("Casino", language: settingsStore.appLanguage), plan.casinoValue.isEmpty ? "—" : plan.casinoValue)
+                summaryRow(L10n.tr("Game", language: settingsStore.appLanguage), plan.gameName.isEmpty ? "—" : plan.gameName)
+                summaryRow(
+                    L10n.tr("Tier points", language: settingsStore.appLanguage),
+                    plan.startingTier.formatted(.number.grouping(.automatic))
+                )
+                summaryRow(
+                    L10n.tr("Initial buy-in", language: settingsStore.appLanguage),
+                    "\(settingsStore.currencySymbol)\(plan.initialBuyIn.formatted(.number.grouping(.automatic)))"
+                )
+                if let prog = plan.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
+                    summaryRow(L10n.tr("Rewards program", language: settingsStore.appLanguage), prog)
+                }
+                if category == .slots, let t = plan.template, let notes = t.slotNotes?.trimmingCharacters(in: .whitespacesAndNewlines), !notes.isEmpty {
+                    summaryRow(L10n.tr("Slot notes", language: settingsStore.appLanguage), notes)
+                }
+            }
+            .font(.subheadline)
+            .foregroundColor(.white.opacity(0.92))
+
+            Button {
+                onRequestOpenCheckIn(category)
+                dismiss()
+            } label: {
+                HStack {
+                    Image(systemName: "square.and.pencil")
+                    L10nText("Edit in Check-In")
+                }
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.white.opacity(0.18))
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.12))
+        }
+    }
+
+    private func summaryRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(label)
+                .foregroundColor(.white.opacity(0.65))
+                .frame(width: 120, alignment: .leading)
+            Text(value)
+                .foregroundColor(.white.opacity(0.95))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
 }
 
 /// Three-zone fast check-in control (table / slots / poker) for the home screen.
 struct FastCheckInBar: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @Binding var showSettingsSheet: Bool
+
     @State private var showActiveSessionAlert = false
     @State private var pendingFastCategory: SessionGameCategory?
     @State private var showTierTrackingWarning = false
@@ -372,12 +518,29 @@ struct FastCheckInBar: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            HStack
-            {
-                Label("", systemImage: "plus.circle.fill")
+            ZStack {
+                HStack {
+                    Label("", systemImage: "plus.circle.fill")
+                    Spacer(minLength: 0)
+                    Button {
+                        showSettingsSheet = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.body.weight(.semibold))
+                            .foregroundColor(.white.opacity(0.95))
+                            .frame(width: 36, height: 36)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(L10n.tr("Fast check-in settings", language: settingsStore.appLanguage)))
+                }
                 L10nText("Fast Check-In")
                     .font(.headline.bold())
                     .foregroundColor(.white.opacity(0.95))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .multilineTextAlignment(.center)
+                    .allowsHitTesting(false)
             }
             HStack(spacing: 0) {
                 fastZone(.poker, emoji: "♠️", title: "Poker")
@@ -427,7 +590,7 @@ struct FastCheckInBar: View {
     }
 
     private func startFastCheckInOrWarn(for category: SessionGameCategory) {
-        guard FastCheckInHelper.canFastCheckIn(category: category, store: store) else { return }
+        guard FastCheckInHelper.canFastCheckIn(category: category, store: store, settingsStore: settingsStore) else { return }
         let plan = FastCheckInHelper.makePlan(category: category, store: store, settingsStore: settingsStore)
         if plan.needsTierTrackingWarning {
             pendingTierWarningPlan = plan
@@ -445,7 +608,7 @@ struct FastCheckInBar: View {
 
     @ViewBuilder
     private func fastZone(_ category: SessionGameCategory, emoji: String, title: String) -> some View {
-        let canFastStart = FastCheckInHelper.canFastCheckIn(category: category, store: store)
+        let canFastStart = FastCheckInHelper.canFastCheckIn(category: category, store: store, settingsStore: settingsStore)
         Button {
             guard canFastStart else { return }
             if store.liveSession != nil {

@@ -151,6 +151,54 @@ enum SupabaseTables {
     }
 }
 
+// MARK: - Remote app defaults (`TierTapAppDefaults`)
+
+/// Keys in Supabase table `"TierTapAppDefaults"`. Rows are optional; missing keys use ``TierTapRemoteDefaultFallbacks``.
+enum TierTapRemoteDefaultKey: String, CaseIterable {
+    case proPlanIncludedTokensPerCalendarMonth = "pro_plan_included_tokens_per_calendar_month"
+    case creditsPackTokenAmount = "credits_pack_token_amount"
+    case maxAICallsPerDay = "max_ai_calls_per_day"
+    case maxAICallsPerDayTestFlight = "max_ai_calls_per_day_testflight"
+    case tierTapAIImagesPerDay = "tiertap_ai_images_per_day"
+}
+
+/// On-device fallbacks when Supabase has no row for the key (or the value is invalid).
+enum TierTapRemoteDefaultFallbacks {
+    static let proPlanIncludedTokensPerCalendarMonth = 1_000_000
+    static let creditsPackTokenAmount = 250_000
+    static let maxAICallsPerDay = 5
+    static let maxAICallsPerDayTestFlight = 20
+    static let tierTapAIImagesPerDay = 2
+}
+
+private struct TierTapAppDefaultRow: Decodable {
+    let key: String
+    let value_int: Int64
+}
+
+enum TierTapAppDefaultsAPI {
+    /// Reads all rows from `TierTapAppDefaults`. Returns `nil` on request/decode failure so callers can keep prior overrides.
+    static func fetchNumericOverrides() async -> [String: Int]? {
+        guard let client = supabase else { return nil }
+        do {
+            let data = try await client.database
+                .from("TierTapAppDefaults")
+                .select("key,value_int")
+                .execute()
+                .data
+            let rows = try JSONDecoder().decode([TierTapAppDefaultRow].self, from: data)
+            var out: [String: Int] = [:]
+            for r in rows where r.value_int > 0 {
+                out[r.key] = Int(r.value_int)
+            }
+            return out
+        } catch {
+            print("[TierTapAppDefaultsAPI] fetch failed: \(error.localizedDescription)")
+            return nil
+        }
+    }
+}
+
 // MARK: - User screen names (Community)
 
 private struct UserScreenNameUpsertRow: Encodable {

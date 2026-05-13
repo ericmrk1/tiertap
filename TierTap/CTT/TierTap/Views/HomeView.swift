@@ -16,6 +16,13 @@ struct HomeView: View {
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @State private var showCheckIn = false
+    /// Pre-selects Table / Slots / Poker when opening Check In from fast check-in settings.
+    @State private var checkInPresetGameCategory: SessionGameCategory?
+    /// When true, Check In is configuring a saved fast check-in (no live session start).
+    @State private var checkInSaveFastConfigurationMode = false
+    @State private var showFastCheckInSettings = false
+    @State private var pendingOpenCheckInFromFastSettings: SessionGameCategory?
+    @State private var reopenFastCheckInSettingsAfterCheckInDismiss = false
     @State private var showLive = false
     @State private var showBuyInSheet = false
     @State private var showUpdateStackSheet = false
@@ -199,7 +206,11 @@ struct HomeView: View {
                             }
                         }
                         if store.liveSession == nil {
-                            Button { showCheckIn = true } label: {
+                            Button {
+                                checkInSaveFastConfigurationMode = false
+                                checkInPresetGameCategory = nil
+                                showCheckIn = true
+                            } label: {
                                 LocalizedLabel(title: "Check In", systemImage: "plus.circle.fill")
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 20)
@@ -208,7 +219,7 @@ struct HomeView: View {
                                     .foregroundColor(.white)
                                     .background(GameCategoryBubbleBackground(cornerRadius: 16))
                             }
-                            FastCheckInBar()
+                            FastCheckInBar(showSettingsSheet: $showFastCheckInSettings)
                                 .environmentObject(store)
                                 .environmentObject(settingsStore)
                         }
@@ -292,8 +303,38 @@ struct HomeView: View {
                 lastComputedLevel = tap.level
             }
         }
-        .adaptiveSheet(isPresented: $showCheckIn) {
-            CheckInView()
+        #if os(iOS)
+        .adaptiveSheet(isPresented: $showFastCheckInSettings, onDismiss: {
+            if let cat = pendingOpenCheckInFromFastSettings {
+                pendingOpenCheckInFromFastSettings = nil
+                checkInPresetGameCategory = cat
+                checkInSaveFastConfigurationMode = true
+                showCheckIn = true
+            }
+        }) {
+            FastCheckInSettingsSheet(onRequestOpenCheckIn: { cat in
+                pendingOpenCheckInFromFastSettings = cat
+            })
+            .environmentObject(store)
+            .environmentObject(settingsStore)
+        }
+        #endif
+        .adaptiveSheet(isPresented: $showCheckIn, onDismiss: {
+            let reopen = reopenFastCheckInSettingsAfterCheckInDismiss
+            reopenFastCheckInSettingsAfterCheckInDismiss = false
+            checkInSaveFastConfigurationMode = false
+            checkInPresetGameCategory = nil
+            if reopen {
+                showFastCheckInSettings = true
+            }
+        }) {
+            CheckInView(
+                initialGameCategory: checkInPresetGameCategory,
+                saveFastCheckInOnly: checkInSaveFastConfigurationMode,
+                onFastCheckInSaved: {
+                    reopenFastCheckInSettingsAfterCheckInDismiss = true
+                }
+            )
                 .environmentObject(store)
                 .environmentObject(settingsStore)
                 .environmentObject(rewardWalletStore)
@@ -317,12 +358,19 @@ struct HomeView: View {
         .adaptiveSheet(isPresented: $showUpdateStackSheet) {
             if let live = store.liveSession {
                 UpdateStackSheet(
+                    sessionID: live.id,
+                    game: live.game,
+                    casino: live.casino,
                     totalBuyIn: live.totalBuyIn,
                     currentTrackedStack: live.liveTrackedStackAmount,
                     hoursPlayed: live.hoursPlayed,
                     onUpdate: { store.updateLiveTrackedStack($0) }
                 )
+                .environmentObject(store)
                 .environmentObject(settingsStore)
+                .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
+                .environment(\.appLanguage, settingsStore.appLanguage)
             }
         }
         .adaptiveSheet(isPresented: $showCompSheet) {

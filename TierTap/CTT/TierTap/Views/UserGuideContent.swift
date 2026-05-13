@@ -28,6 +28,8 @@ enum UserGuideContent {
         overviewRows(language)
             + gettingStartedRows(language)
             + mainFeaturesRows(language)
+            + tierTapPRORows(language)
+            + tierTapPlusRows(language)
             + faqRows(language)
             + troubleshootingRows(language)
     }
@@ -61,6 +63,41 @@ enum UserGuideContent {
             topIndex += 1
         }
         return topSections
+    }
+
+    /// When `searchQuery` is empty (after trimming), returns `sections` unchanged. Otherwise keeps only chapters whose title or any subsection heading/body matches, using a locale-aware case- and diacritic-insensitive search. If a subsection heading matches, the whole subsection is kept; if only some bullets or paragraphs match, only those rows are kept.
+    static func filteredGuideSections(_ sections: [UserGuideTopSection], searchQuery: String) -> [UserGuideTopSection] {
+        let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else { return sections }
+
+        return sections.compactMap { section -> UserGuideTopSection? in
+            if section.title.localizedStandardContains(q) {
+                return section
+            }
+
+            let newSubsections: [UserGuideSubsection] = section.subsections.compactMap { sub -> UserGuideSubsection? in
+                let heading = sub.heading ?? ""
+                if heading.localizedStandardContains(q) {
+                    return sub
+                }
+
+                let matchingRows: [UserGuideRow] = sub.rows.compactMap { row in
+                    switch row {
+                    case .paragraph(let s):
+                        return s.localizedStandardContains(q) ? .paragraph(s) : nil
+                    case .bullet(let s):
+                        return s.localizedStandardContains(q) ? .bullet(s) : nil
+                    case .h1, .h2:
+                        return nil
+                    }
+                }
+                guard !matchingRows.isEmpty else { return nil }
+                return UserGuideSubsection(id: sub.id, heading: sub.heading, rows: matchingRows)
+            }
+
+            guard !newSubsections.isEmpty else { return nil }
+            return UserGuideTopSection(id: section.id, title: section.title, subsections: newSubsections)
+        }
     }
 
     static func plainTextForPDF(language: AppLanguage) -> String {
@@ -237,6 +274,46 @@ enum UserGuideContent {
             .paragraph(loc("What it does: Companion experience to start or monitor play from your wrist, with details completed on iPhone when needed.", language)),
             .paragraph(loc("How to use it: Open TierTap on Apple Watch and follow the start and live flows; finish missing details on the phone if prompted.", language)),
             .paragraph(loc("Tips: Keep the watch and phone in sync for the most reliable session state.", language)),
+        ]
+    }
+
+    private static func tierTapPRORows(_ language: AppLanguage) -> [UserGuideRow] {
+        [
+            .h1(loc("TierTap PRO", language)),
+            .paragraph(loc("TierTap Pro is the paid subscription that unlocks TierTap’s cloud-backed AI experiences and the Community feed. Most features also require you to be signed in with your TierTap account (email, Apple, or Google). You can subscribe or manage your plan from Settings → Upgrade to TierTap Pro / Manage TierTap Pro, or from the TierTap Pro paywall when the app prompts you.", language)),
+            .h2(loc("Subscribe or manage", language)),
+            .bullet(loc("Settings tab → Account → Upgrade to TierTap Pro (or Manage TierTap Pro when you are already subscribed).", language)),
+            .bullet(loc("TierTap Account (from Settings) → Subscribe / Manage opens the same subscription choices.", language)),
+            .bullet(loc("Some screens show an upgrade prompt that opens the TierTap Pro paywall directly.", language)),
+            .h2(loc("What TierTap Pro includes", language)),
+            .bullet(loc("Ask TierTap (AI Play Analysis): Analytics tab → Ask TierTap for natural-language summaries of your saved play data.", language)),
+            .bullet(loc("AI session share images: After close-out or from session sharing flows, generate premium session art with TierTap AI where the app offers Generate Session Art or similar.", language)),
+            .bullet(loc("Chip Estimator: During close-out, use the Chip Estimator camera flow to estimate stacks from a table photo (signed-in TierTap account required).", language)),
+            .bullet(loc("Comp Estimator: When adding comps during a live session, capture a comp slip, receipt, or screen so TierTap AI can suggest a dollar value you can accept or edit.", language)),
+            .bullet(loc("Slot reader: On a Slots check-in, tap Scan slot game name and use Camera or Photo Library so TierTap AI can read the machine title area.", language)),
+            .bullet(loc("Trips magic wand: Trips tab → toolbar magic wand for AI-assisted trip suggestions when you are subscribed.", language)),
+            .bullet(loc("Community: Community tab → browse, filter, map, and publish eligible sessions when you have TierTap Pro access and are signed in.", language)),
+            .bullet(loc("Tax Preparation Documentation: Sessions tab → History → toolbar Tools (wrench) → Tax Prep. Subscribers can generate a US-focused tax assistance summary for a chosen calendar year with TierTap AI, then export a PDF (Tax Report) or CSV (Transaction Report) to save or share. Have a tax professional review outputs; TierTap is not a CPA and this is not certified tax advice.", language)),
+            .paragraph(loc("Tip: If a TierTap Pro feature looks inactive, confirm both an active subscription and sign-in, then retry after a good network connection.", language)),
+        ]
+    }
+
+    private static func tierTapPlusRows(_ language: AppLanguage) -> [UserGuideRow] {
+        [
+            .h1(loc("TierTap+", language)),
+            .paragraph(loc("TierTap+ is the optional token-pack add-on for subscribers who want more AI capacity beyond the monthly allowance included with TierTap Pro. TierTap AI features spend model tokens; your subscription covers a per-calendar-month pool first, then any TierTap+ tokens you have purchased.", language)),
+            .h2(loc("Why add tokens", language)),
+            .bullet(loc("More headroom for Ask TierTap, image generation, chip and comp estimation, slot reading, trip magic wand, and other TierTap AI calls without waiting for the next monthly reset.", language)),
+            .bullet(loc("Purchased tokens accumulate in your TierTap+ balance until used; usage charts help you see day-to-day trends.", language)),
+            .h2(loc("Where to buy TierTap+ packs", language)),
+            .bullet(loc("Settings tab → expand the TierTap+ section (labeled TierTap Plus in text-to-speech) → Buy TierTap+ Tokens when the pack appears with a store price.", language)),
+            .bullet(loc("TierTap Account (Settings → TierTap Account) → AI token packs card has the same purchase control and shows balances.", language)),
+            .h2(loc("Requirements", language)),
+            .bullet(loc("You need an active TierTap Pro subscription before token packs can be purchased; the app explains this if the buy button is disabled.", language)),
+            .bullet(loc("Token packs are normal App Store consumables—use Restore Purchases on the TierTap Pro paywall if Apple confirms a sale but the balance did not update.", language)),
+            .h2(loc("Track balances and usage", language)),
+            .bullet(loc("Settings → TierTap+ section: switch the chart between sessions, tokens, and TierTap AI views for the selected month.", language)),
+            .bullet(loc("TierTap Account: review purchased-pack balance, lifetime purchased total, pack usage, and how many Pro plan tokens remain this month.", language)),
         ]
     }
 

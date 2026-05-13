@@ -1,5 +1,5 @@
 -- Authoritative TierTap Plus / Pro token balances per Supabase user (mirrors simulator/TestFlight `_Test` table).
--- Must match iOS `TierTapProductId.proPlanIncludedTokensPerCalendarMonth` (1_000_000) for plan-vs-pack split.
+-- Plan monthly allowance fallback is 1_000_000 tokens; override with `TierTapAppDefaults` key `pro_plan_included_tokens_per_calendar_month` (see migration `20260514120000_tier_tap_app_defaults.sql`).
 
 CREATE TABLE public."UserAITokenBalances" (
   user_id uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,

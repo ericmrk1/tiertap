@@ -333,12 +333,19 @@ struct LiveSessionView: View {
             .adaptiveSheet(isPresented: $showUpdateStackSheet) {
                 if let live = store.liveSession {
                     UpdateStackSheet(
+                        sessionID: live.id,
+                        game: live.game,
+                        casino: live.casino,
                         totalBuyIn: live.totalBuyIn,
                         currentTrackedStack: live.liveTrackedStackAmount,
                         hoursPlayed: live.hoursPlayed,
                         onUpdate: { store.updateLiveTrackedStack($0) }
                     )
+                    .environmentObject(store)
                     .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
+                    .environment(\.appLanguage, settingsStore.appLanguage)
                 }
             }
             .adaptiveSheet(isPresented: $showCompSheet) {

@@ -1543,11 +1543,17 @@ struct BuyInQuickAddSheet: View {
 
 /// Enter current chip stack while live; session win/loss vs buy-ins and $/hr update until close-out.
 struct UpdateStackSheet: View {
+    let sessionID: UUID
+    let game: String
+    let casino: String
     let totalBuyIn: Int
     let currentTrackedStack: Int?
     let hoursPlayed: Double
     let onUpdate: (Int) -> Void
+    @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
     @Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var pendingStack = 0
@@ -1555,6 +1561,13 @@ struct UpdateStackSheet: View {
     @State private var showBuyInGrid = false
     @State private var gridAmountScratch = ""
     @State private var stackWinConfettiBurst = 0
+    @State private var showChipEstimatorSheet = false
+    @State private var chipEstimatorError: String?
+    @State private var showSubscriptionPaywall = false
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
 
     private var isCustomValid: Bool {
         (Int(customAmount) ?? 0) > 0
@@ -1697,6 +1710,32 @@ struct UpdateStackSheet: View {
                 StackWinConfettiBurst(burstID: stackWinConfettiBurst, enabled: !accessibilityReduceMotion)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .allowsHitTesting(false)
+
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button {
+                            if hasProAccess && authStore.isSignedIn {
+                                startChipEstimatorFlow()
+                            } else {
+                                showSubscriptionPaywall = true
+                            }
+                        } label: {
+                            LocalizedLabel(title: "Chip Estimator", systemImage: "camera.viewfinder")
+                                .font(.subheadline.bold())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color.black)
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
+                                .shadow(radius: 5)
+                        }
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 16)
+                    }
+                }
+                .allowsHitTesting(true)
             }
             .localizedNavigationTitle("Stack")
             .navigationBarTitleDisplayMode(.inline)
@@ -1722,10 +1761,45 @@ struct UpdateStackSheet: View {
                     pendingStack = v
                 }
             }
+            .alert("Chip estimator error", isPresented: Binding<Bool>(
+                get: { chipEstimatorError != nil },
+                set: { if !$0 { chipEstimatorError = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(chipEstimatorError ?? "Something went wrong while estimating the chip value.")
+            }
+            .adaptiveSheet(isPresented: $showChipEstimatorSheet) {
+                ChipEstimatorSheetView(
+                    sessionID: sessionID,
+                    game: game,
+                    casino: casino,
+                    applyMode: .liveStack($pendingStack)
+                )
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+                .environmentObject(subscriptionStore)
+                .environment(\.appLanguage, settingsStore.appLanguage)
+            }
+            .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+            }
         }
         .onAppear {
             pendingStack = max(0, currentTrackedStack ?? totalBuyIn)
         }
+    }
+
+    private func startChipEstimatorFlow() {
+        guard SupabaseConfig.isConfigured else {
+            chipEstimatorError = "AI is not configured for this build."
+            return
+        }
+        showChipEstimatorSheet = true
     }
 
     private func formatSignedCurrency(_ value: Int) -> String {

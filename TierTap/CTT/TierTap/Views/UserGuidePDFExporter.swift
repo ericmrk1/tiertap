@@ -1,14 +1,12 @@
 import UIKit
-import CoreText
 
 enum UserGuidePDFExporter {
     /// Renders multi-page letter-size PDF from plain text (black on white).
+    /// Uses `UIGraphicsPDFRenderer` + `NSLayoutManager` so coordinates match UIKit (avoids flipped / inverted Core Text + Quartz PDF output).
     static func makePDF(text: String, title: String) -> Data? {
         let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
         let margin: CGFloat = 48
-        let textRect = CGRect(
-            x: margin,
-            y: margin,
+        let contentSize = CGSize(
             width: pageRect.width - 2 * margin,
             height: pageRect.height - 2 * margin
         )
@@ -17,56 +15,48 @@ enum UserGuidePDFExporter {
         paragraph.lineBreakMode = .byWordWrapping
         paragraph.paragraphSpacing = 6
 
-        let titleAttr = NSAttributedString(
-            string: title + "\n\n",
-            attributes: [
-                .font: UIFont.boldSystemFont(ofSize: 20),
-                .paragraphStyle: paragraph
-            ]
-        )
-        let bodyAttr = NSAttributedString(
-            string: text,
-            attributes: [
-                .font: UIFont.systemFont(ofSize: 11),
-                .paragraphStyle: paragraph
-            ]
-        )
-        let full = NSMutableAttributedString()
-        full.append(titleAttr)
-        full.append(bodyAttr)
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.boldSystemFont(ofSize: 20),
+            .paragraphStyle: paragraph,
+            .foregroundColor: UIColor.black
+        ]
+        let bodyAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 11),
+            .paragraphStyle: paragraph,
+            .foregroundColor: UIColor.black
+        ]
 
-        let path = CGPath(rect: textRect, transform: nil)
-        let framesetter = CTFramesetterCreateWithAttributedString(full as CFAttributedString)
+        let full = NSMutableAttributedString(string: title + "\n\n", attributes: titleAttributes)
+        full.append(NSAttributedString(string: text, attributes: bodyAttributes))
 
-        let data = NSMutableData()
-        guard let consumer = CGDataConsumer(data: data as CFMutableData) else { return nil }
-        var mediaBox = pageRect
-        guard let pdfContext = CGContext(consumer: consumer, mediaBox: &mediaBox, nil) else { return nil }
+        let textStorage = NSTextStorage(attributedString: full)
+        let layoutManager = NSLayoutManager()
+        textStorage.addLayoutManager(layoutManager)
 
-        var pageStart: CFIndex = 0
-        let stringLength = full.length
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+        let data = renderer.pdfData { pdfContext in
+            var glyphIndex = 0
+            let totalGlyphs = layoutManager.numberOfGlyphs
+            let drawOrigin = CGPoint(x: margin, y: margin)
 
-        while pageStart < stringLength {
-            pdfContext.beginPDFPage(nil)
-            pdfContext.saveGState()
-            pdfContext.translateBy(x: 0, y: pageRect.height)
-            pdfContext.scaleBy(x: 1, y: -1)
+            while glyphIndex < totalGlyphs {
+                pdfContext.beginPage()
+                let container = NSTextContainer(size: contentSize)
+                container.lineFragmentPadding = 0
+                layoutManager.addTextContainer(container)
+                layoutManager.ensureLayout(for: container)
 
-            let frame = CTFramesetterCreateFrame(
-                framesetter,
-                CFRangeMake(pageStart, 0),
-                path,
-                nil
-            )
-            let visible = CTFrameGetVisibleStringRange(frame)
-            CTFrameDraw(frame, pdfContext)
+                let glyphRange = layoutManager.glyphRange(for: container)
+                guard glyphRange.length > 0 else { break }
 
-            pdfContext.restoreGState()
-            pdfContext.endPDFPage()
-            pageStart = visible.location + visible.length
+                layoutManager.drawBackground(forGlyphRange: glyphRange, at: drawOrigin)
+                layoutManager.drawGlyphs(forGlyphRange: glyphRange, at: drawOrigin)
+
+                let next = NSMaxRange(glyphRange)
+                if next <= glyphIndex { break }
+                glyphIndex = next
+            }
         }
-
-        pdfContext.closePDF()
-        return data as Data
+        return data
     }
 }

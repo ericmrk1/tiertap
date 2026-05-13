@@ -19,11 +19,11 @@ enum TierTapProductId: String, CaseIterable {
         }
     }
 
-    /// Tokens credited to the user for one successful **Credits** purchase.
-    static let creditsPackTokenAmount: Int = 250_000
+    /// Tokens credited to the user for one successful **Credits** purchase (bundled fallback; live value is ``SettingsStore/effectiveCreditsPackTokenAmount``).
+    static let creditsPackTokenAmount: Int = TierTapRemoteDefaultFallbacks.creditsPackTokenAmount
 
-    /// TierTap Pro “included” Gemini token allowance per calendar month before **purchased** TierTap Plus pack balance is drawn down.
-    static let proPlanIncludedTokensPerCalendarMonth: Int = 1_000_000
+    /// TierTap Pro “included” Gemini token allowance per calendar month before **purchased** TierTap Plus pack balance is drawn down (bundled fallback; live value is ``SettingsStore/effectiveProPlanIncludedTokensPerCalendarMonth``).
+    static let proPlanIncludedTokensPerCalendarMonth: Int = TierTapRemoteDefaultFallbacks.proPlanIncludedTokensPerCalendarMonth
 }
 
 @MainActor

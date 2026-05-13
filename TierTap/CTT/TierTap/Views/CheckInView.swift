@@ -3,6 +3,13 @@ import UIKit
 import Supabase
 
 struct CheckInView: View {
+    /// When non-nil, this game type is selected when the form opens (e.g. from fast check-in settings).
+    var initialGameCategory: SessionGameCategory? = nil
+    /// When true, only **Save fast check-in** is offered (no live session).
+    var saveFastCheckInOnly: Bool = false
+    /// Called after a successful fast check-in save (before dismiss).
+    var onFastCheckInSaved: (() -> Void)? = nil
+
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var rewardWalletStore: RewardWalletStore
@@ -155,6 +162,7 @@ struct CheckInView: View {
                                 .foregroundColor(.white)
                             GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
                                 .environmentObject(settingsStore)
+                                .disabled(saveFastCheckInOnly)
 
                             if gameCategory == .table || gameCategory == .slots {
                                 // Table or Slots: favorites grid + More games search (slot list is slots-only)
@@ -624,10 +632,16 @@ struct CheckInView: View {
                             if store.liveSession != nil {
                                 showExistingAlert = true
                             } else {
-                                attemptGo()
+                                performPrimaryCheckInAction()
                             }
                         } label: {
-                            L10nText("Let’s F@#$@ Go!")
+                            Group {
+                                if saveFastCheckInOnly {
+                                    L10nText("Save fast check-in")
+                                } else {
+                                    L10nText("Let’s F@#$@ Go!")
+                                }
+                            }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
                                 .padding(.horizontal, 16)
@@ -650,7 +664,7 @@ struct CheckInView: View {
                 }
                 .scrollDismissesKeyboard(.interactively)
             }
-            .localizedNavigationTitle("Check In")
+            .localizedNavigationTitle(saveFastCheckInOnly ? "Fast check-in" : "Check In")
             .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -770,7 +784,7 @@ struct CheckInView: View {
                 Button("Resume Existing", role: .cancel) { dismiss() }
                 Button("End & Start New", role: .destructive) {
                     store.discardLiveSession()
-                    attemptGo()
+                    performPrimaryCheckInAction()
                 }
             } message: {
                 L10nText("You have a live session. Resume it or end it to start a new one?")
@@ -788,9 +802,16 @@ struct CheckInView: View {
                 if casino.isEmpty, let recent = store.mostRecentCasino() {
                     casino = recent
                 }
-                gameCategory = settingsStore.defaultGameCategory
+                if let preset = initialGameCategory {
+                    gameCategory = preset
+                } else {
+                    gameCategory = settingsStore.defaultGameCategory
+                }
                 applyLastSavedGameDefaults()
                 applyCasinoHistoryDefaults()
+                if saveFastCheckInOnly, let cat = initialGameCategory, let saved = settingsStore.fastCheckInSavedPreset(for: cat) {
+                    applyFastCheckInSavedPreset(saved)
+                }
             }
             .onChange(of: casino) { _ in
                 applyCasinoHistoryDefaults()
@@ -848,6 +869,131 @@ struct CheckInView: View {
         pokerLevelMinutesText = d.pokerLevelMinutesText
         pokerStartingStackText = d.pokerStartingStackText
         pokerTournamentCostText = d.pokerTournamentCostText
+    }
+
+    private func performPrimaryCheckInAction() {
+        if saveFastCheckInOnly {
+            saveFastCheckInConfiguration()
+        } else {
+            attemptGo()
+        }
+    }
+
+    /// Applies a saved fast check-in preset on top of defaults (configure flow).
+    private func applyFastCheckInSavedPreset(_ p: FastCheckInSavedPreset) {
+        casino = p.casino
+        startingTier = "\(p.startingTierPoints)"
+        initialBuyIn = "\(p.initialBuyIn)"
+        if let r = p.rewardsProgramName, !r.isEmpty {
+            selectedRewardsProgram = r
+        } else {
+            selectedRewardsProgram = ""
+        }
+        linkedRewardWalletCardId = p.linkedRewardWalletCardId
+        casinoLatitude = p.casinoLatitude
+        casinoLongitude = p.casinoLongitude
+        switch gameCategory {
+        case .poker:
+            if let k = p.pokerGameKind { pokerGameKind = k }
+            if let v = p.pokerAllowsRebuy { pokerAllowsRebuy = v }
+            if let v = p.pokerAllowsAddOn { pokerAllowsAddOn = v }
+            if let v = p.pokerHasFreeOut { pokerHasFreezeOut = v }
+            if let v = p.pokerVariant { pokerVariant = v }
+            if let v = p.pokerSmallBlind { pokerSmallBlind = v }
+            if let v = p.pokerBigBlind { pokerBigBlind = v }
+            if let v = p.pokerAnte { pokerAnte = v }
+            if let v = p.pokerLevelMinutes {
+                pokerLevelMinutesText = "\(v)"
+            } else {
+                pokerLevelMinutesText = ""
+            }
+            if let v = p.pokerStartingStack {
+                pokerStartingStackText = "\(v)"
+            } else {
+                pokerStartingStackText = ""
+            }
+            pokerTournamentCostText = p.pokerTournamentCostText
+            selectedGame = p.game
+        case .slots:
+            selectedGame = p.game
+            slotNotes = p.slotNotes ?? ""
+        case .table:
+            selectedGame = p.game
+        }
+    }
+
+    private func saveFastCheckInConfiguration() {
+        if gameCategory == .poker {
+            selectedGame = FastCheckInHelper.composedPokerGameName(
+                pokerGameKind: pokerGameKind,
+                pokerVariant: pokerVariant,
+                pokerAllowsRebuy: pokerAllowsRebuy,
+                pokerAllowsAddOn: pokerAllowsAddOn,
+                pokerHasFreezeOut: pokerHasFreezeOut
+            )
+        }
+        guard isValid else { return }
+        guard let buy = Int(initialBuyIn), buy > 0 else { return }
+        let trimmedTier = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
+        let tier = trimmedTier.isEmpty ? 0 : (Int(trimmedTier) ?? 0)
+        let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: gameCategory,
+            format: nil,
+            formatOther: "",
+            feature: nil,
+            featureOther: "",
+            notes: slotNotes
+        )
+        let gameDisplay = selectedGame
+        let preset = FastCheckInSavedPreset(
+            casino: casino.trimmingCharacters(in: .whitespacesAndNewlines),
+            game: gameDisplay,
+            startingTierPoints: tier,
+            initialBuyIn: buy,
+            rewardsProgramName: program.isEmpty ? nil : program,
+            casinoLatitude: casinoLatitude,
+            casinoLongitude: casinoLongitude,
+            linkedRewardWalletCardId: linkedRewardWalletCardId,
+            pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,
+            pokerAllowsRebuy: gameCategory == .poker ? pokerAllowsRebuy : nil,
+            pokerAllowsAddOn: gameCategory == .poker ? pokerAllowsAddOn : nil,
+            pokerHasFreeOut: gameCategory == .poker ? pokerHasFreezeOut : nil,
+            pokerVariant: gameCategory == .poker ? pokerVariant : nil,
+            pokerSmallBlind: gameCategory == .poker ? pokerSmallBlind : nil,
+            pokerBigBlind: gameCategory == .poker ? pokerBigBlind : nil,
+            pokerAnte: gameCategory == .poker ? pokerAnte : nil,
+            pokerLevelMinutes: (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil,
+            pokerStartingStack: (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil,
+            pokerTournamentCostText: pokerTournamentCostText,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
+        )
+        settingsStore.setFastCheckInSavedPreset(preset, for: gameCategory)
+        settingsStore.recordLastCheckInGameSelection(
+            gameCategory: gameCategory,
+            selectedGame: gameCategory == .poker ? selectedGame : gameDisplay,
+            pokerGameKind: pokerGameKind,
+            pokerAllowsRebuy: pokerAllowsRebuy,
+            pokerAllowsAddOn: pokerAllowsAddOn,
+            pokerHasFreezeOut: pokerHasFreezeOut,
+            pokerVariant: pokerVariant,
+            pokerSmallBlind: pokerSmallBlind,
+            pokerBigBlind: pokerBigBlind,
+            pokerAnte: pokerAnte,
+            pokerLevelMinutesText: pokerLevelMinutesText,
+            pokerStartingStackText: pokerStartingStackText,
+            pokerTournamentCostText: pokerTournamentCostText,
+            slotNotes: slotMeta.notes ?? ""
+        )
+        if settingsStore.enableCasinoFeedback {
+            CelebrationPlayer.shared.playQuickChime()
+        }
+        onFastCheckInSaved?()
+        dismiss()
     }
 
     private func attemptGo() {
