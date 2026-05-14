@@ -311,6 +311,8 @@ struct TierTapPaywallView: View {
 
         var id: String { plan.rawValue }
 
+        var isProductAvailable: Bool { product != nil }
+
         var displayPrice: String {
             product?.displayPrice ?? plan.catalogDisplayPrice
         }
@@ -341,11 +343,31 @@ struct TierTapPaywallView: View {
                 .padding(.vertical, 8)
             }
 
+            if !subscriptionStore.isLoading && subscriptionStore.subscriptionProducts.isEmpty {
+                if SupabaseConfig.isTestFlight {
+                    L10nText("Subscription products are not available from App Store Connect yet. TierTap Pro is included on this TestFlight build while subscriptions are being set up.")
+                        .font(.caption)
+                        .foregroundColor(.orange.opacity(0.95))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if SupabaseConfig.prefersBundledStoreKitTesting {
+                    L10nText("Couldn’t load the bundled StoreKit test plans. Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected.")
+                        .font(.caption)
+                        .foregroundColor(.orange.opacity(0.95))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    L10nText("Subscription plans aren’t available from the App Store right now. Pull down to refresh, or try again in a moment.")
+                        .font(.caption)
+                        .foregroundColor(.orange.opacity(0.95))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
             HStack(alignment: .top, spacing: 8) {
                 ForEach(paywallSubscriptionPlanRows) { row in
                     PaywallPlanBox(
                         plan: row.plan,
                         displayPrice: row.displayPrice,
+                        showsEstimatedPrice: !row.isProductAvailable,
                         savingsPercent: subscriptionSavingsPercent(
                             plan: row.plan,
                             product: row.product,
@@ -354,6 +376,7 @@ struct TierTapPaywallView: View {
                         isCurrent: subscriptionStore.purchasedProductIds.contains(row.id),
                         isPurchasing: purchasingProductId == row.id,
                         isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
+                        canPurchase: row.isProductAvailable,
                         hasProAccess: hasProAccess,
                         accentColor: settingsStore.primaryColor
                     ) {
@@ -464,7 +487,7 @@ struct TierTapPaywallView: View {
     }
 
     private func isPurchaseDisabled(for product: Product) -> Bool {
-        if purchasingProductId != nil || subscriptionStore.isLoading { return true }
+        if purchasingProductId != nil { return true }
         if subscriptionStore.purchasedProductIds.contains(product.id) { return true }
         return false
     }
@@ -502,11 +525,21 @@ struct TierTapPaywallView: View {
     }
 
     private func purchaseSubscriptionPlan(_ row: PaywallSubscriptionPlanRow) {
-        guard let product = row.product else {
-            Task { await subscriptionStore.loadProducts() }
+        if let product = row.product {
+            purchase(product)
             return
         }
-        purchase(product)
+        guard purchasingProductId == nil, !subscriptionStore.isLoading else { return }
+
+        purchasingProductId = row.id
+        Task {
+            await subscriptionStore.loadProducts()
+            let refreshedProduct = subscriptionStore.subscriptionProducts.first { $0.id == row.id }
+            purchasingProductId = nil
+            if let refreshedProduct {
+                purchase(refreshedProduct)
+            }
+        }
     }
 
     private func purchase(_ product: Product) {
@@ -571,10 +604,12 @@ private struct ProBenefitRow: View {
 private struct PaywallPlanBox: View {
     let plan: TierTapProductId
     let displayPrice: String
+    let showsEstimatedPrice: Bool
     let savingsPercent: Int?
     let isCurrent: Bool
     let isPurchasing: Bool
     let isBusy: Bool
+    let canPurchase: Bool
     let hasProAccess: Bool
     let accentColor: Color
     let action: () -> Void
@@ -584,7 +619,13 @@ private struct PaywallPlanBox: View {
     }
 
     private var actionTitle: String {
-        hasProAccess ? "Change plan" : "Subscribe"
+        if isPurchasing {
+            return "Loading…"
+        }
+        if !canPurchase {
+            return "Unavailable"
+        }
+        return hasProAccess ? "Change plan" : "Subscribe"
     }
 
     var body: some View {
@@ -594,7 +635,12 @@ private struct PaywallPlanBox: View {
                 .foregroundColor(.white)
             Text(displayPrice)
                 .font(.caption)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.white.opacity(showsEstimatedPrice ? 0.65 : 0.9))
+            if showsEstimatedPrice {
+                Text("Estimated price")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.55))
+            }
 
             if let savingsPercent {
                 Text("Save \(savingsPercent)% vs monthly")
@@ -633,7 +679,8 @@ private struct PaywallPlanBox: View {
                     .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
-                .disabled(isBusy)
+                .disabled(isBusy || (!canPurchase && (SupabaseConfig.isTestFlight || !SupabaseConfig.prefersBundledStoreKitTesting)))
+                .opacity(isBusy || (!canPurchase && (SupabaseConfig.isTestFlight || !SupabaseConfig.prefersBundledStoreKitTesting)) ? 0.65 : 1)
             }
         }
         .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)

@@ -46,6 +46,15 @@ enum SupabaseConfig {
         #endif
     }
 
+    /// Simulator and debug device installs can use the bundled `.storekit` catalog. TestFlight uses App Store Connect sandbox instead.
+    static var prefersBundledStoreKitTesting: Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return currentDistributionChannel() == .development
+        #endif
+    }
+
     private static func string(forKey key: String) -> String? {
         guard let url = Bundle.main.url(forResource: keysPlistName, withExtension: "plist"),
               let dict = NSDictionary(contentsOf: url) as? [String: Any],

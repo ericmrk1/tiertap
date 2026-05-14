@@ -1,5 +1,8 @@
 import Foundation
 import StoreKit
+#if canImport(StoreKitTest)
+import StoreKitTest
+#endif
 
 /// Product identifiers for TierTap subscriptions and consumables (must match App Store Connect / `.storekit`).
 enum TierTapProductId: String, CaseIterable {
@@ -53,12 +56,18 @@ final class SubscriptionStore: ObservableObject {
     @Published private(set) var purchasedProductIds: Set<String> = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var subscriptionCatalogAvailable = false
 
     private var updateListenerTask: Task<Void, Error>?
 
+    /// TestFlight builds include TierTap Pro while subscription products are not yet returned by App Store Connect.
+    var hasComplimentaryBetaProAccess: Bool {
+        SupabaseConfig.isTestFlight && !subscriptionCatalogAvailable
+    }
+
     /// Whether the user has an active TierTap Pro subscription entitlement from StoreKit.
     var isPro: Bool {
-        !purchasedProductIds.isEmpty
+        hasComplimentaryBetaProAccess || !purchasedProductIds.isEmpty
     }
 
     /// Subscription products only (excludes consumables like **Credits**).
@@ -72,6 +81,7 @@ final class SubscriptionStore: ObservableObject {
     }
 
     init() {
+        TierTapStoreKitLocalTesting.activateIfNeeded()
         updateListenerTask = listenForTransactions()
         Task {
             await loadProducts()
@@ -107,6 +117,7 @@ final class SubscriptionStore: ObservableObject {
             }
             let loadedIds = products.map(\.id)
             let loadedSubscriptionIds = loadedSubscriptionProducts.map(\.id)
+            subscriptionCatalogAvailable = !loadedSubscriptionIds.isEmpty
             print(
                 "[SubscriptionStore] loadProducts OK count=\(products.count) loadedIds=\(loadedIds) "
                 + "subscriptionIds=\(loadedSubscriptionIds)"
@@ -114,10 +125,28 @@ final class SubscriptionStore: ObservableObject {
             // StoreKit returns [] (without throwing) for unknown IDs — typical when App Store Connect
             // product IDs don’t match the app, or subscriptions aren’t cleared for sale yet.
             if loadedSubscriptionIds.isEmpty {
-                errorMessage =
-                    "Couldn’t load subscription plans. Check your connection and try again. "
-                    + "If this persists, confirm in App Store Connect that these product IDs exist for this app: "
-                    + subscriptionIds.joined(separator: ", ")
+                if SupabaseConfig.isTestFlight {
+                    errorMessage =
+                        "Subscription products are not available from App Store Connect yet. "
+                        + "TierTap Pro is included on this TestFlight build while subscriptions are being set up. "
+                        + "To test purchases, add these product IDs in App Store Connect: "
+                        + subscriptionIds.joined(separator: ", ")
+                } else if SupabaseConfig.prefersBundledStoreKitTesting {
+                    if TierTapStoreKitLocalTesting.isActive {
+                        errorMessage =
+                            "Couldn’t load subscription plans from the bundled StoreKit test catalog. "
+                            + "Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected."
+                    } else {
+                        errorMessage =
+                            "Couldn’t load subscription plans from the bundled StoreKit test catalog. "
+                            + "Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected."
+                    }
+                } else {
+                    errorMessage =
+                        "Couldn’t load subscription plans. Check your connection and try again. "
+                        + "If this persists, confirm in App Store Connect that these product IDs exist for this app: "
+                        + subscriptionIds.joined(separator: ", ")
+                }
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -200,5 +229,45 @@ final class SubscriptionStore: ObservableObject {
 
 enum StoreError: Error {
     case failedVerification
+}
+
+/// Activates the bundled `TierTapStoreKitConfig.storekit` catalog for simulator and debug installs.
+enum TierTapStoreKitLocalTesting {
+    #if canImport(StoreKitTest)
+    private static var session: SKTestSession?
+    #endif
+
+    static var isActive: Bool {
+        #if canImport(StoreKitTest)
+        return session != nil
+        #else
+        return false
+        #endif
+    }
+
+    static func activateIfNeeded() {
+        guard SupabaseConfig.prefersBundledStoreKitTesting else { return }
+        #if canImport(StoreKitTest)
+        guard session == nil else { return }
+        #endif
+        guard Bundle.main.url(forResource: "TierTapStoreKitConfig", withExtension: "storekit") != nil else {
+            print("[StoreKit] Bundled TierTapStoreKitConfig.storekit not found in app resources.")
+            return
+        }
+
+        #if canImport(StoreKitTest)
+        do {
+            let testSession = try SKTestSession(configurationFileNamed: "TierTapStoreKitConfig")
+            testSession.resetToDefaultState()
+            testSession.disableDialogs = false
+            session = testSession
+            print("[StoreKit] Activated bundled StoreKit test catalog TierTapStoreKitConfig.storekit")
+        } catch {
+            print("[StoreKit] Failed to activate bundled StoreKit test catalog: \(error.localizedDescription)")
+        }
+        #else
+        print("[StoreKit] StoreKitTest is unavailable in this build; bundled catalog cannot be activated.")
+        #endif
+    }
 }
 
