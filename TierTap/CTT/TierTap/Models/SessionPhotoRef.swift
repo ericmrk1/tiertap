@@ -79,15 +79,21 @@ enum SessionPhotoCatalog {
         let sessionID: UUID
         let sessionTitle: String
         let sessionDate: Date
-        let capturedAt: Date
         let ref: SessionPhotoRef
 
         var id: String { "\(sessionID.uuidString)-\(ref.storageKey)" }
     }
 
     static func feedEntries(from sessions: [Session]) -> [FeedEntry] {
+        let orderedSessions = sessions.sorted { lhs, rhs in
+            let lhsDate = lhs.endTime ?? lhs.startTime
+            let rhsDate = rhs.endTime ?? rhs.startTime
+            if lhsDate != rhsDate { return lhsDate > rhsDate }
+            return lhs.startTime > rhs.startTime
+        }
+
         var entries: [FeedEntry] = []
-        for session in sessions {
+        for session in orderedSessions {
             let sessionTitle = feedTitle(for: session)
             let sessionDate = session.endTime ?? session.startTime
             for item in items(for: session) {
@@ -96,13 +102,12 @@ enum SessionPhotoCatalog {
                         sessionID: session.id,
                         sessionTitle: sessionTitle,
                         sessionDate: sessionDate,
-                        capturedAt: captureDate(for: item.ref, session: session),
                         ref: item.ref
                     )
                 )
             }
         }
-        return entries.sorted { $0.capturedAt > $1.capturedAt }
+        return entries
     }
 
     static func feedTitle(for session: Session) -> String {
@@ -126,20 +131,6 @@ enum SessionPhotoCatalog {
             guard let uuid = UUID(uuidString: ref.objectID) else { return nil }
             return SessionAttachedPhotoStorage.url(for: uuid)
         }
-    }
-
-    private static func captureDate(for ref: SessionPhotoRef, session: Session) -> Date {
-        if let url = photoURL(for: ref, session: session),
-           let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
-           let modified = attrs[.modificationDate] as? Date {
-            return modified
-        }
-        if ref.kind == .comp,
-           let uuid = UUID(uuidString: ref.objectID),
-           let event = session.compEvents.first(where: { $0.id == uuid }) {
-            return event.timestamp
-        }
-        return session.endTime ?? session.startTime
     }
 
     static func resolvedPrimaryRef(for session: Session) -> SessionPhotoRef? {

@@ -525,6 +525,10 @@ private struct TaxPrepMultiDocumentExportPicker: UIViewControllerRepresentable {
 }
 #endif
 
+private enum TaxPrepAIAccessError: Error {
+    case tokenBudgetExhausted
+}
+
 /// TierTap Pro: sequential AI-assisted US gambling tax-prep exports (not certified tax advice).
 struct HistoryTaxPrepView: View {
     @EnvironmentObject var sessionStore: SessionStore
@@ -594,6 +598,8 @@ struct HistoryTaxPrepView: View {
 
                     if !hasProAccess {
                         nonSubscriberCard
+                    } else if settingsStore.isProTokenBackedAccessBlocked(hasProAccess: hasProAccess) {
+                        exhaustedTokenBudgetCard
                     } else if sessionStore.sessions.isEmpty {
                         emptySessionsHint
                     } else {
@@ -765,6 +771,33 @@ struct HistoryTaxPrepView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
+    private var exhaustedTokenBudgetCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(
+                L10n.tr(
+                    "You have used your TierTap Pro AI allowance and any TierTap+ token balance for this month. Buy TierTap+ tokens to continue using Tax Prep and other advanced features. Your included AI budget resets at the start of the next calendar month.",
+                    language: appLanguage
+                )
+            )
+            .font(.body)
+            .foregroundColor(.white.opacity(0.9))
+            Button {
+                isPaywallPresented = true
+            } label: {
+                Text(L10n.tr("Buy TierTap+ tokens", language: appLanguage))
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(Color.green.opacity(0.9))
+                    .foregroundColor(.black)
+                    .cornerRadius(12)
+            }
+        }
+        .padding(16)
+        .background(Color.black.opacity(0.22))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
     private var emptySessionsHint: some View {
         L10nText("Complete a session to see your history.")
             .font(.subheadline)
@@ -825,7 +858,14 @@ struct HistoryTaxPrepView: View {
 
     private var generateButton: some View {
         Button {
-            Task { await runSequentialTaxPrepPipeline() }
+            if settingsStore.requiresTierTapAIFeaturePaywall(
+                isSignedIn: authStore.isSignedIn,
+                hasProAccess: hasProAccess
+            ) {
+                isPaywallPresented = true
+            } else {
+                Task { await runSequentialTaxPrepPipeline() }
+            }
         } label: {
             HStack(spacing: 6) {
                 if isRunningDocumentBatch {
@@ -851,8 +891,15 @@ struct HistoryTaxPrepView: View {
 
     private var taxOptimizationButton: some View {
         Button {
-            taxOptimizationError = nil
-            showTaxOptimizationSheet = true
+            if settingsStore.requiresTierTapAIFeaturePaywall(
+                isSignedIn: authStore.isSignedIn,
+                hasProAccess: hasProAccess
+            ) {
+                isPaywallPresented = true
+            } else {
+                taxOptimizationError = nil
+                showTaxOptimizationSheet = true
+            }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "lightbulb.max")
@@ -1064,6 +1111,16 @@ struct HistoryTaxPrepView: View {
     }
 
     private func callGeminiRouter(client: SupabaseClient, prompt: String, language: AppLanguage) async throws -> String {
+        let hasPro = await MainActor.run { subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive }
+        let signedIn = await MainActor.run { authStore.isSignedIn }
+        let blocked = await MainActor.run {
+            settingsStore.requiresTierTapAIFeaturePaywall(isSignedIn: signedIn, hasProAccess: hasPro)
+        }
+        if blocked {
+            await MainActor.run { isPaywallPresented = true }
+            throw TaxPrepAIAccessError.tokenBudgetExhausted
+        }
+
         struct GeminiRequest: Encodable {
             struct Part: Encodable { let text: String }
             struct Content: Encodable { let role: String; let parts: [Part] }
@@ -1079,7 +1136,6 @@ struct HistoryTaxPrepView: View {
                 options: FunctionInvokeOptions(body: routerBody)
             )
         }
-        let hasPro = await MainActor.run { subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive }
         await MainActor.run {
             settingsStore.recordAITelemetry(
                 invocationTokens: response.telemetryTokenTotal,
@@ -1097,6 +1153,13 @@ struct HistoryTaxPrepView: View {
 
     private func taxOptimizationSheetAppeared() async {
         guard hasProAccess else { return }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run { isPaywallPresented = true }
+            return
+        }
         let year = await MainActor.run { selectedYear }
         let lang = await MainActor.run { settingsStore.appLanguage }
 
@@ -1126,6 +1189,13 @@ struct HistoryTaxPrepView: View {
 
     private func runTaxOptimizationTipsAndPersist() async {
         guard hasProAccess else { return }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run { isPaywallPresented = true }
+            return
+        }
         guard SupabaseConfig.isConfigured, let client = supabase else {
             await MainActor.run {
                 taxOptimizationError = L10n.tr("Supabase is not configured. Add your project keys to SupabaseKeys.plist.", language: appLanguage)
@@ -1247,6 +1317,13 @@ struct HistoryTaxPrepView: View {
 
     private func runSequentialTaxPrepPipeline() async {
         guard hasProAccess else { return }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run { isPaywallPresented = true }
+            return
+        }
         guard SupabaseConfig.isConfigured, let client = supabase else {
             await MainActor.run {
                 batchError = L10n.tr("Supabase is not configured. Add your project keys to SupabaseKeys.plist.", language: appLanguage)
@@ -1317,6 +1394,9 @@ struct HistoryTaxPrepView: View {
                 )
                 try verifyNonEmptyFile(at: url, language: lang)
                 await MainActor.run { setArtifactRow(index: index, status: .ready(url)) }
+            } catch TaxPrepAIAccessError.tokenBudgetExhausted {
+                await MainActor.run { isRunningDocumentBatch = false }
+                break
             } catch {
                 await MainActor.run { setArtifactRow(index: index, status: .failed(error.localizedDescription)) }
             }

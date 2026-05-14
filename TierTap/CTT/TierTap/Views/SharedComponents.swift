@@ -1716,10 +1716,13 @@ struct UpdateStackSheet: View {
                     HStack {
                         Spacer()
                         Button {
-                            if hasProAccess && authStore.isSignedIn {
-                                startChipEstimatorFlow()
-                            } else {
+                            if settingsStore.requiresTierTapAIFeaturePaywall(
+                                isSignedIn: authStore.isSignedIn,
+                                hasProAccess: hasProAccess
+                            ) {
                                 showSubscriptionPaywall = true
+                            } else {
+                                startChipEstimatorFlow()
                             }
                         } label: {
                             LocalizedLabel(title: "Chip Estimator", systemImage: "camera.viewfinder")
@@ -1797,6 +1800,13 @@ struct UpdateStackSheet: View {
     private func startChipEstimatorFlow() {
         guard SupabaseConfig.isConfigured else {
             chipEstimatorError = "AI is not configured for this build."
+            return
+        }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        ) {
+            showSubscriptionPaywall = true
             return
         }
         showChipEstimatorSheet = true
@@ -1997,10 +2007,6 @@ struct CompQuickAddSheet: View {
         let reason: String
     }
 
-    private var hasProEstimatorAccess: Bool {
-        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
-    }
-
     /// Matches Est. value `TextField` + spacing + Estimator button on the food row (below the column labels).
     private static let compDetailsEditorHeight: CGFloat = 100
     /// Minimum height so an empty details field shows ~3 caption lines.
@@ -2182,8 +2188,15 @@ struct CompQuickAddSheet: View {
                                         dialPadNavigationTitle: "Amount"
                                     )
                                     Button {
-                                        if hasProEstimatorAccess && authStore.isSignedIn {
-                                            Task { await runCompValueEstimator() }
+                                        if authStore.isSignedIn {
+                                            if settingsStore.requiresTierTapAIFeaturePaywall(
+                                                isSignedIn: true,
+                                                hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                                            ) {
+                                                showSubscriptionPaywall = true
+                                            } else {
+                                                Task { await runCompValueEstimator() }
+                                            }
                                         } else {
                                             showSubscriptionPaywall = true
                                         }
@@ -2454,8 +2467,11 @@ struct CompQuickAddSheet: View {
             await MainActor.run { compEstimatorError = "Comp Estimator is only available to signed-in users." }
             return
         }
-        if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive && !settingsStore.canUseAI() {
-            await MainActor.run { compEstimatorError = "You've reached today's free AI limit. Try again tomorrow." }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        ) {
+            await MainActor.run { showSubscriptionPaywall = true }
             return
         }
 

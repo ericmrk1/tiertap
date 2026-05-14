@@ -266,8 +266,8 @@ struct HomeView: View {
                         .accessibilityLabel("Photo Feed")
                     }
                 }
-                if hasProAccess {
-                    ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if hasProAccess {
                         Button {
                             showSubscriptionPaywall = true
                         } label: {
@@ -276,6 +276,15 @@ struct HomeView: View {
                                 .foregroundColor(.white)
                         }
                         .accessibilityLabel("TierTap Pro subscription")
+                    } else {
+                        Button {
+                            NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                        } label: {
+                            Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                                .font(.body.weight(.medium))
+                                .foregroundColor(.white)
+                        }
+                        .accessibilityLabel("TierTap Account")
                     }
                 }
             }

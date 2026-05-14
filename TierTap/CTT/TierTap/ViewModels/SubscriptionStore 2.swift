@@ -56,15 +56,9 @@ final class SubscriptionStore: ObservableObject {
 
     private var updateListenerTask: Task<Void, Error>?
 
-    /// Whether the user has TierTap Pro access: an active subscription, or a TestFlight / sandbox build
-    /// (sandbox receipt path) where Pro is enabled by default for beta testers.
+    /// Whether the user has an active TierTap Pro subscription entitlement from StoreKit.
     var isPro: Bool {
-        Self.isTestFlightOrSandboxBuild || !purchasedProductIds.isEmpty
-    }
-
-    /// Pro is unlocked without a StoreKit purchase on TestFlight / sandbox builds. Used for feature gating.
-    private static var isTestFlightOrSandboxBuild: Bool {
-        Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        !purchasedProductIds.isEmpty
     }
 
     /// Subscription products only (excludes consumables like **Credits**).
@@ -103,9 +97,6 @@ final class SubscriptionStore: ObservableObject {
         )
         defer { isLoading = false }
         do {
-            if Self.isTestFlightOrSandboxBuild {
-                try? await AppStore.sync()
-            }
             async let subscriptionProductsRequest = Product.products(for: subscriptionIds)
             async let consumableProductsRequest = Product.products(for: consumableIds)
             let loadedSubscriptionProducts = try await subscriptionProductsRequest

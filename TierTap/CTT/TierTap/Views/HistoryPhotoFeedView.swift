@@ -1,23 +1,61 @@
 import SwiftUI
 import UIKit
 
+private enum HistoryPhotoFeedFilter: String, CaseIterable, Identifiable {
+    case allPhotos
+    case primaryOnly
+
+    var id: String { rawValue }
+}
+
 struct HistoryPhotoFeedView: View {
+    private static let pageSize = 12
+
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var rewardWalletStore: RewardWalletStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
     @State private var selectedSession: Session?
+    @State private var photoFeedFilter: HistoryPhotoFeedFilter = .allPhotos
+    @State private var visibleEntryLimit = HistoryPhotoFeedView.pageSize
     #if os(iOS)
     @State private var shareSessionRef: PostCloseoutSessionRef?
     #endif
 
-    private var feedEntries: [SessionPhotoCatalog.FeedEntry] {
+    private var feedSessions: [Session] {
         var sessions = store.sessions
         if let live = store.liveSession {
             sessions.append(live)
         }
-        return SessionPhotoCatalog.feedEntries(from: sessions)
+        return sessions
+    }
+
+    private var feedEntries: [SessionPhotoCatalog.FeedEntry] {
+        SessionPhotoCatalog.feedEntries(from: feedSessions)
+    }
+
+    private var displayedFeedEntries: [SessionPhotoCatalog.FeedEntry] {
+        switch photoFeedFilter {
+        case .allPhotos:
+            return feedEntries
+        case .primaryOnly:
+            return feedEntries.filter { entry in
+                guard let session = session(for: entry),
+                      let primary = SessionPhotoCatalog.resolvedPrimaryRef(for: session) else {
+                    return false
+                }
+                return entry.ref == primary
+            }
+        }
+    }
+
+    private var paginatedFeedEntries: [SessionPhotoCatalog.FeedEntry] {
+        Array(displayedFeedEntries.prefix(visibleEntryLimit))
+    }
+
+    private var hasMoreFeedEntries: Bool {
+        visibleEntryLimit < displayedFeedEntries.count
     }
 
     var body: some View {
@@ -26,25 +64,51 @@ struct HistoryPhotoFeedView: View {
             if feedEntries.isEmpty {
                 emptyState
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 28) {
-                        ForEach(feedEntries) { entry in
-                            HistoryPhotoFeedPost(
-                                entry: entry,
-                                session: session(for: entry),
-                                onImageTap: {
-                                    if let session = session(for: entry) {
-                                        selectedSession = session
+                VStack(spacing: 0) {
+                    photoFeedFilterBar
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
+
+                    if displayedFeedEntries.isEmpty {
+                        filteredEmptyState
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 28) {
+                                ForEach(paginatedFeedEntries) { entry in
+                                    HistoryPhotoFeedPost(
+                                        entry: entry,
+                                        session: session(for: entry),
+                                        onImageTap: {
+                                            if let session = session(for: entry) {
+                                                selectedSession = session
+                                            }
+                                        },
+                                        onShareTap: {
+                                            shareSessionRef = PostCloseoutSessionRef(id: entry.sessionID)
+                                        }
+                                    )
+                                    .onAppear {
+                                        if entry.id == paginatedFeedEntries.last?.id {
+                                            loadMoreFeedEntriesIfNeeded()
+                                        }
                                     }
-                                },
-                                onShareTap: {
-                                    shareSessionRef = PostCloseoutSessionRef(id: entry.sessionID)
                                 }
-                            )
+
+                                if hasMoreFeedEntries {
+                                    ProgressView()
+                                        .tint(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 12)
+                                        .onAppear {
+                                            loadMoreFeedEntriesIfNeeded()
+                                        }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 20)
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 20)
                 }
             }
         }
@@ -69,6 +133,33 @@ struct HistoryPhotoFeedView: View {
                 .environmentObject(subscriptionStore)
         }
         #endif
+        .onChange(of: photoFeedFilter) { _ in
+            resetFeedPagination()
+        }
+        .onChange(of: feedEntriesSignature) { _ in
+            resetFeedPagination()
+        }
+    }
+
+    private func resetFeedPagination() {
+        visibleEntryLimit = Self.pageSize
+    }
+
+    private func loadMoreFeedEntriesIfNeeded() {
+        guard hasMoreFeedEntries else { return }
+        visibleEntryLimit = min(visibleEntryLimit + Self.pageSize, displayedFeedEntries.count)
+    }
+
+    private var feedEntriesSignature: String {
+        feedEntries.map(\.id).joined(separator: "|")
+    }
+
+    private var photoFeedFilterBar: some View {
+        Picker("", selection: $photoFeedFilter) {
+            Text("All photos").tag(HistoryPhotoFeedFilter.allPhotos)
+            Text("Primary").tag(HistoryPhotoFeedFilter.primaryOnly)
+        }
+        .pickerStyle(.segmented)
     }
 
     private var emptyState: some View {
@@ -80,6 +171,23 @@ struct HistoryPhotoFeedView: View {
                 .font(.title3)
                 .foregroundColor(.gray)
             L10nText("Photos from live sessions, comps, and session galleries will appear here.")
+                .font(.subheadline)
+                .foregroundColor(.gray.opacity(0.75))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 28)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var filteredEmptyState: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "star")
+                .font(.system(size: 44))
+                .foregroundColor(.gray)
+            L10nText("No primary photos to show.")
+                .font(.title3)
+                .foregroundColor(.gray)
+            L10nText("Choose a primary photo in session details or edit session.")
                 .font(.subheadline)
                 .foregroundColor(.gray.opacity(0.75))
                 .multilineTextAlignment(.center)
@@ -102,6 +210,14 @@ private struct HistoryPhotoFeedPost: View {
     let onImageTap: () -> Void
     let onShareTap: () -> Void
 
+    private var sessionMetadataText: String {
+        var parts = [entry.sessionDate.formatted(date: .abbreviated, time: .shortened)]
+        if let session {
+            parts.append(Session.durationString(session.duration))
+        }
+        return parts.joined(separator: " · ")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
@@ -110,8 +226,8 @@ private struct HistoryPhotoFeedPost: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(.white)
                         .lineLimit(2)
-                    Text(entry.sessionDate, style: .date)
-                        .font(.caption)
+                    Text(sessionMetadataText)
+                        .font(.caption.monospacedDigit())
                         .foregroundColor(.gray)
                 }
 
@@ -133,32 +249,58 @@ private struct HistoryPhotoFeedPost: View {
             }
 
             Button(action: onImageTap) {
-                Group {
-                    if let session,
-                       let image = SessionPhotoCatalog.image(for: entry.ref, session: session) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                    } else {
-                        Color(.systemGray6).opacity(0.25)
-                            .overlay {
-                                Image(systemName: "photo")
-                                    .font(.title2)
-                                    .foregroundColor(.gray)
-                            }
+                HistoryPhotoFeedImage(entry: entry, session: session)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 220, maxHeight: 420)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
                     }
-                }
-                .frame(maxWidth: .infinity)
-                .frame(minHeight: 220, maxHeight: 420)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                }
             }
             .buttonStyle(.plain)
             .disabled(session == nil)
+        }
+    }
+}
+
+private struct HistoryPhotoFeedImage: View {
+    let entry: SessionPhotoCatalog.FeedEntry
+    let session: Session?
+
+    @State private var image: UIImage?
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else if session == nil {
+                Color(.systemGray6).opacity(0.25)
+                    .overlay {
+                        Image(systemName: "photo")
+                            .font(.title2)
+                            .foregroundColor(.gray)
+                    }
+            } else {
+                Color(.systemGray6).opacity(0.25)
+                    .overlay {
+                        ProgressView()
+                            .tint(.white)
+                    }
+            }
+        }
+        .task(id: entry.id) {
+            image = nil
+            guard let session else { return }
+            let ref = entry.ref
+            let loaded = await Task.detached(priority: .utility) {
+                SessionPhotoCatalog.image(for: ref, session: session)
+            }.value
+            guard !Task.isCancelled else { return }
+            image = loaded
         }
     }
 }

@@ -137,12 +137,6 @@ struct CheckInView: View {
         var id: Int { hashValue }
     }
 
-    private var canUseSlotGameAI: Bool {
-        subscriptionStore.isPro
-            || settingsStore.isSubscriptionOverrideActive
-            || settingsStore.canUseAI()
-    }
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -193,12 +187,17 @@ struct CheckInView: View {
                                         .environmentObject(settingsStore)
 
                                         Button {
-                                            if authStore.isSignedIn && canUseSlotGameAI {
-                                                showSlotGamePhotoOptions = true
-                                            } else if !authStore.isSignedIn {
-                                                slotGameScanError = "Sign in to use AI slot scanner."
+                                            if authStore.isSignedIn {
+                                                if settingsStore.requiresTierTapAIFeaturePaywall(
+                                                    isSignedIn: true,
+                                                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                                                ) {
+                                                    showSubscriptionPaywall = true
+                                                } else {
+                                                    showSlotGamePhotoOptions = true
+                                                }
                                             } else {
-                                                showSubscriptionPaywall = true
+                                                slotGameScanError = "Sign in to use AI slot scanner."
                                             }
                                         } label: {
                                             Image(systemName: "camera.viewfinder")
@@ -1113,7 +1112,10 @@ struct CheckInView: View {
             await MainActor.run { slotGameScanError = "Sign in to use AI slot scanner." }
             return
         }
-        guard canUseSlotGameAI else {
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        ) {
             await MainActor.run { showSubscriptionPaywall = true }
             return
         }

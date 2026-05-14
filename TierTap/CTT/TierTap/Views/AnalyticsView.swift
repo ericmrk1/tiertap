@@ -233,7 +233,14 @@ struct AnalyticsView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         if hasProAccess && authStore.isSignedIn {
-                            isAISheetPresented = true
+                            if settingsStore.requiresTierTapAIFeaturePaywall(
+                                isSignedIn: authStore.isSignedIn,
+                                hasProAccess: hasProAccess
+                            ) {
+                                isPaywallPresented = true
+                            } else {
+                                isAISheetPresented = true
+                            }
                         } else {
                             isPaywallPresented = true
                         }
@@ -864,6 +871,7 @@ struct AIAnalyticsSheet: View {
     @EnvironmentObject var sessionStore: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
     @Environment(\.dismiss) private var dismiss
     
     enum TierTapAIQuestion: String, CaseIterable, Identifiable {
@@ -1056,6 +1064,7 @@ struct AIAnalyticsSheet: View {
     @State private var fullAnswer: String?
     @State private var displayedAnswer: String = ""
     @State private var errorMessage: String?
+    @State private var isPaywallPresented = false
     
     @State private var selectedQuestion: TierTapAIQuestion = .whereEarnTiersFastest
     @State private var selectedAnalyticsCategory: SessionGameCategory = .table
@@ -1228,6 +1237,12 @@ struct AIAnalyticsSheet: View {
                 }
             }
         }
+        .adaptiveSheet(isPresented: $isPaywallPresented) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
     }
     
     /// Currently available questions given the selected game category.
@@ -1252,6 +1267,16 @@ struct AIAnalyticsSheet: View {
         if !hasProAccess && !settingsStore.canUseAI() {
             await MainActor.run {
                 errorMessage = "You have reached the daily limit of 5 AI calls on the free version of TierTap. Upgrade to the PRO version to unlock unlimited AI analysis."
+            }
+            return
+        }
+
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run {
+                isPaywallPresented = true
             }
             return
         }

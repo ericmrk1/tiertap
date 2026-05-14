@@ -4455,7 +4455,15 @@ struct SessionArtGeneratorView: View {
                 aiPlayerTraitsSection
             }
             Button {
-                Task { await generateTierTapAIImage() }
+                let hasPaidAccess = subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                if settingsStore.requiresTierTapAIFeaturePaywall(
+                    isSignedIn: authStore.isSignedIn,
+                    hasProAccess: hasPaidAccess
+                ) {
+                    showPaywall = true
+                } else {
+                    Task { await generateTierTapAIImage() }
+                }
             } label: {
                 Text("Go")
                     .font(.headline)
@@ -4957,6 +4965,13 @@ struct SessionArtGeneratorView: View {
         }
         let hasPaidAccess = subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
         guard hasPaidAccess else {
+            showPaywall = true
+            return
+        }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasPaidAccess
+        ) {
             showPaywall = true
             return
         }

@@ -11660,18 +11660,18 @@
     "fr": "You need an active TierTap Pro subscription before token packs can be purchased; the app explains this if the buy button is disabled.",
     "hi": "You need an active TierTap Pro subscription before token packs can be purchased; the app explains this if the buy button is disabled."
   },
-  "ui.c23c46d95ca2c92cff66fe6a": {
-    "en": "You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.",
-    "zh-Hans": "您尚未登录。打开 **社区** 选项卡，使用 Apple、Google 或魔法链接电子邮件登录。",
-    "ja": "サインインしていません。**コミュニティ** タブを開いて、Apple、Google、またはマジック リンク メールでサインインしてください。",
-    "ko": "로그인되어 있지 않습니다. **커뮤니티** 탭을 열어 Apple, Google 또는 매직 링크 이메일로 로그인하세요.",
-    "vi": "Bạn chưa đăng nhập. Hãy mở tab **Cộng đồng** để đăng nhập bằng Apple, Google hoặc email liên kết ma thuật.",
-    "es": "No has iniciado sesión. Abre la pestaña **Comunidad** para iniciar sesión con Apple, Google o un correo electrónico con enlace mágico.",
-    "ar": "لم تقم بتسجيل الدخول. افتح علامة التبويب **المجتمع** لتسجيل الدخول باستخدام Apple أو Google أو بريد إلكتروني يحتوي على رابط سحري.",
-    "he": "אתה לא מחובר. פתח את הכרטיסייה **קהילה** כדי להיכנס עם Apple, Google או אימייל עם קישור קסום.",
-    "de": "Sie sind nicht angemeldet. Öffnen Sie die Registerkarte **Community**, um sich mit Apple, Google oder einer E-Mail mit einem magischen Link anzumelden.",
-    "fr": "Vous n'êtes pas connecté. Ouvrez l'onglet **Communauté** pour vous connecter avec Apple, Google ou un e-mail de lien magique.",
-    "hi": "आप साइन इन नहीं हैं। Apple, Google, या मैजिक लिंक ईमेल से साइन इन करने के लिए **समुदाय** टैब खोलें।"
+  "ui.8b545c801c6e460f4bfb6205": {
+    "en": "You're not signed in. Sign in with Apple, Google, or a magic link email.",
+    "zh-Hans": "您尚未登录。请使用 Apple、Google 或魔法链接电子邮件登录。",
+    "ja": "サインインしていません。Apple、Google、またはマジックリンクメールでサインインしてください。",
+    "ko": "로그인되어 있지 않습니다. Apple, Google 또는 매직 링크 이메일로 로그인하세요.",
+    "vi": "Bạn chưa đăng nhập. Hãy đăng nhập bằng Apple, Google hoặc email liên kết ma thuật.",
+    "es": "No has iniciado sesión. Inicia sesión con Apple, Google o un correo electrónico con enlace mágico.",
+    "ar": "لم تقم بتسجيل الدخول. سجّل الدخول باستخدام Apple أو Google أو بريد إلكتروني يحتوي على رابط سحري.",
+    "he": "אתה לא מחובר. היכנס באמצעות Apple, Google או אימייל עם קישור קסום.",
+    "de": "Sie sind nicht angemeldet. Melden Sie sich mit Apple, Google oder einer E-Mail mit magischem Link an.",
+    "fr": "Vous n'êtes pas connecté. Connectez-vous avec Apple, Google ou un e-mail de lien magique.",
+    "hi": "आप साइन इन नहीं हैं। Apple, Google, या मैजिक लिंक ईमेल से साइन इन करें।"
   },
   "ui.c739187d6e8692ec57263680": {
     "en": "You're signed in to TierTap.",

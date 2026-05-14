@@ -119,13 +119,6 @@ struct TripMagicWandView: View {
         case review
     }
 
-    /// Same rule as other AI surfaces: Pro, developer subscription override, or free-tier daily quota.
-    private var canRequestTripSuggestions: Bool {
-        subscriptionStore.isPro
-            || settingsStore.isSubscriptionOverrideActive
-            || settingsStore.canUseAI()
-    }
-
     private var assignedSessionIDs: Set<UUID> {
         Set(tripStore.trips.flatMap(\.sessionIDs))
     }
@@ -624,7 +617,10 @@ struct TripMagicWandView: View {
         }
         guard !unassignedSessions.isEmpty else { return }
 
-        if !canRequestTripSuggestions {
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        ) {
             await MainActor.run { showPaywall = true }
             return
         }

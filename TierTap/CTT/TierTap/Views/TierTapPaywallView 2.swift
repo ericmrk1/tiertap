@@ -64,6 +64,10 @@ struct TierTapPaywallView: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
+    private var showsAiBudgetExhaustedPaywall: Bool {
+        settingsStore.isProTokenBackedAccessBlocked(hasProAccess: hasProAccess)
+    }
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -73,12 +77,20 @@ struct TierTapPaywallView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         headerSection
-                        requirementsSection
-                        benefitsSection
-                        productsSection
-                        tierTapPlusSection
-                        restoreSection
-                        legalSection
+                        if showsAiBudgetExhaustedPaywall {
+                            aiBudgetExhaustedNoticeSection
+                            tierTapPlusSection
+                            requirementsSection
+                            restoreSection
+                            legalSection
+                        } else {
+                            requirementsSection
+                            benefitsSection
+                            productsSection
+                            tierTapPlusSection
+                            restoreSection
+                            legalSection
+                        }
 
                         if let message = subscriptionStore.errorMessage {
                             Text(message)
@@ -95,7 +107,7 @@ struct TierTapPaywallView: View {
                     await subscriptionStore.loadProducts()
                 }
             }
-            .localizedNavigationTitle("TierTap Pro")
+            .localizedNavigationTitle(showsAiBudgetExhaustedPaywall ? "TierTap Pro usage" : "TierTap Pro")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -129,14 +141,41 @@ struct TierTapPaywallView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            L10nText("Unlock TierTap Pro")
-                .font(.title2.weight(.bold))
-                .foregroundColor(.white)
-            L10nText("Smarter play decisions, powered by AI.")
-                .font(.footnote)
-                .foregroundColor(.white.opacity(0.9))
+            if showsAiBudgetExhaustedPaywall {
+                L10nText("TierTap Pro usage limit reached")
+                    .font(.title2.weight(.bold))
+                    .foregroundColor(.white)
+                L10nText("Buy TierTap+ tokens to continue using your TierTap Pro subscription and advanced features.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+            } else {
+                L10nText("Unlock TierTap Pro")
+                    .font(.title2.weight(.bold))
+                    .foregroundColor(.white)
+                L10nText("Smarter play decisions, powered by AI.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var aiBudgetExhaustedNoticeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            L10nText("You have used your TierTap Pro AI allowance and any TierTap+ token balance for this month.")
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.92))
+                .fixedSize(horizontal: false, vertical: true)
+            L10nText("Your included AI budget resets at the start of the next calendar month.")
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.78))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.15))
+        .cornerRadius(12)
     }
 
     private var requirementsSection: some View {
@@ -342,10 +381,17 @@ struct TierTapPaywallView: View {
             TierTapPlusMark(font: .subheadline.weight(.semibold), weight: .semibold, foreground: .white)
 
             VStack(alignment: .leading, spacing: 10) {
-                L10nText("Need more AI power? Add token packs to extend usage beyond your TierTap Pro plan.")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.9))
-                    .fixedSize(horizontal: false, vertical: true)
+                if showsAiBudgetExhaustedPaywall {
+                    L10nText("Add TierTap+ tokens to unlock AI, Community, Tax Prep, and other advanced TierTap Pro features for the rest of this month.")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    L10nText("Need more AI power? Add token packs to extend usage beyond your TierTap Pro plan.")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 if let creditsProduct = subscriptionStore.creditsProduct {
                     TierTapPlusTokenStatBubbles(

@@ -893,6 +893,41 @@ final class SettingsStore: ObservableObject {
         max(0, effectiveProPlanIncludedTokensPerCalendarMonth - proPlanTokensConsumedThisMonth)
     }
 
+    /// True when the monthly Pro allowance and any TierTap+ pack balance are both depleted.
+    var isProAITokenBudgetExhausted: Bool {
+        proPlanIncludedTokensRemainingThisMonth == 0 && aiPurchasedTokenBalance == 0
+    }
+
+    /// Whether a signed-in TierTap Pro subscriber is blocked from token-backed AI and advanced features.
+    func isProTokenBackedAccessBlocked(hasProAccess: Bool) -> Bool {
+        guard hasProAccess else { return false }
+        if isSubscriptionOverrideActive { return false }
+        #if targetEnvironment(simulator)
+        return false
+        #else
+        return isProAITokenBudgetExhausted
+        #endif
+    }
+
+    /// Whether the user may invoke TierTap AI features (free daily quota or Pro monthly + pack budget).
+    func canInvokeTierTapAIFeatures(hasProAccess: Bool) -> Bool {
+        if isSubscriptionOverrideActive { return true }
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        if hasProAccess {
+            return !isProAITokenBudgetExhausted
+        }
+        return canUseAI()
+        #endif
+    }
+
+    /// Whether an AI feature attempt should present `TierTapPaywallView` before calling the model.
+    func requiresTierTapAIFeaturePaywall(isSignedIn: Bool, hasProAccess: Bool) -> Bool {
+        guard isSignedIn else { return true }
+        return !canInvokeTierTapAIFeatures(hasProAccess: hasProAccess)
+    }
+
     /// Remaining AI calls the user can make today on the free tier.
     var remainingAICallsToday: Int {
         max(0, maxAICallsPerDay - effectiveAICallsToday())
@@ -970,8 +1005,8 @@ final class SettingsStore: ObservableObject {
         } else {
             self.fastCheckInSavedPresets = [:]
         }
-        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "indigo"
-        self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "yellow"
+        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
+        self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
         self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)
         self.secondaryColorHex = UserDefaults.standard.string(forKey: keySecondaryColorHex)
         self.selectedLocationFilter = UserDefaults.standard.string(forKey: keySelectedLocationFilter)

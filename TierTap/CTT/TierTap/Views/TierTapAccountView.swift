@@ -111,12 +111,165 @@ struct LockDownTierTapSection: View {
     }
 }
 
+struct TierTapAccountSignInSection: View {
+    @EnvironmentObject var authStore: AuthStore
+    @Binding var emailInput: String
+    var compact: Bool = false
+    var showsBenefitsPitch: Bool = false
+    var onContinueWithoutAccount: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 12) {
+            if showsBenefitsPitch {
+                VStack(alignment: .leading, spacing: 6) {
+                    L10nText("Why create an account?")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        LocalizedLabel(title: "Advanced AI summaries and guidance for your sessions.", systemImage: "wand.and.stars")
+                        LocalizedLabel(title: "Sync your sessions and bankroll safely across devices.", systemImage: "icloud")
+                        LocalizedLabel(title: "See and publish Community sessions with other players.", systemImage: "person.3.sequence.fill")
+                        LocalizedLabel(title: "Back up your data so you never lose your history.", systemImage: "clock.arrow.circlepath")
+                    }
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.9))
+                    .labelStyle(.titleAndIcon)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color.black.opacity(0.35))
+                .cornerRadius(14)
+            }
+
+            Button {
+                authStore.signInWithApple()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "apple.logo")
+                    L10nText("Sign in with Apple")
+                }
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: compact ? 44 : 44)
+                .background(Color.black)
+                .cornerRadius(10)
+            }
+            .buttonStyle(.plain)
+            .disabled(authStore.isLoading)
+
+            Button {
+                authStore.signInWithGoogle()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "globe")
+                    L10nText("Sign in with Google")
+                }
+                .font(.subheadline.bold())
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: compact ? 44 : 44)
+                .background(Color.white)
+                .cornerRadius(10)
+            }
+            .buttonStyle(.plain)
+            .disabled(authStore.isLoading)
+
+            VStack(alignment: .leading, spacing: 6) {
+                L10nText("Email")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+
+                L10nText("We'll email a one-time sign-in link — no password.")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                TextField("you@example.com", text: $emailInput)
+                    .textContentType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.emailAddress)
+                    .font(.subheadline)
+                    .padding(10)
+                    .background(Color.white.opacity(0.15))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+
+                if let info = authStore.infoMessage {
+                    Text(info)
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .multilineTextAlignment(.leading)
+                }
+
+                if let msg = authStore.errorMessage {
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.leading)
+                }
+
+                Button {
+                    let trimmedEmail = emailInput.trimmingCharacters(in: .whitespacesAndNewlines)
+                    Task { await authStore.signInWithOTP(email: trimmedEmail) }
+                } label: {
+                    if authStore.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Text(authStore.otpSent ? "Magic link sent" : "Send magic link")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(
+                    authStore.isLoading ||
+                    emailInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                )
+
+                if authStore.otpSent {
+                    L10nText("Open the link in the email on this device to finish signing in. You can leave this screen open or close it.")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(4)
+                        .minimumScaleFactor(0.85)
+                }
+            }
+
+            if let onContinueWithoutAccount {
+                Button(action: onContinueWithoutAccount) {
+                    L10nText("Continue without an account")
+                        .font(.caption.bold())
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
+                        .background(Color.white.opacity(0.1))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+
+                L10nText("You can continue using TierTap without signing in. For advanced AI features and Community sessions, you’ll need to create and log in to your account.")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.85))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(4)
+                    .minimumScaleFactor(0.88)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
 struct TierTapAccountView: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
 
     @State private var isConfirmingSignOut = false
+    @State private var signInEmailInput = ""
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -197,9 +350,13 @@ struct TierTapAccountView: View {
                 }
                 .padding(.vertical, 4)
             } else {
-                L10nText("You're not signed in. Open the **Community** tab to sign in with Apple, Google, or a magic link email.")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 12) {
+                    L10nText("You're not signed in. Sign in with Apple, Google, or a magic link email.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+
+                    TierTapAccountSignInSection(emailInput: $signInEmailInput)
+                }
             }
         }
         .padding()

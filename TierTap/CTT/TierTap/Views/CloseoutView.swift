@@ -515,10 +515,13 @@ struct CloseoutView: View {
                     HStack {
                         Spacer()
                         Button {
-                            if hasProAccess && authStore.isSignedIn {
-                                startChipEstimatorFlow()
-                            } else {
+                            if settingsStore.requiresTierTapAIFeaturePaywall(
+                                isSignedIn: authStore.isSignedIn,
+                                hasProAccess: hasProAccess
+                            ) {
                                 showSubscriptionPaywall = true
+                            } else {
+                                startChipEstimatorFlow()
                             }
                         } label: {
                             LocalizedLabel(title: "Chip Estimator", systemImage: "camera.viewfinder")
@@ -743,6 +746,13 @@ struct CloseoutView: View {
             chipEstimatorError = "AI is not configured for this build."
             return
         }
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+        ) {
+            showSubscriptionPaywall = true
+            return
+        }
         showChipEstimatorSheet = true
     }
 
@@ -826,13 +836,17 @@ struct ChipEstimatorSheetView: View {
     }
 
     @State private var chipPhotoSource: ChipPhotoSource?
+    @State private var showSubscriptionPaywall = false
 
-    private var canEstimate: Bool {
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var estimatePrerequisitesMet: Bool {
         selectedImage != nil &&
         !isEstimating &&
         SupabaseConfig.isConfigured &&
-        authStore.isSignedIn &&
-        (subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive || settingsStore.canUseAI())
+        authStore.isSignedIn
     }
 
     var body: some View {
@@ -918,6 +932,14 @@ struct ChipEstimatorSheetView: View {
 
                             Button {
                                 guard estimateTask == nil else { return }
+                                guard estimatePrerequisitesMet else { return }
+                                if settingsStore.requiresTierTapAIFeaturePaywall(
+                                    isSignedIn: authStore.isSignedIn,
+                                    hasProAccess: hasProAccess
+                                ) {
+                                    showSubscriptionPaywall = true
+                                    return
+                                }
                                 estimateTask = Task {
                                     await estimateAmount()
                                     await MainActor.run {
@@ -937,11 +959,11 @@ struct ChipEstimatorSheetView: View {
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
-                                .background(canEstimate ? Color.green : Color.gray)
-                                .foregroundColor(canEstimate ? .black : .white)
+                                .background(estimatePrerequisitesMet ? Color.green : Color.gray)
+                                .foregroundColor(estimatePrerequisitesMet ? .black : .white)
                                 .cornerRadius(16)
                             }
-                            .disabled(!canEstimate)
+                            .disabled(!estimatePrerequisitesMet || isEstimating)
 
                             if let estimatedAmount {
                                 VStack(spacing: 8) {
@@ -1045,6 +1067,12 @@ struct ChipEstimatorSheetView: View {
                     #endif
                 }
             }
+            .adaptiveSheet(isPresented: $showSubscriptionPaywall) {
+                TierTapPaywallView()
+                    .environmentObject(subscriptionStore)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+            }
         }
     }
 
@@ -1077,8 +1105,11 @@ struct ChipEstimatorSheetView: View {
             errorMessage = "Chip Estimator is only available to signed-in users."
             return
         }
-        if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive && !settingsStore.canUseAI() {
-            errorMessage = "You've reached today's free AI limit. Try again tomorrow."
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            showSubscriptionPaywall = true
             return
         }
 
