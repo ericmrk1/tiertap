@@ -365,6 +365,7 @@ final class SessionSyncManager: NSObject, ObservableObject {
             "startingTierPoints": session.startingTierPoints,
             "totalBuyIn": session.totalBuyIn,
             "totalComp": session.totalComp,
+            "totalFreePlay": session.totalFreePlay,
             "isLive": session.isLive
         ]
         if let end = session.endTime {
@@ -390,10 +391,14 @@ final class SessionSyncManager: NSObject, ObservableObject {
         let endTime = (summary["endTime"] as? TimeInterval).map { Date(timeIntervalSince1970: $0) }
         let totalBuyIn = max(0, summary["totalBuyIn"] as? Int ?? 0)
         let totalComp = max(0, summary["totalComp"] as? Int ?? 0)
+        let totalFreePlay = max(0, summary["totalFreePlay"] as? Int ?? 0)
         let isLive = summary["isLive"] as? Bool ?? (endTime == nil)
         let liveStack = summary["liveTrackedStackAmount"] as? Int
         let buyIns: [BuyInEvent] = totalBuyIn > 0 ? [BuyInEvent(amount: totalBuyIn, timestamp: startTime)] : []
         let comps: [CompEvent] = totalComp > 0 ? [CompEvent(amount: totalComp, timestamp: startTime)] : []
+        let freePlay: [FreePlayEvent] = totalFreePlay > 0
+            ? [FreePlayEvent(amount: totalFreePlay, timestamp: startTime, playType: "Free play")]
+            : []
         return Session(
             id: id,
             game: game,
@@ -402,6 +407,7 @@ final class SessionSyncManager: NSObject, ObservableObject {
             endTime: endTime,
             startingTierPoints: startingTier,
             buyInEvents: buyIns,
+            freePlayEvents: freePlay,
             compEvents: comps,
             liveTrackedStackAmount: liveStack,
             isLive: isLive

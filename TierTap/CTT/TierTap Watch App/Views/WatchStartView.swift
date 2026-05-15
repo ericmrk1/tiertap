@@ -3,16 +3,11 @@ import SwiftUI
 /// Watch app is a remote only. Shown when no session is in progress on iPhone.
 struct WatchStartView: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
 
     var body: some View {
         VStack(spacing: 12) {
-            Image("TierTap_C_PokerChip")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 48, height: 48)
-
-            L10nText("TierTap")
-                .font(.headline)
+            WatchTierTapLogo(style: .idle)
 
             L10nText("No session in progress")
                 .font(.caption2)
@@ -25,6 +20,7 @@ struct WatchStartView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .watchThemedScreen()
         .localizedNavigationTitle("Remote")
     }
 }

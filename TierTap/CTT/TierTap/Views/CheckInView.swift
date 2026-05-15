@@ -21,6 +21,9 @@ struct CheckInView: View {
     @State private var isCasinoPublic = true
     @State private var startingTier = "0"
     @State private var initialBuyIn = ""
+    @State private var initialFreePlay = ""
+    @State private var initialFreePlayType = ""
+    @State private var showFreePlayPicker = false
     @State private var selectedRewardsProgram = ""
     @State private var linkedRewardWalletCardId: UUID?
     @State private var showGamePicker = false
@@ -114,9 +117,22 @@ struct CheckInView: View {
         return selectedGame.isEmpty || list.contains(selectedGame)
     }
 
+    private var parsedInitialBuyIn: Int {
+        max(0, Int(initialBuyIn.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
+    }
+
+    private var parsedInitialFreePlay: Int {
+        max(0, Int(initialFreePlay.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
+    }
+
+    /// Cash buy-in and/or free play must be greater than zero to start.
+    private var hasSessionFunding: Bool {
+        parsedInitialBuyIn > 0 || parsedInitialFreePlay > 0
+    }
+
     var isValid: Bool {
         let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
-        return hasGame && !casino.isEmpty && (Int(initialBuyIn) ?? 0) > 0
+        return hasGame && !casino.isEmpty && hasSessionFunding
     }
 
     /// True when tier field is empty, non-numeric, or zero or negative — session may still start after confirmation.
@@ -603,14 +619,14 @@ struct CheckInView: View {
 
                             // Right: typed value + number pad sheet
                             NumericEntryWithDialPad(
-                                placeholder: "Exact amount",
+                                placeholder: "0 or amount",
                                 text: $initialBuyIn,
                                 dialPadNavigationTitle: "Buy-In"
                             )
                             .environmentObject(settingsStore)
                             .frame(maxWidth: .infinity)
                         }
-                        if settingsStore.unitSize > 0, (Int(initialBuyIn) ?? 0) > settingsStore.unitSize {
+                        if settingsStore.unitSize > 0, parsedInitialBuyIn > settingsStore.unitSize {
                             HStack(spacing: 8) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .foregroundColor(.orange)
@@ -622,6 +638,40 @@ struct CheckInView: View {
                             .background(Color.orange.opacity(0.15))
                             .cornerRadius(8)
                         }
+                    }
+                    .padding()
+                    .background(Color(.systemGray6).opacity(0.15))
+                    .cornerRadius(16)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        LocalizedLabel(title: "Free Play", systemImage: "ticket.fill")
+                            .font(.headline).foregroundColor(.white)
+                        Text("Optional. Not counted in win/loss, session ROI, or tax.")
+                            .font(.caption).foregroundColor(.gray)
+                        HStack(alignment: .top, spacing: 12) {
+                            Button { showFreePlayPicker = true } label: {
+                                HStack {
+                                    Image(systemName: "square.grid.2x2.fill")
+                                    Text(initialFreePlay.isEmpty ? "Choose amount" : "\(settingsStore.currencySymbol)\(initialFreePlay)")
+                                        .lineLimit(1)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6).opacity(0.25))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                            }
+                            .frame(maxWidth: .infinity)
+                            NumericEntryWithDialPad(
+                                placeholder: "0",
+                                text: $initialFreePlay,
+                                dialPadNavigationTitle: "Free Play"
+                            )
+                            .environmentObject(settingsStore)
+                            .frame(maxWidth: .infinity)
+                        }
+                        TextField("Type (e.g. match play)", text: $initialFreePlayType)
+                            .textFieldStyle(DarkTextFieldStyle())
                     }
                     .padding()
                     .background(Color(.systemGray6).opacity(0.15))
@@ -684,6 +734,12 @@ struct CheckInView: View {
             }
             .adaptiveSheet(isPresented: $showBuyInPicker) {
                 BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $initialBuyIn)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.fraction(0.7), .large])
+                    .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(isPresented: $showFreePlayPicker) {
+                BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $initialFreePlay, mode: .freePlay)
                     .environmentObject(settingsStore)
                     .presentationDetents([.fraction(0.7), .large])
                     .presentationDragIndicator(.visible)
@@ -931,8 +987,8 @@ struct CheckInView: View {
                 pokerHasFreezeOut: pokerHasFreezeOut
             )
         }
-        guard isValid else { return }
-        guard let buy = Int(initialBuyIn), buy > 0 else { return }
+        guard isValid, hasSessionFunding else { return }
+        let buy = parsedInitialBuyIn
         let trimmedTier = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
         let tier = trimmedTier.isEmpty ? 0 : (Int(trimmedTier) ?? 0)
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1019,12 +1075,19 @@ struct CheckInView: View {
             return
         }
 
-        guard let buy = Int(initialBuyIn), buy > 0 else { return }
+        guard hasSessionFunding else { return }
+        let buy = parsedInitialBuyIn
         let trimmedTier = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
         let tier = trimmedTier.isEmpty ? 0 : (Int(trimmedTier) ?? 0)
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fpAmount = parsedInitialFreePlay
+        let fpType = initialFreePlayType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let initialFP: [FreePlayEvent] = fpAmount > 0
+            ? [FreePlayEvent(amount: fpAmount, timestamp: Date(), playType: fpType.isEmpty ? "Free play" : fpType)]
+            : []
         store.startSession(
             game: selectedGame, casino: casino, startingTier: tier, initialBuyIn: buy,
+            initialFreePlayEvents: initialFP,
             rewardsProgramName: program.isEmpty ? nil : program,
             casinoLatitude: casinoLatitude,
             casinoLongitude: casinoLongitude,

@@ -76,6 +76,7 @@ struct SettingsView: View {
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .onAppear {
+                settingsStore.reloadThemeFromSharedStorage()
                 bankrollText = settingsStore.bankroll > 0 ? "\(settingsStore.bankroll)" : ""
                 unitSizeText = settingsStore.unitSize > 0 ? "\(settingsStore.unitSize)" : ""
                 if let t = settingsStore.targetAveragePerSession {

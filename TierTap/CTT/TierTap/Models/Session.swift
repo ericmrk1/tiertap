@@ -53,6 +53,89 @@ struct BuyInEvent: Identifiable, Codable, Hashable {
     var timestamp: Date
 }
 
+/// Promotional or match-play value received during a session (logged like buy-in; excluded from cash win/loss, ROI, and tax).
+struct FreePlayEvent: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var amount: Int
+    var timestamp: Date
+    /// User-defined label (e.g. match play, promo credit).
+    var playType: String
+
+    init(id: UUID = UUID(), amount: Int, timestamp: Date, playType: String) {
+        self.id = id
+        self.amount = amount
+        self.timestamp = timestamp
+        self.playType = playType
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, amount, timestamp, playType
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        amount = try c.decode(Int.self, forKey: .amount)
+        timestamp = try c.decode(Date.self, forKey: .timestamp)
+        playType = try c.decodeIfPresent(String.self, forKey: .playType) ?? ""
+    }
+}
+
+extension FreePlayEvent {
+    var playTypeDisplayLabel: String {
+        let t = playType.trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? "Free play" : t
+    }
+}
+
+/// User- and system-assigned context labels for a session photo (chip, comp receipt, or attachment).
+enum SessionPhotoContextTag: String, Codable, CaseIterable, Hashable {
+    case session
+    case chips
+    case comps
+    case drinks
+    case friends
+    case environment
+    case w2g
+    case taxForm
+    case food
+    case receipt
+    case table
+
+    var label: String {
+        switch self {
+        case .session: return "Session"
+        case .chips: return "Chips"
+        case .comps: return "Comps"
+        case .drinks: return "Drinks"
+        case .friends: return "Friends"
+        case .environment: return "Environment"
+        case .w2g: return "W2G"
+        case .taxForm: return "Tax Form"
+        case .food: return "Food"
+        case .receipt: return "Receipt"
+        case .table: return "Table"
+        }
+    }
+
+    /// Tags offered in the manual multi-select picker.
+    static let pickerCases: [SessionPhotoContextTag] = [
+        .session, .chips, .comps, .drinks, .friends, .environment, .w2g, .taxForm, .food, .receipt, .table
+    ]
+
+    private var sortIndex: Int {
+        Self.pickerCases.firstIndex(of: self) ?? Int.max
+    }
+
+    static func sorted(_ tags: some Sequence<SessionPhotoContextTag>) -> [SessionPhotoContextTag] {
+        Array(Set(tags)).sorted { $0.sortIndex < $1.sortIndex }
+    }
+
+    static func merged(auto autoTags: Set<SessionPhotoContextTag>, user userTags: Set<SessionPhotoContextTag>) -> [SessionPhotoContextTag] {
+        sorted(autoTags.union(userTags))
+    }
+}
+
 /// Manual checkpoint of the current chip stack while a session is live.
 struct StackUpdateEvent: Identifiable, Codable, Hashable {
     var id = UUID()
@@ -247,6 +330,8 @@ struct Session: Identifiable, Codable, Equatable {
     var startingTierPoints: Int
     var endingTierPoints: Int?
     var buyInEvents: [BuyInEvent] = []
+    /// Promotional value; excluded from cash win/loss, session ROI, and tax exports.
+    var freePlayEvents: [FreePlayEvent] = []
     var compEvents: [CompEvent] = []
     /// While live: last chip stack total counted at the table (currency units). Used with buy-ins for in-session P&L; cleared when the session is no longer live.
     var liveTrackedStackAmount: Int?
@@ -272,6 +357,10 @@ struct Session: Identifiable, Codable, Equatable {
     var sessionAttachedPhotoIDs: [UUID] = []
     /// Primary session photo across chip/table, comp receipts, and attachments.
     var primarySessionPhotoRefKey: String?
+    /// Context tags per photo ref key (`SessionPhotoRef.storageKey`).
+    var sessionPhotoContextTagsByRefKey: [String: [SessionPhotoContextTag]] = [:]
+    /// User-written context labels per photo ref key.
+    var sessionPhotoCustomContextByRefKey: [String: [String]] = [:]
 
     /// Optional structured metadata describing the type of game.
     /// Older sessions may have these unset; fall back to `game` string if needed.
@@ -309,9 +398,9 @@ struct Session: Identifiable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case id, game, casino, casinoLatitude, casinoLongitude, startTime, endTime, startingTierPoints, endingTierPoints
-        case buyInEvents, compEvents, liveTrackedStackAmount, stackUpdateEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
+        case buyInEvents, freePlayEvents, compEvents, liveTrackedStackAmount, stackUpdateEvents, cashOut, avgBetActual, avgBetRated, isLive, status, sessionMood, privateNotes, rewardsProgramName, linkedRewardWalletCardId, tierPointsVerification
         case chipEstimatorImageFilename
-        case sessionAttachedPhotoIDs, primarySessionPhotoRefKey
+        case sessionAttachedPhotoIDs, primarySessionPhotoRefKey, sessionPhotoContextTagsByRefKey, sessionPhotoCustomContextByRefKey
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
         case slotFormat, slotFormatOther, slotFeature, slotFeatureOther, slotNotes
@@ -329,6 +418,7 @@ struct Session: Identifiable, Codable, Equatable {
         startingTierPoints = try c.decode(Int.self, forKey: .startingTierPoints)
         endingTierPoints = try c.decodeIfPresent(Int.self, forKey: .endingTierPoints)
         buyInEvents = try c.decodeIfPresent([BuyInEvent].self, forKey: .buyInEvents) ?? []
+        freePlayEvents = try c.decodeIfPresent([FreePlayEvent].self, forKey: .freePlayEvents) ?? []
         compEvents = try c.decodeIfPresent([CompEvent].self, forKey: .compEvents) ?? []
         liveTrackedStackAmount = try c.decodeIfPresent(Int.self, forKey: .liveTrackedStackAmount)
         stackUpdateEvents = try c.decodeIfPresent([StackUpdateEvent].self, forKey: .stackUpdateEvents) ?? []
@@ -345,6 +435,8 @@ struct Session: Identifiable, Codable, Equatable {
         chipEstimatorImageFilename = try c.decodeIfPresent(String.self, forKey: .chipEstimatorImageFilename)
         sessionAttachedPhotoIDs = try c.decodeIfPresent([UUID].self, forKey: .sessionAttachedPhotoIDs) ?? []
         primarySessionPhotoRefKey = try c.decodeIfPresent(String.self, forKey: .primarySessionPhotoRefKey)
+        sessionPhotoContextTagsByRefKey = try c.decodeIfPresent([String: [SessionPhotoContextTag]].self, forKey: .sessionPhotoContextTagsByRefKey) ?? [:]
+        sessionPhotoCustomContextByRefKey = try c.decodeIfPresent([String: [String]].self, forKey: .sessionPhotoCustomContextByRefKey) ?? [:]
         gameCategory = try c.decodeIfPresent(SessionGameCategory.self, forKey: .gameCategory)
         pokerGameKind = try c.decodeIfPresent(SessionPokerGameKind.self, forKey: .pokerGameKind)
         pokerAllowsRebuy = try c.decodeIfPresent(Bool.self, forKey: .pokerAllowsRebuy)
@@ -366,6 +458,7 @@ struct Session: Identifiable, Codable, Equatable {
     init(id: UUID = UUID(), game: String, casino: String, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil,
          startTime: Date, endTime: Date? = nil,
          startingTierPoints: Int, endingTierPoints: Int? = nil, buyInEvents: [BuyInEvent] = [],
+         freePlayEvents: [FreePlayEvent] = [],
          compEvents: [CompEvent] = [],
          liveTrackedStackAmount: Int? = nil,
          stackUpdateEvents: [StackUpdateEvent] = [],
@@ -377,6 +470,8 @@ struct Session: Identifiable, Codable, Equatable {
          chipEstimatorImageFilename: String? = nil,
          sessionAttachedPhotoIDs: [UUID] = [],
          primarySessionPhotoRefKey: String? = nil,
+         sessionPhotoContextTagsByRefKey: [String: [SessionPhotoContextTag]] = [:],
+         sessionPhotoCustomContextByRefKey: [String: [String]] = [:],
          gameCategory: SessionGameCategory? = nil,
          pokerGameKind: SessionPokerGameKind? = nil,
          pokerAllowsRebuy: Bool? = nil,
@@ -403,6 +498,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.startingTierPoints = startingTierPoints
         self.endingTierPoints = endingTierPoints
         self.buyInEvents = buyInEvents
+        self.freePlayEvents = freePlayEvents
         self.compEvents = compEvents
         self.liveTrackedStackAmount = liveTrackedStackAmount
         self.stackUpdateEvents = stackUpdateEvents
@@ -419,6 +515,8 @@ struct Session: Identifiable, Codable, Equatable {
         self.chipEstimatorImageFilename = chipEstimatorImageFilename
         self.sessionAttachedPhotoIDs = sessionAttachedPhotoIDs
         self.primarySessionPhotoRefKey = primarySessionPhotoRefKey
+        self.sessionPhotoContextTagsByRefKey = sessionPhotoContextTagsByRefKey
+        self.sessionPhotoCustomContextByRefKey = sessionPhotoCustomContextByRefKey
         self.gameCategory = gameCategory
         self.pokerGameKind = pokerGameKind
         self.pokerAllowsRebuy = pokerAllowsRebuy
@@ -449,6 +547,7 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encode(startingTierPoints, forKey: .startingTierPoints)
         try c.encodeIfPresent(endingTierPoints, forKey: .endingTierPoints)
         try c.encode(buyInEvents, forKey: .buyInEvents)
+        try c.encode(freePlayEvents, forKey: .freePlayEvents)
         try c.encode(compEvents, forKey: .compEvents)
         try c.encodeIfPresent(liveTrackedStackAmount, forKey: .liveTrackedStackAmount)
         try c.encode(stackUpdateEvents, forKey: .stackUpdateEvents)
@@ -465,6 +564,12 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(chipEstimatorImageFilename, forKey: .chipEstimatorImageFilename)
         try c.encode(sessionAttachedPhotoIDs, forKey: .sessionAttachedPhotoIDs)
         try c.encodeIfPresent(primarySessionPhotoRefKey, forKey: .primarySessionPhotoRefKey)
+        if !sessionPhotoContextTagsByRefKey.isEmpty {
+            try c.encode(sessionPhotoContextTagsByRefKey, forKey: .sessionPhotoContextTagsByRefKey)
+        }
+        if !sessionPhotoCustomContextByRefKey.isEmpty {
+            try c.encode(sessionPhotoCustomContextByRefKey, forKey: .sessionPhotoCustomContextByRefKey)
+        }
         try c.encodeIfPresent(gameCategory, forKey: .gameCategory)
         try c.encodeIfPresent(pokerGameKind, forKey: .pokerGameKind)
         try c.encodeIfPresent(pokerAllowsRebuy, forKey: .pokerAllowsRebuy)
@@ -483,7 +588,13 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(slotNotes, forKey: .slotNotes)
     }
 
+    /// Sum of cash buy-ins only (excludes free play).
     var totalBuyIn: Int { buyInEvents.reduce(0) { $0 + $1.amount } }
+
+    var totalFreePlay: Int { freePlayEvents.reduce(0) { $0 + $1.amount } }
+
+    /// Chip stack starting baseline while live: cash buy-in plus logged free play.
+    var totalStackBaseline: Int { totalBuyIn + totalFreePlay }
 
     var totalComp: Int { compEvents.reduce(0) { $0 + $1.amount } }
 
@@ -517,19 +628,19 @@ struct Session: Identifiable, Codable, Equatable {
         return Double(wl) / hoursPlayed
     }
 
-    /// Single value to show as “current stack” while live: the explicit tracked field, else the newest stack checkpoint, else total buy-in.
+    /// Single value to show as “current stack” while live: the explicit tracked field, else the newest stack checkpoint, else buy-in + free play.
     var resolvedLiveStackAmount: Int {
         if let stack = liveTrackedStackAmount { return stack }
         if let latest = stackUpdateEvents.max(by: { $0.timestamp < $1.timestamp }) {
             return latest.amount
         }
-        return totalBuyIn
+        return totalStackBaseline
     }
 
-    /// While live: net result implied by the last stack count vs total buy-in. Nil until stack is updated at least once.
+    /// While live: table result implied by stack vs buy-in + free play. Nil until stack is tracked. Cash win/loss at close-out stays buy-in only.
     var liveSessionRunningWinLoss: Int? {
         guard isLive, let stack = liveTrackedStackAmount else { return nil }
-        return stack - totalBuyIn
+        return stack - totalStackBaseline
     }
 
     /// In-session win (or loss) rate per hour from stack tracking. Nil until stack is set and play time is positive.
@@ -561,9 +672,22 @@ struct Session: Identifiable, Codable, Equatable {
     }
 
     /// Result used for analytics win/loss and rates: cash **net** (default) or **EV** (net + logged comps).
+    /// Free play is never included in win/loss or EV.
     func analyticsOutcome(useExpectedValue: Bool) -> Int? {
         guard winLoss != nil else { return nil }
         return useExpectedValue ? expectedValue : winLoss
+    }
+
+    /// Session cash ROI % (win/loss vs initial cash buy-in). Free play excluded.
+    var sessionCashROIPercent: Double? {
+        guard let wl = winLoss, let initial = initialBuyIn, initial > 0 else { return nil }
+        return (Double(wl) / Double(initial)) * 100.0
+    }
+
+    /// Analytics-only: cash net plus logged free play, divided by total cash buy-in.
+    var valueAdjustedROIPercent: Double? {
+        guard let wl = winLoss, totalBuyIn > 0 else { return nil }
+        return (Double(wl + totalFreePlay) / Double(totalBuyIn)) * 100.0
     }
 
     /// Display label for slot format including "Other" detail when present.

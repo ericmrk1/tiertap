@@ -696,6 +696,87 @@ extension View {
     }
 }
 
+// MARK: - Free Play Analytics
+
+/// Summarizes logged free play and value-adjusted ROI (analytics only; excluded from win/loss).
+struct FreePlaySummaryCard: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    let currencySymbol: String
+    let dateRangeText: String?
+
+    private var closedWithWL: [Session] {
+        sessions.filter { $0.winLoss != nil }
+    }
+
+    private var totalFreePlay: Int {
+        closedWithWL.map(\.totalFreePlay).reduce(0, +)
+    }
+
+    private var totalCashBuyIn: Int {
+        closedWithWL.map(\.totalBuyIn).reduce(0, +)
+    }
+
+    private var totalCashNet: Int {
+        closedWithWL.compactMap(\.winLoss).reduce(0, +)
+    }
+
+    private var cashROIPercent: Double? {
+        let initialSum = closedWithWL.compactMap(\.initialBuyIn).reduce(0, +)
+        guard initialSum > 0 else { return nil }
+        return (Double(totalCashNet) / Double(initialSum)) * 100.0
+    }
+
+    private var valueAdjustedROIPercent: Double? {
+        guard totalCashBuyIn > 0 else { return nil }
+        return (Double(totalCashNet + totalFreePlay) / Double(totalCashBuyIn)) * 100.0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                L10nText("Free Play")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+                if let range = dateRangeText {
+                    Text(range)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            }
+            Text("Excluded from win/loss, session ROI, and tax. Value-adjusted ROI is for analytics only.")
+                .font(.caption2)
+                .foregroundColor(.gray)
+
+            HStack(spacing: 12) {
+                MetricPill(
+                    title: "Total free play",
+                    value: "\(currencySymbol)\(totalFreePlay.formatted(.number.grouping(.automatic)))",
+                    color: totalFreePlay > 0 ? .green : .gray
+                )
+                if let roi = cashROIPercent {
+                    MetricPill(
+                        title: "Cash ROI",
+                        value: String(format: "%.1f%%", roi),
+                        color: roi >= 0 ? .green : .red
+                    )
+                }
+                if let adj = valueAdjustedROIPercent, totalFreePlay > 0 {
+                    MetricPill(
+                        title: "Value ROI",
+                        value: String(format: "%.1f%%", adj),
+                        color: adj >= 0 ? .green : .red
+                    )
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
 // MARK: - Poker Analytics Shared Components
 
 /// Poker-focused summary metrics card (win rate, hourly, ROI).
@@ -739,6 +820,10 @@ struct PokerPerformanceSummaryCard: View {
         guard totalInitial > 0 else { return nil }
         let net = closedWithWL.map { outcome($0) }.reduce(0, +)
         return (Double(net) / Double(totalInitial)) * 100.0
+    }
+
+    private var totalFreePlayLogged: Int {
+        closedWithWL.map(\.totalFreePlay).reduce(0, +)
     }
 
     private var winRate: Double? {
@@ -793,6 +878,11 @@ struct PokerPerformanceSummaryCard: View {
 
             if let wr = winRate {
                 Text("Win rate: \(String(format: "%.0f%%", wr * 100)) over \(closedWithWL.count) sessions")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if totalFreePlayLogged > 0 {
+                Text("Free play logged: \(currencySymbol)\(totalFreePlayLogged.formatted(.number.grouping(.automatic))) (not in net or ROI above)")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -1249,6 +1339,7 @@ private struct TierPointsQuickPickSheet: View {
 /// Shared multi-select chip grid for buy-in and dollars/credits comp entry.
 enum BuyInGridSheetMode: Equatable {
     case initialBuyIn
+    case freePlay
     case compAmount
     case stackAmount
 }
@@ -1268,6 +1359,7 @@ struct BuyInGridSheet: View {
     private var navigationTitle: String {
         switch mode {
         case .initialBuyIn: return "Initial Buy-In"
+        case .freePlay: return "Free Play"
         case .compAmount: return "Comp amount"
         case .stackAmount: return "Stack"
         }
@@ -1280,6 +1372,10 @@ struct BuyInGridSheet: View {
             return totalSelected > 0
                 ? "Total buy-in: \(sym)\(totalSelected)"
                 : "Select one or more amounts."
+        case .freePlay:
+            return totalSelected > 0
+                ? "Free play: \(sym)\(totalSelected)"
+                : "Select one or more amounts (optional)."
         case .compAmount:
             return totalSelected > 0
                 ? "Comp amount: \(sym)\(totalSelected)"
@@ -1298,6 +1394,10 @@ struct BuyInGridSheet: View {
             return totalSelected > 0
                 ? "Good Luck - Buying in for \(sym)\(totalSelected)"
                 : "Good Luck"
+        case .freePlay:
+            return totalSelected > 0
+                ? "Use \(sym)\(totalSelected)"
+                : "Set amount"
         case .compAmount:
             return totalSelected > 0
                 ? "Use \(sym)\(totalSelected)"
@@ -1416,6 +1516,8 @@ struct BuyInGridSheet: View {
 struct BuyInQuickAddSheet: View {
     let quickBuyIns: [Int]
     let onAdd: (Int) -> Void
+    /// When set, shows a secondary action to log free play from this sheet.
+    var onAddFreePlay: (() -> Void)? = nil
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) var dismiss
     @State private var customAmount = ""
@@ -1518,6 +1620,20 @@ struct BuyInQuickAddSheet: View {
                             .font(.subheadline)
                             .foregroundColor(.red)
                             .padding(.top, 4)
+
+                            if let onAddFreePlay {
+                                Button {
+                                    dismiss()
+                                    onAddFreePlay()
+                                } label: {
+                                    LocalizedLabel(title: "Add Free Play instead", systemImage: "ticket.fill")
+                                        .font(.subheadline.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .foregroundColor(.green)
+                                }
+                                .padding(.top, 4)
+                            }
                         }
                     }
                 }
@@ -1541,15 +1657,282 @@ struct BuyInQuickAddSheet: View {
     }
 }
 
+// MARK: - Free Play Sheet
+
+struct FreePlayQuickAddSheet: View {
+    let existingSessionFreePlayTotal: Int
+    let onAdd: (Int, String, Data?, Set<SessionPhotoContextTag>, [String]) -> Void
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+    @State private var amountText = ""
+    @State private var playTypeText = ""
+    @State private var showAmountGrid = false
+    @State private var freePlayPhoto: UIImage?
+
+    private enum FreePlayPhotoSource: Identifiable {
+        case camera
+        case photoLibrary
+        var id: Int { hashValue }
+    }
+
+    @State private var freePlayPhotoSource: FreePlayPhotoSource?
+    @State private var showFreePlayPhotoOptions = false
+    @State private var freePlayPhotoContextTags: Set<SessionPhotoContextTag> = []
+    @State private var freePlayPhotoCustomContextLabels: [String] = []
+
+    private var parsedAmount: Int {
+        max(0, Int(amountText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
+    }
+
+    private var canSubmit: Bool { parsedAmount > 0 }
+
+    private var totalAfterAdd: Int { existingSessionFreePlayTotal + parsedAmount }
+
+    var body: some View {
+        NavigationStack {
+            ZStack(alignment: .bottomTrailing) {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        VStack(spacing: 8) {
+                            L10nText("Add Free Play")
+                                .font(.title2.bold())
+                                .foregroundColor(.white)
+                            Text("Not counted in win/loss, session ROI, or tax.")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                            Text("\(settingsStore.currencySymbol)\(parsedAmount.formatted(.number.grouping(.automatic)))")
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .foregroundColor(parsedAmount > 0 ? Color.green : Color.gray.opacity(0.85))
+                        }
+                        .padding(.top, 8)
+
+                        if let img = freePlayPhoto {
+                            Image(uiImage: img)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .cornerRadius(12)
+                                .overlay(alignment: .bottomTrailing) {
+                                    Button(role: .destructive) { freePlayPhoto = nil } label: {
+                                        Image(systemName: "trash.fill")
+                                            .font(.footnote.weight(.semibold))
+                                            .foregroundStyle(.white)
+                                            .padding(7)
+                                            .background(Circle().fill(Color.red.opacity(0.92)))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .offset(x: -4, y: -4)
+                                }
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            L10nText("Type of free play")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            TextField("e.g. match play, promo credit…", text: $playTypeText)
+                                .textFieldStyle(DarkTextFieldStyle())
+                        }
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            L10nText("Amount")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(.gray)
+                            HStack(alignment: .top, spacing: 12) {
+                                Button { showAmountGrid = true } label: {
+                                    HStack {
+                                        Image(systemName: "square.grid.2x2.fill")
+                                        Text(
+                                            parsedAmount > 0
+                                                ? "\(settingsStore.currencySymbol)\(parsedAmount)"
+                                                : "Chip grid"
+                                        )
+                                        .lineLimit(1)
+                                    }
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(12)
+                                }
+                                NumericEntryWithDialPad(
+                                    placeholder: "Exact amount",
+                                    text: $amountText,
+                                    dialPadNavigationTitle: "Free Play"
+                                )
+                                .environmentObject(settingsStore)
+                            }
+                        }
+
+                        VStack(spacing: 6) {
+                            if existingSessionFreePlayTotal > 0 {
+                                Text("Session free play: \(settingsStore.currencySymbol)\(existingSessionFreePlayTotal.formatted(.number.grouping(.automatic)))")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            Text(parsedAmount > 0
+                                 ? "After this entry: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))"
+                                 : "Set an amount to add free play.")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+
+                            Button {
+                                guard canSubmit else { return }
+                                let type = playTypeText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                onAdd(
+                                    parsedAmount,
+                                    type,
+                                    freePlayPhoto?.jpegData(compressionQuality: 0.9),
+                                    freePlayPhotoContextTags,
+                                    freePlayPhotoCustomContextLabels
+                                )
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
+                                dismiss()
+                            } label: {
+                                Text(canSubmit ? "Add \(settingsStore.currencySymbol)\(parsedAmount)" : "Add Free Play")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(canSubmit ? Color.green : Color.gray)
+                                    .foregroundColor(canSubmit ? .black : .white)
+                                    .cornerRadius(14)
+                            }
+                            .disabled(!canSubmit)
+
+                            Button("Clear") {
+                                amountText = ""
+                                playTypeText = ""
+                                freePlayPhoto = nil
+                                freePlayPhotoContextTags = []
+                                freePlayPhotoCustomContextLabels = []
+                            }
+                            .font(.subheadline)
+                            .foregroundColor(.red)
+                        }
+                    }
+                    .padding()
+                    .padding(.bottom, 72)
+                }
+
+                Button { showFreePlayPhotoOptions = true } label: {
+                    LocalizedLabel(title: "Add Photo", systemImage: "camera.viewfinder")
+                        .font(.subheadline.bold())
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(Color.black)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                        .shadow(radius: 5)
+                }
+                .padding(.trailing, 16)
+                .padding(.bottom, 16)
+            }
+            .localizedNavigationTitle("Free Play")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.foregroundColor(.green)
+                }
+            }
+            .sheet(isPresented: $showAmountGrid) {
+                BuyInGridSheet(
+                    amounts: settingsStore.buyInGridAmounts,
+                    selected: $amountText,
+                    mode: .freePlay
+                )
+                .environmentObject(settingsStore)
+                .presentationDetents([.fraction(0.7), .large])
+                .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(isPresented: $showFreePlayPhotoOptions) {
+                freePlayPhotoOptionsSheet
+            }
+            .adaptiveSheet(item: $freePlayPhotoSource) { source in
+                switch source {
+                case .camera:
+                    CameraPicker(selectedImage: .constant(nil)) { image in
+                        freePlayPhoto = image
+                        freePlayPhotoSource = nil
+                    }
+                case .photoLibrary:
+                    ImagePicker(selectedImage: .constant(nil)) { image in
+                        freePlayPhoto = image
+                        freePlayPhotoSource = nil
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var freePlayPhotoOptionsSheet: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Free play photo")
+                .font(.headline)
+                .foregroundColor(.white)
+            Text("Saved with your session photos.")
+                .font(.caption)
+                .foregroundColor(.gray)
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                Button {
+                    showFreePlayPhotoOptions = false
+                    freePlayPhotoSource = .camera
+                } label: {
+                    LocalizedLabel(title: "Take photo", systemImage: "camera")
+                        .font(.subheadline.bold())
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color(.systemGray6).opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+            }
+            Button {
+                showFreePlayPhotoOptions = false
+                freePlayPhotoSource = .photoLibrary
+            } label: {
+                LocalizedLabel(title: "Choose from library", systemImage: "photo")
+                    .font(.subheadline.bold())
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(Color(.systemGray6).opacity(0.3))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            SessionPhotoContextTagPicker(
+                selectedTags: $freePlayPhotoContextTags,
+                customLabels: $freePlayPhotoCustomContextLabels
+            )
+
+            Button("Cancel", role: .cancel) { showFreePlayPhotoOptions = false }
+                .font(.subheadline)
+                .frame(maxWidth: .infinity)
+        }
+        .padding(16)
+        .background(settingsStore.primaryGradient)
+        .presentationDetents([.fraction(0.55)])
+        .presentationDragIndicator(.visible)
+    }
+}
+
 /// Enter current chip stack while live; session win/loss vs buy-ins and $/hr update until close-out.
 struct UpdateStackSheet: View {
     let sessionID: UUID
     let game: String
     let casino: String
-    let totalBuyIn: Int
+    /// Cash buy-in plus free play — stack preview baseline.
+    let stackBaseline: Int
     let currentTrackedStack: Int?
     let hoursPlayed: Double
     let onUpdate: (Int) -> Void
+    var onAddFreePlay: (() -> Void)? = nil
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
@@ -1574,7 +1957,7 @@ struct UpdateStackSheet: View {
     }
 
     private var previewWinLoss: Int {
-        pendingStack - totalBuyIn
+        pendingStack - stackBaseline
     }
 
     private var previewRatePerHour: Double? {
@@ -1592,7 +1975,7 @@ struct UpdateStackSheet: View {
                         L10nText("Update Stack")
                             .font(.title2.bold())
                             .foregroundColor(.white)
-                        Text("Win/loss is stack minus total buy-in of \(settingsStore.currencySymbol)\(totalBuyIn.formatted(.number.grouping(.automatic))).")
+                        Text("Table result is stack minus buy-in and free play (\(settingsStore.currencySymbol)\(stackBaseline.formatted(.number.grouping(.automatic))) total). Cash win/loss at close-out uses buy-in only.")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
@@ -1702,6 +2085,20 @@ struct UpdateStackSheet: View {
                             .font(.subheadline)
                             .foregroundColor(.red)
                             .padding(.top, 4)
+
+                            if let onAddFreePlay {
+                                Button {
+                                    dismiss()
+                                    onAddFreePlay()
+                                } label: {
+                                    LocalizedLabel(title: "Add Free Play", systemImage: "ticket.fill")
+                                        .font(.subheadline.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .foregroundColor(.green)
+                                }
+                                .padding(.top, 4)
+                            }
                         }
                     }
                 }
@@ -1793,7 +2190,7 @@ struct UpdateStackSheet: View {
             }
         }
         .onAppear {
-            pendingStack = max(0, currentTrackedStack ?? totalBuyIn)
+            pendingStack = max(0, currentTrackedStack ?? stackBaseline)
         }
     }
 
@@ -1964,6 +2361,8 @@ private struct CompEstimateReviewSheet: View {
 struct CompQuickAddSheet: View {
     /// Sum of comp amounts already recorded for this session (running total before this entry).
     let existingSessionCompTotal: Int
+    /// Sum of free play already logged (for dollars/credits “free play comp” toggle).
+    var existingSessionFreePlayTotal: Int = 0
     /// Live session table game (for AI comp value estimation).
     var sessionGame: String = ""
     /// Live session casino / location name (for AI comp value estimation).
@@ -1971,7 +2370,8 @@ struct CompQuickAddSheet: View {
     /// WGS84 coordinates from check-in map pick, when available (for regional pricing context).
     var sessionCasinoLatitude: Double? = nil
     var sessionCasinoLongitude: Double? = nil
-    let onAdd: (CompKind, Int, String?, FoodBeverageKind?, String?, Data?) -> Void
+    /// Last parameter is true when dollars/credits should be stored as free play (not a comp).
+    let onAdd: (CompKind, Int, String?, FoodBeverageKind?, String?, Data?, Bool) -> Void
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @EnvironmentObject var authStore: AuthStore
@@ -1979,6 +2379,7 @@ struct CompQuickAddSheet: View {
     @State private var selectedKind: CompKind = .foodBeverage
     /// Dollars / credits comp value (same grid + exact field pattern as buy-in).
     @State private var dollarsCreditsText = ""
+    @State private var dollarsCreditsIsFreePlay = false
     @State private var showDollarsCreditsGrid = false
     @State private var foodValueText = ""
     @State private var foodBeverageKind: FoodBeverageKind = .meal
@@ -2035,7 +2436,10 @@ struct CompQuickAddSheet: View {
     }
 
     private var totalAfterAdd: Int {
-        existingSessionCompTotal + parsedValueForSubmit
+        if selectedKind == .dollarsCredits && dollarsCreditsIsFreePlay {
+            return existingSessionFreePlayTotal + parsedValueForSubmit
+        }
+        return existingSessionCompTotal + parsedValueForSubmit
     }
 
     @ViewBuilder
@@ -2059,8 +2463,10 @@ struct CompQuickAddSheet: View {
                     .foregroundColor(.primary)
             }
             Text(parsedValueForSubmit > 0
-                 ? "After this entry, session comps total: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))"
-                 : "Set a value to see the new session comps total.")
+                 ? (selectedKind == .dollarsCredits && dollarsCreditsIsFreePlay
+                    ? "After this entry, session free play total: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))"
+                    : "After this entry, session comps total: \(settingsStore.currencySymbol)\(totalAfterAdd.formatted(.number.grouping(.automatic)))")
+                 : "Set a value to see the new total.")
                 .font(.subheadline)
                 .foregroundColor(.primary)
                 .multilineTextAlignment(.center)
@@ -2079,13 +2485,18 @@ struct CompQuickAddSheet: View {
             if kind == .foodBeverage {
                 settingsStore.lastFoodBeverageCompKind = foodBeverageKind
             }
-            onAdd(kind, parsedValueForSubmit, note.isEmpty ? nil : note, fb, otherDesc, compPhoto?.jpegData(compressionQuality: 0.9))
+            let asFreePlay = (kind == .dollarsCredits && dollarsCreditsIsFreePlay)
+            onAdd(kind, parsedValueForSubmit, note.isEmpty ? nil : note, fb, otherDesc, compPhoto?.jpegData(compressionQuality: 0.9), asFreePlay)
             if settingsStore.enableCasinoFeedback {
                 CelebrationPlayer.shared.playQuickChime()
             }
             dismiss()
         } label: {
-            Text(canSubmit ? "Add \(settingsStore.currencySymbol)\(parsedValueForSubmit)" : "Add comp")
+            Text(canSubmit
+                 ? (selectedKind == .dollarsCredits && dollarsCreditsIsFreePlay
+                    ? "Add \(settingsStore.currencySymbol)\(parsedValueForSubmit) free play"
+                    : "Add \(settingsStore.currencySymbol)\(parsedValueForSubmit)")
+                 : (selectedKind == .dollarsCredits && dollarsCreditsIsFreePlay ? "Add free play" : "Add comp"))
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -2155,6 +2566,17 @@ struct CompQuickAddSheet: View {
 
                         if selectedKind == .dollarsCredits {
                             dollarsCreditsBuyInStyleSection
+                            Toggle(isOn: $dollarsCreditsIsFreePlay) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("This is free play")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor(.white)
+                                    Text("Stored with free play (not comps) so totals are not double-counted.")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                            .tint(.green)
                             VStack(alignment: .leading, spacing: 0) {
                                 VStack(alignment: .leading, spacing: 6) {
                                     L10nText("Details (optional)")
@@ -2227,6 +2649,7 @@ struct CompQuickAddSheet: View {
 
                         Button("Clear") {
                             dollarsCreditsText = ""
+                            dollarsCreditsIsFreePlay = false
                             foodValueText = ""
                             foodBeverageOtherText = ""
                             foodBeverageKind = settingsStore.lastFoodBeverageCompKind
@@ -2779,6 +3202,9 @@ struct CompQuickAddSheet: View {
         let isOn = selectedKind == kind
         return Button {
             selectedKind = kind
+            if kind != .dollarsCredits {
+                dollarsCreditsIsFreePlay = false
+            }
         } label: {
             VStack(spacing: 10) {
                 Image(systemName: kind.symbolName)

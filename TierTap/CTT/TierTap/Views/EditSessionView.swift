@@ -43,9 +43,12 @@ struct EditSessionView: View {
     @State private var compEvents: [CompEvent] = []
     @State private var showCompSheet = false
     @State private var compToEdit: CompEvent?
+    @State private var freePlayEvents: [FreePlayEvent] = []
+    @State private var showFreePlaySheet = false
     @State private var showSessionPhotos = false
 
     private var compTotal: Int { compEvents.reduce(0) { $0 + $1.amount } }
+    private var freePlayTotal: Int { freePlayEvents.reduce(0) { $0 + $1.amount } }
 
     private var photoSessionState: Session {
         store.sessions.first(where: { $0.id == session.id }) ?? session
@@ -215,6 +218,57 @@ struct EditSessionView: View {
 
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
+                                L10nText("Free Play").font(.headline).foregroundColor(.white)
+                                Spacer()
+                                Text("Total: \(settingsStore.currencySymbol)\(freePlayTotal)")
+                                    .font(.title3.bold()).foregroundColor(.white)
+                            }
+                            if freePlayEvents.isEmpty {
+                                L10nText("No free play logged.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            } else {
+                                ForEach(freePlayEvents) { ev in
+                                    HStack {
+                                        Image(systemName: "ticket.fill")
+                                            .foregroundColor(.green).font(.caption)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("\(settingsStore.currencySymbol)\(ev.amount)")
+                                                .foregroundColor(.white)
+                                            Text(ev.playTypeDisplayLabel)
+                                                .font(.caption2)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Text(ev.timestamp, style: .time)
+                                            .font(.caption).foregroundColor(.gray)
+                                        Button(role: .destructive) {
+                                            removeFreePlay(ev)
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.caption)
+                                        }
+                                    }
+                                }
+                            }
+                            Button {
+                                showFreePlaySheet = true
+                            } label: {
+                                LocalizedLabel(title: "Add Free Play", systemImage: "ticket.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(14)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6).opacity(0.15))
+                        .cornerRadius(16)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
                                 L10nText("Comps").font(.headline).foregroundColor(.white)
                                 Spacer()
                                 Text("Total: \(settingsStore.currencySymbol)\(compTotal)")
@@ -361,33 +415,58 @@ struct EditSessionView: View {
                     slotNotes = ""
                 }
             }
+            .adaptiveSheet(isPresented: $showFreePlaySheet) {
+                FreePlayQuickAddSheet(existingSessionFreePlayTotal: freePlayTotal) { amount, playType, photoJPEG, photoContextTags, photoCustomLabels in
+                    appendFreePlay(
+                        amount: amount,
+                        playType: playType,
+                        photoJPEG: photoJPEG,
+                        photoContextTags: photoContextTags,
+                        photoCustomLabels: photoCustomLabels
+                    )
+                }
+                .environmentObject(settingsStore)
+            }
             .adaptiveSheet(isPresented: $showCompSheet) {
                 CompQuickAddSheet(
                     existingSessionCompTotal: compTotal,
+                    existingSessionFreePlayTotal: freePlayTotal,
                     sessionGame: selectedGame,
                     sessionCasino: casino,
                     sessionCasinoLatitude: session.casinoLatitude,
                     sessionCasinoLongitude: session.casinoLongitude
-                ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
-                    appendComp(
-                        kind: kind,
-                        amount: amount,
-                        details: details,
-                        foodBeverageKind: foodKind,
-                        foodBeverageOtherDescription: otherDesc,
-                        photoJPEG: photoJPEG
-                    )
+                ) { kind, amount, details, foodKind, otherDesc, photoJPEG, asFreePlay in
+                    if kind == .dollarsCredits && asFreePlay {
+                        let note = details?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        appendFreePlay(
+                            amount: amount,
+                            playType: note.isEmpty ? "Free play" : note,
+                            photoJPEG: photoJPEG,
+                            photoContextTags: [],
+                            photoCustomLabels: []
+                        )
+                    } else {
+                        appendComp(
+                            kind: kind,
+                            amount: amount,
+                            details: details,
+                            foodBeverageKind: foodKind,
+                            foodBeverageOtherDescription: otherDesc,
+                            photoJPEG: photoJPEG
+                        )
+                    }
                 }
                 .environmentObject(settingsStore)
                 .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
             }
             .adaptiveSheet(item: $compToEdit) { ev in
-                EditCompEventSheet(original: ev) { updated in
+                EditCompEventSheet(sessionID: session.id, original: ev) { updated in
                     if let i = compEvents.firstIndex(where: { $0.id == updated.id }) {
                         compEvents[i] = updated
                     }
                 }
+                .environmentObject(store)
                 .environmentObject(settingsStore)
             }
             .adaptiveSheet(isPresented: $showGamePicker) {
@@ -434,6 +513,7 @@ struct EditSessionView: View {
         slotNotes = session.slotNotes ?? ""
 
         compEvents = session.compEvents
+        freePlayEvents = session.freePlayEvents
     }
 
     private func save() {
@@ -493,6 +573,7 @@ struct EditSessionView: View {
             startingTierPoints: st,
             endingTierPoints: et,
             buyInEvents: [ev],
+            freePlayEvents: freePlayEvents,
             compEvents: compEvents,
             cashOut: co,
             avgBetActual: Int(avgBetActual),
@@ -507,6 +588,8 @@ struct EditSessionView: View {
             chipEstimatorImageFilename: photoState.chipEstimatorImageFilename,
             sessionAttachedPhotoIDs: photoState.sessionAttachedPhotoIDs,
             primarySessionPhotoRefKey: photoState.primarySessionPhotoRefKey,
+            sessionPhotoContextTagsByRefKey: photoState.sessionPhotoContextTagsByRefKey,
+            sessionPhotoCustomContextByRefKey: photoState.sessionPhotoCustomContextByRefKey,
             gameCategory: gameCategory,
             pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,
             pokerAllowsRebuy: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsRebuy : nil,
@@ -524,6 +607,7 @@ struct EditSessionView: View {
             slotFeatureOther: slotMeta.featureOther,
             slotNotes: slotMeta.notes
         )
+        updated.pruneOrphanPhotoContextTags()
         store.updateSession(updated)
         dismiss()
     }
@@ -570,8 +654,35 @@ struct EditSessionView: View {
         }
         #if os(iOS)
         CompPhotoStorage.deleteImage(compEventID: ev.id)
+        store.setSessionPhotoContext(sessionID: session.id, ref: .comp(ev.id), tags: [], customLabels: [])
         #endif
         compEvents.removeAll { $0.id == ev.id }
+    }
+
+    private func removeFreePlay(_ ev: FreePlayEvent) {
+        freePlayEvents.removeAll { $0.id == ev.id }
+    }
+
+    private func appendFreePlay(
+        amount: Int,
+        playType: String,
+        photoJPEG: Data?,
+        photoContextTags: Set<SessionPhotoContextTag>,
+        photoCustomLabels: [String]
+    ) {
+        let trimmedType = playType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedType = trimmedType.isEmpty ? "Free play" : trimmedType
+        freePlayEvents.append(FreePlayEvent(amount: amount, timestamp: Date(), playType: storedType))
+        #if os(iOS)
+        if let jpeg = photoJPEG, let image = UIImage(data: jpeg) {
+            _ = store.addAttachedSessionPhoto(
+                sessionID: session.id,
+                image: image,
+                contextTags: photoContextTags,
+                customContextLabels: photoCustomLabels
+            )
+        }
+        #endif
     }
 
     /// Mirrors `SessionStore.addComp` for the edited session’s working `compEvents` list.
@@ -602,6 +713,7 @@ struct EditSessionView: View {
         #if os(iOS)
         if let jpeg = photoJPEG {
             CompPhotoStorage.saveJPEGData(jpeg, compEventID: eventId)
+            store.applyCompPhotoContextTags(sessionID: session.id, compEventID: eventId, compKind: kind)
         }
         #endif
     }
@@ -609,9 +721,11 @@ struct EditSessionView: View {
 
 /// Edit an existing comp while preserving `CompEvent.id` so receipt photos stay linked on disk.
 private struct EditCompEventSheet: View {
+    let sessionID: UUID
     let original: CompEvent
     let onSave: (CompEvent) -> Void
 
+    @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
 
@@ -624,6 +738,8 @@ private struct EditCompEventSheet: View {
     @State private var compPhoto: UIImage?
     @State private var photoExplicitlyRemoved = false
     @State private var compPhotoSource: CompPhotoSource?
+    @State private var compPhotoContextTags: Set<SessionPhotoContextTag> = [.comps]
+    @State private var compPhotoCustomContextLabels: [String] = []
 
     private enum CompPhotoSource: Identifiable {
         case camera
@@ -632,7 +748,8 @@ private struct EditCompEventSheet: View {
         var id: Int { hashValue }
     }
 
-    init(original: CompEvent, onSave: @escaping (CompEvent) -> Void) {
+    init(sessionID: UUID, original: CompEvent, onSave: @escaping (CompEvent) -> Void) {
+        self.sessionID = sessionID
         self.original = original
         self.onSave = onSave
         _amountText = State(initialValue: "\(original.amount)")
@@ -764,6 +881,12 @@ private struct EditCompEventSheet: View {
                                     }
                                 }
                             }
+
+                            SessionPhotoContextTagPicker(
+                                selectedTags: $compPhotoContextTags,
+                                customLabels: $compPhotoCustomContextLabels,
+                                onContextChanged: persistCompPhotoContext
+                            )
                         }
 
                         Button {
@@ -798,6 +921,13 @@ private struct EditCompEventSheet: View {
             if let url = CompPhotoStorage.url(for: original.id),
                let img = UIImage(contentsOfFile: url.path) {
                 compPhoto = img
+            }
+            if let live = store.liveSession, live.id == sessionID {
+                compPhotoContextTags = Set(live.contextTags(for: .comp(original.id)))
+                compPhotoCustomContextLabels = live.customContextLabels(for: .comp(original.id))
+            } else if let saved = store.sessions.first(where: { $0.id == sessionID }) {
+                compPhotoContextTags = Set(saved.contextTags(for: .comp(original.id)))
+                compPhotoCustomContextLabels = saved.customContextLabels(for: .comp(original.id))
             }
         }
         .adaptiveSheet(item: $compPhotoSource) { source in
@@ -849,10 +979,24 @@ private struct EditCompEventSheet: View {
         )
         if photoExplicitlyRemoved {
             CompPhotoStorage.deleteImage(compEventID: original.id)
+            store.setSessionPhotoContext(sessionID: sessionID, ref: .comp(original.id), tags: [], customLabels: [])
         } else if let img = compPhoto, let jpeg = img.jpegData(compressionQuality: 0.9) {
             CompPhotoStorage.saveJPEGData(jpeg, compEventID: original.id)
+            persistCompPhotoContext()
         }
         onSave(updated)
         dismiss()
+    }
+
+    private func persistCompPhotoContext() {
+        guard !photoExplicitlyRemoved else { return }
+        let hasPhotoOnDisk = CompPhotoStorage.url(for: original.id).map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+        guard compPhoto != nil || hasPhotoOnDisk else { return }
+        store.setSessionPhotoContext(
+            sessionID: sessionID,
+            ref: .comp(original.id),
+            tags: SessionPhotoContextTag.sorted(compPhotoContextTags),
+            customLabels: compPhotoCustomContextLabels
+        )
     }
 }

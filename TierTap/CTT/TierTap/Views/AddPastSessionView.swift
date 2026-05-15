@@ -15,6 +15,8 @@ struct AddPastSessionView: View {
     @State private var startTime = Date()
     @State private var endTime = Date().addingTimeInterval(3600)
     @State private var totalBuyIn = ""
+    @State private var totalFreePlay = ""
+    @State private var freePlayType = ""
     @State private var cashOut = ""
     @State private var startingTier = "0"
     @State private var endingTier = ""
@@ -25,6 +27,7 @@ struct AddPastSessionView: View {
     @State private var showGamePicker = false
     @State private var showCasinoLocationPicker = false
     @State private var showBuyInPicker = false
+    @State private var showFreePlayPicker = false
 
     // Casino game type metadata
     @State private var gameCategory: SessionGameCategory = .table
@@ -131,6 +134,12 @@ struct AddPastSessionView: View {
             }
             .adaptiveSheet(isPresented: $showBuyInPicker) {
                 BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $totalBuyIn)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.fraction(0.7), .large])
+                    .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(isPresented: $showFreePlayPicker) {
+                BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $totalFreePlay, mode: .freePlay)
                     .environmentObject(settingsStore)
                     .presentationDetents([.fraction(0.7), .large])
                     .presentationDragIndicator(.visible)
@@ -527,6 +536,37 @@ struct AddPastSessionView: View {
                 .background(Color.orange.opacity(0.15))
                 .cornerRadius(8)
             }
+
+            Divider().background(Color.gray.opacity(0.35))
+
+            LocalizedLabel(title: "Free Play", systemImage: "ticket.fill")
+                .font(.subheadline.weight(.semibold)).foregroundColor(.white)
+            Text("Optional. Not counted in win/loss or tax.")
+                .font(.caption).foregroundColor(.gray)
+            HStack(alignment: .top, spacing: 12) {
+                Button { showFreePlayPicker = true } label: {
+                    HStack {
+                        Image(systemName: "square.grid.2x2.fill")
+                        Text(totalFreePlay.isEmpty ? "0" : "\(settingsStore.currencySymbol)\(totalFreePlay)")
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .frame(maxWidth: .infinity)
+                NumericEntryWithDialPad(
+                    placeholder: "0",
+                    text: $totalFreePlay,
+                    dialPadNavigationTitle: "Free Play"
+                )
+                .environmentObject(settingsStore)
+                .frame(maxWidth: .infinity)
+            }
+            TextField("Type (e.g. match play)", text: $freePlayType)
+                .textFieldStyle(DarkTextFieldStyle())
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -751,6 +791,11 @@ struct AddPastSessionView: View {
         let start = cal.date(from: s1) ?? date
         let end = cal.date(from: e1) ?? date.addingTimeInterval(3600)
         let ev = BuyInEvent(amount: bi, timestamp: start)
+        let fpAmount = max(0, Int(totalFreePlay.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
+        let fpTypeTrim = freePlayType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fpEvents: [FreePlayEvent] = fpAmount > 0
+            ? [FreePlayEvent(amount: fpAmount, timestamp: start, playType: fpTypeTrim.isEmpty ? "Free play" : fpTypeTrim)]
+            : []
         let sb: Int? = (gameCategory == .poker && pokerSmallBlind > 0) ? pokerSmallBlind : nil
         let bb: Int? = (gameCategory == .poker && pokerBigBlind > 0) ? pokerBigBlind : nil
         let ante: Int? = (gameCategory == .poker && pokerAnte > 0) ? pokerAnte : nil
@@ -774,6 +819,7 @@ struct AddPastSessionView: View {
             startingTierPoints: st,
             endingTierPoints: et,
             buyInEvents: [ev],
+            freePlayEvents: fpEvents,
             cashOut: co,
             avgBetActual: aba,
             avgBetRated: abr,

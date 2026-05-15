@@ -25,6 +25,7 @@ struct HomeView: View {
     @State private var reopenFastCheckInSettingsAfterCheckInDismiss = false
     @State private var showLive = false
     @State private var showBuyInSheet = false
+    @State private var showFreePlaySheet = false
     @State private var showUpdateStackSheet = false
     @State private var showCompSheet = false
     @State private var showAddPast = false
@@ -373,8 +374,22 @@ struct HomeView: View {
                 .environmentObject(rewardWalletStore)
         }
         .adaptiveSheet(isPresented: $showBuyInSheet) {
-            BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
+            BuyInQuickAddSheet(quickBuyIns: quickBuyIns, onAdd: { amount in
                 store.addBuyIn(amount)
+            }, onAddFreePlay: {
+                showFreePlaySheet = true
+            })
+            .environmentObject(settingsStore)
+        }
+        .adaptiveSheet(isPresented: $showFreePlaySheet) {
+            FreePlayQuickAddSheet(existingSessionFreePlayTotal: store.liveSession?.totalFreePlay ?? 0) { amount, playType, photoJPEG, photoContextTags, photoCustomLabels in
+                store.addFreePlay(
+                    amount: amount,
+                    playType: playType,
+                    photoJPEG: photoJPEG,
+                    photoContextTags: photoContextTags,
+                    photoCustomContextLabels: photoCustomLabels
+                )
             }
             .environmentObject(settingsStore)
         }
@@ -384,10 +399,11 @@ struct HomeView: View {
                     sessionID: live.id,
                     game: live.game,
                     casino: live.casino,
-                    totalBuyIn: live.totalBuyIn,
+                    stackBaseline: live.totalStackBaseline,
                     currentTrackedStack: live.liveTrackedStackAmount,
                     hoursPlayed: live.hoursPlayed,
-                    onUpdate: { store.updateLiveTrackedStack($0) }
+                    onUpdate: { store.updateLiveTrackedStack($0) },
+                    onAddFreePlay: { showFreePlaySheet = true }
                 )
                 .environmentObject(store)
                 .environmentObject(settingsStore)
@@ -399,12 +415,21 @@ struct HomeView: View {
         .adaptiveSheet(isPresented: $showCompSheet) {
             CompQuickAddSheet(
                 existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
+                existingSessionFreePlayTotal: store.liveSession?.totalFreePlay ?? 0,
                 sessionGame: store.liveSession?.game ?? "",
                 sessionCasino: store.liveSession?.casino ?? "",
                 sessionCasinoLatitude: store.liveSession?.casinoLatitude,
                 sessionCasinoLongitude: store.liveSession?.casinoLongitude
-            ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
-                store.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: foodKind, foodBeverageOtherDescription: otherDesc, photoJPEG: photoJPEG)
+            ) { kind, amount, details, foodKind, otherDesc, photoJPEG, asFreePlay in
+                store.addComp(
+                    amount: amount,
+                    kind: kind,
+                    details: details,
+                    foodBeverageKind: foodKind,
+                    foodBeverageOtherDescription: otherDesc,
+                    photoJPEG: photoJPEG,
+                    recordAsFreePlay: asFreePlay
+                )
             }
             .environmentObject(settingsStore)
             .environmentObject(subscriptionStore)
@@ -482,6 +507,9 @@ struct LiveNowCard: View {
                         .lineLimit(2)
                 }
                 Text("Total buy-in \(settingsStore.currencySymbol)\(currentSession.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.75))
+                Text("Total free play \(settingsStore.currencySymbol)\(currentSession.totalFreePlay.formatted(.number.grouping(.automatic)))")
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.75))
                 if let stack = currentSession.liveTrackedStackAmount {

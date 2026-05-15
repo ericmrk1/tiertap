@@ -46,9 +46,17 @@ struct SessionDetailView: View {
 
                         // Header
                         VStack(spacing: 6) {
-                            Text(displaySession.casino).font(.title.bold()).foregroundColor(.white)
-                            Text(displaySession.game).font(.subheadline).foregroundColor(.gray)
-                            Text(displaySession.startTime, style: .date).font(.caption).foregroundColor(.gray)
+                            Text(displaySession.casino)
+                                .font(.title.bold())
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                            Text(displaySession.game)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
+                            Text(displaySession.startTime, style: .date)
+                                .font(.caption)
+                                .foregroundColor(.gray)
                             if let mood = displaySession.sessionMood {
                                 Text(mood.label)
                                     .font(.subheadline.weight(.medium))
@@ -56,7 +64,7 @@ struct SessionDetailView: View {
                                     .padding(.top, 4)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color(.systemGray6).opacity(0.15)).cornerRadius(16)
@@ -122,6 +130,15 @@ struct SessionDetailView: View {
                                           value: "\(settingsStore.currencySymbol)\(ev.amount)")
                             }
                             DetailRow(label: "Total Buy-In", value: "\(settingsStore.currencySymbol)\(displaySession.totalBuyIn)", bold: true)
+                            if !displaySession.freePlayEvents.isEmpty {
+                                ForEach(displaySession.freePlayEvents) { ev in
+                                    DetailRow(
+                                        label: "\(ev.timestamp.formatted(date: .omitted, time: .shortened)) · \(ev.playTypeDisplayLabel)",
+                                        value: "\(settingsStore.currencySymbol)\(ev.amount)"
+                                    )
+                                }
+                                DetailRow(label: "Total Free Play", value: "\(settingsStore.currencySymbol)\(displaySession.totalFreePlay)", bold: true)
+                            }
                             if !displaySession.compEvents.isEmpty {
                                 ForEach(displaySession.compEvents) { ev in
                                     DetailRow(

@@ -576,8 +576,8 @@ struct AnalyticsView: View {
                         .font(.headline)
                         .foregroundColor(.white)
                     Text(settingsStore.analyticsUseExpectedValue
-                         ? "Results use EV (cash net + logged comps)."
-                         : "Results use cash net (comps excluded).")
+                         ? "Results use EV (cash net + logged comps). Free play excluded."
+                         : "Results use cash net (comps and free play excluded).")
                         .font(.caption2)
                         .foregroundColor(.gray)
                 }
@@ -608,6 +608,15 @@ struct AnalyticsView: View {
                 MetricPill(title: "Wins", value: sessionShareLabel(wins), color: .green)
                 MetricPill(title: "Losses", value: sessionShareLabel(losses), color: .red)
                 MetricPill(title: "Even", value: sessionShareLabel(breakeven), color: .gray)
+            }
+
+            if closedSessions.contains(where: { $0.totalFreePlay > 0 }) {
+                FreePlaySummaryCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText
+                )
             }
 
             if usesTableStyleAnalytics {
@@ -770,8 +779,8 @@ struct AnalyticsView: View {
             }
             .pickerStyle(.segmented)
             Text(settingsStore.analyticsUseExpectedValue
-                 ? "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps."
-                 : "Win rate and dollar totals reflect table, slots, and poker cash only; comps are ignored.")
+                 ? "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps. Free play is never included."
+                 : "Win rate and dollar totals reflect cash buy-in/out only; comps and free play are ignored.")
                 .font(.caption2)
                 .foregroundColor(.gray)
         }
@@ -1329,6 +1338,7 @@ struct AIAnalyticsSheet: View {
         let netCashTotal = closedSessions.compactMap { $0.winLoss }.reduce(0, +)
         let netEVTotal = closedSessions.compactMap { $0.expectedValue }.reduce(0, +)
         let compsLoggedTotal = closedSessions.map { $0.totalComp }.reduce(0, +)
+        let freePlayLoggedTotal = closedSessions.map { $0.totalFreePlay }.reduce(0, +)
         
         let rorResult = RiskOfRuinMath.compute(
             sessions: closedSessions,
@@ -1418,7 +1428,7 @@ struct AIAnalyticsSheet: View {
         Settings: bankroll \(currency)\(settingsStore.bankroll), unit \(currency)\(settingsStore.unitSize)
         Results basis for counts/net/win rate below: \(basisName) (user-selected in Analytics).
         Summary (\(basisName)): sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString) (table games only; poker excluded from RoR).
-        Aggregates for comparison: cash net total \(cashNetAggString), EV total \(evAggString), comps logged \(currency)\(compsLoggedTotal).
+        Aggregates for comparison: cash net total \(cashNetAggString), EV total \(evAggString), comps logged \(currency)\(compsLoggedTotal), free play logged \(currency)\(freePlayLoggedTotal) (free play excluded from win/loss and tax; use for promotional-value context only).
         """
         
         let toneInstruction = settingsStore.aiTone.promptLabel

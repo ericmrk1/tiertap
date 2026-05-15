@@ -20,6 +20,8 @@ struct CompleteSessionView: View {
     @State private var chipEstimatorImageFilename: String?
     @State private var chipPreviewImage: UIImage?
     @State private var showChipSourceDialog = false
+    @State private var chipPhotoContextTags: Set<SessionPhotoContextTag> = SessionPhotoContextTag.autoTags(for: .chipTable)
+    @State private var chipPhotoCustomContextLabels: [String] = []
 
     private enum ChipPhotoSource: Identifiable {
         case camera
@@ -185,6 +187,7 @@ struct CompleteSessionView: View {
                                         // Persist removal immediately.
                                         var updated = session
                                         updated.chipEstimatorImageFilename = nil
+                                        updated.setContextTags([], for: .chipTable())
                                         store.updateSession(updated)
                                     } label: {
                                         Image(systemName: "trash")
@@ -196,6 +199,11 @@ struct CompleteSessionView: View {
                                     }
                                 }
                             }
+
+                            SessionPhotoContextTagPicker(
+                                selectedTags: $chipPhotoContextTags,
+                                customLabels: $chipPhotoCustomContextLabels
+                            )
                         }
 
                         VStack(spacing: 10) {
@@ -235,6 +243,8 @@ struct CompleteSessionView: View {
                    let url = ChipEstimatorPhotoStorage.url(for: fileName),
                    let uiImage = UIImage(contentsOfFile: url.path) {
                     chipPreviewImage = uiImage
+                    chipPhotoContextTags = Set(session.contextTags(for: .chipTable()))
+                    chipPhotoCustomContextLabels = session.customContextLabels(for: .chipTable())
                 } else {
                     chipPreviewImage = nil
                 }
@@ -396,9 +406,12 @@ struct CompleteSessionView: View {
         if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: session.id) {
             chipEstimatorImageFilename = fileName
             chipPreviewImage = image
-            var updated = session
-            updated.chipEstimatorImageFilename = fileName
-            store.updateSession(updated)
+            store.setChipEstimatorImageFilename(
+                fileName,
+                sessionID: session.id,
+                additionalContextTags: chipPhotoContextTags,
+                additionalCustomContextLabels: chipPhotoCustomContextLabels
+            )
         }
     }
 

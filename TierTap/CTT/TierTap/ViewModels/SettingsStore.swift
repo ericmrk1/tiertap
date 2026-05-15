@@ -220,13 +220,6 @@ struct FastCheckInSavedPreset: Codable, Equatable {
     }
 }
 
-struct ThemePreset: Identifiable, Codable, Equatable {
-    let id: UUID
-    var name: String
-    var primaryHex: String
-    var secondaryHex: String
-}
-
 /// Supported currency for bankroll, units, and money displays.
 /// Backed by a 3-letter ISO code, a primary symbol, and an optional country/region name.
 struct Currency: Identifiable, Codable, Equatable {
@@ -524,39 +517,23 @@ final class SettingsStore: ObservableObject {
 
     /// Stored names for primary/secondary theme colors.
     @Published var primaryColorName: String {
-        didSet { UserDefaults.standard.set(primaryColorName, forKey: keyPrimaryColorName) }
+        didSet { syncThemeToSharedStorage() }
     }
     @Published var secondaryColorName: String {
-        didSet { UserDefaults.standard.set(secondaryColorName, forKey: keySecondaryColorName) }
+        didSet { syncThemeToSharedStorage() }
     }
 
     /// Stored hex strings for primary/secondary theme colors (takes precedence over name when present).
     @Published var primaryColorHex: String? {
-        didSet {
-            if let hex = primaryColorHex {
-                UserDefaults.standard.set(hex, forKey: keyPrimaryColorHex)
-            } else {
-                UserDefaults.standard.removeObject(forKey: keyPrimaryColorHex)
-            }
-        }
+        didSet { syncThemeToSharedStorage() }
     }
     @Published var secondaryColorHex: String? {
-        didSet {
-            if let hex = secondaryColorHex {
-                UserDefaults.standard.set(hex, forKey: keySecondaryColorHex)
-            } else {
-                UserDefaults.standard.removeObject(forKey: keySecondaryColorHex)
-            }
-        }
+        didSet { syncThemeToSharedStorage() }
     }
 
     /// Saved theme presets (built-in + user-defined).
     @Published var themePresets: [ThemePreset] {
-        didSet {
-            if let data = try? JSONEncoder().encode(themePresets) {
-                UserDefaults.standard.set(data, forKey: keyThemePresets)
-            }
-        }
+        didSet { syncThemeToSharedStorage() }
     }
 
     /// When true (default), show the session mood picker after ending a session. When false, skip the emotion grid.
@@ -1005,19 +982,13 @@ final class SettingsStore: ObservableObject {
         } else {
             self.fastCheckInSavedPresets = [:]
         }
-        self.primaryColorName = UserDefaults.standard.string(forKey: keyPrimaryColorName) ?? "black"
-        self.secondaryColorName = UserDefaults.standard.string(forKey: keySecondaryColorName) ?? "blue"
-        self.primaryColorHex = UserDefaults.standard.string(forKey: keyPrimaryColorHex)
-        self.secondaryColorHex = UserDefaults.standard.string(forKey: keySecondaryColorHex)
+        let themeSnapshot = TierTapThemeSettings.load()
+        self.primaryColorName = themeSnapshot.primaryColorName
+        self.secondaryColorName = themeSnapshot.secondaryColorName
+        self.primaryColorHex = themeSnapshot.primaryColorHex
+        self.secondaryColorHex = themeSnapshot.secondaryColorHex
+        self.themePresets = themeSnapshot.themePresets
         self.selectedLocationFilter = UserDefaults.standard.string(forKey: keySelectedLocationFilter)
-
-        if let data = UserDefaults.standard.data(forKey: keyThemePresets),
-           let decoded = try? JSONDecoder().decode([ThemePreset].self, from: data),
-           !decoded.isEmpty {
-            self.themePresets = decoded
-        } else {
-            self.themePresets = []
-        }
         if UserDefaults.standard.object(forKey: keyPromptSessionMood) != nil {
             self.promptSessionMood = UserDefaults.standard.bool(forKey: keyPromptSessionMood)
         } else {
@@ -1180,24 +1151,6 @@ final class SettingsStore: ObservableObject {
         }
         self.lifetimeTierTapPlusTokensPurchased = lifetimePurchased
 
-        if self.themePresets.isEmpty {
-            let defaults: [ThemePreset] = [
-                ThemePreset(id: UUID(), name: "Royal Blue & Gold", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .yellow)),
-                ThemePreset(id: UUID(), name: "Apple Standard", primaryHex: Self.hexString(from: .blue), secondaryHex: Self.hexString(from: .teal)),
-                ThemePreset(id: UUID(), name: "Emerald Night", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .teal)),
-                ThemePreset(id: UUID(), name: "Royal Blue", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .blue)),
-                ThemePreset(id: UUID(), name: "Sunset", primaryHex: Self.hexString(from: .orange), secondaryHex: Self.hexString(from: .pink)),
-                ThemePreset(id: UUID(), name: "Gold Rush", primaryHex: Self.hexString(from: .yellow), secondaryHex: Self.hexString(from: .orange)),
-                ThemePreset(id: UUID(), name: "Purple Royale", primaryHex: Self.hexString(from: .purple), secondaryHex: Self.hexString(from: .blue)),
-                ThemePreset(id: UUID(), name: "Ocean Floor", primaryHex: Self.hexString(from: .teal), secondaryHex: Self.hexString(from: .blue)),
-                ThemePreset(id: UUID(), name: "Vegas Neon", primaryHex: Self.hexString(from: .pink), secondaryHex: Self.hexString(from: .green)),
-                ThemePreset(id: UUID(), name: "Midnight", primaryHex: Self.hexString(from: .indigo), secondaryHex: Self.hexString(from: .teal)),
-                ThemePreset(id: UUID(), name: "High Roller", primaryHex: Self.hexString(from: .green), secondaryHex: Self.hexString(from: .yellow)),
-                ThemePreset(id: UUID(), name: "Ice", primaryHex: Self.hexString(from: .mint), secondaryHex: Self.hexString(from: .blue))
-            ]
-            self.themePresets = defaults
-        }
-
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.appLanguage.rawValue, forKey: keyAppLanguage)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticProfile.rawValue, forKey: keyWatchHapticProfile)
@@ -1208,6 +1161,29 @@ final class SettingsStore: ObservableObject {
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompCashDefaultsText, forKey: keyWatchCompCashDefaults)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchCompContextOptionsText, forKey: keyWatchCompContextOptions)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchAnimationsEnabled, forKey: keyWatchAnimationsEnabled)
+        syncThemeToSharedStorage()
+    }
+
+    /// Reload theme colors from the App Group (e.g. after changing them on Apple Watch).
+    func reloadThemeFromSharedStorage() {
+        let theme = TierTapThemeSettings.load()
+        primaryColorName = theme.primaryColorName
+        secondaryColorName = theme.secondaryColorName
+        primaryColorHex = theme.primaryColorHex
+        secondaryColorHex = theme.secondaryColorHex
+        themePresets = theme.themePresets
+    }
+
+    private func syncThemeToSharedStorage() {
+        TierTapThemeSettings.save(
+            TierTapThemeSettings.Snapshot(
+                primaryColorName: primaryColorName,
+                secondaryColorName: secondaryColorName,
+                primaryColorHex: primaryColorHex,
+                secondaryColorHex: secondaryColorHex,
+                themePresets: themePresets
+            )
+        )
     }
 
     /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).
@@ -1630,191 +1606,71 @@ final class SettingsStore: ObservableObject {
         return set.sorted()
     }
 
+    private var themeSnapshot: TierTapThemeSettings.Snapshot {
+        TierTapThemeSettings.Snapshot(
+            primaryColorName: primaryColorName,
+            secondaryColorName: secondaryColorName,
+            primaryColorHex: primaryColorHex,
+            secondaryColorHex: secondaryColorHex,
+            themePresets: themePresets
+        )
+    }
+
     var primaryColor: Color {
-        if let hex = primaryColorHex, let c = color(fromHex: hex) {
-            return c
-        }
-        return color(fromName: primaryColorName)
+        TierTapThemeSettings.primaryColor(in: themeSnapshot)
     }
 
     var secondaryColor: Color {
-        if let hex = secondaryColorHex, let c = color(fromHex: hex) {
-            return c
-        }
-        return color(fromName: secondaryColorName)
+        TierTapThemeSettings.secondaryColor(in: themeSnapshot)
     }
 
     var effectivePrimaryHex: String {
-        primaryColorHex ?? Self.hexString(from: primaryColor)
+        TierTapThemeSettings.effectivePrimaryHex(in: themeSnapshot)
     }
 
     var effectiveSecondaryHex: String {
-        secondaryColorHex ?? Self.hexString(from: secondaryColor)
+        TierTapThemeSettings.effectiveSecondaryHex(in: themeSnapshot)
     }
 
     var primaryGradient: LinearGradient {
-        LinearGradient(
-            colors: [primaryColor, secondaryColor],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        TierTapThemeSettings.primaryGradient(in: themeSnapshot)
     }
 
     /// Update and persist the primary theme color.
     func setPrimaryColor(_ color: Color) {
-        primaryColorHex = Self.hexString(from: color)
-        primaryColorName = nearestColorName(for: color)
+        var snap = themeSnapshot
+        TierTapThemeSettings.setPrimaryColor(color, in: &snap)
+        primaryColorHex = snap.primaryColorHex
+        primaryColorName = snap.primaryColorName
     }
 
     /// Update and persist the secondary theme color.
     func setSecondaryColor(_ color: Color) {
-        secondaryColorHex = Self.hexString(from: color)
-        secondaryColorName = nearestColorName(for: color)
+        var snap = themeSnapshot
+        TierTapThemeSettings.setSecondaryColor(color, in: &snap)
+        secondaryColorHex = snap.secondaryColorHex
+        secondaryColorName = snap.secondaryColorName
     }
 
     /// Apply a given theme preset to the current settings.
     func applyThemePreset(_ preset: ThemePreset) {
-        if let primary = color(fromHex: preset.primaryHex),
-           let secondary = color(fromHex: preset.secondaryHex) {
-            setPrimaryColor(primary)
-            setSecondaryColor(secondary)
-        }
+        var snap = themeSnapshot
+        TierTapThemeSettings.applyThemePreset(preset, to: &snap)
+        primaryColorHex = snap.primaryColorHex
+        primaryColorName = snap.primaryColorName
+        secondaryColorHex = snap.secondaryColorHex
+        secondaryColorName = snap.secondaryColorName
     }
 
     /// Persist the current primary/secondary colors as a new preset.
     func saveCurrentThemeAsPreset() {
-        let primaryHexValue = effectivePrimaryHex
-        let secondaryHexValue = effectiveSecondaryHex
-
-        let primaryName = primaryColorName.capitalized
-        let secondaryName = secondaryColorName.capitalized
-
-        let baseName: String
-        if primaryName.isEmpty && secondaryName.isEmpty {
-            baseName = "Custom Theme"
-        } else if primaryName == secondaryName {
-            baseName = primaryName
-        } else {
-            baseName = "\(primaryName) → \(secondaryName)"
-        }
-
-        var candidateName = baseName
-        let existingNames = Set(themePresets.map { $0.name })
-        var index = 2
-        while existingNames.contains(candidateName) {
-            candidateName = "\(baseName) (\(index))"
-            index += 1
-        }
-
-        let newPreset = ThemePreset(
-            id: UUID(),
-            name: candidateName,
-            primaryHex: primaryHexValue,
-            secondaryHex: secondaryHexValue
-        )
-        themePresets.insert(newPreset, at: 0)
+        var snap = themeSnapshot
+        TierTapThemeSettings.saveCurrentThemeAsPreset(in: &snap)
+        themePresets = snap.themePresets
     }
 
     /// Convenience for turning a preset into concrete SwiftUI colors.
     func colors(for preset: ThemePreset) -> (Color, Color) {
-        let primary = color(fromHex: preset.primaryHex) ?? .black
-        let secondary = color(fromHex: preset.secondaryHex) ?? .blue
-        return (primary, secondary)
-    }
-
-    /// Fallback mapping from legacy color names to SwiftUI colors.
-    private func color(fromName name: String) -> Color {
-        switch name {
-        case "black": return .black
-        case "red": return .red
-        case "orange": return .orange
-        case "yellow": return .yellow
-        case "mint": return .mint
-        case "teal": return .teal
-        case "blue": return .blue
-        case "indigo": return .indigo
-        case "purple": return .purple
-        case "pink": return .pink
-        case "green": return .green
-        default: return .green
-        }
-    }
-
-    /// Decode a hex RGB string like "#00FF00" into a SwiftUI `Color`.
-    private func color(fromHex hex: String) -> Color? {
-        var cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        if cleaned.hasPrefix("#") {
-            cleaned.removeFirst()
-        }
-        guard cleaned.count == 6, let value = Int(cleaned, radix: 16) else {
-            return nil
-        }
-        let r = Double((value >> 16) & 0xFF) / 255.0
-        let g = Double((value >> 8) & 0xFF) / 255.0
-        let b = Double(value & 0xFF) / 255.0
-        return Color(red: r, green: g, blue: b)
-    }
-
-    /// Encode a SwiftUI `Color` into a hex RGB string for storage.
-    private static func hexString(from color: Color) -> String {
-        #if os(iOS)
-        let uiColor = UIColor(color)
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        guard uiColor.getRed(&r, green: &g, blue: &b, alpha: &a) else {
-            return "#000000"
-        }
-        let value = (Int(r * 255) << 16) | (Int(g * 255) << 8) | Int(b * 255)
-        return String(format: "#%06X", value)
-        #else
-        // Reasonable default on non-iOS platforms.
-        return "#000000"
-        #endif
-    }
-
-    /// Roughly classify a color into one of our named buckets.
-    private func nearestColorName(for color: Color) -> String {
-        #if os(iOS)
-        let uiColor = UIColor(color)
-        var h: CGFloat = 0
-        var s: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        if uiColor.getHue(&h, saturation: &s, brightness: &b, alpha: &a) {
-            let hue = h * 360.0
-            if b < 0.25 {
-                if s < 0.2 {
-                    return "black"
-                }
-                return "indigo"
-            }
-            if s < 0.2 {
-                return b > 0.8 ? "yellow" : "mint"
-            }
-            switch hue {
-            case 0..<20, 340...360:
-                return "red"
-            case 20..<50:
-                return "orange"
-            case 50..<80:
-                return "yellow"
-            case 80..<150:
-                return "mint"
-            case 150..<190:
-                return "teal"
-            case 190..<250:
-                return "blue"
-            case 250..<290:
-                return "indigo"
-            case 290..<320:
-                return "purple"
-            default:
-                return "pink"
-            }
-        }
-        #endif
-        return "black"
+        TierTapThemeSettings.colors(for: preset)
     }
 }

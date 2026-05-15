@@ -20,6 +20,8 @@ struct CloseoutView: View {
     // Session photo attachment
     @State private var sessionPhoto: UIImage?
     @State private var sessionPhotoSource: SessionPhotoSource?
+    @State private var sessionPhotoContextTags: Set<SessionPhotoContextTag> = SessionPhotoContextTag.autoTags(for: .chipTable)
+    @State private var sessionPhotoCustomContextLabels: [String] = []
 
     // Chip estimator entry point
     @State private var showChipEstimatorSheet = false
@@ -50,7 +52,7 @@ struct CloseoutView: View {
 
     /// Default close-out cash amount: most recent tracked stack, falling back to total buy-in.
     private var defaultCloseoutCashOut: Int {
-        s.liveTrackedStackAmount ?? s.totalBuyIn
+        s.liveTrackedStackAmount ?? s.totalStackBaseline
     }
 
     var isValid: Bool {
@@ -170,6 +172,14 @@ struct CloseoutView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
                     Text("\(settingsStore.currencySymbol)\(s.totalBuyIn)").font(.subheadline).foregroundColor(.white)
+                }
+                if s.totalFreePlay > 0 {
+                    VStack(alignment: .leading, spacing: 4) {
+                        L10nText("Free play").font(.caption2).foregroundColor(.gray)
+                        Text("\(settingsStore.currencySymbol)\(s.totalFreePlay)")
+                            .font(.subheadline)
+                            .foregroundColor(.green)
+                    }
                 }
                 if let hourly = previewHourlyWinLoss,
                    let amount = Int(exactly: round(hourly)) {
@@ -475,6 +485,11 @@ struct CloseoutView: View {
                                     }
                                 }
                             }
+
+                            SessionPhotoContextTagPicker(
+                                selectedTags: $sessionPhotoContextTags,
+                                customLabels: $sessionPhotoCustomContextLabels
+                            )
                         }
 
                         // Actions
@@ -669,6 +684,8 @@ struct CloseoutView: View {
                let url = ChipEstimatorPhotoStorage.url(for: fileName),
                let uiImage = UIImage(contentsOfFile: url.path) {
                 sessionPhoto = uiImage
+                sessionPhotoContextTags = Set(s.contextTags(for: .chipTable()))
+                sessionPhotoCustomContextLabels = s.customContextLabels(for: .chipTable())
             }
         }
     }
@@ -759,7 +776,11 @@ struct CloseoutView: View {
     private func handlePickedSessionPhoto(_ image: UIImage) {
         sessionPhoto = image
         if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: s.id) {
-            store.setChipEstimatorImageFilename(fileName)
+            store.setChipEstimatorImageFilename(
+                fileName,
+                additionalContextTags: sessionPhotoContextTags,
+                additionalCustomContextLabels: sessionPhotoCustomContextLabels
+            )
         }
     }
 
@@ -837,6 +858,8 @@ struct ChipEstimatorSheetView: View {
 
     @State private var chipPhotoSource: ChipPhotoSource?
     @State private var showSubscriptionPaywall = false
+    @State private var chipPhotoContextTags: Set<SessionPhotoContextTag> = SessionPhotoContextTag.autoTags(for: .chipTable)
+    @State private var chipPhotoCustomContextLabels: [String] = []
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -929,6 +952,11 @@ struct ChipEstimatorSheetView: View {
                                         .cornerRadius(18)
                                 }
                             }
+
+                            SessionPhotoContextTagPicker(
+                                selectedTags: $chipPhotoContextTags,
+                                customLabels: $chipPhotoCustomContextLabels
+                            )
 
                             Button {
                                 guard estimateTask == nil else { return }
@@ -1290,7 +1318,11 @@ struct ChipEstimatorSheetView: View {
                 estimatedAmount = amount
 
                 if let fileName = ChipEstimatorPhotoStorage.saveImage(image, for: sessionID) {
-                    store.setChipEstimatorImageFilename(fileName)
+                    store.setChipEstimatorImageFilename(
+                        fileName,
+                        additionalContextTags: chipPhotoContextTags,
+                        additionalCustomContextLabels: chipPhotoCustomContextLabels
+                    )
                 }
             } else {
                 errorMessage = "AI did not return a clear numeric estimate."

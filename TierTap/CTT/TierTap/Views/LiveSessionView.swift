@@ -9,6 +9,7 @@ struct LiveSessionView: View {
     @Environment(\.dismiss) var dismiss
     @State private var elapsed: TimeInterval = 0
     @State private var showBuyInSheet = false
+    @State private var showFreePlaySheet = false
     @State private var showUpdateStackSheet = false
     @State private var showCompSheet = false
     @State private var showCloseout = false
@@ -27,7 +28,9 @@ struct LiveSessionView: View {
         var missing: [String] = []
         if s.game.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Game") }
         if s.casino.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Casino / Location") }
-        if s.buyInEvents.isEmpty { missing.append("At least one buy-in") }
+        if s.totalBuyIn == 0 && s.totalFreePlay == 0 {
+            missing.append("Buy-in or free play")
+        }
         return missing
     }
 
@@ -144,6 +147,33 @@ struct LiveSessionView: View {
                                             .font(.caption).foregroundColor(.gray)
                                     }
                                 }
+                                if s.totalFreePlay > 0 {
+                                    HStack {
+                                        L10nText("Free play")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                        Spacer()
+                                        Text("\(settingsStore.currencySymbol)\(s.totalFreePlay)")
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundColor(.green)
+                                    }
+                                    ForEach(s.freePlayEvents) { ev in
+                                        HStack {
+                                            Image(systemName: "ticket.fill")
+                                                .foregroundColor(.green).font(.caption)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("\(settingsStore.currencySymbol)\(ev.amount)")
+                                                    .foregroundColor(.white)
+                                                Text(ev.playTypeDisplayLabel)
+                                                    .font(.caption2)
+                                                    .foregroundColor(.gray)
+                                            }
+                                            Spacer()
+                                            Text(ev.timestamp, style: .time)
+                                                .font(.caption).foregroundColor(.gray)
+                                        }
+                                    }
+                                }
                                 VStack(spacing: 10) {
                                     HStack(spacing: 12) {
                                         Button {
@@ -172,10 +202,22 @@ struct LiveSessionView: View {
                                         }
                                     }
                                     Button {
+                                        showFreePlaySheet = true
+                                    } label: {
+                                        LocalizedLabel(title: "Free Play", systemImage: "ticket.fill")
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 14)
+                                            .padding(.horizontal)
+                                            .background(Color(.systemGray6).opacity(0.25))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(14)
+                                    }
+                                    Button {
                                         showUpdateStackSheet = true
                                     } label: {
                                         LocalizedChipStackLabel(
-                                            title: "Stack: \(settingsStore.currencySymbol)\((s.liveTrackedStackAmount ?? s.totalBuyIn).formatted(.number.grouping(.automatic)))"
+                                            title: "Stack: \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))"
                                         )
                                             .font(.headline)
                                             .frame(maxWidth: .infinity)
@@ -330,8 +372,22 @@ struct LiveSessionView: View {
             .onReceive(ticker) { _ in elapsed = s.duration }
             .onAppear { elapsed = s.duration }
             .adaptiveSheet(isPresented: $showBuyInSheet) {
-                BuyInQuickAddSheet(quickBuyIns: quickBuyIns) { amount in
+                BuyInQuickAddSheet(quickBuyIns: quickBuyIns, onAdd: { amount in
                     store.addBuyIn(amount)
+                }, onAddFreePlay: {
+                    showFreePlaySheet = true
+                })
+                .environmentObject(settingsStore)
+            }
+            .adaptiveSheet(isPresented: $showFreePlaySheet) {
+                FreePlayQuickAddSheet(existingSessionFreePlayTotal: store.liveSession?.totalFreePlay ?? 0) { amount, playType, photoJPEG, photoContextTags, photoCustomLabels in
+                    store.addFreePlay(
+                        amount: amount,
+                        playType: playType,
+                        photoJPEG: photoJPEG,
+                        photoContextTags: photoContextTags,
+                        photoCustomContextLabels: photoCustomLabels
+                    )
                 }
                 .environmentObject(settingsStore)
             }
@@ -341,10 +397,11 @@ struct LiveSessionView: View {
                         sessionID: live.id,
                         game: live.game,
                         casino: live.casino,
-                        totalBuyIn: live.totalBuyIn,
+                        stackBaseline: live.totalStackBaseline,
                         currentTrackedStack: live.liveTrackedStackAmount,
                         hoursPlayed: live.hoursPlayed,
-                        onUpdate: { store.updateLiveTrackedStack($0) }
+                        onUpdate: { store.updateLiveTrackedStack($0) },
+                        onAddFreePlay: { showFreePlaySheet = true }
                     )
                     .environmentObject(store)
                     .environmentObject(settingsStore)
@@ -356,12 +413,21 @@ struct LiveSessionView: View {
             .adaptiveSheet(isPresented: $showCompSheet) {
                 CompQuickAddSheet(
                     existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
+                    existingSessionFreePlayTotal: store.liveSession?.totalFreePlay ?? 0,
                     sessionGame: store.liveSession?.game ?? "",
                     sessionCasino: store.liveSession?.casino ?? "",
                     sessionCasinoLatitude: store.liveSession?.casinoLatitude,
                     sessionCasinoLongitude: store.liveSession?.casinoLongitude
-                ) { kind, amount, details, foodKind, otherDesc, photoJPEG in
-                    store.addComp(amount: amount, kind: kind, details: details, foodBeverageKind: foodKind, foodBeverageOtherDescription: otherDesc, photoJPEG: photoJPEG)
+                ) { kind, amount, details, foodKind, otherDesc, photoJPEG, asFreePlay in
+                    store.addComp(
+                        amount: amount,
+                        kind: kind,
+                        details: details,
+                        foodBeverageKind: foodKind,
+                        foodBeverageOtherDescription: otherDesc,
+                        photoJPEG: photoJPEG,
+                        recordAsFreePlay: asFreePlay
+                    )
                 }
                 .environmentObject(settingsStore)
                 .environmentObject(subscriptionStore)

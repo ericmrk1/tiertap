@@ -115,6 +115,11 @@ class SessionStore: ObservableObject {
                 guard let amount = params["amount"] as? Int else { return nil }
                 self.addBuyIn(amount)
                 return self.watchConnectivityReply()
+            case "addFreePlay":
+                guard let amount = params["amount"] as? Int else { return nil }
+                let playType = (params["playType"] as? String) ?? ""
+                self.addFreePlay(amount: amount, playType: playType, photoJPEG: nil)
+                return self.watchConnectivityReply()
             case "updateLiveStack":
                 let raw = (params["stack"] as? NSNumber)?.intValue ?? params["stack"] as? Int
                 guard let stack = raw else { return nil }
@@ -302,12 +307,29 @@ class SessionStore: ObservableObject {
         #endif
     }
 
+    /// Adjusts live stack when buy-in or free play is added (baseline is cash buy-in + free play).
+    private func bumpLiveStack(for session: inout Session, by addedChips: Int) {
+        guard addedChips > 0 else { return }
+        let now = Date()
+        if let currentStack = session.liveTrackedStackAmount {
+            let updatedStack = max(0, currentStack + addedChips)
+            session.liveTrackedStackAmount = updatedStack
+            session.stackUpdateEvents.append(StackUpdateEvent(amount: updatedStack, timestamp: now))
+        } else {
+            let baseline = session.totalStackBaseline
+            guard baseline > 0 else { return }
+            session.liveTrackedStackAmount = baseline
+            session.stackUpdateEvents.append(StackUpdateEvent(amount: baseline, timestamp: now))
+        }
+    }
+
     // MARK: Live
     func startSession(
         game: String,
         casino: String,
         startingTier: Int,
         initialBuyIn: Int,
+        initialFreePlayEvents: [FreePlayEvent] = [],
         rewardsProgramName: String? = nil,
         casinoLatitude: Double? = nil,
         casinoLongitude: Double? = nil,
@@ -324,17 +346,26 @@ class SessionStore: ObservableObject {
         return
         #endif
         guard liveSession == nil else { return }
-        let ev = BuyInEvent(amount: initialBuyIn, timestamp: Date())
+        let now = Date()
+        let buyInEvents: [BuyInEvent] = initialBuyIn > 0
+            ? [BuyInEvent(amount: initialBuyIn, timestamp: now)]
+            : []
+        let initialFreePlayTotal = initialFreePlayEvents.reduce(0) { $0 + $1.amount }
+        let initialStack = initialBuyIn + initialFreePlayTotal
+        let stackEvents: [StackUpdateEvent] = initialStack > 0
+            ? [StackUpdateEvent(amount: initialStack, timestamp: now)]
+            : []
         let s = Session(
             game: game,
             casino: casino,
             casinoLatitude: casinoLatitude,
             casinoLongitude: casinoLongitude,
-            startTime: Date(),
+            startTime: now,
             startingTierPoints: startingTier,
-            buyInEvents: [ev],
-            liveTrackedStackAmount: initialBuyIn,
-            stackUpdateEvents: [StackUpdateEvent(amount: initialBuyIn, timestamp: Date())],
+            buyInEvents: buyInEvents,
+            freePlayEvents: initialFreePlayEvents,
+            liveTrackedStackAmount: initialStack > 0 ? initialStack : nil,
+            stackUpdateEvents: stackEvents,
             isLive: true,
             rewardsProgramName: rewardsProgramName,
             linkedRewardWalletCardId: linkedRewardWalletCardId
@@ -359,14 +390,44 @@ class SessionStore: ObservableObject {
         #endif
         guard var s = liveSession else { return }
         s.buyInEvents.append(BuyInEvent(amount: amount, timestamp: Date()))
-        if let currentStack = s.liveTrackedStackAmount {
-            let updatedStack = max(0, currentStack + amount)
-            s.liveTrackedStackAmount = updatedStack
-            s.stackUpdateEvents.append(StackUpdateEvent(amount: updatedStack, timestamp: Date()))
-        }
+        bumpLiveStack(for: &s, by: amount)
         liveSession = s; saveLive()
         #if os(iOS)
         LiveActivityManager.shared.update(totalBuyIn: s.totalBuyIn)
+        pushContext()
+        #endif
+    }
+
+    /// Logs free play (promotional value). Increases tracked stack; excluded from cash win/loss and buy-in totals.
+    /// Optional `photoJPEG` is stored as a session attachment (visible in session photos).
+    func addFreePlay(
+        amount: Int,
+        playType: String,
+        photoJPEG: Data? = nil,
+        photoContextTags: Set<SessionPhotoContextTag> = [],
+        photoCustomContextLabels: [String] = []
+    ) {
+        let trimmedType = playType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storedType = trimmedType.isEmpty ? "Free play" : trimmedType
+        #if os(watchOS)
+        SessionSyncManager.shared.sendAction("addFreePlay", params: [
+            "amount": amount,
+            "playType": storedType
+        ]) { [weak self] sessions, liveSession, _ in
+            DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
+        }
+        return
+        #endif
+        guard var s = liveSession else { return }
+        let ev = FreePlayEvent(amount: amount, timestamp: Date(), playType: storedType)
+        s.freePlayEvents.append(ev)
+        bumpLiveStack(for: &s, by: amount)
+        liveSession = s
+        saveLive()
+        #if os(iOS)
+        if let jpeg = photoJPEG, let image = UIImage(data: jpeg) {
+            _ = addAttachedSessionPhoto(sessionID: s.id, image: image, contextTags: photoContextTags, customContextLabels: photoCustomContextLabels)
+        }
         pushContext()
         #endif
     }
@@ -441,7 +502,22 @@ class SessionStore: ObservableObject {
     }
 
     /// `photoJPEG` is optional JPEG bytes for a comp receipt; stored on disk only (not in session JSON).
-    func addComp(amount: Int, kind: CompKind = .dollarsCredits, details: String? = nil, foodBeverageKind: FoodBeverageKind? = nil, foodBeverageOtherDescription: String? = nil, photoJPEG: Data? = nil) {
+    /// When `recordAsFreePlay` is true with dollars/credits kind, value is stored as free play (not a comp) so totals are not double-counted.
+    func addComp(
+        amount: Int,
+        kind: CompKind = .dollarsCredits,
+        details: String? = nil,
+        foodBeverageKind: FoodBeverageKind? = nil,
+        foodBeverageOtherDescription: String? = nil,
+        photoJPEG: Data? = nil,
+        recordAsFreePlay: Bool = false
+    ) {
+        if recordAsFreePlay && kind == .dollarsCredits {
+            let trimmed = details?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let playType = trimmed.isEmpty ? "Free play" : trimmed
+            addFreePlay(amount: amount, playType: playType, photoJPEG: photoJPEG)
+            return
+        }
         let trimmed = details?.trimmingCharacters(in: .whitespacesAndNewlines)
         let storedDetails = (trimmed?.isEmpty == false) ? trimmed : nil
         let storedFB: FoodBeverageKind? = (kind == .foodBeverage) ? foodBeverageKind : nil
@@ -465,6 +541,7 @@ class SessionStore: ObservableObject {
         #if os(iOS)
         if let jpeg = photoJPEG {
             CompPhotoStorage.saveJPEGData(jpeg, compEventID: eventId)
+            applyCompPhotoContextTags(sessionID: s.id, compEventID: eventId, compKind: kind)
         }
         #endif
         saveLive()
@@ -498,7 +575,7 @@ class SessionStore: ObservableObject {
         #endif
         _ = afterWatchCloseSync
         guard var s = liveSession else { return }
-        let defaultCashOut = s.liveTrackedStackAmount ?? s.totalBuyIn
+        let defaultCashOut = s.liveTrackedStackAmount ?? s.totalStackBaseline
         let cashOut = max(0, cashOutOverride ?? defaultCashOut)
         let endingTier: Int
         if s.startingTierPoints > 0 {
@@ -730,12 +807,22 @@ class SessionStore: ObservableObject {
     }
 
     /// Attach or replace the chip estimator image filename on the current live session.
-    func setChipEstimatorImageFilename(_ fileName: String?) {
+    func setChipEstimatorImageFilename(
+        _ fileName: String?,
+        additionalContextTags: Set<SessionPhotoContextTag> = [],
+        additionalCustomContextLabels: [String] = []
+    ) {
         guard var s = liveSession else { return }
         s.chipEstimatorImageFilename = fileName
         #if os(iOS)
         if fileName != nil, s.primarySessionPhotoRefKey == nil {
             s.primarySessionPhotoRefKey = SessionPhotoRef.chipTable().storageKey
+        }
+        if fileName != nil {
+            applyChipPhotoContextTags(to: &s, userTags: additionalContextTags, userCustomLabels: additionalCustomContextLabels)
+        } else {
+            s.setContextTags([], for: .chipTable())
+            s.setCustomContextLabels([], for: .chipTable())
         }
         #endif
         liveSession = s
@@ -744,6 +831,123 @@ class SessionStore: ObservableObject {
         pushContext()
         #endif
     }
+
+    #if os(iOS)
+    func setChipEstimatorImageFilename(
+        _ fileName: String?,
+        sessionID: UUID,
+        additionalContextTags: Set<SessionPhotoContextTag> = [],
+        additionalCustomContextLabels: [String] = []
+    ) {
+        if var live = liveSession, live.id == sessionID {
+            live.chipEstimatorImageFilename = fileName
+            if fileName != nil, live.primarySessionPhotoRefKey == nil {
+                live.primarySessionPhotoRefKey = SessionPhotoRef.chipTable().storageKey
+            }
+            if fileName != nil {
+                applyChipPhotoContextTags(to: &live, userTags: additionalContextTags, userCustomLabels: additionalCustomContextLabels)
+            } else {
+                live.setContextTags([], for: .chipTable())
+                live.setCustomContextLabels([], for: .chipTable())
+            }
+            liveSession = live
+            saveLive()
+            pushContext()
+            return
+        }
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionID }) else { return }
+        var updated = sessions[idx]
+        updated.chipEstimatorImageFilename = fileName
+        if fileName != nil, updated.primarySessionPhotoRefKey == nil {
+            updated.primarySessionPhotoRefKey = SessionPhotoRef.chipTable().storageKey
+        }
+        if fileName != nil {
+            applyChipPhotoContextTags(to: &updated, userTags: additionalContextTags, userCustomLabels: additionalCustomContextLabels)
+        } else {
+            updated.setContextTags([], for: .chipTable())
+            updated.setCustomContextLabels([], for: .chipTable())
+        }
+        sessions[idx] = updated
+        saveSessions()
+        pushContext()
+    }
+
+    func setSessionPhotoContext(
+        sessionID: UUID,
+        ref: SessionPhotoRef,
+        tags: [SessionPhotoContextTag],
+        customLabels: [String]
+    ) {
+        mutateSession(sessionID: sessionID) { session in
+            session.setContextTags(tags, for: ref)
+            session.setCustomContextLabels(customLabels, for: ref)
+        }
+    }
+
+    func setSessionPhotoContextTags(sessionID: UUID, ref: SessionPhotoRef, tags: [SessionPhotoContextTag]) {
+        mutateSession(sessionID: sessionID) { session in
+            session.setContextTags(tags, for: ref)
+        }
+    }
+
+    func mergeSessionPhotoContextTags(
+        sessionID: UUID,
+        ref: SessionPhotoRef,
+        autoTags: Set<SessionPhotoContextTag>,
+        userTags: Set<SessionPhotoContextTag>,
+        userCustomLabels: [String] = []
+    ) {
+        let merged = SessionPhotoContextTag.merged(auto: autoTags, user: userTags)
+        setSessionPhotoContext(sessionID: sessionID, ref: ref, tags: merged, customLabels: userCustomLabels)
+    }
+
+    func applyCompPhotoContextTags(
+        sessionID: UUID,
+        compEventID: UUID,
+        compKind: CompKind,
+        userTags: Set<SessionPhotoContextTag> = [],
+        userCustomLabels: [String] = []
+    ) {
+        let ref = SessionPhotoRef.comp(compEventID)
+        let auto = SessionPhotoContextTag.autoTags(for: .comp, compKind: compKind)
+        mergeSessionPhotoContextTags(
+            sessionID: sessionID,
+            ref: ref,
+            autoTags: auto,
+            userTags: userTags,
+            userCustomLabels: userCustomLabels
+        )
+    }
+
+    private func applyChipPhotoContextTags(
+        to session: inout Session,
+        userTags: Set<SessionPhotoContextTag>,
+        userCustomLabels: [String] = []
+    ) {
+        let ref = SessionPhotoRef.chipTable()
+        let auto = SessionPhotoContextTag.autoTags(for: .chipTable)
+        session.setContextTags(SessionPhotoContextTag.merged(auto: auto, user: userTags), for: ref)
+        session.setCustomContextLabels(userCustomLabels, for: ref)
+    }
+
+    private func mutateSession(sessionID: UUID, _ transform: (inout Session) -> Void) {
+        if var live = liveSession, live.id == sessionID {
+            transform(&live)
+            live.pruneOrphanPhotoContextTags()
+            liveSession = live
+            saveLive()
+            pushContext()
+            return
+        }
+        guard let idx = sessions.firstIndex(where: { $0.id == sessionID }) else { return }
+        var updated = sessions[idx]
+        transform(&updated)
+        updated.pruneOrphanPhotoContextTags()
+        sessions[idx] = updated
+        saveSessions()
+        pushContext()
+    }
+    #endif
 
     #if os(iOS)
     func setPrimarySessionPhoto(sessionID: UUID, ref: SessionPhotoRef?) {
@@ -763,13 +967,23 @@ class SessionStore: ObservableObject {
     }
 
     @discardableResult
-    func addAttachedSessionPhoto(sessionID: UUID, image: UIImage) -> UUID? {
+    func addAttachedSessionPhoto(
+        sessionID: UUID,
+        image: UIImage,
+        contextTags: Set<SessionPhotoContextTag> = [],
+        customContextLabels: [String] = []
+    ) -> UUID? {
         guard let photoID = SessionAttachedPhotoStorage.saveImage(image) else { return nil }
+        let ref = SessionPhotoRef.attached(photoID)
+        let tags = SessionPhotoContextTag.sorted(contextTags)
+        let custom = Session.normalizedCustomContextLabels(customContextLabels)
         if var live = liveSession, live.id == sessionID {
             live.sessionAttachedPhotoIDs.append(photoID)
             if live.primarySessionPhotoRefKey == nil {
-                live.primarySessionPhotoRefKey = SessionPhotoRef.attached(photoID).storageKey
+                live.primarySessionPhotoRefKey = ref.storageKey
             }
+            live.setContextTags(tags, for: ref)
+            live.setCustomContextLabels(custom, for: ref)
             liveSession = live
             saveLive()
             pushContext()
@@ -779,8 +993,10 @@ class SessionStore: ObservableObject {
         var updated = sessions[idx]
         updated.sessionAttachedPhotoIDs.append(photoID)
         if updated.primarySessionPhotoRefKey == nil {
-            updated.primarySessionPhotoRefKey = SessionPhotoRef.attached(photoID).storageKey
+            updated.primarySessionPhotoRefKey = ref.storageKey
         }
+        updated.setContextTags(tags, for: ref)
+        updated.setCustomContextLabels(custom, for: ref)
         sessions[idx] = updated
         saveSessions()
         pushContext()
@@ -820,6 +1036,8 @@ class SessionStore: ObservableObject {
                 session.sessionAttachedPhotoIDs.removeAll { $0 == uuid }
             }
         }
+        session.setContextTags([], for: ref)
+        session.setCustomContextLabels([], for: ref)
 
         if session.primarySessionPhotoRefKey == ref.storageKey {
             session.primarySessionPhotoRefKey = SessionPhotoCatalog.items(for: session).first?.ref.storageKey
@@ -956,7 +1174,11 @@ class SessionStore: ObservableObject {
     func updateSession(_ session: Session) {
         guard let idx = sessions.firstIndex(where: { $0.id == session.id }) else { return }
         let prev = sessions[idx]
-        var s = session; s.isLive = false
+        var s = session
+        s.isLive = false
+        #if os(iOS)
+        s.pruneOrphanPhotoContextTags()
+        #endif
         sessions[idx] = s
         saveSessions()
         #if os(iOS)

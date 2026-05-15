@@ -98,6 +98,8 @@
 		SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
+		THM2E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
+		THM3E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
 		TDTA1E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */; };
 		TEDR1E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */; };
 		TLSK1E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */; };
@@ -119,6 +121,9 @@
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
 		WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */; };
+		WCHAE2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */; };
+		WTHM2E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */; };
+		WTHM4E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */; };
 		WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */; };
 		WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */; };
 		WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
@@ -273,6 +278,7 @@
 		SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SupabaseKeys.plist; sourceTree = "<group>"; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
+		THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapThemeSettings.swift; sourceTree = "<group>"; };
 		TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailView.swift; sourceTree = "<group>"; };
 		TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEditorView.swift; sourceTree = "<group>"; };
 		TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLinkSessionsSheet.swift; sourceTree = "<group>"; };
@@ -294,6 +300,9 @@
 		WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
 		WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLiveView.swift; sourceTree = "<group>"; };
+		WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTierTapLogo.swift; sourceTree = "<group>"; };
+		WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchThemeColorPicker.swift; sourceTree = "<group>"; };
+		WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
 		WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNumericKeypad.swift; sourceTree = "<group>"; };
 		WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRainingCoinsOverlay.swift; sourceTree = "<group>"; };
 		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -546,6 +555,7 @@
 			isa = PBXGroup;
 			children = (
 				SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */,
+				THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */,
 			);
 			path = WatchConnectivity;
 			sourceTree = "<group>";
@@ -568,6 +578,9 @@
 				WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */,
 				WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */,
 				WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */,
+				WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */,
+				WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */,
+				WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */,
 				WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */,
 				WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */,
 			);
@@ -900,6 +913,7 @@
 				TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
+				THM2E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */,
 				VADAPT2E2F3A4B5C6D7E8F9A0B1 /* View+AdaptiveSheet.swift in Sources */,
 				SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */,
 				GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */,
@@ -920,6 +934,9 @@
 				WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */,
 				WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */,
 				WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */,
+				WCHAE2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift in Sources */,
+				WTHM2E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift in Sources */,
+				WTHM4E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift in Sources */,
 				WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */,
 				WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */,
 				SUFB02E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */,
@@ -927,6 +944,7 @@
 				WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */,
 				WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */,
 				SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
+				THM3E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */,
 				L10NB3E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

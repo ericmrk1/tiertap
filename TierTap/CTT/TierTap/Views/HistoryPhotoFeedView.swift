@@ -18,6 +18,7 @@ struct HistoryPhotoFeedView: View {
     @EnvironmentObject var authStore: AuthStore
     @State private var selectedSession: Session?
     @State private var photoFeedFilter: HistoryPhotoFeedFilter = .allPhotos
+    @State private var selectedContextFilterKeys: Set<String> = []
     @State private var visibleEntryLimit = HistoryPhotoFeedView.pageSize
     #if os(iOS)
     @State private var shareSessionRef: PostCloseoutSessionRef?
@@ -35,18 +36,28 @@ struct HistoryPhotoFeedView: View {
         SessionPhotoCatalog.feedEntries(from: feedSessions)
     }
 
+    private var contextFilterOptions: [SessionPhotoCatalog.ContextFilterOption] {
+        SessionPhotoCatalog.contextFilterOptions(from: feedSessions)
+    }
+
     private var displayedFeedEntries: [SessionPhotoCatalog.FeedEntry] {
+        let base: [SessionPhotoCatalog.FeedEntry]
         switch photoFeedFilter {
         case .allPhotos:
-            return feedEntries
+            base = feedEntries
         case .primaryOnly:
-            return feedEntries.filter { entry in
+            base = feedEntries.filter { entry in
                 guard let session = session(for: entry),
                       let primary = SessionPhotoCatalog.resolvedPrimaryRef(for: session) else {
                     return false
                 }
                 return entry.ref == primary
             }
+        }
+        guard !selectedContextFilterKeys.isEmpty else { return base }
+        return base.filter { entry in
+            guard let session = session(for: entry) else { return false }
+            return session.matchesContextFilters(selectedContextFilterKeys, for: entry.ref)
         }
     }
 
@@ -136,9 +147,18 @@ struct HistoryPhotoFeedView: View {
         .onChange(of: photoFeedFilter) { _ in
             resetFeedPagination()
         }
-        .onChange(of: feedEntriesSignature) { _ in
+        .onChange(of: selectedContextFilterKeys) { _ in
             resetFeedPagination()
         }
+        .onChange(of: feedEntriesSignature) { _ in
+            resetFeedPagination()
+            pruneStaleContextFilters()
+        }
+    }
+
+    private func pruneStaleContextFilters() {
+        let valid = Set(contextFilterOptions.map(\.id))
+        selectedContextFilterKeys = selectedContextFilterKeys.intersection(valid)
     }
 
     private func resetFeedPagination() {
@@ -155,11 +175,53 @@ struct HistoryPhotoFeedView: View {
     }
 
     private var photoFeedFilterBar: some View {
-        Picker("", selection: $photoFeedFilter) {
-            Text("All photos").tag(HistoryPhotoFeedFilter.allPhotos)
-            Text("Primary").tag(HistoryPhotoFeedFilter.primaryOnly)
+        VStack(alignment: .leading, spacing: 10) {
+            Picker("", selection: $photoFeedFilter) {
+                Text("All photos").tag(HistoryPhotoFeedFilter.allPhotos)
+                Text("Primary").tag(HistoryPhotoFeedFilter.primaryOnly)
+            }
+            .pickerStyle(.segmented)
+
+            if !contextFilterOptions.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Context")
+                            .font(.caption.bold())
+                            .foregroundColor(.gray)
+                        if !selectedContextFilterKeys.isEmpty {
+                            Button("Clear") {
+                                selectedContextFilterKeys = []
+                            }
+                            .font(.caption2)
+                            .foregroundColor(.green)
+                        }
+                    }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(contextFilterOptions) { option in
+                                let isSelected = selectedContextFilterKeys.contains(option.id)
+                                Button {
+                                    if isSelected {
+                                        selectedContextFilterKeys.remove(option.id)
+                                    } else {
+                                        selectedContextFilterKeys.insert(option.id)
+                                    }
+                                } label: {
+                                    Text(option.label)
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(isSelected ? Color.green : Color.white.opacity(0.18))
+                                        .foregroundColor(isSelected ? .black : .white)
+                                        .cornerRadius(16)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
+            }
         }
-        .pickerStyle(.segmented)
     }
 
     private var emptyState: some View {
@@ -181,17 +243,28 @@ struct HistoryPhotoFeedView: View {
 
     private var filteredEmptyState: some View {
         VStack(spacing: 14) {
-            Image(systemName: "star")
+            Image(systemName: selectedContextFilterKeys.isEmpty ? "star" : "tag")
                 .font(.system(size: 44))
                 .foregroundColor(.gray)
-            L10nText("No primary photos to show.")
-                .font(.title3)
-                .foregroundColor(.gray)
-            L10nText("Choose a primary photo in session details or edit session.")
-                .font(.subheadline)
-                .foregroundColor(.gray.opacity(0.75))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 28)
+            if !selectedContextFilterKeys.isEmpty {
+                L10nText("No photos match these context tags.")
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                L10nText("Try clearing context filters or choosing different tags.")
+                    .font(.subheadline)
+                    .foregroundColor(.gray.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+            } else {
+                L10nText("No primary photos to show.")
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                L10nText("Choose a primary photo in session details or edit session.")
+                    .font(.subheadline)
+                    .foregroundColor(.gray.opacity(0.75))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -216,6 +289,14 @@ private struct HistoryPhotoFeedPost: View {
             parts.append(Session.durationString(session.duration))
         }
         return parts.joined(separator: " · ")
+    }
+
+    private var contextTags: [SessionPhotoContextTag] {
+        session?.contextTags(for: entry.ref) ?? []
+    }
+
+    private var customContextLabels: [String] {
+        session?.customContextLabels(for: entry.ref) ?? []
     }
 
     var body: some View {
@@ -261,6 +342,8 @@ private struct HistoryPhotoFeedPost: View {
             }
             .buttonStyle(.plain)
             .disabled(session == nil)
+
+            SessionPhotoContextTagBadgeRow(tags: contextTags, customLabels: customContextLabels)
         }
     }
 }

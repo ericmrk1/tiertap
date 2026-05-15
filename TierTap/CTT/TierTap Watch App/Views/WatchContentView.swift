@@ -6,6 +6,7 @@ import WatchKit
 /// Watch app is strictly a remote control for the live session on iPhone.
 struct WatchContentView: View {
     @EnvironmentObject var store: SessionStore
+    @EnvironmentObject private var themeStore: TierTapThemeStore
     @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var syncManager = SessionSyncManager.shared
     private let syncTicker = Timer.publish(every: 6, on: .main, in: .common).autoconnect()
@@ -28,6 +29,11 @@ struct WatchContentView: View {
                 #if targetEnvironment(simulator)
                 WatchSyncDebugPanel()
                 #endif
+
+                WatchTierTapLogo(style: .header)
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 2, trailing: 0))
+                    .listRowBackground(Color.clear)
 
                 NavigationLink {
                     WatchLiveView()
@@ -55,12 +61,17 @@ struct WatchContentView: View {
                 }
             }
             .localizedNavigationTitle("TierTap")
+            .scrollContentBackground(.hidden)
         }
+        .watchThemedScreen()
+        .tint(themeStore.primaryColor)
         .onAppear {
+            themeStore.reload()
             refreshWatchStateFromPhone()
         }
         .onChange(of: scenePhase) { newPhase in
             if newPhase == .active {
+                themeStore.reload()
                 refreshWatchStateFromPhone()
             }
         }
@@ -93,7 +104,10 @@ struct WatchContentView: View {
 }
 
 private struct WatchSettingsView: View {
+    @EnvironmentObject private var themeStore: TierTapThemeStore
     private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+    @State private var showPrimaryColorPicker = false
+    @State private var showSecondaryColorPicker = false
     @State private var watchHapticsEnabled = true
     @State private var watchSessionPulseEnabled = true
     @State private var watchSessionPulseMinutes = 20
@@ -106,6 +120,85 @@ private struct WatchSettingsView: View {
 
     var body: some View {
         Form {
+            Section("Theme & colors") {
+                Text("Presets")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                ForEach(themeStore.themePresets) { preset in
+                    Button {
+                        themeStore.applyThemePreset(preset)
+                    } label: {
+                        HStack(spacing: 8) {
+                            let colors = TierTapThemeSettings.colors(for: preset)
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [colors.0, colors.1],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 28, height: 14)
+                            Text(preset.name)
+                                .font(.caption)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                            Spacer(minLength: 0)
+                            if themeStore.isPresetSelected(preset) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Button("Save current as preset") {
+                    themeStore.saveCurrentThemeAsPreset()
+                }
+                .font(.caption)
+
+                Button {
+                    showPrimaryColorPicker = true
+                } label: {
+                    HStack {
+                        Text("Primary color")
+                        Spacer()
+                        Circle()
+                            .fill(themeStore.primaryColor)
+                            .frame(width: 18, height: 18)
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Button {
+                    showSecondaryColorPicker = true
+                } label: {
+                    HStack {
+                        Text("Secondary color")
+                        Spacer()
+                        Circle()
+                            .fill(themeStore.secondaryColor)
+                            .frame(width: 18, height: 18)
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(themeStore.primaryGradient)
+                    .frame(height: 28)
+                    .overlay {
+                        Text("Preview")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.9))
+                    }
+            }
+
             Toggle("Watch haptics", isOn: $watchHapticsEnabled)
             Toggle("Animations", isOn: $watchAnimationsEnabled)
             Picker("Haptic profile", selection: $watchHapticProfile) {
@@ -133,8 +226,30 @@ private struct WatchSettingsView: View {
             WatchNumericDigitPad(text: $watchCompCashDefaults, allowSpace: true, maxLength: 48)
             TextField("Comp type options", text: $watchCompContextOptions)
         }
+        .scrollContentBackground(.hidden)
+        .watchThemedScreen()
+        .tint(themeStore.primaryColor)
         .localizedNavigationTitle("Watch Settings")
-        .onAppear(perform: load)
+        .onAppear {
+            themeStore.reload()
+            load()
+        }
+        .sheet(isPresented: $showPrimaryColorPicker) {
+            WatchThemeColorPickerSheet(
+                title: "Primary color",
+                selectedName: themeStore.primaryColorName
+            ) { color in
+                themeStore.setPrimaryColor(color)
+            }
+        }
+        .sheet(isPresented: $showSecondaryColorPicker) {
+            WatchThemeColorPickerSheet(
+                title: "Secondary color",
+                selectedName: themeStore.secondaryColorName
+            ) { color in
+                themeStore.setSecondaryColor(color)
+            }
+        }
         .onChange(of: watchHapticsEnabled) { _ in save() }
         .onChange(of: watchAnimationsEnabled) { _ in save() }
         .onChange(of: watchSessionPulseEnabled) { _ in save() }
@@ -182,6 +297,7 @@ private struct WatchSettingsView: View {
             .split(whereSeparator: \.isWhitespace)
             .joined(separator: " ")
     }
+
 }
 
 #if targetEnvironment(simulator)
@@ -224,6 +340,8 @@ private struct WatchSyncDebugPanel: View {
 
 struct WatchHistoryView: View {
     @EnvironmentObject var store: SessionStore
+    @EnvironmentObject private var themeStore: TierTapThemeStore
+    @Environment(\.watchTheme) private var theme
     @State private var isRefreshing = false
 
     private var sessions: [Session] {
@@ -273,6 +391,9 @@ struct WatchHistoryView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("History")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -285,6 +406,7 @@ struct WatchHistoryView: View {
             }
         }
         .onAppear {
+            themeStore.reload()
             refreshFromPhone()
         }
     }
@@ -411,6 +533,8 @@ private struct WatchSessionDetailView: View {
 }
 
 struct WatchRemotesView: View {
+    @EnvironmentObject private var themeStore: TierTapThemeStore
+    @Environment(\.watchTheme) private var theme
     @ObservedObject private var syncManager = SessionSyncManager.shared
 
     var body: some View {
@@ -434,7 +558,7 @@ struct WatchRemotesView: View {
                             Spacer()
                             Text(entry.delivery == .sent ? "sent" : "queued")
                                 .font(.caption2.bold())
-                                .foregroundColor(entry.delivery == .sent ? .green : .orange)
+                                .foregroundColor(entry.delivery == .sent ? theme.primary : theme.secondary)
                         }
                         if entry.paramsSummary != "-" {
                             Text(entry.paramsSummary)
@@ -450,7 +574,11 @@ struct WatchRemotesView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Remotes")
+        .onAppear { themeStore.reload() }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {

@@ -91,6 +91,7 @@ private struct WatchCloseoutSheetRef: Identifiable, Hashable {
 /// Fast close-out, regular close-out (cash-out on watch), or cancel (discard) live session — complements pause/unpause on the timer tab.
 private struct WatchEndSessionOptionsView: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var showConfirmFastClose = false
@@ -150,6 +151,8 @@ private struct WatchEndSessionOptionsView: View {
             }
             WatchRainingCoinsOverlay(playToken: profitRainPlayToken, enabled: celebrationMotionOK)
         }
+        .watchThemedScreen()
+        .tint(theme.primary)
         .navigationTitle("End session")
         .alert("Fast close-out?", isPresented: $showConfirmFastClose) {
             Button("No", role: .cancel) {}
@@ -163,7 +166,7 @@ private struct WatchEndSessionOptionsView: View {
                     }
                 })
                 statusLine = immediate ? "Fast close-out sent" : "Fast close-out queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 playWatchEndFlowHaptic(success: immediate)
             }
         } message: {
@@ -175,7 +178,7 @@ private struct WatchEndSessionOptionsView: View {
                 store.watchStopLiveSessionForCloseout { sessionId, err in
                     if let err {
                         statusLine = err
-                        statusColor = .orange
+                        statusColor = theme.queuedColor
                         playWatchEndFlowHaptic(success: false)
                     } else if let sessionId {
                         let session = store.sessions.first(where: { $0.id == sessionId })
@@ -187,11 +190,11 @@ private struct WatchEndSessionOptionsView: View {
                             initialCashOut: initialCashOut
                         )
                         statusLine = "Enter cash-out on the next screen."
-                        statusColor = .green
+                        statusColor = theme.successColor
                         playWatchEndFlowHaptic(success: SessionSyncManager.shared.isReachable)
                     } else {
                         statusLine = "Stop did not complete. Try again."
-                        statusColor = .orange
+                        statusColor = theme.queuedColor
                         playWatchEndFlowHaptic(success: false)
                     }
                 }
@@ -205,7 +208,7 @@ private struct WatchEndSessionOptionsView: View {
                 let immediate = SessionSyncManager.shared.isReachable
                 store.discardLiveSession()
                 statusLine = immediate ? "Cancel sent" : "Cancel queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 playWatchEndFlowHaptic(success: immediate)
             }
         } message: {
@@ -215,11 +218,11 @@ private struct WatchEndSessionOptionsView: View {
             WatchCloseoutCashSheet(ref: ref) { err, closedInProfit in
                 if let err {
                     statusLine = err
-                    statusColor = .orange
+                    statusColor = theme.queuedColor
                     playWatchEndFlowHaptic(success: false)
                 } else {
                     statusLine = "Close-out complete"
-                    statusColor = .green
+                    statusColor = theme.successColor
                     playWatchEndFlowHaptic(success: true)
                     if closedInProfit, celebrationMotionOK {
                         profitRainPlayToken += 1
@@ -239,6 +242,7 @@ private struct WatchEndSessionOptionsView: View {
 
 struct WatchLiveView: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
@@ -253,9 +257,11 @@ struct WatchLiveView: View {
     @State private var lastAppGroupSnapshotRevision: Int = 0
     @State private var lastObservedBuyIn: Int?
     @State private var lastObservedComp: Int?
+    @State private var lastObservedFreePlay: Int?
     @State private var lastObservedTier: Int?
     @State private var buyInSuccessPulse = 0
     @State private var compSuccessPulse = 0
+    @State private var freePlaySuccessPulse = 0
     @State private var tierSuccessPulse = 0
     @State private var stackSuccessPulse = 0
     @State private var lastObservedStack: Int?
@@ -292,6 +298,8 @@ struct WatchLiveView: View {
         }
         .tabViewStyle(.page)
         .indexViewStyle(.page(backgroundDisplayMode: .automatic))
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("TierTap Remote")
         .onReceive(syncTicker) { _ in
             requestLatestContext()
@@ -321,6 +329,12 @@ struct WatchLiveView: View {
                 compSuccessPulse += 1
             }
             lastObservedComp = newTotal
+        }
+        .onChange(of: s?.totalFreePlay) { _, newTotal in
+            if watchAnimationsAllowMotion, let prev = lastObservedFreePlay, let n = newTotal, n > prev {
+                freePlaySuccessPulse += 1
+            }
+            lastObservedFreePlay = newTotal
         }
         .onChange(of: s?.startingTierPoints) { _, newPoints in
             if watchAnimationsAllowMotion, let prev = lastObservedTier, let n = newPoints, n > prev {
@@ -356,6 +370,12 @@ struct WatchLiveView: View {
                     Text(live.game)
                         .font(.caption2)
                         .foregroundColor(.secondary)
+                    Text("Buy-in $\(live.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                    Text("Free play $\(live.totalFreePlay.formatted(.number.grouping(.automatic)))")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 } else {
                     L10nText("No live session")
                         .font(.caption)
@@ -368,6 +388,8 @@ struct WatchLiveView: View {
                             .font(.caption2.bold())
                             .foregroundColor(.secondary)
                         Text("Buy-In: $\((s?.totalBuyIn ?? 0).formatted(.number.grouping(.automatic)))")
+                            .font(.caption2)
+                        Text("Free Play: $\((s?.totalFreePlay ?? 0).formatted(.number.grouping(.automatic)))")
                             .font(.caption2)
                         Text("Comp: $\((s?.totalComp ?? 0).formatted(.number.grouping(.automatic)))")
                             .font(.caption2)
@@ -387,11 +409,11 @@ struct WatchLiveView: View {
                         VStack(spacing: 4) {
                             Text(Session.durationString(liveElapsedSeconds(at: context.date)))
                                 .font(.system(.title2, design: .monospaced).weight(.semibold))
-                                .foregroundColor(.black)
+                                .foregroundStyle(theme.onPrimaryButtonLabel)
                                 .frame(maxWidth: .infinity)
                             Text(primaryTimerButtonTitle)
                                 .font(.caption2.bold())
-                                .foregroundColor(.black)
+                                .foregroundStyle(theme.onPrimaryButtonLabel)
                         }
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
@@ -435,7 +457,7 @@ struct WatchLiveView: View {
                             title: "Buy-In",
                             value: "$\((s?.totalBuyIn ?? 0).formatted(.number.grouping(.automatic)))",
                             icon: "plus.circle.fill",
-                            accent: .blue,
+                            accent: theme.metricAccent(at: 0),
                             successPulse: buyInSuccessPulse
                         )
                     }
@@ -450,12 +472,27 @@ struct WatchLiveView: View {
                             title: "Comps",
                             value: "$\((s?.totalComp ?? 0).formatted(.number.grouping(.automatic)))",
                             icon: "gift.fill",
-                            accent: .cyan,
+                            accent: theme.metricAccent(at: 1),
                             successPulse: compSuccessPulse
                         )
                     }
                     .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
                     .id("watch-quick-comp")
+
+                    NavigationLink {
+                        WatchAddFreePlaySheet()
+                            .environmentObject(store)
+                    } label: {
+                        metricButton(
+                            title: "Free Play",
+                            value: "$\((s?.totalFreePlay ?? 0).formatted(.number.grouping(.automatic)))",
+                            icon: "ticket.fill",
+                            accent: theme.metricAccent(at: 2),
+                            successPulse: freePlaySuccessPulse
+                        )
+                    }
+                    .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
+                    .id("watch-quick-freeplay")
 
                     NavigationLink {
                         WatchUpdateTierSheet()
@@ -465,7 +502,7 @@ struct WatchLiveView: View {
                             title: "Tier",
                             value: (s?.startingTierPoints ?? 0).formatted(.number.grouping(.automatic)),
                             icon: "chart.bar.fill",
-                            accent: .purple,
+                            accent: theme.metricAccent(at: 3),
                             successPulse: tierSuccessPulse
                         )
                     }
@@ -500,6 +537,7 @@ struct WatchLiveView: View {
                     buttonLabel("Pause session", icon: "pause.circle.fill")
                 }
                 .buttonStyle(.bordered)
+                .tint(theme.primary)
                 .disabled(!hasLiveSession || isSessionPaused)
 
                 Button {
@@ -510,6 +548,7 @@ struct WatchLiveView: View {
                     buttonLabel("Unpause session", icon: "play.circle.fill")
                 }
                 .buttonStyle(.bordered)
+                .tint(theme.primary)
                 .disabled(!hasLiveSession || !isSessionPaused)
 
                 NavigationLink {
@@ -519,7 +558,7 @@ struct WatchLiveView: View {
                     buttonLabel("End session…", icon: "flag.checkered")
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.orange)
+                .tint(theme.secondary)
                 .disabled(!hasLiveSession)
 
                 NavigationLink {
@@ -528,6 +567,7 @@ struct WatchLiveView: View {
                     buttonLabel("Event Log", icon: "list.bullet.rectangle")
                 }
                 .buttonStyle(.bordered)
+                .tint(theme.primary)
 
                 NavigationLink {
                     WatchHistoryView()
@@ -536,6 +576,7 @@ struct WatchLiveView: View {
                     buttonLabel("Session History", icon: "clock.arrow.circlepath")
                 }
                 .buttonStyle(.bordered)
+                .tint(theme.primary)
 
                 Text(syncManager.syncStatusMessage)
                     .font(.caption2)
@@ -557,16 +598,15 @@ struct WatchLiveView: View {
     }
 
     private var primaryTimerFill: Color {
-        if !hasLiveSession { return .green }
-        return isSessionPaused ? .orange : .green
+        theme.timerFill(hasLive: hasLiveSession, paused: isSessionPaused)
     }
 
     private var timerStatusColor: Color {
         if let msg = feedbackMessage, msg.localizedCaseInsensitiveContains("close out") {
             return .red
         }
-        if !hasLiveSession { return .black }
-        return isSessionPaused ? .orange : .green
+        if !hasLiveSession { return theme.primary }
+        return isSessionPaused ? theme.secondary : theme.primary
     }
 
     private var wristRaiseSummaryEnabled: Bool {
@@ -606,7 +646,7 @@ struct WatchLiveView: View {
                 title: "Stack",
                 value: quickStackTileValue,
                 icon: TierTapLabelIcon.chipStackSentinel,
-                accent: .green,
+                accent: theme.metricAccent(at: 4),
                 successPulse: stackSuccessPulse,
                 animateValueDigits: false
             )
@@ -659,11 +699,11 @@ struct WatchLiveView: View {
         action()
         if immediate {
             feedbackMessage = "\(name) sent"
-            feedbackColor = .green
+            feedbackColor = theme.successColor
             playConfiguredHaptic(style: .success)
         } else {
             feedbackMessage = "\(name) queued"
-            feedbackColor = .orange
+            feedbackColor = theme.queuedColor
             playConfiguredHaptic(style: .queue)
         }
     }
@@ -676,7 +716,7 @@ struct WatchLiveView: View {
         guard elapsedMinutes != lastPulseMinuteMark else { return }
         lastPulseMinuteMark = elapsedMinutes
         feedbackMessage = "Pulse: \(elapsedMinutes)m"
-        feedbackColor = .orange
+        feedbackColor = theme.queuedColor
         playConfiguredHaptic(style: .pulse)
     }
 
@@ -753,6 +793,7 @@ struct WatchLiveView: View {
 
 private struct WatchCloseoutCashSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.dismiss) private var dismiss
 
     let ref: WatchCloseoutSheetRef
@@ -899,6 +940,7 @@ private struct WatchPrimaryTimerPressStyle: ButtonStyle {
 }
 
 private struct WatchQuickMetricLabel: View {
+    @Environment(\.watchTheme) private var theme
     let title: String
     let value: String
     let icon: String
@@ -949,7 +991,11 @@ private struct WatchQuickMetricLabel: View {
             }
             .padding(8)
             .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
-            .background(Color.gray.opacity(0.18))
+            .background(theme.tileBackground)
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(theme.tileStroke, lineWidth: 1)
+            }
 
             if motionEnabled {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -1011,6 +1057,7 @@ private struct WatchChipNudgeModifier: ViewModifier {
 
 private struct WatchFastStartSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.dismiss) private var dismiss
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
@@ -1069,6 +1116,8 @@ private struct WatchFastStartSheet: View {
                     .foregroundColor(.secondary)
             }
         }
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Fast Start")
         .onAppear {
             baselineLiveSessionID = store.liveSession?.id
@@ -1078,7 +1127,7 @@ private struct WatchFastStartSheet: View {
             guard newID != nil, newID != baselineLiveSessionID else { return }
             pendingFastStart = false
             statusMessage = "Live session started on iPhone"
-            statusColor = .green
+            statusColor = theme.successColor
             WKInterfaceDevice.current().play(.success)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 dismiss()
@@ -1115,7 +1164,7 @@ private struct WatchFastStartSheet: View {
         guard store.liveSession == nil else {
             pendingFastStart = false
             statusMessage = "A session is already live"
-            statusColor = .orange
+            statusColor = theme.queuedColor
             WKInterfaceDevice.current().play(.click)
             return
         }
@@ -1124,7 +1173,7 @@ private struct WatchFastStartSheet: View {
         baselineLiveSessionID = store.liveSession?.id
         store.fastStartSession(category: category)
         statusMessage = immediate ? "Fast start sent" : "Fast start queued"
-        statusColor = immediate ? .green : .orange
+        statusColor = immediate ? theme.successColor : theme.queuedColor
         WKInterfaceDevice.current().play(immediate ? .success : .click)
     }
 
@@ -1159,6 +1208,7 @@ private struct WatchFastStartSheet: View {
 
 private struct WatchAddBuyInSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var amount: Double = 100
@@ -1226,7 +1276,7 @@ private struct WatchAddBuyInSheet: View {
             }
             Text("Proposed total: $\(proposedTotal)")
                 .font(.caption2)
-                .foregroundColor(.green)
+                .foregroundStyle(theme.primary)
                 .contentTransition(.numericText())
                 .animation(buyInMotionOK ? .snappy : nil, value: proposedTotal)
             quickAmountRows(amountPresetValues)
@@ -1239,10 +1289,7 @@ private struct WatchAddBuyInSheet: View {
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
-            .foregroundColor(.black)
-            .padding(.vertical, 6)
-            .background(Color.green)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .watchThemedActionChip()
             }
             if let celebration = buyInCelebration {
                 watchAmountFullscreenCelebrationView(
@@ -1264,6 +1311,8 @@ private struct WatchAddBuyInSheet: View {
             isContinuous: false,
             isHapticFeedbackEnabled: true
         )
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Add Buy-In")
         .alert("Add buy-in?", isPresented: $showConfirmAdd) {
             Button("No", role: .cancel) {}
@@ -1274,7 +1323,7 @@ private struct WatchAddBuyInSheet: View {
                 pendingExpectedTotal = currentTotalBuyIn + selected
                 store.addBuyIn(selected)
                 statusMessage = immediate ? "Buy-in sent" : "Buy-in queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
             }
         } message: {
@@ -1288,7 +1337,7 @@ private struct WatchAddBuyInSheet: View {
             pendingBuyInBaselineTotal = nil
             let added = max(0, newTotal - baseline)
             statusMessage = "Buy-in updated on iPhone"
-            statusColor = .green
+            statusColor = theme.successColor
             playSuccessHaptic()
             if buyInMotionOK {
                 addOnChipNudge += 1
@@ -1298,7 +1347,7 @@ private struct WatchAddBuyInSheet: View {
                 title: "Buy-in added",
                 primaryValue: "$\(newTotal)",
                 caption: added > 0 ? "+$\(added) this add" : nil,
-                gradientColors: [Color.green.opacity(0.5), Color.black.opacity(0.94)]
+                gradientColors: [theme.celebrationGradientLead, Color.black.opacity(0.94)]
             )
             let dismissDelay: TimeInterval = buyInMotionOK ? 2.2 : 1.6
             DispatchQueue.main.asyncAfter(deadline: .now() + dismissDelay) {
@@ -1317,9 +1366,217 @@ private struct WatchAddBuyInSheet: View {
         }
         .buttonStyle(WatchQuickTilePressStyle(enabled: buyInMotionOK))
         .frame(maxWidth: .infinity, alignment: .center)
+        .watchThemedActionChip(compact: true)
+    }
+
+    @ViewBuilder
+    private func quickAmountRows(_ values: [Int]) -> some View {
+        let chunkSize = 2
+        let totalRows = Int(ceil(Double(values.count) / Double(chunkSize)))
+        ForEach(0..<max(totalRows, 1), id: \.self) { row in
+            HStack {
+                let firstIndex = row * chunkSize
+                if firstIndex < values.count {
+                    quickAmountButton(values[firstIndex])
+                }
+                let secondIndex = firstIndex + 1
+                if secondIndex < values.count {
+                    quickAmountButton(values[secondIndex])
+                }
+            }
+        }
+    }
+
+    private func parseFlexibleSeparatedIntegers(_ raw: String) -> [Int] {
+        raw
+            .replacingOccurrences(of: ",", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .compactMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+            .filter { $0 > 0 }
+    }
+
+    private func playSuccessHaptic() {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(.success)
+        #endif
+    }
+
+    private func playClickHaptic() {
+        #if os(watchOS)
+        WKInterfaceDevice.current().play(.click)
+        #endif
+    }
+}
+
+private struct WatchAddFreePlaySheet: View {
+    @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
+    @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+    @State private var amount: Double = 100
+    @State private var customAmountText: String = "100"
+    @State private var playTypeText: String = ""
+    @State private var statusMessage: String?
+    @State private var statusColor: Color = .green
+    @State private var pendingExpectedTotal: Int?
+    @State private var pendingFreePlayBaselineTotal: Int?
+    @State private var showConfirmAdd = false
+    @State private var freePlayCelebration: WatchAmountFullscreenCelebration?
+    private let groupDefaults = UserDefaults(suiteName: "group.com.app.tiertap")
+
+    private var motionOK: Bool {
+        tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
+    }
+
+    private var currentTotalFreePlay: Int {
+        store.liveSession?.totalFreePlay ?? 0
+    }
+
+    private var selectedAmount: Int {
+        let custom = Int(customAmountText.filter { $0.isNumber }) ?? 0
+        if custom > 0 { return custom }
+        return max(5, Int(amount))
+    }
+
+    private var proposedTotal: Int {
+        currentTotalFreePlay + selectedAmount
+    }
+
+    private var amountPresetValues: [Int] {
+        let defaults = [20, 100, 200, 500]
+        guard let raw = groupDefaults?.string(forKey: "ctt_watch_buyin_cash_defaults") else {
+            return defaults
+        }
+        let parsed = parseFlexibleSeparatedIntegers(raw)
+        return parsed.isEmpty ? defaults : parsed
+    }
+
+    private var storedPlayType: String {
+        let trimmed = playTypeText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Free play" : trimmed
+    }
+
+    private var confirmationSummary: String {
+        let typedDigits = customAmountText.filter { $0.isNumber }
+        let entryMode = typedDigits.isEmpty ? "Digital Crown / preset" : "Typed amount"
+        return "Amount: $\(selectedAmount)\nType: \(storedPlayType)\nEntry: \(entryMode)\nCurrent total: $\(currentTotalFreePlay)\nNew total: $\(proposedTotal)"
+    }
+
+    var body: some View {
+        ZStack {
+            Form {
+                if let statusMessage {
+                    Text(statusMessage)
+                        .font(.caption2.bold())
+                        .foregroundColor(statusColor)
+                }
+                Text("Current free play: $\(currentTotalFreePlay)")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .contentTransition(.numericText())
+                    .animation(motionOK ? .snappy : nil, value: currentTotalFreePlay)
+                Text("Amount: $\(selectedAmount)")
+                    .font(.headline.monospacedDigit())
+                    .contentTransition(.numericText())
+                    .animation(motionOK ? .snappy : nil, value: selectedAmount)
+                Text("Proposed total: $\(proposedTotal)")
+                    .font(.caption2)
+                    .foregroundColor(.mint)
+                    .contentTransition(.numericText())
+                    .animation(motionOK ? .snappy : nil, value: proposedTotal)
+                TextField("Type (optional)", text: $playTypeText)
+                quickAmountRows(amountPresetValues)
+                Text("Custom amount")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
+                Button("Add Free Play") {
+                    showConfirmAdd = true
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .foregroundColor(.black)
+                .padding(.vertical, 6)
+                .background(Color.mint)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            if let celebration = freePlayCelebration {
+                watchAmountFullscreenCelebrationView(
+                    celebration,
+                    onDismiss: { freePlayCelebration = nil }
+                )
+                .transition(.opacity)
+                .zIndex(2)
+            }
+        }
+        .animation(motionOK ? .easeOut(duration: 0.22) : nil, value: freePlayCelebration)
+        .focusable(true)
+        .digitalCrownRotation(
+            $amount,
+            from: 5,
+            through: 20_000,
+            by: 5,
+            sensitivity: .low,
+            isContinuous: false,
+            isHapticFeedbackEnabled: true
+        )
+        .watchThemedScreen()
+        .tint(theme.primary)
+        .localizedNavigationTitle("Free Play")
+        .alert("Add free play?", isPresented: $showConfirmAdd) {
+            Button("No", role: .cancel) {}
+            Button("Yes") {
+                let selected = selectedAmount
+                let immediate = SessionSyncManager.shared.isReachable
+                pendingFreePlayBaselineTotal = currentTotalFreePlay
+                pendingExpectedTotal = currentTotalFreePlay + selected
+                store.addFreePlay(amount: selected, playType: storedPlayType)
+                statusMessage = immediate ? "Free play sent" : "Free play queued"
+                statusColor = immediate ? theme.successColor : theme.queuedColor
+                if immediate { playSuccessHaptic() } else { playClickHaptic() }
+            }
+        } message: {
+            Text("\n\(confirmationSummary)")
+        }
+        .onChange(of: store.liveSession?.totalFreePlay) { newTotal in
+            guard let expected = pendingExpectedTotal, let newTotal else { return }
+            guard newTotal >= expected else { return }
+            pendingExpectedTotal = nil
+            let baseline = pendingFreePlayBaselineTotal ?? newTotal
+            pendingFreePlayBaselineTotal = nil
+            let added = max(0, newTotal - baseline)
+            statusMessage = "Free play updated on iPhone"
+            statusColor = theme.successColor
+            playSuccessHaptic()
+            if motionOK {
+                freePlayCelebration = WatchAmountFullscreenCelebration(
+                    emoji: "🎟️",
+                    title: "Free play added",
+                    primaryValue: "$\(newTotal)",
+                    caption: added > 0 ? "+$\(added) this add" : nil,
+                    gradientColors: [Color.mint.opacity(0.5), Color.black.opacity(0.94)]
+                )
+                let dismissDelay: TimeInterval = motionOK ? 2.2 : 1.6
+                DispatchQueue.main.asyncAfter(deadline: .now() + dismissDelay) {
+                    freePlayCelebration = nil
+                }
+            }
+        }
+        .onAppear {
+            customAmountText = "\(max(5, Int(amount)))"
+        }
+    }
+
+    private func quickAmountButton(_ value: Int) -> some View {
+        Button("$\(value)") {
+            amount = Double(value)
+            customAmountText = "\(value)"
+        }
+        .buttonStyle(WatchQuickTilePressStyle(enabled: motionOK))
+        .frame(maxWidth: .infinity, alignment: .center)
         .foregroundColor(.black)
         .padding(.vertical, 4)
-        .background(Color.green)
+        .background(Color.mint)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
@@ -1364,6 +1621,7 @@ private struct WatchAddBuyInSheet: View {
 
 private struct WatchUpdateStackSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var amount: Double = 100
@@ -1381,8 +1639,8 @@ private struct WatchUpdateStackSheet: View {
         tierTapWatchAnimationsEnabled && !accessibilityReduceMotion
     }
 
-    private var totalBuyIn: Int {
-        store.liveSession?.totalBuyIn ?? 0
+    private var stackBaseline: Int {
+        store.liveSession?.totalStackBaseline ?? 0
     }
 
     private var selectedStack: Int {
@@ -1392,7 +1650,7 @@ private struct WatchUpdateStackSheet: View {
     }
 
     private var sessionWinLossPreview: Int {
-        selectedStack - totalBuyIn
+        selectedStack - stackBaseline
     }
 
     private var amountPresetValues: [Int] {
@@ -1409,7 +1667,7 @@ private struct WatchUpdateStackSheet: View {
         let entryMode = typedDigits.isEmpty ? "Digital Crown / preset" : "Typed amount"
         let wl = sessionWinLossPreview
         let wlLine = wl >= 0 ? "Session win: $\(wl)" : "Session loss: $\(abs(wl))"
-        return "Stack: $\(selectedStack)\nEntry: \(entryMode)\nTotal buy-in: $\(totalBuyIn)\n\(wlLine)"
+        return "Stack: $\(selectedStack)\nEntry: \(entryMode)\nBuy-in + free play: $\(stackBaseline)\n\(wlLine)"
     }
 
     var body: some View {
@@ -1420,11 +1678,11 @@ private struct WatchUpdateStackSheet: View {
                     .font(.caption2.bold())
                     .foregroundColor(statusColor)
             }
-            Text("Total buy-in: $\(totalBuyIn)")
+            Text("Buy-in + free play: $\(stackBaseline)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .contentTransition(.numericText())
-                .animation(stackMotionOK ? .snappy : nil, value: totalBuyIn)
+                .animation(stackMotionOK ? .snappy : nil, value: stackBaseline)
             HStack(alignment: .center, spacing: 8) {
                 Text("Stack: $\(selectedStack)")
                     .font(.headline.monospacedDigit())
@@ -1472,6 +1730,8 @@ private struct WatchUpdateStackSheet: View {
             isContinuous: false,
             isHapticFeedbackEnabled: true
         )
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Update Stack")
         .alert("Update stack?", isPresented: $showConfirmUpdate) {
             Button("No", role: .cancel) {}
@@ -1481,7 +1741,7 @@ private struct WatchUpdateStackSheet: View {
                 pendingExpectedStack = stack
                 store.updateLiveTrackedStack(stack)
                 statusMessage = immediate ? "Stack sent" : "Stack queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
             }
         } message: {
@@ -1491,9 +1751,9 @@ private struct WatchUpdateStackSheet: View {
             guard let expected = pendingExpectedStack, let newVal else { return }
             guard newVal == expected else { return }
             pendingExpectedStack = nil
-            let wl = newVal - (store.liveSession?.totalBuyIn ?? 0)
+            let wl = newVal - (store.liveSession?.totalStackBaseline ?? 0)
             statusMessage = wl >= 0 ? "Session win $\(wl)" : "Session loss $\(abs(wl))"
-            statusColor = .green
+            statusColor = theme.successColor
             playSuccessHaptic()
             if stackMotionOK {
                 stackChipNudge += 1
@@ -1505,10 +1765,10 @@ private struct WatchUpdateStackSheet: View {
             let gradient: [Color]
             if wl > 0 {
                 caption = "Up $\(wl) vs buy-in"
-                gradient = [Color.green.opacity(0.48), Color.black.opacity(0.94)]
+                gradient = [theme.celebrationGradientLead, Color.black.opacity(0.94)]
             } else if wl < 0 {
                 caption = "Down $\(abs(wl)) vs buy-in"
-                gradient = [Color.orange.opacity(0.42), Color.black.opacity(0.94)]
+                gradient = [theme.secondary.opacity(0.42), Color.black.opacity(0.94)]
             } else {
                 caption = "Even with buy-in"
                 gradient = [Color.teal.opacity(0.45), Color.black.opacity(0.94)]
@@ -1593,12 +1853,14 @@ private struct WatchAddCompSheet: View {
     }
 
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var amount: Double = 20
     @State private var customAmountText: String = "20"
     @State private var details = ""
     @State private var selectedCompEntryMode: WatchCompEntryMode?
+    @State private var cashValueIsFreePlay = false
     @State private var selectedContextIndex: Int = 0
     @State private var statusMessage: String?
     @State private var statusColor: Color = .green
@@ -1624,8 +1886,15 @@ private struct WatchAddCompSheet: View {
         return max(5, Int(amount))
     }
 
+    private var currentFreePlayTotal: Int {
+        store.liveSession?.totalFreePlay ?? 0
+    }
+
     private var proposedCompTotal: Int {
-        currentCompTotal + selectedAmount
+        if selectedCompEntryMode == .cashValue && cashValueIsFreePlay {
+            return currentFreePlayTotal + selectedAmount
+        }
+        return currentCompTotal + selectedAmount
     }
 
     private var compContextLabel: String {
@@ -1641,11 +1910,12 @@ private struct WatchAddCompSheet: View {
 
     private var compConfirmationSummary: String {
         let notes = details.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isFreePlay = selectedCompEntryMode == .cashValue && cashValueIsFreePlay
         var lines = [
-            "Type: \(compContextLabel)",
+            "Type: \(isFreePlay ? "Free play" : compContextLabel)",
             "Amount: $\(selectedAmount)",
-            "Current comps: $\(currentCompTotal)",
-            "New comps total: $\(proposedCompTotal)"
+            isFreePlay ? "Current free play: $\(currentFreePlayTotal)" : "Current comps: $\(currentCompTotal)",
+            isFreePlay ? "New free play total: $\(proposedCompTotal)" : "New comps total: $\(proposedCompTotal)"
         ]
         if !notes.isEmpty {
             lines.append("Notes: \(notes)")
@@ -1693,7 +1963,7 @@ private struct WatchAddCompSheet: View {
                 if compMotionOK {
                     Image(systemName: "gift.fill")
                         .font(.caption2)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(theme.secondary)
                         .symbolEffect(.bounce, value: compCelebrationToken)
                 }
             }
@@ -1703,12 +1973,14 @@ private struct WatchAddCompSheet: View {
                     .foregroundColor(.secondary)
                 Button("Add Food/Beverage") {
                     selectedCompEntryMode = .foodBeverage
+                    cashValueIsFreePlay = false
                     selectedContextIndex = min(selectedContextIndex, max(contextOptions.count - 1, 0))
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.cyan)
+                .tint(theme.secondary)
                 Button("Add Cash Value") {
                     selectedCompEntryMode = .cashValue
+                    cashValueIsFreePlay = false
                 }
                 .buttonStyle(.bordered)
             } else if selectedCompEntryMode == .cashValue {
@@ -1719,13 +1991,13 @@ private struct WatchAddCompSheet: View {
                 HStack(spacing: 6) {
                     Text("Proposed comps: $\(proposedCompTotal)")
                         .font(.caption2)
-                        .foregroundColor(.green)
+                        .foregroundStyle(theme.primary)
                         .contentTransition(.numericText())
                         .animation(compMotionOK ? .snappy : nil, value: proposedCompTotal)
                     if compMotionOK, selectedAmount > 0 {
                         Text("+\(selectedAmount)")
                             .font(.caption2.weight(.semibold))
-                            .foregroundColor(.green.opacity(0.9))
+                            .foregroundStyle(theme.primary.opacity(0.9))
                             .transition(.move(edge: .trailing).combined(with: .opacity))
                     }
                 }
@@ -1735,6 +2007,7 @@ private struct WatchAddCompSheet: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                 WatchNumericDigitPad(text: $customAmountText, allowSpace: false, maxLength: 8)
+                Toggle("Log as free play", isOn: $cashValueIsFreePlay)
                 TextField("Context (optional)", text: $details)
             } else {
                 Text("Category")
@@ -1759,7 +2032,7 @@ private struct WatchAddCompSheet: View {
                         .buttonStyle(WatchQuickTilePressStyle(enabled: compMotionOK))
                         .frame(maxWidth: .infinity, minHeight: 34)
                         .foregroundColor(selectedContextIndex == index ? .black : .white)
-                        .background(selectedContextIndex == index ? Color.green : Color.gray.opacity(0.22))
+                        .background(selectedContextIndex == index ? theme.primary : Color.gray.opacity(0.22))
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
                 }
@@ -1769,8 +2042,8 @@ private struct WatchAddCompSheet: View {
                     .animation(compMotionOK ? .snappy : nil, value: selectedAmount)
                 Text("Proposed comps: $\(proposedCompTotal)")
                     .font(.caption2)
-                    .foregroundColor(.green)
-                    .underline(true, color: .cyan)
+                    .foregroundStyle(theme.primary)
+                    .underline(true, color: theme.secondary)
                     .contentTransition(.numericText())
                     .animation(compMotionOK ? .snappy : nil, value: proposedCompTotal)
                 quickAmountRows(amountPresetValues)
@@ -1792,10 +2065,7 @@ private struct WatchAddCompSheet: View {
             .disabled(selectedCompEntryMode == nil || selectedAmount <= 0 || (selectedCompEntryMode == .foodBeverage && contextOptions.isEmpty))
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
-            .foregroundColor(.black)
-            .padding(.vertical, 6)
-            .background(Color.green)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .watchThemedActionChip()
             }
             }
             if let celebration = addedCompCelebration {
@@ -1815,6 +2085,8 @@ private struct WatchAddCompSheet: View {
             isContinuous: false,
             isHapticFeedbackEnabled: true
         )
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Add Comp")
         .alert("Add comp?", isPresented: $showConfirmAdd) {
             Button("No", role: .cancel) {}
@@ -1822,8 +2094,10 @@ private struct WatchAddCompSheet: View {
                 let selected = selectedAmount
                 let immediate = SessionSyncManager.shared.isReachable
                 let trimmed = details.trimmingCharacters(in: .whitespacesAndNewlines)
-                pendingExpectedCompTotal = currentCompTotal + selected
                 let mode = selectedCompEntryMode ?? .cashValue
+                pendingExpectedCompTotal = (mode == .cashValue && cashValueIsFreePlay)
+                    ? currentFreePlayTotal + selected
+                    : currentCompTotal + selected
                 if mode == .foodBeverage {
                     let context = compContextLabel
                     let detailsParts = [context, trimmed].filter { !$0.isEmpty }
@@ -1836,13 +2110,18 @@ private struct WatchAddCompSheet: View {
                         foodBeverageOtherDescription: mappedFoodBeverageKind(for: context) == .other ? context : nil
                     )
                 } else {
-                    let cashContext = "Cash Value"
+                    let cashContext = cashValueIsFreePlay ? "Free play" : "Cash Value"
                     let detailsParts = [cashContext, trimmed].filter { !$0.isEmpty }
                     let mergedDetails = detailsParts.joined(separator: " - ")
-                    store.addComp(amount: selected, kind: .dollarsCredits, details: mergedDetails.isEmpty ? nil : mergedDetails)
+                    store.addComp(
+                        amount: selected,
+                        kind: .dollarsCredits,
+                        details: mergedDetails.isEmpty ? nil : mergedDetails,
+                        recordAsFreePlay: cashValueIsFreePlay
+                    )
                 }
                 statusMessage = immediate ? "Comp sent" : "Comp queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
                 let celebrationTitle: String
                 let celebrationEmoji: String
@@ -1851,10 +2130,17 @@ private struct WatchAddCompSheet: View {
                     celebrationTitle = compContextLabel
                     celebrationEmoji = emojiForCompLabel(compContextLabel)
                 case .cashValue:
-                    celebrationTitle = trimmed.isEmpty ? "Cash Value" : trimmed
-                    celebrationEmoji = trimmed.isEmpty ? "💵" : fallbackCashEmojiIfGeneric(emojiForCompLabel(trimmed))
+                    if cashValueIsFreePlay {
+                        celebrationTitle = trimmed.isEmpty ? "Free play" : trimmed
+                        celebrationEmoji = "🎟️"
+                    } else {
+                        celebrationTitle = trimmed.isEmpty ? "Cash Value" : trimmed
+                        celebrationEmoji = trimmed.isEmpty ? "💵" : fallbackCashEmojiIfGeneric(emojiForCompLabel(trimmed))
+                    }
                 }
-                let newCompTotal = currentCompTotal + selected
+                let newCompTotal = (mode == .cashValue && cashValueIsFreePlay)
+                    ? currentFreePlayTotal + selected
+                    : currentCompTotal + selected
                 addedCompCelebration = AddedCompCelebration(
                     title: celebrationTitle,
                     emoji: celebrationEmoji,
@@ -1869,11 +2155,24 @@ private struct WatchAddCompSheet: View {
             Text("\n\(compConfirmationSummary)")
         }
         .onChange(of: store.liveSession?.totalComp) { newTotal in
+            guard cashValueIsFreePlay == false else { return }
             guard let expected = pendingExpectedCompTotal, let newTotal else { return }
             guard newTotal >= expected else { return }
             pendingExpectedCompTotal = nil
             statusMessage = "Comp updated on iPhone"
-            statusColor = .green
+            statusColor = theme.successColor
+            playSuccessHaptic()
+            if compMotionOK {
+                compCelebrationToken += 1
+            }
+        }
+        .onChange(of: store.liveSession?.totalFreePlay) { newTotal in
+            guard cashValueIsFreePlay else { return }
+            guard let expected = pendingExpectedCompTotal, let newTotal else { return }
+            guard newTotal >= expected else { return }
+            pendingExpectedCompTotal = nil
+            statusMessage = "Free play updated on iPhone"
+            statusColor = theme.successColor
             playSuccessHaptic()
             if compMotionOK {
                 compCelebrationToken += 1
@@ -1921,10 +2220,7 @@ private struct WatchAddCompSheet: View {
         }
         .buttonStyle(WatchQuickTilePressStyle(enabled: compMotionOK))
         .frame(maxWidth: .infinity, alignment: .center)
-        .foregroundColor(.black)
-        .padding(.vertical, 4)
-        .background(Color.green)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .watchThemedActionChip(compact: true)
     }
 
     private func parseFlexibleSeparatedIntegers(_ raw: String) -> [Int] {
@@ -1984,7 +2280,7 @@ private struct WatchAddCompSheet: View {
     private func addedCompFullscreenCelebration(_ celebration: AddedCompCelebration) -> some View {
         ZStack {
             LinearGradient(
-                colors: [Color.cyan.opacity(0.42), Color.black.opacity(0.94)],
+                colors: [theme.secondary.opacity(0.42), Color.black.opacity(0.94)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -2072,6 +2368,7 @@ private struct WatchTierLadderBars: View {
 
 private struct WatchUpdateTierSheet: View {
     @EnvironmentObject var store: SessionStore
+    @Environment(\.watchTheme) private var theme
     @Environment(\.tierTapWatchAnimationsEnabled) private var tierTapWatchAnimationsEnabled
     @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
     @State private var pointsDelta: Double = 0
@@ -2135,7 +2432,7 @@ private struct WatchUpdateTierSheet: View {
             .frame(maxWidth: .infinity, alignment: .center)
             Text("Proposed tier: \(proposedTierPoints)")
                 .font(.caption2)
-                .foregroundColor(.green)
+                .foregroundStyle(theme.primary)
                 .contentTransition(.numericText())
                 .animation(tierMotionOK ? .snappy : nil, value: proposedTierPoints)
             WatchTierLadderBars(motionEnabled: tierMotionOK, pulseSignal: tierLadderPulse)
@@ -2156,10 +2453,7 @@ private struct WatchUpdateTierSheet: View {
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
-            .foregroundColor(.black)
-            .padding(.vertical, 6)
-            .background(Color.green)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .watchThemedActionChip()
             }
             WatchRainingCoinsOverlay(playToken: tierRainPlayToken, enabled: tierMotionOK)
         }
@@ -2173,6 +2467,8 @@ private struct WatchUpdateTierSheet: View {
             isContinuous: false,
             isHapticFeedbackEnabled: true
         )
+        .watchThemedScreen()
+        .tint(theme.primary)
         .localizedNavigationTitle("Update Tier")
         .alert("Update tier points?", isPresented: $showConfirmUpdateTier) {
             Button("No", role: .cancel) {}
@@ -2183,7 +2479,7 @@ private struct WatchUpdateTierSheet: View {
                 pendingTierPoints = selected
                 store.updateLiveSessionStartingTier(selected)
                 statusMessage = immediate ? "Tier sent" : "Tier queued"
-                statusColor = immediate ? .green : .orange
+                statusColor = immediate ? theme.successColor : theme.queuedColor
                 if immediate { playSuccessHaptic() } else { playClickHaptic() }
             }
         } message: {
@@ -2202,7 +2498,7 @@ private struct WatchUpdateTierSheet: View {
             }
             tierBaselineAtSend = nil
             statusMessage = "Tier updated on iPhone"
-            statusColor = .green
+            statusColor = theme.successColor
             playSuccessHaptic()
             if tierMotionOK {
                 tierLadderPulse += 1

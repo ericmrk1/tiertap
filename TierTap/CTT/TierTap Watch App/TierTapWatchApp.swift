@@ -7,7 +7,9 @@ import WatchKit
 @main
 struct TierTapWatchApp: App {
     @StateObject private var store = SessionStore()
+    @StateObject private var themeStore = TierTapThemeStore()
     @State private var appLanguage: AppLanguage = .english
+    @State private var showSplash = true
     @StateObject private var notificationDelegate = WatchNotificationDelegate()
     @AppStorage(
         TierTapWatchAnimationsSettings.userDefaultsKey,
@@ -16,23 +18,40 @@ struct TierTapWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WatchContentView()
-                .environmentObject(store)
-                .environment(\.tierTapWatchAnimationsEnabled, watchTierTapAnimationsEnabled)
-                .environment(\.locale, appLanguage.locale)
-                .environment(\.layoutDirection, appLanguage.layoutDirection)
-                .environment(\.appLanguage, appLanguage)
-                .onOpenURL { url in
-                    // Keep deep links idempotent on watch: opening this URL should land on the remote pane.
-                    _ = url
-                }
-                .onAppear {
-                    let raw = UserDefaults(suiteName: "group.com.app.tiertap")?.string(forKey: "ctt_app_language")
-                    if let raw, let lang = AppLanguage(rawValue: raw) {
-                        appLanguage = lang
+            ZStack {
+                WatchContentView()
+                    .environmentObject(store)
+                    .environmentObject(themeStore)
+                    .environment(\.watchTheme, WatchThemePalette(from: themeStore))
+                    .environment(\.tierTapWatchAnimationsEnabled, watchTierTapAnimationsEnabled)
+                    .environment(\.locale, appLanguage.locale)
+                    .environment(\.layoutDirection, appLanguage.layoutDirection)
+                    .environment(\.appLanguage, appLanguage)
+                    .opacity(showSplash ? 0 : 1)
+
+                if showSplash {
+                    WatchSplashScreen {
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            showSplash = false
+                        }
                     }
-                    notificationDelegate.installIfNeeded()
+                    .environmentObject(themeStore)
+                    .environment(\.watchTheme, WatchThemePalette(from: themeStore))
+                    .environment(\.tierTapWatchAnimationsEnabled, watchTierTapAnimationsEnabled)
                 }
+            }
+            .onOpenURL { url in
+                // Keep deep links idempotent on watch: opening this URL should land on the remote pane.
+                _ = url
+            }
+            .onAppear {
+                themeStore.reload()
+                let raw = UserDefaults(suiteName: "group.com.app.tiertap")?.string(forKey: "ctt_app_language")
+                if let raw, let lang = AppLanguage(rawValue: raw) {
+                    appLanguage = lang
+                }
+                notificationDelegate.installIfNeeded()
+            }
         }
     }
 }
