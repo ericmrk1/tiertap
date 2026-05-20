@@ -66,6 +66,27 @@ struct LiveSessionView: View {
                             .foregroundColor(.green)
                             .padding(.vertical, 4)
 
+                        Button {
+                            showUpdateStackSheet = true
+                        } label: {
+                            Text("\(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))")
+                                .font(.system(size: 52, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                                .padding(.horizontal, 28)
+                                .padding(.vertical, 14)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.black.opacity(0.68))
+                                )
+                                .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 2)
+                        .padding(.bottom, 6)
+                        .accessibilityLabel("Stack \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic))). Tap to update.")
+
                         HStack(spacing: 10) {
                             
                                 Button { showPrivateNotes = true } label: {
