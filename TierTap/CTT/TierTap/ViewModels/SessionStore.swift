@@ -393,7 +393,7 @@ class SessionStore: ObservableObject {
         bumpLiveStack(for: &s, by: amount)
         liveSession = s; saveLive()
         #if os(iOS)
-        LiveActivityManager.shared.update(totalBuyIn: s.totalBuyIn)
+        LiveActivityManager.shared.update(for: s)
         pushContext()
         #endif
     }
@@ -425,6 +425,7 @@ class SessionStore: ObservableObject {
         liveSession = s
         saveLive()
         #if os(iOS)
+        LiveActivityManager.shared.update(for: s)
         if let jpeg = photoJPEG, let image = UIImage(data: jpeg) {
             _ = addAttachedSessionPhoto(sessionID: s.id, image: image, contextTags: photoContextTags, customContextLabels: photoCustomContextLabels)
         }
@@ -546,6 +547,7 @@ class SessionStore: ObservableObject {
         #endif
         saveLive()
         #if os(iOS)
+        LiveActivityManager.shared.update(for: s)
         pushContext()
         #endif
     }

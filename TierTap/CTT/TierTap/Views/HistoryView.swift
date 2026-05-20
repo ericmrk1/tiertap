@@ -525,6 +525,12 @@ struct HistoryView: View {
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
             }
+            .navigationDestination(isPresented: $isDeleteSelectorPresented) {
+                SessionDeleteSelectionView(sessions: store.sessions) { selectedSessionIDs in
+                    store.deleteSessions(withIDs: selectedSessionIDs)
+                }
+                .environmentObject(settingsStore)
+            }
             .localizedNavigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
@@ -607,12 +613,6 @@ struct HistoryView: View {
                     .environmentObject(subscriptionStore)
                     .environmentObject(authStore)
             }
-            .adaptiveSheet(isPresented: $isDeleteSelectorPresented) {
-                SessionDeleteSelectionView(sessions: store.sessions) { selectedSessionIDs in
-                    store.deleteSessions(withIDs: selectedSessionIDs)
-                }
-                .environmentObject(settingsStore)
-            }
             .alert("Delete Session?", isPresented: showDeleteAlert) {
                 Button("Cancel", role: .cancel) { sessionToDelete = nil }
                 Button("Delete", role: .destructive) {
@@ -634,7 +634,7 @@ private struct HistoryToolsMenuPresentation: ViewModifier {
             content.presentationCompactAdaptation(.popover)
         } else {
             content
-                .presentationDetents([.height(136)])
+                .presentationDetents([.height(180)])
                 .presentationDragIndicator(.hidden)
         }
     }
@@ -714,10 +714,9 @@ private struct SessionDeleteSelectionView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                settingsStore.primaryGradient.ignoresSafeArea()
-                if sortedSessions.isEmpty {
+        ZStack {
+            settingsStore.primaryGradient.ignoresSafeArea()
+            if sortedSessions.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "trash.slash")
                             .font(.system(size: 40))
@@ -804,7 +803,6 @@ private struct SessionDeleteSelectionView: View {
                 let count = selectedSessionIDs.count
                 Text("You are about to permanently delete \(count) session\(count == 1 ? "" : "s"). This cannot be undone.")
             }
-        }
     }
 
     private func toggleSelection(for session: Session) {

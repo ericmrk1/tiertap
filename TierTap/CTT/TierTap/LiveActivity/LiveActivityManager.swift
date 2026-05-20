@@ -6,14 +6,30 @@ class LiveActivityManager {
     private var currentActivity: Activity<TimerActivityAttributes>?
     private init() {}
 
+    private func resolvedCurrencySymbol() -> String {
+        let code = UserDefaults.standard.string(forKey: "ctt_currency_code") ?? "USD"
+        return Currency.byCode(code).symbol
+    }
+
+    private func contentState(from session: Session) -> TimerActivityAttributes.ContentState {
+        TimerActivityAttributes.ContentState(
+            startTime: session.startTime,
+            casino: session.casino,
+            game: session.game,
+            totalBuyIn: session.totalBuyIn,
+            startingTierPoints: session.startingTierPoints,
+            rewardsProgramName: session.rewardsProgramName,
+            totalFreePlay: session.totalFreePlay,
+            totalComp: session.totalComp,
+            liveTrackedStackAmount: session.liveTrackedStackAmount,
+            currencySymbol: resolvedCurrencySymbol()
+        )
+    }
+
     func start(session: Session) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         let attrs = TimerActivityAttributes(sessionID: session.id.uuidString)
-        let state = TimerActivityAttributes.ContentState(
-            startTime: session.startTime, casino: session.casino,
-            game: session.game, totalBuyIn: session.totalBuyIn,
-            startingTierPoints: session.startingTierPoints,
-            rewardsProgramName: session.rewardsProgramName)
+        let state = contentState(from: session)
         do {
             currentActivity = try Activity.request(
                 attributes: attrs,
@@ -21,28 +37,9 @@ class LiveActivityManager {
         } catch { print("LiveActivity error: \(error)") }
     }
 
-    func update(totalBuyIn: Int) {
-        guard let a = currentActivity else { return }
-        let state = TimerActivityAttributes.ContentState(
-            startTime: a.content.state.startTime,
-            casino: a.content.state.casino,
-            game: a.content.state.game,
-            totalBuyIn: totalBuyIn,
-            startingTierPoints: a.content.state.startingTierPoints,
-            rewardsProgramName: a.content.state.rewardsProgramName)
-        Task { await a.update(ActivityContent(state: state, staleDate: nil)) }
-    }
-
     func update(for session: Session) {
         guard let a = currentActivity else { return }
-        let state = TimerActivityAttributes.ContentState(
-            startTime: session.startTime,
-            casino: session.casino,
-            game: session.game,
-            totalBuyIn: session.totalBuyIn,
-            startingTierPoints: session.startingTierPoints,
-            rewardsProgramName: session.rewardsProgramName
-        )
+        let state = contentState(from: session)
         Task { await a.update(ActivityContent(state: state, staleDate: nil)) }
     }
 

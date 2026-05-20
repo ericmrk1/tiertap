@@ -16,48 +16,31 @@ struct CasinoTimerLiveActivity: Widget {
             ZStack {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.black.opacity(0.9))
-                HStack(spacing: 14) {
-                    VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .center, spacing: 8) {
                         HStack(spacing: 5) {
                             Circle().fill(Color.red).frame(width: 6, height: 6)
-                            Text("LIVE SESSION")
+                            Text("LIVE NOW")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.red)
                         }
-                        Text(context.state.casino)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundColor(.white)
-                            .lineLimit(2)
-                        Text(context.state.game)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .lineLimit(2)
-                        Text("Starting tier \(context.state.startingTierPoints.formatted(.number.grouping(.automatic)))")
-                            .font(.caption2)
-                            .foregroundColor(.white.opacity(0.85))
-                        if let prog = context.state.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
-                            Text(prog)
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.7))
-                                .lineLimit(1)
-                        }
-                        Text("Total buy-in $\(context.state.totalBuyIn.formatted(.number.grouping(.automatic)))")
-                            .font(.caption2)
-                            .foregroundColor(.green.opacity(0.95))
-                    }
-                    Spacer(minLength: 8)
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.body)
+                        Spacer(minLength: 4)
                         Text(context.state.startTime, style: .timer)
-                            .font(.system(.title3, design: .monospaced).bold())
+                            .font(.system(size: 14, weight: .bold, design: .monospaced))
                             .foregroundColor(.green)
-                            .multilineTextAlignment(.trailing)
                             .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
+                    LiveSessionSummaryGrid(
+                        metrics: context.state.summaryMetrics,
+                        compact: true,
+                        columnCount: 4
+                    )
                 }
-                .padding(.horizontal, 18).padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
             }
             .widgetURL(URL(string: "com.app.tiertap://watch/live"))
         } dynamicIsland: { context in

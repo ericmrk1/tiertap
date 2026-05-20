@@ -48,25 +48,25 @@ struct HomeView: View {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
     }
 
-    /// Logo with black pixels made transparent so the gradient shows through.
-    private var logoImage: Image {
-        if let processed = TransparentLogoCache.image {
-            return Image(uiImage: processed)
-        }
-        return Image("LogoSplash")
-    }
-
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
-                VStack(spacing: 24) {
-                    logoImage
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 240)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 8)
+                VStack(spacing: store.liveSession != nil ? 16 : 24) {
+                    if store.liveSession == nil {
+                        HomeBrandLogo.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 240)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 8)
+                    } else {
+                        Color.clear
+                            .frame(height: 96)
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 8)
+                    }
 
                     if let live = store.liveSession {
                         LiveNowCard(session: live)
@@ -470,6 +470,155 @@ struct HomeView: View {
     }
 }
 
+private struct LiveSessionMetricSnapshot: Equatable {
+    var tier: Int
+    var buyIn: Int
+    var freePlay: Int
+    var comps: Int
+    var stack: Int?
+
+    init(session: Session) {
+        tier = session.startingTierPoints
+        buyIn = session.totalBuyIn
+        freePlay = session.totalFreePlay
+        comps = session.totalComp
+        stack = session.liveTrackedStackAmount
+    }
+}
+
+/// Splash logo with black pixels made transparent so the gradient shows through.
+private enum HomeBrandLogo {
+    static var image: Image {
+        if let processed = TransparentLogoCache.image {
+            return Image(uiImage: processed)
+        }
+        return Image("LogoSplash")
+    }
+}
+
+/// Main-screen Live Now summary: full-width game, tier + location, then 2×2 financial grid.
+private struct LiveNowHomeSummaryLayout: View {
+    let metrics: [LiveSessionSummaryMetric]
+    let metricTrends: [String: LiveSessionMetricTrend]
+
+    private static let twoColumnGrid = [
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8),
+    ]
+
+    private func metric(_ id: String) -> LiveSessionSummaryMetric? {
+        metrics.first { $0.id == id }
+    }
+
+    private func trend(for id: String) -> LiveSessionMetricTrend? {
+        metricTrends[id]
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let game = metric("game") {
+                GeometryReader { proxy in
+                    let textWidth = max(1, proxy.size.width - 20)
+                    let charCount = max(1, CGFloat(game.value.count))
+                    let fittedSize = min(34, max(16, textWidth / (charCount * 0.52)))
+                    Text(game.value)
+                        .font(.system(size: fittedSize, weight: .bold))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.35)
+                        .allowsTightening(true)
+                        .frame(width: textWidth, alignment: .leading)
+                }
+                .frame(height: 36)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.08))
+                .cornerRadius(8)
+            }
+
+            HStack(spacing: 8) {
+                if let tier = metric("tier") {
+                    LiveSessionSummaryCell(title: tier.title, value: tier.value, compact: true, trend: trend(for: "tier"))
+                }
+                if let location = metric("location") {
+                    LiveSessionSummaryCell(title: location.title, value: location.value, compact: true)
+                }
+            }
+
+            LazyVGrid(columns: Self.twoColumnGrid, spacing: 8) {
+                if let buyIn = metric("buyIn") {
+                    LiveSessionSummaryCell(
+                        title: buyIn.title,
+                        value: buyIn.value,
+                        compact: true,
+                        trend: trend(for: "buyIn")
+                    )
+                }
+                if let freePlay = metric("freePlay") {
+                    LiveSessionSummaryCell(
+                        title: freePlay.title,
+                        value: freePlay.value,
+                        compact: true,
+                        trend: trend(for: "freePlay")
+                    )
+                }
+                if let comps = metric("comps") {
+                    LiveSessionSummaryCell(
+                        title: comps.title,
+                        value: comps.value,
+                        compact: true,
+                        trend: trend(for: "comps")
+                    )
+                }
+                if let stack = metric("stack") {
+                    LiveSessionSummaryCell(
+                        title: stack.title,
+                        value: stack.value,
+                        compact: true,
+                        trend: trend(for: "stack")
+                    )
+                }
+            }
+        }
+    }
+}
+
+private struct LiveNowBrandLogo: View {
+    var body: some View {
+        HomeBrandLogo.image
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: 48.4, maxHeight: 30.8)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
+            .accessibilityLabel("TierTap")
+    }
+}
+
+private struct LiveNowIconActionButton: View {
+    let systemImage: String
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    private var iconFont: Font {
+        let base = UIFont.preferredFont(forTextStyle: .caption1).pointSize
+        return .system(size: base * 1.55, weight: .semibold)
+    }
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(iconFont)
+                .foregroundColor(.green)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
 struct LiveNowCard: View {
     let session: Session
     @EnvironmentObject var store: SessionStore
@@ -478,6 +627,8 @@ struct LiveNowCard: View {
     @State private var elapsed: TimeInterval = 0
     @State private var showStrategyOdds = false
     @State private var showPrivateNotes = false
+    @State private var metricTrendReference: LiveSessionMetricSnapshot?
+    @State private var displayedMetricTrends: [String: LiveSessionMetricTrend] = [:]
     #if os(iOS)
     @State private var liveSessionShareRef: PostCloseoutSessionRef?
     @State private var showSessionPhotos = false
@@ -488,110 +639,109 @@ struct LiveNowCard: View {
     private var currentSession: Session {
         store.liveSession ?? session
     }
+
+    private var summaryMetrics: [LiveSessionSummaryMetric] {
+        LiveSessionSummaryMetricsBuilder.metrics(
+            casino: currentSession.casino,
+            game: currentSession.game,
+            startingTierPoints: currentSession.startingTierPoints,
+            totalBuyIn: currentSession.totalBuyIn,
+            totalFreePlay: currentSession.totalFreePlay,
+            totalComp: currentSession.totalComp,
+            liveTrackedStackAmount: currentSession.liveTrackedStackAmount,
+            currencySymbol: settingsStore.currencySymbol
+        )
+    }
+
+    private var currentMetricSnapshot: LiveSessionMetricSnapshot {
+        LiveSessionMetricSnapshot(session: currentSession)
+    }
+
+    private func refreshMetricTrends(from prior: LiveSessionMetricSnapshot, to current: LiveSessionMetricSnapshot) {
+        var trends = displayedMetricTrends
+        if current.tier != prior.tier {
+            trends["tier"] = LiveSessionMetricTrend.from(current: current.tier, prior: prior.tier)
+        }
+        if current.buyIn != prior.buyIn {
+            trends["buyIn"] = LiveSessionMetricTrend.from(current: current.buyIn, prior: prior.buyIn)
+        }
+        if current.freePlay != prior.freePlay {
+            trends["freePlay"] = LiveSessionMetricTrend.from(current: current.freePlay, prior: prior.freePlay)
+        }
+        if current.comps != prior.comps {
+            trends["comps"] = LiveSessionMetricTrend.from(current: current.comps, prior: prior.comps)
+        }
+        if current.stack != prior.stack, let stackTrend = LiveSessionMetricTrend.fromStack(current: current.stack, prior: prior.stack) {
+            trends["stack"] = stackTrend
+        }
+        displayedMetricTrends = trends
+    }
+
+    private func syncMetricTrendReference(with snapshot: LiveSessionMetricSnapshot) {
+        if let prior = metricTrendReference, prior != snapshot {
+            refreshMetricTrends(from: prior, to: snapshot)
+        }
+        metricTrendReference = snapshot
+    }
+
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center) {
+                HStack(spacing: 6) {
                     Circle().fill(Color.red).frame(width: 8, height: 8)
                     L10nText("LIVE NOW").font(.caption.bold()).foregroundColor(.red)
                 }
-                Text(currentSession.casino).font(.subheadline.weight(.semibold)).foregroundColor(.white)
-                Text(currentSession.game).font(.caption).foregroundColor(.gray)
-                Text("Starting tier \(currentSession.startingTierPoints.formatted(.number.grouping(.automatic)))")
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.85))
-                if let prog = currentSession.rewardsProgramName?.trimmingCharacters(in: .whitespacesAndNewlines), !prog.isEmpty {
-                    Text(prog)
-                        .font(.caption2)
-                        .foregroundColor(.white.opacity(0.7))
-                        .lineLimit(2)
-                }
-                Text("Total buy-in \(settingsStore.currencySymbol)\(currentSession.totalBuyIn.formatted(.number.grouping(.automatic)))")
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.75))
-                Text("Total free play \(settingsStore.currencySymbol)\(currentSession.totalFreePlay.formatted(.number.grouping(.automatic)))")
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.75))
-                if let stack = currentSession.liveTrackedStackAmount {
-                    Text("Stack: \(settingsStore.currencySymbol)\(stack.formatted(.number.grouping(.automatic)))")
-                        .font(.caption2)
-                        .foregroundColor(.white.opacity(0.75))
-                }
-                if currentSession.totalComp > 0 {
-                    Text("Total comps \(settingsStore.currencySymbol)\(currentSession.totalComp.formatted(.number.grouping(.automatic)))")
-                        .font(.caption2)
-                        .foregroundColor(.white.opacity(0.75))
-                }
-            }
-            Spacer(minLength: 8)
-            VStack(alignment: .trailing, spacing: 6) {
+                Spacer(minLength: 8)
                 Text(Session.durationString(elapsed))
                     .font(.system(
-                        size: UIFont.preferredFont(forTextStyle: .caption1).pointSize * 2,
+                        size: UIFont.preferredFont(forTextStyle: .caption1).pointSize * 1.55,
                         design: .monospaced
                     ))
                     .foregroundColor(.green)
-                Spacer(minLength: 0)
-                HStack(spacing: 6) {
-                    VStack
-                    {
-                        HStack
-                        {
-                            Button { showPrivateNotes = true } label: {
-                                Image(systemName: "note.text")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundColor(.green)
-                                    .frame(width: 32, height: 28)
-                                    .background(Color(.systemGray6).opacity(0.3))
-                                    .cornerRadius(8)
-                            }
-                            .accessibilityLabel("Private notes")
-                            Button { showStrategyOdds = true } label: {
-                                Image(systemName: "info.circle")
-                                    .font(.caption.weight(.medium))
-                                    .foregroundColor(.green)
-                                    .frame(width: 32, height: 28)
-                                    .background(Color(.systemGray6).opacity(0.3))
-                                    .cornerRadius(8)
-                            }
-                        }
-
-                        #if os(iOS)
-                        Button {
-                            liveSessionShareRef = PostCloseoutSessionRef(id: currentSession.id)
-                        } label: {
-                            HStack(spacing: 5) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.caption.weight(.medium))
-                                L10nText("Share")
-                                    .font(.caption.weight(.medium))
-                            }
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color(.systemGray6).opacity(0.3))
-                            .cornerRadius(8)
-                        }
-                        .accessibilityLabel("Share session")
-
-                        SessionPhotosEntryButton(compact: true) {
-                            showSessionPhotos = true
-                        }
-                        #endif
-                        
-                        
-                    }
-
-                }
             }
-            .frame(maxHeight: .infinity)
+
+            LiveNowHomeSummaryLayout(metrics: summaryMetrics, metricTrends: displayedMetricTrends)
+
+            HStack(spacing: 0) {
+                LiveNowIconActionButton(systemImage: "note.text", accessibilityLabel: "Private notes") {
+                    showPrivateNotes = true
+                }
+                LiveNowIconActionButton(systemImage: "info.circle", accessibilityLabel: "Strategy and odds") {
+                    showStrategyOdds = true
+                }
+                LiveNowBrandLogo()
+                #if os(iOS)
+                LiveNowIconActionButton(systemImage: "square.and.arrow.up", accessibilityLabel: "Share session") {
+                    liveSessionShareRef = PostCloseoutSessionRef(id: currentSession.id)
+                }
+                LiveNowIconActionButton(systemImage: "photo.on.rectangle.angled", accessibilityLabel: "Session photos") {
+                    showSessionPhotos = true
+                }
+                #endif
+            }
         }
-        .padding()
-        .background(Color(.systemGray6).opacity(0.2))
-        .cornerRadius(16)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.red.opacity(0.4), lineWidth: 1))
+        .padding(12)
+        .background(Color(.systemGray6).opacity(0.2), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.red.opacity(0.4), lineWidth: 1)
+        }
+        .layoutPriority(1)
         .onReceive(ticker) { _ in elapsed = currentSession.duration }
-        .onAppear { elapsed = currentSession.duration }
+        .onAppear {
+            elapsed = currentSession.duration
+            let snapshot = currentMetricSnapshot
+            metricTrendReference = snapshot
+            displayedMetricTrends = [:]
+        }
+        .onChange(of: currentMetricSnapshot) { snapshot in
+            syncMetricTrendReference(with: snapshot)
+        }
+        .onChange(of: currentSession.id) { _ in
+            let snapshot = currentMetricSnapshot
+            metricTrendReference = snapshot
+            displayedMetricTrends = [:]
+        }
         .adaptiveSheet(isPresented: $showStrategyOdds) {
             StrategyOddsSheet(gameName: currentSession.game)
                 .environmentObject(settingsStore)

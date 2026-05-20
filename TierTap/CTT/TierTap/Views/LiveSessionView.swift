@@ -299,6 +299,24 @@ struct LiveSessionView: View {
                                     .foregroundColor(.white).cornerRadius(14).font(.headline)
                             }
 
+                            Button {
+                                if hasMissingInfo {
+                                    showMissingInfoAlert = true
+                                } else {
+                                    if settingsStore.enableCasinoFeedback {
+                                        CelebrationPlayer.shared.playQuickChime()
+                                    }
+                                    showCloseout = true
+                                }
+                            } label: {
+                                LocalizedLabel(title: "Stop & Close Out", systemImage: "stop.circle.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 16)
+                                    .background(Color.red.opacity(0.85))
+                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
+                            }
+
                             HStack(spacing: 12) {
                                 StatMini(title: "Hours", value: String(format: "%.1f", s.hoursPlayed))
                                 StatMini(title: "Start Pts", value: "\(s.startingTierPoints)")
@@ -321,24 +339,6 @@ struct LiveSessionView: View {
                             .padding()
                             .background(Color(.systemGray6).opacity(0.15))
                             .cornerRadius(16)
-
-                            Button {
-                                if hasMissingInfo {
-                                    showMissingInfoAlert = true
-                                } else {
-                                    if settingsStore.enableCasinoFeedback {
-                                        CelebrationPlayer.shared.playQuickChime()
-                                    }
-                                    showCloseout = true
-                                }
-                            } label: {
-                                LocalizedLabel(title: "Stop & Close Out", systemImage: "stop.circle.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 16)
-                                    .background(Color.red.opacity(0.85))
-                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
-                            }
 
                             VStack(alignment: .leading, spacing: 6) {
                                 L10nText("Private notes (not shared)")
