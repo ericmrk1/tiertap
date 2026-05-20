@@ -273,7 +273,7 @@ class SessionStore: ObservableObject {
             enqueueWatchCommunityPublishFromWatch(session: session, auth: auth, settings: settings)
             return watchConnectivityReply(extras: [
                 "watchPublishAccepted": true,
-                "watchPublishMessage": "Publishing on iPhone (screen name + tier/hour only)."
+                "watchPublishMessage": "Publishing on iPhone (screen name, tier/hour, and free play when logged)."
             ])
         }
     }
@@ -290,6 +290,7 @@ class SessionStore: ObservableObject {
                     publishTierPerHour: true,
                     publishWinLoss: false,
                     publishCompDetails: false,
+                    publishFreePlayTotal: true,
                     attachScreenName: true
                 )
             } catch {

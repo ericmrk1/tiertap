@@ -32,6 +32,7 @@ struct CommunityPublisher {
     /// When `publishTierPerHour` is true, `tiers_per_hour` is included in metrics; otherwise it is omitted.
     /// When `publishWinLoss` is true, buy-in, cash-out, net win/loss, total comps, and EV (expected value = net + comps) are included in metrics.
     /// When `publishCompDetails` is true, `comp_count` and `comp_value_total` (sum of logged comp amounts) are included for sessions that have comps.
+    /// When `publishFreePlayTotal` is true, `total_free_play` is included for sessions with logged free play (promotional value, not cash P&L).
     /// When `attachScreenName` is false, `session_details.screen_name` is omitted so the post appears as Anonymous in the feed (still tied to your account on the server).
     static func publishSessions(
         _ sessions: [Session],
@@ -42,6 +43,7 @@ struct CommunityPublisher {
         publishTierPerHour: Bool = true,
         publishWinLoss: Bool = false,
         publishCompDetails: Bool = false,
+        publishFreePlayTotal: Bool = true,
         attachScreenName: Bool = true
     ) async throws -> Int {
         guard SupabaseConfig.isConfigured else {
@@ -90,6 +92,7 @@ struct CommunityPublisher {
             )
 
             let includeCompSummary = publishCompDetails && !s.compEvents.isEmpty
+            let includeFreePlayTotal = publishFreePlayTotal && s.totalFreePlay > 0
             let metrics = TableGamePostMetricsPayload(
                 duration_seconds: Int(s.duration),
                 starting_tier_points: s.startingTierPoints,
@@ -105,7 +108,8 @@ struct CommunityPublisher {
                 total_comp: publishWinLoss ? s.totalComp : nil,
                 expected_value: publishWinLoss ? s.expectedValue : nil,
                 comp_count: includeCompSummary ? s.compEvents.count : nil,
-                comp_value_total: includeCompSummary ? s.totalComp : nil
+                comp_value_total: includeCompSummary ? s.totalComp : nil,
+                total_free_play: includeFreePlayTotal ? s.totalFreePlay : nil
             )
 
             return TableGamePostPayload(
@@ -170,6 +174,8 @@ struct TableGamePostMetrics: Codable {
     let comp_count: Int?
     /// Sum of logged comp amounts (estimated cash value) when the poster shared comp details.
     let comp_value_total: Int?
+    /// Total logged free play (promotional value) when the poster opted in; not included in net win/loss.
+    let total_free_play: Int?
 }
 
 /// JSON body stored in the `metrics` column when publishing sessions.
@@ -190,6 +196,7 @@ struct TableGamePostMetricsPayload: Encodable {
     let expected_value: Int?
     let comp_count: Int?
     let comp_value_total: Int?
+    let total_free_play: Int?
 }
 
 /// Decodable row type for reading from the `TableGamePosts` table.

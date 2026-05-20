@@ -1483,6 +1483,20 @@ struct CommunityFeedRow: View {
                     )
                 }
 
+                if let fp = metrics?.total_free_play, fp > 0 {
+                    let sym = currencySymbolForMetrics
+                    Text("Free play \(sym)\(fp)")
+                        .font(.caption.bold())
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.orange.opacity(0.8))
+                        )
+                        .accessibilityLabel("Free play total \(sym)\(fp)")
+                }
+
                 if let tiers = metrics?.tiers_per_hour {
                     Text(String(format: "%.1f pts/hr", tiers))
                         .font(.caption.bold())
@@ -2138,6 +2152,8 @@ struct CommunitySessionPublishSelectionView: View {
     @State private var publishWinLoss = false
     /// When on, comp count and total estimated comp value (from logged comps) are stored and shown on the feed.
     @State private var publishCompDetails = false
+    /// When on, total logged free play is stored in metrics and shown on the feed (promotional value, not cash P&L).
+    @State private var publishFreePlayTotal = true
     /// When on, your Community screen name is stored on each post; when off, posts show as Anonymous.
     @State private var attachScreenName = true
 
@@ -2208,12 +2224,24 @@ struct CommunitySessionPublishSelectionView: View {
 
                         Section(
                             header: L10nText("Share details").foregroundColor(.secondary),
-                            footer: L10nText("Tier/hour, comps, and wins/losses are optional.")
+                            footer: L10nText("Tier/hour, free play, comps, and wins/losses are optional.")
                                 .foregroundColor(.gray.opacity(0.8))
                         ) {
                             Toggle(isOn: $publishTierPerHour) {
                                 L10nText("Tier / hour")
                                     .foregroundColor(.white)
+                            }
+                            .tint(.green)
+                            .listRowBackground(Color(.systemGray6).opacity(0.15))
+
+                            Toggle(isOn: $publishFreePlayTotal) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    L10nText("Free play total")
+                                        .foregroundColor(.white)
+                                    L10nText("Promotional value; not cash win/loss")
+                                        .font(.caption2)
+                                        .foregroundColor(.gray)
+                                }
                             }
                             .tint(.green)
                             .listRowBackground(Color(.systemGray6).opacity(0.15))
@@ -2428,6 +2456,7 @@ struct CommunitySessionPublishSelectionView: View {
                 publishTierPerHour: publishTierPerHour,
                 publishWinLoss: publishWinLoss,
                 publishCompDetails: publishCompDetails,
+                publishFreePlayTotal: publishFreePlayTotal,
                 attachScreenName: attachScreenName
             )
             await MainActor.run {
