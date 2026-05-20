@@ -539,10 +539,21 @@ private struct LiveNowHomeSummaryLayout: View {
 
             HStack(spacing: 8) {
                 if let tier = metric("tier") {
-                    LiveSessionSummaryCell(title: tier.title, value: tier.value, compact: true, trend: trend(for: "tier"))
+                    LiveSessionSummaryCell(
+                        title: tier.title,
+                        value: tier.value,
+                        metricId: tier.id,
+                        compact: true,
+                        trend: trend(for: "tier")
+                    )
                 }
                 if let location = metric("location") {
-                    LiveSessionSummaryCell(title: location.title, value: location.value, compact: true)
+                    LiveSessionSummaryCell(
+                        title: location.title,
+                        value: location.value,
+                        metricId: location.id,
+                        compact: true
+                    )
                 }
             }
 
@@ -551,6 +562,7 @@ private struct LiveNowHomeSummaryLayout: View {
                     LiveSessionSummaryCell(
                         title: buyIn.title,
                         value: buyIn.value,
+                        metricId: buyIn.id,
                         compact: true,
                         trend: trend(for: "buyIn")
                     )
@@ -559,6 +571,7 @@ private struct LiveNowHomeSummaryLayout: View {
                     LiveSessionSummaryCell(
                         title: freePlay.title,
                         value: freePlay.value,
+                        metricId: freePlay.id,
                         compact: true,
                         trend: trend(for: "freePlay")
                     )
@@ -567,6 +580,7 @@ private struct LiveNowHomeSummaryLayout: View {
                     LiveSessionSummaryCell(
                         title: comps.title,
                         value: comps.value,
+                        metricId: comps.id,
                         compact: true,
                         trend: trend(for: "comps")
                     )
@@ -575,6 +589,7 @@ private struct LiveNowHomeSummaryLayout: View {
                     LiveSessionSummaryCell(
                         title: stack.title,
                         value: stack.value,
+                        metricId: stack.id,
                         compact: true,
                         trend: trend(for: "stack")
                     )

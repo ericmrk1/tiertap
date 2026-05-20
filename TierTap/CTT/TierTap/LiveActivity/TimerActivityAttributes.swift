@@ -116,29 +116,110 @@ enum LiveSessionMetricTrend: Equatable {
     }
 }
 
+/// Coin-style chip for stack metric labels (shared by app + widget; mirrors `TierTapChipStackIcon`).
+private struct LiveSessionChipStackIcon: View {
+    var side: CGFloat
+    var currencySymbol: String
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.green.opacity(0.95))
+            Circle()
+                .stroke(Color.green.opacity(0.7), lineWidth: max(1, side * 0.08))
+            Text(currencySymbol)
+                .font(.system(size: side * 0.46, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
+                .foregroundColor(.black.opacity(0.75))
+                .offset(y: -0.2)
+        }
+        .frame(width: side, height: side)
+        .accessibilityLabel("Coin icon")
+    }
+}
+
+/// SF Symbol / chip icons aligned with live-session quick-action buttons.
+private enum LiveSessionSummaryMetricIcons {
+    static func sfSymbol(for metricId: String) -> String? {
+        switch metricId {
+        case "location": "building.columns"
+        case "tier": "star.circle"
+        case "buyIn": "plus.circle"
+        case "freePlay": "ticket.fill"
+        case "comps": "gift.fill"
+        default: nil
+        }
+    }
+
+    static func usesChipStack(for metricId: String) -> Bool {
+        metricId == "stack"
+    }
+}
+
 struct LiveSessionSummaryCell: View {
     let title: String
     let value: String
+    var metricId: String? = nil
     var compact: Bool = false
     var dense: Bool = false
     var trend: LiveSessionMetricTrend?
+
+    private var titleIconSide: CGFloat {
+        dense ? 8 : (compact ? 10 : 12)
+    }
+
+    private var metricCurrencySymbol: String {
+        let code = UserDefaults(suiteName: "group.com.app.tiertap")?.string(forKey: "ctt_currency_code") ?? "USD"
+        switch code.uppercased() {
+        case "EUR": return "€"
+        case "GBP": return "£"
+        case "JPY", "CNY": return "¥"
+        case "KRW": return "₩"
+        case "INR": return "₹"
+        default: return "$"
+        }
+    }
 
     private var valueFont: Font {
         if dense {
             return .system(size: 9, weight: .semibold)
         }
         if compact {
-            return .system(size: 10, weight: .semibold)
+            return .system(size: 14, weight: .semibold)
         }
         return .caption.weight(.semibold)
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: dense ? 0 : (compact ? 1 : 2)) {
+    @ViewBuilder
+    private var titleLabel: some View {
+        let titleFont = dense ? Font.system(size: 8) : (compact ? Font.system(size: 9) : Font.caption2)
+        HStack(spacing: 3) {
+            if let metricId {
+                metricLabelIcon(for: metricId)
+            }
             Text(title)
-                .font(dense ? .system(size: 8) : (compact ? .system(size: 9) : .caption2))
+                .font(titleFont)
                 .foregroundColor(.white.opacity(0.65))
                 .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+    }
+
+    @ViewBuilder
+    private func metricLabelIcon(for metricId: String) -> some View {
+        if LiveSessionSummaryMetricIcons.usesChipStack(for: metricId) {
+            LiveSessionChipStackIcon(side: titleIconSide, currencySymbol: metricCurrencySymbol)
+        } else if let symbol = LiveSessionSummaryMetricIcons.sfSymbol(for: metricId) {
+            Image(systemName: symbol)
+                .font(.system(size: titleIconSide, weight: .semibold))
+                .foregroundColor(.white.opacity(0.65))
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: dense ? 0 : (compact ? 1 : 2)) {
+            titleLabel
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
                     .font(valueFont)
@@ -191,6 +272,7 @@ struct LiveSessionSummaryGrid: View {
                 LiveSessionSummaryCell(
                     title: metric.title,
                     value: metric.value,
+                    metricId: metric.id,
                     compact: compact,
                     dense: dense
                 )

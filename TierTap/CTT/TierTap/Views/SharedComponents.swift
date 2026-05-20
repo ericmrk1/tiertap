@@ -1531,7 +1531,8 @@ struct BuyInQuickAddSheet: View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
-                VStack(spacing: 24) {
+                ScrollView {
+                    VStack(spacing: 18) {
                     VStack(spacing: 8) {
                         L10nText("Add Buy-In")
                             .font(.title2.bold())
@@ -1543,17 +1544,17 @@ struct BuyInQuickAddSheet: View {
                     }
                     .padding(.top, 8)
 
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                         ForEach(quickBuyIns, id: \.self) { amt in
                             Button {
                                 pendingTotal += amt
                             } label: {
                                 Text("\(settingsStore.currencySymbol)\(amt)")
-                                    .font(.title3.bold())
-                                    .frame(maxWidth: .infinity, minHeight: 70)
+                                    .font(.headline.bold())
+                                    .frame(maxWidth: .infinity, minHeight: 56)
                                     .background(Color.green)
                                     .foregroundColor(.black)
-                                    .cornerRadius(16)
+                                    .cornerRadius(14)
                             }
                         }
                     }
@@ -1636,8 +1637,10 @@ struct BuyInQuickAddSheet: View {
                             }
                         }
                     }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 24)
                 }
-                .padding()
             }
             .localizedNavigationTitle("Buy-In")
             .navigationBarTitleDisplayMode(.inline)
