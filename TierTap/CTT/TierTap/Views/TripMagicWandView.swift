@@ -288,7 +288,14 @@ struct TripMagicWandView: View {
                 }
 
                 Button {
-                    Task { await generateProposals() }
+                    if settingsStore.requiresTierTapAIFeaturePaywall(
+                        isSignedIn: authStore.isSignedIn,
+                        hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                    ) {
+                        showPaywall = true
+                    } else {
+                        Task { await generateProposals() }
+                    }
                 } label: {
                     HStack {
                         if isWorking {
@@ -304,18 +311,12 @@ struct TripMagicWandView: View {
                     .foregroundColor(.black)
                     .cornerRadius(12)
                 }
-                .disabled(unassignedSessions.isEmpty || isWorking || !authStore.isSignedIn)
+                .disabled(unassignedSessions.isEmpty || isWorking)
 
                 if unassignedSessions.isEmpty {
                     L10nText("No unassigned completed sessions—every session is already linked to a trip, or you have no completed sessions yet.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
-                }
-
-                if !authStore.isSignedIn {
-                    L10nText("Sign in to use AI trip suggestions.")
-                        .font(.caption)
-                        .foregroundColor(.orange)
                 }
             }
             .padding(20)

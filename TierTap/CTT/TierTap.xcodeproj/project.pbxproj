@@ -111,6 +111,7 @@
 		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
 		TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */; };
 		TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */; };
+		TTAI2E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */; };
 		TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */; };
 		TWND2E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */; };
 		UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */; };
@@ -290,6 +291,7 @@
 		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
 		TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWalletView.swift; sourceTree = "<group>"; };
 		TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardWalletCardModels.swift; sourceTree = "<group>"; };
+		TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAIAnalysisModels.swift; sourceTree = "<group>"; };
 		TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardProgramPicker.swift; sourceTree = "<group>"; };
 		TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMagicWandView.swift; sourceTree = "<group>"; };
 		UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideContent.swift; sourceTree = "<group>"; };
@@ -427,6 +429,7 @@
 				2E9D7BC02F650000004015F4 /* SessionPhotoRef.swift */,
 				2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */,
 				TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */,
+				TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */,
 				TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */,
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */,
@@ -892,6 +895,7 @@
 				2E9D7BC52F650005004015F4 /* SessionPhotosSheet.swift in Sources */,
 				2E9D7BC62F650006004015F4 /* HistoryPhotoFeedView.swift in Sources */,
 				TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */,
+				TTAI2E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
 				TAXPPREPB01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift in Sources */,

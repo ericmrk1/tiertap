@@ -1391,17 +1391,17 @@
     "hi": "फ़िल्टर लागू करें"
   },
   "ui.25313ed8d58bffb12b71b418": {
-    "en": "Ask TierTap",
-    "zh-Hans": "询问 TierTap",
-    "ja": "ティアタップに質問する",
-    "ko": "TierTap에 문의하세요",
-    "vi": "Hỏi CấpTap",
-    "es": "Preguntar a TierTap",
-    "ar": "اسأل TierTap",
-    "he": "שאל את TierTap",
-    "de": "Fragen Sie TierTap",
-    "fr": "Demandez à TierTap",
-    "hi": "टियरटैप से पूछें"
+    "en": "Ask TierTap AI",
+    "zh-Hans": "询问 TierTap AI",
+    "ja": "TierTap AI に質問",
+    "ko": "TierTap AI에 문의",
+    "vi": "Hỏi TierTap AI",
+    "es": "Preguntar a TierTap AI",
+    "ar": "اسأل TierTap AI",
+    "he": "שאל את TierTap AI",
+    "de": "TierTap AI fragen",
+    "fr": "Demander à TierTap AI",
+    "hi": "TierTap AI से पूछें"
   },
   "ui.7d704d871e9331e7a2d6c7d5": {
     "en": "Ask TierTap (AI Play Analysis): Analytics tab → Ask TierTap for natural-language summaries of your saved play data.",

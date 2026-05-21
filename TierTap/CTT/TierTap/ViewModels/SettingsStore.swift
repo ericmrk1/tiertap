@@ -34,6 +34,7 @@ private let keyAITierTapPlusTokensConsumedFromPacks = "ctt_ai_tiertap_plus_token
 private let keyAILifetimeTierTapPlusTokensPurchased = "ctt_ai_lifetime_tiertap_plus_tokens_purchased"
 private let keyAIProPlanTokenMonth = "ctt_ai_pro_plan_token_month"
 private let keyAIProPlanTokensConsumed = "ctt_ai_pro_plan_tokens_consumed"
+private let keyAISavedAnalysisQuestions = "ctt_ai_saved_analysis_questions_v1"
 
 /// Per-calendar-day aggregates for Settings “Tokens” charts (persisted).
 struct AIDayTelemetry: Codable, Equatable {
@@ -653,6 +654,26 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(aiTypingSpeed.rawValue, forKey: keyAITypingSpeed) }
     }
 
+    /// User-generated AI Analysis questions saved from the Analytics magic-wand sheet.
+    @Published var savedAIAnalysisQuestions: [TierTapAISavedQuestion] {
+        didSet { persistSavedAIAnalysisQuestions() }
+    }
+
+    func addSavedAIAnalysisQuestions(_ questions: [TierTapAISavedQuestion]) {
+        guard !questions.isEmpty else { return }
+        savedAIAnalysisQuestions.append(contentsOf: questions)
+    }
+
+    func removeSavedAIAnalysisQuestion(id: UUID) {
+        savedAIAnalysisQuestions.removeAll { $0.id == id }
+    }
+
+    private func persistSavedAIAnalysisQuestions() {
+        if let data = try? JSONEncoder().encode(savedAIAnalysisQuestions) {
+            UserDefaults.standard.set(data, forKey: keyAISavedAnalysisQuestions)
+        }
+    }
+
     /// When true, analytics (and matching AI summaries) treat session results as **EV** (cash net + comps). When false, **cash net** only.
     @Published var analyticsUseExpectedValue: Bool {
         didSet { UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue) }
@@ -1016,6 +1037,12 @@ final class SettingsStore: ObservableObject {
             self.aiTypingSpeed = speed
         } else {
             self.aiTypingSpeed = .fast
+        }
+        if let data = UserDefaults.standard.data(forKey: keyAISavedAnalysisQuestions),
+           let saved = try? JSONDecoder().decode([TierTapAISavedQuestion].self, from: data) {
+            self.savedAIAnalysisQuestions = saved
+        } else {
+            self.savedAIAnalysisQuestions = []
         }
         if UserDefaults.standard.object(forKey: keyAnalyticsUseExpectedValue) != nil {
             self.analyticsUseExpectedValue = UserDefaults.standard.bool(forKey: keyAnalyticsUseExpectedValue)

@@ -22,12 +22,15 @@ struct AnalyticsView: View {
     @State private var isAISheetPresented: Bool = false
     @State private var isPaywallPresented: Bool = false
     
-    @State private var selectedGraphKind: GraphKind = .betCaptureDiff
+    @State private var selectedGraphKind: GraphKind = .venn
     @State private var isShareSelectionPresented: Bool = false
     @State private var isShareSheetPresented: Bool = false
     @State private var analyticsFromDate: Date? = nil
     @State private var analyticsToDate: Date? = nil
     @State private var isFiltersExpanded: Bool = false
+    @State private var isOverviewExpanded: Bool = true
+    @State private var isMonthlyChartExpanded: Bool = false
+    @State private var isBasicResultsExpanded: Bool = false
 
 #if os(iOS)
     @State private var shareImages: [UIImage] = []
@@ -195,6 +198,49 @@ struct AnalyticsView: View {
         return "\(df.string(from: first)) – \(df.string(from: last))"
     }
 
+    private var monthlyProfitLossAggregates: [MonthlyProfitLossAggregate] {
+        let cal = Calendar.current
+        var byMonth: [Date: [Session]] = [:]
+        for session in closedSessions {
+            let comps = cal.dateComponents([.year, .month], from: session.startTime)
+            guard let monthStart = cal.date(from: comps) else { continue }
+            byMonth[monthStart, default: []].append(session)
+        }
+        let labelFormatter = DateFormatter()
+        labelFormatter.dateFormat = "MMM yy"
+
+        return byMonth.map { monthStart, sessions in
+            let cashNets = sessions.compactMap(\.winLoss)
+            let evNets = sessions.compactMap(\.expectedValue)
+            let profit = cashNets.filter { $0 > 0 }.reduce(0, +)
+            let loss = abs(cashNets.filter { $0 < 0 }.reduce(0, +))
+            let profitCash = profit
+            let profitEV = evNets.filter { $0 > 0 }.reduce(0, +)
+            let profitComp = max(0, profitEV - profitCash)
+            let lossCash = loss
+            let lossEV = abs(evNets.filter { $0 < 0 }.reduce(0, +))
+            let lossCompOffset = max(0, lossCash - lossEV)
+            let cashNet = cashNets.reduce(0, +)
+            let evNet = evNets.reduce(0, +)
+            let initialSum = sessions.compactMap(\.initialBuyIn).reduce(0, +)
+            let cashROI = initialSum > 0 ? (Double(cashNet) / Double(initialSum)) * 100.0 : nil
+            let evROI = initialSum > 0 ? (Double(evNet) / Double(initialSum)) * 100.0 : nil
+            return MonthlyProfitLossAggregate(
+                id: monthStart,
+                monthLabel: labelFormatter.string(from: monthStart),
+                profit: profit,
+                loss: loss,
+                profitCash: profitCash,
+                profitComp: profitComp,
+                lossCash: lossCash,
+                lossCompOffset: lossCompOffset,
+                cashROIPercent: cashROI,
+                evROIPercent: evROI
+            )
+        }
+        .sorted { $0.id < $1.id }
+    }
+
     private var analyticsLocationFilterText: String? {
         guard let filter = settingsStore.selectedLocationFilter, !filter.isEmpty else { return nil }
         return "Location: \(filter)"
@@ -213,13 +259,11 @@ struct AnalyticsView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 24) {
-                            headerSummary
                             filtersSection
                             gameCategoryToggle
-                            resultsBasisSection
-                            graphTypePicker
-                            selectedGraph
-                            secondaryGraphs
+                            overviewSection
+                            monthlyProfitLossChartSection
+                            basicResultsAnalysisSection
                         }
                         .padding()
                     }
@@ -517,7 +561,33 @@ struct AnalyticsView: View {
         }
     }
 
-    private var headerSummary: some View {
+    private var overviewSection: some View {
+        AnalyticsCollapsibleSection(
+            title: analyticsSessionOverviewTitle,
+            systemImage: "chart.bar.doc.horizontal",
+            isExpanded: $isOverviewExpanded
+        ) {
+            headerSummaryContent
+        }
+    }
+
+    private var monthlyProfitLossChartSection: some View {
+        AnalyticsCollapsibleSection(
+            title: "Monthly Profit & Loss",
+            systemImage: "chart.bar.fill",
+            isExpanded: $isMonthlyChartExpanded
+        ) {
+            MonthlyProfitLossChartCard(
+                aggregates: monthlyProfitLossAggregates,
+                gradient: settingsStore.primaryGradient,
+                currencySymbol: settingsStore.currencySymbol,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+        }
+    }
+
+    private var headerSummaryContent: some View {
         let total = closedSessions.count
         let wins = winningSessions.count
         let losses = losingSessions.count
@@ -572,9 +642,6 @@ struct AnalyticsView: View {
         return VStack(spacing: 12) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(analyticsSessionOverviewTitle)
-                        .font(.headline)
-                        .foregroundColor(.white)
                     Text(settingsStore.analyticsUseExpectedValue
                          ? "Results use EV (cash net + logged comps). Free play excluded."
                          : "Results use cash net (comps and free play excluded).")
@@ -644,9 +711,87 @@ struct AnalyticsView: View {
                 .accessibilityValue("Overall estimated risk of ruin \(riskOfRuinHeaderPercent)")
             }
         }
-        .padding()
-        .background(Color(.systemGray6).opacity(0.15))
-        .cornerRadius(16)
+    }
+
+    private var selectableGraphKinds: [GraphKind] {
+        GraphKind.allCases.filter { $0 != .betCaptureDiff }
+    }
+
+    private var basicResultsAnalysisSection: some View {
+        AnalyticsCollapsibleSection(
+            title: "Basic Results Analysis",
+            systemImage: "slider.horizontal.3",
+            isExpanded: $isBasicResultsExpanded
+        ) {
+            VStack(alignment: .leading, spacing: 16) {
+                resultsBasisSection
+                graphTypePicker
+                graphStyleSelectedGraph
+                basicResultsAnalysisCharts
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var basicResultsAnalysisCharts: some View {
+        VStack(spacing: 16) {
+            BetCaptureDiffLineChartCard(
+                series: betCaptureDiffByDate,
+                goodBadCounts: betCaptureGoodBadCounts,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if !moodCounts.isEmpty {
+                SessionMoodBarChartCard(
+                    moodCounts: moodCounts,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if usesTableStyleAnalytics {
+                GameBreakdownBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                TierPointsByLoyaltyProgramBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                PokerPerformanceSummaryCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                PokerROITrendChartCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
     }
 
     private var graphTypePicker: some View {
@@ -658,7 +803,7 @@ struct AnalyticsView: View {
                 Spacer()
             }
             Picker("Graph style", selection: $selectedGraphKind) {
-                ForEach(GraphKind.allCases) { kind in
+                ForEach(selectableGraphKinds) { kind in
                     Text(L10n.tr(kind.displayName, language: settingsStore.appLanguage)).tag(kind)
                 }
             }
@@ -666,95 +811,47 @@ struct AnalyticsView: View {
         }
     }
 
-    private var selectedGraph: some View {
-        Group {
-            switch selectedGraphKind {
-            case .betCaptureDiff:
-                BetCaptureDiffLineChartCard(
-                    series: betCaptureDiffByDate,
-                    goodBadCounts: betCaptureGoodBadCounts,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-            case .venn:
-                VennDiagramCard(
-                    leftLabel: vennLeftLabel,
-                    rightLabel: "Tier gain",
-                    leftCount: winningSessions.count,
-                    rightCount: sessionsWithTierGain.count,
-                    intersectionCount: vennIntersectionCount,
-                    total: closedSessions.count,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-            case .winLossBars:
-                WinLossBarChartCard(
-                    totalProfit: totalProfit,
-                    totalLoss: totalLoss,
-                    totalSessions: closedSessions.count,
-                    gradient: settingsStore.primaryGradient,
-                    currencySymbol: settingsStore.currencySymbol,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText,
-                    chartTitle: settingsStore.analyticsUseExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
-                    basisCaption: settingsStore.analyticsUseExpectedValue
-                        ? "Totals use expected value (cash net + comps)."
-                        : "Totals use cash net (comps excluded)."
-                )
-            case .tierProgress:
-                TierProgressLineChartCard(
-                    pointsByDate: cumulativePointsByDate,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-            }
-        }
-    }
-
-    private var secondaryGraphs: some View {
-        VStack(spacing: 16) {
-            if !moodCounts.isEmpty {
-                SessionMoodBarChartCard(
-                    moodCounts: moodCounts,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-            }
-            if usesTableStyleAnalytics {
-                GameBreakdownBars(
-                    sessions: closedSessions,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-                TierPointsByLoyaltyProgramBars(
-                    sessions: closedSessions,
-                    gradient: settingsStore.primaryGradient,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText
-                )
-            } else {
-                PokerPerformanceSummaryCard(
-                    sessions: closedSessions,
-                    gradient: settingsStore.primaryGradient,
-                    currencySymbol: settingsStore.currencySymbol,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText,
-                    useExpectedValue: settingsStore.analyticsUseExpectedValue
-                )
-                PokerROITrendChartCard(
-                    sessions: closedSessions,
-                    gradient: settingsStore.primaryGradient,
-                    currencySymbol: settingsStore.currencySymbol,
-                    dateRangeText: analyticsDateRangeText,
-                    locationFilterText: analyticsLocationFilterText,
-                    useExpectedValue: settingsStore.analyticsUseExpectedValue
-                )
-            }
+    @ViewBuilder
+    private var graphStyleSelectedGraph: some View {
+        switch selectedGraphKind {
+        case .betCaptureDiff:
+            EmptyView()
+        case .venn:
+            VennDiagramCard(
+                leftLabel: vennLeftLabel,
+                rightLabel: "Tier gain",
+                leftCount: winningSessions.count,
+                rightCount: sessionsWithTierGain.count,
+                intersectionCount: vennIntersectionCount,
+                total: closedSessions.count,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+        case .winLossBars:
+            WinLossBarChartCard(
+                totalProfit: totalProfit,
+                totalLoss: totalLoss,
+                totalSessions: closedSessions.count,
+                gradient: settingsStore.primaryGradient,
+                currencySymbol: settingsStore.currencySymbol,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText,
+                chartTitle: settingsStore.analyticsUseExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
+                basisCaption: settingsStore.analyticsUseExpectedValue
+                    ? "Totals use expected value (cash net + comps)."
+                    : "Totals use cash net (comps excluded)."
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+        case .tierProgress:
+            TierProgressLineChartCard(
+                pointsByDate: cumulativePointsByDate,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -835,6 +932,7 @@ private func aiAnalysisRelaxedOutcomeBucket(_ value: Int) -> Int {
 
 private func aiAnalysisRelaxedFingerprint(
     questionRaw: String,
+    contextRaw: String,
     category: SessionGameCategory,
     useEV: Bool,
     tone: String,
@@ -863,6 +961,7 @@ private func aiAnalysisRelaxedFingerprint(
         .joined(separator: "|")
     return [
         questionRaw,
+        contextRaw,
         category.rawValue,
         useEV ? "ev" : "cash",
         tone,
@@ -913,6 +1012,15 @@ struct AIAnalyticsSheet: View {
         case tableCompsVsCashNet
         case tableEvHotspots
 
+        case freePlayLoggedOverview
+        case freePlayVsOutcomes
+        case freePlayByProperty
+
+        case tableWinRateOverview
+        case tableResultsByGame
+        case tableResultsTrend
+        case tableSessionPatterns
+
         // Poker-focused questions
         case pokerProfitabilityOverview
         case pokerWinrateByGame
@@ -948,7 +1056,14 @@ struct AIAnalyticsSheet: View {
                 .consistencyTapPointsIdeas,
                 .bestFittingRewards,
                 .tableCompsVsCashNet,
-                .tableEvHotspots
+                .tableEvHotspots,
+                .freePlayLoggedOverview,
+                .freePlayVsOutcomes,
+                .freePlayByProperty,
+                .tableWinRateOverview,
+                .tableResultsByGame,
+                .tableResultsTrend,
+                .tableSessionPatterns
             ]
         }
         
@@ -967,8 +1082,48 @@ struct AIAnalyticsSheet: View {
                 .gentleBreakMoments,
                 .highVolatilitySessions,
                 .riskVolatilityProfile,
-                .stopLossAndBreakNudges
+                .stopLossAndBreakNudges,
+                .freePlayLoggedOverview,
+                .freePlayVsOutcomes,
+                .freePlayByProperty
             ]
+        }
+
+        var context: TierTapAIContext {
+            switch self {
+            case .whereEarnTiersFastest, .rankProgramsByTierEfficiency, .rankPropertiesByTierEfficiency,
+                 .bestGamePropertyCombos, .optimizeForFastestTierGain,
+                 .tapPointsEarningLately, .nextBadgeOrLevel, .consistencyTapPointsIdeas, .bestFittingRewards:
+                return .tierAnalysis
+            case .pokerProfitabilityOverview, .pokerWinrateByGame, .pokerROITrends,
+                 .tableWinRateOverview, .tableResultsByGame, .tableResultsTrend:
+                return .winRates
+            case .pokerSessionPatterns, .tableSessionPatterns:
+                return .playAnalysis
+            case .showRatedVsActualGaps, .whereUnderRated, .trendGapByProperty, .trendGapByGame,
+                 .ratingInsightsConfidence, .moodVsPlay, .whenTiltedOrOff, .gentleBreakMoments:
+                return .moodAndProperties
+            case .highVolatilitySessions, .riskVolatilityProfile, .stopLossAndBreakNudges, .pokerRiskProfile:
+                return .riskOfRuin
+            case .tableCompsVsCashNet, .tableEvHotspots, .pokerCompsVsCashNet, .pokerEvVsCashRoi:
+                return .comps
+            case .freePlayLoggedOverview, .freePlayVsOutcomes, .freePlayByProperty:
+                return .freePlay
+            }
+        }
+
+        static func builtInQuestions(
+            context: TierTapAIContext,
+            category: SessionGameCategory
+        ) -> [TierTapAIQuestion] {
+            let pool: [TierTapAIQuestion]
+            switch category {
+            case .table, .slots:
+                pool = tableQuestions
+            case .poker:
+                pool = pokerQuestions
+            }
+            return pool.filter { $0.context == context }
         }
         
         var title: String {
@@ -1002,6 +1157,13 @@ struct AIAnalyticsSheet: View {
             case .pokerRiskProfile: return "What is my risk/volatility profile in poker?"
             case .pokerCompsVsCashNet: return "How do comps change my poker results vs. cash net?"
             case .pokerEvVsCashRoi: return "How does EV-based ROI compare to cash ROI in poker?"
+            case .freePlayLoggedOverview: return "How much free play have I logged recently?"
+            case .freePlayVsOutcomes: return "Do sessions with more free play line up with better or worse outcomes?"
+            case .freePlayByProperty: return "Where do I log the most free play by property or casino?"
+            case .tableWinRateOverview: return "How are my overall win rate and net results?"
+            case .tableResultsByGame: return "How do my results vary by table game?"
+            case .tableResultsTrend: return "How are my net results trending over time?"
+            case .tableSessionPatterns: return "What patterns show up in my table sessions?"
             }
         }
         
@@ -1065,6 +1227,32 @@ struct AIAnalyticsSheet: View {
                 return "Using poker sessions only, compare cash net to EV (including comps). Summarize how comps change profitability and win‑rate‑style session counts, in \(toneLabel)."
             case .pokerEvVsCashRoi:
                 return "Using poker sessions only, contrast ROI using cash net vs. ROI using EV (comps included) per session, and describe what that implies about the mix of comps vs. felt results, in \(toneLabel)."
+            case .freePlayLoggedOverview:
+                return "Summarize how much free play the player has logged in the selected game set (totals and recent trend). Note that free play is excluded from win/loss and tax; keep the focus on promotional value context, in \(toneLabel)."
+            case .freePlayVsOutcomes:
+                return "Look for patterns between logged free play and session outcomes (cash net or selected results basis) in the selected game set. Stay factual and \(toneLabel); do not suggest gambling more for promos."
+            case .freePlayByProperty:
+                return "Break down free play logging by property or casino for the selected game set. Highlight where free play is most common, in \(toneLabel)."
+            case .tableWinRateOverview:
+                return "Using non‑poker table/slots sessions in the selected scope, summarize win rate, W/L counts, net results, and average per session for the selected results basis, in \(toneLabel)."
+            case .tableResultsByGame:
+                return "From table/slots sessions in the selected scope, compare results by game type and highlight stronger or weaker games, in \(toneLabel)."
+            case .tableResultsTrend:
+                return "Describe how net results and win rate for table/slots play have trended over time in the selected scope, in \(toneLabel)."
+            case .tableSessionPatterns:
+                return "From table/slots sessions in the selected scope, describe patterns in session length, stakes, and outcomes, in \(toneLabel)."
+            }
+        }
+    }
+
+    private enum AIQuestionPick: Equatable, Identifiable {
+        case builtIn(TierTapAIQuestion)
+        case saved(UUID)
+
+        var id: String {
+            switch self {
+            case .builtIn(let q): return "builtin:\(q.rawValue)"
+            case .saved(let id): return "saved:\(id.uuidString)"
             }
         }
     }
@@ -1075,8 +1263,13 @@ struct AIAnalyticsSheet: View {
     @State private var errorMessage: String?
     @State private var isPaywallPresented = false
     
-    @State private var selectedQuestion: TierTapAIQuestion = .whereEarnTiersFastest
+    @State private var selectedContext: TierTapAIContext = .winRates
+    @State private var selectedQuestionPick: AIQuestionPick = .builtIn(.pokerProfitabilityOverview)
     @State private var selectedAnalyticsCategory: SessionGameCategory = .table
+    @State private var isGeneratingQuestions = false
+    @State private var generateQuestionsError: String?
+    @State private var generatedDrafts: [TierTapAIGeneratedQuestionDraft] = []
+    @State private var isGeneratedQuestionsSheetPresented = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -1098,17 +1291,8 @@ struct AIAnalyticsSheet: View {
                                 compactHeading: true
                             )
                             .environmentObject(settingsStore)
-                            .onChange(of: selectedAnalyticsCategory) { newValue in
-                                switch newValue {
-                                case .table, .slots:
-                                    if !TierTapAIQuestion.tableQuestions.contains(selectedQuestion) {
-                                        selectedQuestion = TierTapAIQuestion.tableQuestions.first ?? .whereEarnTiersFastest
-                                    }
-                                case .poker:
-                                    if !TierTapAIQuestion.pokerQuestions.contains(selectedQuestion) {
-                                        selectedQuestion = TierTapAIQuestion.pokerQuestions.first ?? .pokerProfitabilityOverview
-                                    }
-                                }
+                            .onChange(of: selectedAnalyticsCategory) { _ in
+                                syncSelectedQuestionPick()
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1129,40 +1313,62 @@ struct AIAnalyticsSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
                         VStack(alignment: .leading, spacing: 8) {
+                            L10nText("Context")
+                                .font(.caption.bold())
+                                .foregroundColor(.white.opacity(0.8))
+                            aiPickerMenu(
+                                title: selectedContext.title,
+                                options: TierTapAIContext.allCases.map { ctx in
+                                    (ctx.title, { selectedContext = ctx; syncSelectedQuestionPick() })
+                                }
+                            )
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: 8) {
                             L10nText("Question")
                                 .font(.caption.bold())
                                 .foregroundColor(.white.opacity(0.8))
-                            Menu {
-                                ForEach(questionsForCurrentCategory, id: \.self) { question in
-                                    Button {
-                                        selectedQuestion = question
-                                    } label: {
-                                        Text(question.title)
-                                            .font(.caption)
-                                            .multilineTextAlignment(.leading)
-                                            .fixedSize(horizontal: false, vertical: true)
-                                    }
+                            aiPickerMenu(
+                                title: selectedQuestionDisplayTitle,
+                                options: availableQuestionPicks.map { pick in
+                                    (questionTitle(for: pick), { selectedQuestionPick = pick })
                                 }
-                            } label: {
-                                HStack(alignment: .top, spacing: 8) {
-                                    Text(selectedQuestion.title)
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .multilineTextAlignment(.leading)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Image(systemName: "chevron.up.chevron.down")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundColor(.white.opacity(0.7))
-                                        .padding(.top, 1)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding()
-                                .background(Color.black.opacity(0.25))
-                                .cornerRadius(12)
+                            )
+                            if availableQuestionPicks.isEmpty {
+                                L10nText("No questions for this context and session scope yet. Generate new questions below.")
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.55))
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Button {
+                            Task { await generateQuestionsForContext() }
+                        } label: {
+                            HStack(spacing: 8) {
+                                if isGeneratingQuestions {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Image(systemName: "arrow.triangle.2.circlepath")
+                                }
+                                L10nText("Generate new questions")
+                                    .font(.caption.weight(.semibold))
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.15))
+                            .cornerRadius(12)
+                        }
+                        .disabled(isGeneratingQuestions || isLoading)
+
+                        if let generateQuestionsError {
+                            Text(generateQuestionsError)
+                                .font(.caption2)
+                                .foregroundColor(.orange)
+                        }
                         
                         if isLoading {
                             ProgressView("Asking TierTap AI…")
@@ -1217,7 +1423,7 @@ struct AIAnalyticsSheet: View {
                                     .tint(.white)
                             } else {
                                 Image(systemName: "sparkles")
-                                L10nText("Ask TierTap")
+                                L10nText("Ask TierTap AI")
                                     .fontWeight(.semibold)
                             }
                         }
@@ -1252,15 +1458,189 @@ struct AIAnalyticsSheet: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
         }
+        .adaptiveSheet(isPresented: $isGeneratedQuestionsSheetPresented) {
+            generatedQuestionsSheet
+        }
+        .onAppear {
+            syncSelectedQuestionPick()
+        }
+        .onChange(of: selectedContext) { _ in
+            syncSelectedQuestionPick()
+        }
     }
-    
-    /// Currently available questions given the selected game category.
-    private var questionsForCurrentCategory: [TierTapAIQuestion] {
-        switch selectedAnalyticsCategory {
-        case .table, .slots:
-            return TierTapAIQuestion.tableQuestions
-        case .poker:
-            return TierTapAIQuestion.pokerQuestions
+
+    private var selectedQuestionDisplayTitle: String {
+        questionTitle(for: selectedQuestionPick)
+    }
+
+    private var availableQuestionPicks: [AIQuestionPick] {
+        let builtIn = TierTapAIQuestion.builtInQuestions(
+            context: selectedContext,
+            category: selectedAnalyticsCategory
+        ).map { AIQuestionPick.builtIn($0) }
+        let saved = settingsStore.savedAIAnalysisQuestions
+            .filter { $0.context == selectedContext }
+            .sorted { $0.createdAt > $1.createdAt }
+            .map { AIQuestionPick.saved($0.id) }
+        return builtIn + saved
+    }
+
+    private func questionTitle(for pick: AIQuestionPick) -> String {
+        switch pick {
+        case .builtIn(let q):
+            return q.title
+        case .saved(let id):
+            return settingsStore.savedAIAnalysisQuestions.first(where: { $0.id == id })?.title ?? "Saved question"
+        }
+    }
+
+    private func syncSelectedQuestionPick() {
+        let picks = availableQuestionPicks
+        guard !picks.isEmpty else { return }
+        if !picks.contains(selectedQuestionPick) {
+            selectedQuestionPick = picks[0]
+        }
+    }
+
+    @ViewBuilder
+    private func aiPickerMenu(
+        title: String,
+        options: [(String, () -> Void)]
+    ) -> some View {
+        Menu {
+            ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+                Button(action: option.1) {
+                    Text(option.0)
+                        .font(.caption)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        } label: {
+            HStack(alignment: .top, spacing: 8) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.top, 1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color.black.opacity(0.25))
+            .cornerRadius(12)
+        }
+    }
+
+    private var generatedQuestionsSheet: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 16) {
+                    VStack(spacing: 4) {
+                        L10nText("Save questions for")
+                            .font(.headline)
+                        Text(selectedContext.title)
+                            .font(.headline)
+                    }
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                    if generatedDrafts.isEmpty {
+                        L10nText("No questions were generated. Try again.")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach($generatedDrafts) { $draft in
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Toggle(isOn: $draft.isSelectedForSave) {
+                                            Text(draft.title)
+                                                .font(.subheadline.weight(.semibold))
+                                                .foregroundColor(.white)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        .tint(.green)
+                                        Text(draft.instruction)
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.65))
+                                    }
+                                    .padding()
+                                    .background(Color.black.opacity(0.25))
+                                    .cornerRadius(12)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+
+                    Button {
+                        saveSelectedGeneratedQuestions()
+                    } label: {
+                        L10nText("Save selected questions")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                    }
+                    .disabled(generatedDrafts.filter(\.isSelectedForSave).isEmpty)
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        isGeneratedQuestionsSheetPresented = false
+                    }
+                    .foregroundColor(.green)
+                }
+            }
+        }
+    }
+
+    private func saveSelectedGeneratedQuestions() {
+        let toSave = generatedDrafts
+            .filter(\.isSelectedForSave)
+            .map { TierTapAISavedQuestion(context: selectedContext, title: $0.title, instruction: $0.instruction) }
+        settingsStore.addSavedAIAnalysisQuestions(toSave)
+        if let first = toSave.first {
+            selectedQuestionPick = .saved(first.id)
+        }
+        isGeneratedQuestionsSheetPresented = false
+        generateQuestionsError = nil
+    }
+
+    private func resolvedQuestionTitle() -> String {
+        questionTitle(for: selectedQuestionPick)
+    }
+
+    private func resolvedQuestionInstruction(toneLabel: String) -> String {
+        switch selectedQuestionPick {
+        case .builtIn(let q):
+            return q.instruction(toneLabel: toneLabel)
+        case .saved(let id):
+            guard let saved = settingsStore.savedAIAnalysisQuestions.first(where: { $0.id == id }) else {
+                return "Answer using the player's saved question, in \(toneLabel)."
+            }
+            return saved.instruction
+        }
+    }
+
+    private func resolvedQuestionCacheKey() -> String {
+        switch selectedQuestionPick {
+        case .builtIn(let q):
+            return q.rawValue
+        case .saved(let id):
+            return "saved:\(id.uuidString)"
         }
     }
     
@@ -1432,7 +1812,9 @@ struct AIAnalyticsSheet: View {
         """
         
         let toneInstruction = settingsStore.aiTone.promptLabel
-        let questionPrompt = selectedQuestion.instruction(toneLabel: toneInstruction)
+        let questionTitle = resolvedQuestionTitle()
+        let questionPrompt = resolvedQuestionInstruction(toneLabel: toneInstruction)
+        let contextLabel = selectedContext.title
         let gameLabel: String = {
             switch selectedAnalyticsCategory {
             case .poker: return "poker"
@@ -1443,8 +1825,9 @@ struct AIAnalyticsSheet: View {
         
         let prompt = """
         You are an analytics assistant for TierTap.
-        Question: \"\(selectedQuestion.title)\"
-        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history.
+        Analysis context: \(contextLabel)
+        Question: \"\(questionTitle)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history. Frame the answer around the \(contextLabel) context.
         Task: \(questionPrompt)
         Data summary:
         \(statsBlock)
@@ -1454,8 +1837,9 @@ struct AIAnalyticsSheet: View {
         
         let promptForExactCache = """
         You are an analytics assistant for TierTap.
-        Question: \"\(selectedQuestion.title)\"
-        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history.
+        Analysis context: \(contextLabel)
+        Question: \"\(questionTitle)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history. Frame the answer around the \(contextLabel) context.
         Task: \(questionPrompt)
         Data summary:
         \(statsBlock)
@@ -1465,7 +1849,8 @@ struct AIAnalyticsSheet: View {
         """
         let promptHash = aiAnalysisPromptHash(promptForExactCache)
         let relaxedFingerprint = aiAnalysisRelaxedFingerprint(
-            questionRaw: selectedQuestion.rawValue,
+            questionRaw: resolvedQuestionCacheKey(),
+            contextRaw: selectedContext.rawValue,
             category: selectedAnalyticsCategory,
             useEV: useEV,
             tone: toneInstruction,
@@ -1574,6 +1959,136 @@ struct AIAnalyticsSheet: View {
             }
         }
     }
+
+    private func generateQuestionsForContext() async {
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run {
+                generateQuestionsError = "Supabase is not configured."
+            }
+            return
+        }
+
+        if !hasProAccess && !settingsStore.canUseAI() {
+            await MainActor.run {
+                generateQuestionsError = "You have reached the daily AI limit. Upgrade to Pro for more AI calls."
+            }
+            return
+        }
+
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run { isPaywallPresented = true }
+            return
+        }
+
+        let gameLabel: String = {
+            switch selectedAnalyticsCategory {
+            case .poker: return "poker"
+            case .table: return "table"
+            case .slots: return "slots"
+            }
+        }()
+        let toneLabel = settingsStore.aiTone.promptLabel
+        let existingTitles = (
+            TierTapAIQuestion.builtInQuestions(context: selectedContext, category: selectedAnalyticsCategory).map(\.title)
+            + settingsStore.savedAIAnalysisQuestions.filter { $0.context == selectedContext }.map(\.title)
+        ).joined(separator: "; ")
+
+        let genPrompt = """
+        You help TierTap, a casino session tracking app, suggest fresh analytics questions.
+        Generate exactly 5 NEW short questions for the "\(selectedContext.title)" context (\(selectedContext.generationTopic)).
+        Session scope: \(gameLabel) sessions only.
+        Tone for eventual answers: \(toneLabel).
+        Do NOT repeat or closely paraphrase these existing questions: \(existingTitles.isEmpty ? "(none)" : existingTitles).
+        Return ONLY a JSON array of objects with keys "title" (user-facing question, one line) and "instruction" (2-3 sentences telling an analyst what to compute from session logs; use \(toneLabel) tone; no betting advice).
+        Example: [{"title":"...","instruction":"..."}]
+        """
+
+        await MainActor.run {
+            isGeneratingQuestions = true
+            generateQuestionsError = nil
+        }
+
+        struct GeminiRequest: Encodable {
+            struct Part: Encodable { let text: String }
+            struct Content: Encodable {
+                let role: String
+                let parts: [Part]
+            }
+            let contents: [Content]
+        }
+
+        let routerBody = GeminiProxyBody(
+            contents: [
+                GeminiRequest.Content(role: "user", parts: [.init(text: genPrompt)])
+            ],
+            language: settingsStore.appLanguage
+        )
+
+        do {
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
+                await MainActor.run { settingsStore.registerAICall() }
+            }
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+                try await client.functions.invoke(
+                    "gemini-router",
+                    options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: hasProAccess
+                )
+            }
+            let raw = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n") ?? ""
+            let drafts = parseGeneratedQuestionDrafts(from: raw)
+            await MainActor.run {
+                isGeneratingQuestions = false
+                if drafts.isEmpty {
+                    generateQuestionsError = "Could not parse generated questions. Try again."
+                } else {
+                    generatedDrafts = drafts
+                    isGeneratedQuestionsSheetPresented = true
+                }
+            }
+        } catch {
+            await MainActor.run {
+                isGeneratingQuestions = false
+                generateQuestionsError = error.localizedDescription
+            }
+        }
+    }
+
+    private func parseGeneratedQuestionDrafts(from raw: String) -> [TierTapAIGeneratedQuestionDraft] {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let jsonSlice: String = {
+            if let start = trimmed.firstIndex(of: "["),
+               let end = trimmed.lastIndex(of: "]") {
+                return String(trimmed[start...end])
+            }
+            return trimmed
+        }()
+        guard let data = jsonSlice.data(using: .utf8) else { return [] }
+        struct Row: Decodable {
+            let title: String
+            let instruction: String
+        }
+        guard let rows = try? JSONDecoder().decode([Row].self, from: data) else { return [] }
+        return rows.compactMap { row in
+            let title = row.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            let instruction = row.instruction.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !title.isEmpty, !instruction.isEmpty else { return nil }
+            return TierTapAIGeneratedQuestionDraft(title: title, instruction: instruction)
+        }
+    }
 }
 
 // MARK: - Graph kinds
@@ -1597,6 +2112,276 @@ enum GraphKind: String, CaseIterable, Identifiable {
 }
 
 // MARK: - Reusable components
+
+struct MonthlyProfitLossAggregate: Identifiable {
+    let id: Date
+    let monthLabel: String
+    let profit: Int
+    let loss: Int
+    let profitCash: Int
+    let profitComp: Int
+    let lossCash: Int
+    let lossCompOffset: Int
+    let cashROIPercent: Double?
+    let evROIPercent: Double?
+}
+
+struct AnalyticsCollapsibleSection<Content: View>: View {
+    let title: String
+    let systemImage: String
+    @Binding var isExpanded: Bool
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Label(title, systemImage: systemImage)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Spacer()
+                    Image(systemName: isExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct MonthlyProfitLossChartCard: View {
+    let aggregates: [MonthlyProfitLossAggregate]
+    let gradient: LinearGradient
+    let currencySymbol: String
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    private var maxBarValue: Double {
+        let values = aggregates.flatMap { agg -> [Double] in
+            [
+                Double(agg.profit),
+                Double(agg.loss),
+                Double(agg.profitCash + agg.profitComp),
+                Double(agg.lossCash)
+            ]
+        }
+        return max(values.max() ?? 1, 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if aggregates.isEmpty {
+                L10nText("No closed sessions in the selected range.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                MonthlyProfitLossVerticalChart(
+                    aggregates: aggregates,
+                    maxValue: maxBarValue,
+                    gradient: gradient,
+                    currencySymbol: currencySymbol
+                )
+                .frame(height: 220)
+
+                HStack(spacing: 16) {
+                    legendItem(color: .green, label: "Profit (cash)")
+                    legendItem(color: Color(red: 0.35, green: 0.85, blue: 0.75), label: "Profit (comps)")
+                    legendItem(color: .red, label: "Loss (cash)")
+                    legendItem(color: Color(red: 1.0, green: 0.55, blue: 0.35), label: "Loss (comps offset)")
+                }
+
+                HStack(spacing: 16) {
+                    legendItem(color: .white.opacity(0.85), label: "ROI w/o comps")
+                    legendItem(color: Color.cyan.opacity(0.9), label: "ROI w/ comps")
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+
+    private func legendItem(color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(color)
+                .frame(width: 12, height: 12)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.gray)
+        }
+    }
+}
+
+struct MonthlyProfitLossVerticalChart: View {
+    let aggregates: [MonthlyProfitLossAggregate]
+    let maxValue: Double
+    let gradient: LinearGradient
+    let currencySymbol: String
+
+    private let profitCashColor = Color.green
+    private let profitCompColor = Color(red: 0.35, green: 0.85, blue: 0.75)
+    private let lossCashColor = Color.red
+    private let lossCompColor = Color(red: 1.0, green: 0.55, blue: 0.35)
+
+    var body: some View {
+        GeometryReader { geo in
+            let chartHeight = geo.size.height - 36
+            let yAxisWidth: CGFloat = 44
+            let plotWidth = max(geo.size.width - yAxisWidth - 8, 1)
+            let columnWidth = aggregates.isEmpty ? 0 : plotWidth / CGFloat(aggregates.count)
+            let barPairWidth = max(8, min(columnWidth * 0.72, 36))
+            let singleBarWidth = max(4, barPairWidth * 0.42)
+
+            HStack(alignment: .bottom, spacing: 0) {
+                yAxisLabels(height: chartHeight, width: yAxisWidth)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .bottom, spacing: max(4, columnWidth * 0.12)) {
+                        ForEach(aggregates) { month in
+                            VStack(spacing: 4) {
+                                HStack(alignment: .bottom, spacing: 3) {
+                                    stackedBar(
+                                        cash: month.profitCash,
+                                        comp: month.profitComp,
+                                        cashColor: profitCashColor,
+                                        compColor: profitCompColor,
+                                        chartHeight: chartHeight,
+                                        barWidth: singleBarWidth
+                                    )
+                                    lossStackedBar(
+                                        lossCash: month.lossCash,
+                                        compOffset: month.lossCompOffset,
+                                        chartHeight: chartHeight,
+                                        barWidth: singleBarWidth
+                                    )
+                                }
+                                roiLabels(for: month)
+                                Text(month.monthLabel)
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                            }
+                            .frame(width: max(columnWidth, barPairWidth + 8))
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func stackedBar(
+        cash: Int,
+        comp: Int,
+        cashColor: Color,
+        compColor: Color,
+        chartHeight: CGFloat,
+        barWidth: CGFloat
+    ) -> some View {
+        let total = max(cash + comp, 0)
+        let totalHeight = CGFloat(Double(total) / maxValue) * chartHeight
+        let cashHeight = total > 0 ? CGFloat(Double(cash) / Double(total)) * totalHeight : 0
+        let compHeight = total > 0 ? totalHeight - cashHeight : 0
+
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if comp > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(compColor)
+                    .frame(width: barWidth, height: max(compHeight, comp > 0 ? 2 : 0))
+            }
+            if cash > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(cashColor)
+                    .frame(width: barWidth, height: max(cashHeight, 2))
+            }
+        }
+        .frame(height: chartHeight, alignment: .bottom)
+    }
+
+    @ViewBuilder
+    private func lossStackedBar(
+        lossCash: Int,
+        compOffset: Int,
+        chartHeight: CGFloat,
+        barWidth: CGFloat
+    ) -> some View {
+        let total = max(lossCash, 0)
+        let totalHeight = CGFloat(Double(total) / maxValue) * chartHeight
+        let remainingLoss = max(0, lossCash - compOffset)
+        let remainingHeight = total > 0 ? CGFloat(Double(remainingLoss) / Double(total)) * totalHeight : 0
+        let offsetHeight = total > 0 ? totalHeight - remainingHeight : 0
+
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if compOffset > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(lossCompColor)
+                    .frame(width: barWidth, height: max(offsetHeight, 2))
+            }
+            if remainingLoss > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(lossCashColor)
+                    .frame(width: barWidth, height: max(remainingHeight, 2))
+            }
+        }
+        .frame(height: chartHeight, alignment: .bottom)
+    }
+
+    @ViewBuilder
+    private func roiLabels(for month: MonthlyProfitLossAggregate) -> some View {
+        VStack(spacing: 2) {
+            if let cash = month.cashROIPercent {
+                Text(String(format: "%.0f%%", cash))
+                    .font(.system(size: 8, weight: .semibold).monospacedDigit())
+                    .foregroundColor(.white.opacity(0.85))
+            }
+            if let ev = month.evROIPercent {
+                Text(String(format: "%.0f%%", ev))
+                    .font(.system(size: 8, weight: .semibold).monospacedDigit())
+                    .foregroundColor(.cyan.opacity(0.9))
+            }
+        }
+    }
+
+    private func yAxisLabels(height: CGFloat, width: CGFloat) -> some View {
+        let ticks = 4
+        return VStack {
+            ForEach((0...ticks).reversed(), id: \.self) { i in
+                let value = Int((maxValue * Double(i) / Double(ticks)).rounded())
+                Text("\(currencySymbol)\(value)")
+                    .font(.system(size: 8).monospacedDigit())
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                if i > 0 { Spacer(minLength: 0) }
+            }
+        }
+        .frame(width: width, height: height, alignment: .trailing)
+    }
+}
 
 struct MetricPill: View {
     let title: String
@@ -2126,6 +2911,7 @@ struct GameBreakdownBars: View {
                     .foregroundColor(.gray)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(16)
@@ -2199,7 +2985,8 @@ struct TierPointsByLoyaltyProgramBars: View {
                                 .font(.caption)
                                 .foregroundColor(.white)
                                 .lineLimit(1)
-                            Spacer()
+                                .minimumScaleFactor(0.8)
+                            Spacer(minLength: 8)
                             Text("\(row.points) pts")
                                 .font(.caption2.bold())
                                 .foregroundColor(.gray)
@@ -2230,6 +3017,7 @@ struct TierPointsByLoyaltyProgramBars: View {
                     .foregroundColor(.gray)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
         .cornerRadius(16)
@@ -2573,16 +3361,13 @@ struct AnalyticsShareSelectionSheet: View {
                         }
                         .listRowBackground(Color(.systemGray6).opacity(0.2))
 
-                        Toggle("Bet Rating vs Actual", isOn: $includeBetCaptureDiff)
-                        Toggle("Win vs. Tier Gain (Venn)", isOn: $includeVenn)
-                        Toggle("Win/Loss Distribution", isOn: $includeWinLoss)
-                        Toggle("Tier Progress Over Time", isOn: $includeTierProgress)
-                            .disabled(!hasTierData)
-                        Toggle("Sessions by Game", isOn: $includeGameBreakdown)
-                        Toggle("Tier Points by Loyalty Program", isOn: $includeTierByLoyaltyProgram)
-                            .disabled(!hasTierData)
-                        Toggle("Session moods", isOn: $includeSessionMoods)
-                            .disabled(!hasMoodData)
+                        AnalyticsShareToggleRow(title: "Bet Rating vs Actual", isOn: $includeBetCaptureDiff)
+                        AnalyticsShareToggleRow(title: "Win vs. Tier Gain (Venn)", isOn: $includeVenn)
+                        AnalyticsShareToggleRow(title: "Win/Loss Distribution", isOn: $includeWinLoss)
+                        AnalyticsShareToggleRow(title: "Tier Progress Over Time", isOn: $includeTierProgress, disabled: !hasTierData)
+                        AnalyticsShareToggleRow(title: "Sessions by Game", isOn: $includeGameBreakdown)
+                        AnalyticsShareToggleRow(title: "Tier Points by Loyalty Program", isOn: $includeTierByLoyaltyProgram, disabled: !hasTierData)
+                        AnalyticsShareToggleRow(title: "Session moods", isOn: $includeSessionMoods, disabled: !hasMoodData)
                     }
 
                     Section(
@@ -2593,6 +3378,8 @@ struct AnalyticsShareSelectionSheet: View {
                         EmptyView()
                     }
                 }
+                .listStyle(.plain)
+                .listRowSpacing(10)
                 .scrollContentBackground(.hidden)
             }
             .localizedNavigationTitle("Share Analytics")
@@ -2630,5 +3417,37 @@ struct AnalyticsShareSelectionSheet: View {
                 }
             }
         }
+    }
+}
+
+private struct AnalyticsShareToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    var disabled: Bool = false
+
+    var body: some View {
+        Toggle(title, isOn: $isOn)
+            .disabled(disabled)
+            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+            .listRowBackground(
+                AnalyticsShareToggleRowBackground(selected: isOn && !disabled)
+            )
+            .listRowSeparator(.hidden)
+    }
+}
+
+private struct AnalyticsShareToggleRowBackground: View {
+    let selected: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(Color(.systemGray6).opacity(selected ? 0.28 : 0.15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(selected ? Color.green.opacity(0.65) : .clear, lineWidth: 1.5)
+            )
+            .shadow(color: selected ? Color.green.opacity(0.55) : .clear, radius: 14, x: 0, y: 0)
+            .shadow(color: selected ? Color.green.opacity(0.38) : .clear, radius: 8, x: 0, y: 4)
+            .padding(.vertical, 4)
     }
 }
