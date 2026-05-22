@@ -1270,9 +1270,22 @@ struct AIAnalyticsSheet: View {
     @State private var generateQuestionsError: String?
     @State private var generatedDrafts: [TierTapAIGeneratedQuestionDraft] = []
     @State private var isGeneratedQuestionsSheetPresented = false
+    @State private var isResultsBasisExpanded = true
+    @State private var isContextExpanded = true
+    @State private var isQuestionExpanded = true
+    @State private var isShareSheetPresented = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var shareableAnswerText: String? {
+        let text = (fullAnswer ?? displayedAnswer).trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? nil : text
+    }
+
+    private var isShowingAnswer: Bool {
+        fullAnswer != nil || !displayedAnswer.isEmpty
     }
     
     var body: some View {
@@ -1297,10 +1310,7 @@ struct AIAnalyticsSheet: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            L10nText("Results basis")
-                                .font(.caption.bold())
-                                .foregroundColor(.white.opacity(0.8))
+                        aiCollapsibleSection(title: "Results basis", isExpanded: $isResultsBasisExpanded) {
                             Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
                                 L10nText("Cash net").tag(false)
                                 L10nText("EV (incl. comps)").tag(true)
@@ -1310,12 +1320,8 @@ struct AIAnalyticsSheet: View {
                                 .font(.caption2)
                                 .foregroundColor(.white.opacity(0.55))
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            L10nText("Context")
-                                .font(.caption.bold())
-                                .foregroundColor(.white.opacity(0.8))
+
+                        aiCollapsibleSection(title: "Context", isExpanded: $isContextExpanded) {
                             aiPickerMenu(
                                 title: selectedContext.title,
                                 options: TierTapAIContext.allCases.map { ctx in
@@ -1323,12 +1329,8 @@ struct AIAnalyticsSheet: View {
                                 }
                             )
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            L10nText("Question")
-                                .font(.caption.bold())
-                                .foregroundColor(.white.opacity(0.8))
+                        aiCollapsibleSection(title: "Question", isExpanded: $isQuestionExpanded) {
                             aiPickerMenu(
                                 title: selectedQuestionDisplayTitle,
                                 options: availableQuestionPicks.map { pick in
@@ -1340,34 +1342,33 @@ struct AIAnalyticsSheet: View {
                                     .font(.caption2)
                                     .foregroundColor(.white.opacity(0.55))
                             }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Button {
-                            Task { await generateQuestionsForContext() }
-                        } label: {
-                            HStack(spacing: 8) {
-                                if isGeneratingQuestions {
-                                    ProgressView()
-                                        .tint(.white)
-                                } else {
-                                    Image(systemName: "arrow.triangle.2.circlepath")
+                            Button {
+                                Task { await generateQuestionsForContext() }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    if isGeneratingQuestions {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "arrow.triangle.2.circlepath")
+                                    }
+                                    L10nText("Generate new questions")
+                                        .font(.caption.weight(.semibold))
                                 }
-                                L10nText("Generate new questions")
-                                    .font(.caption.weight(.semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(Color.white.opacity(0.15))
+                                .cornerRadius(12)
                             }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.15))
-                            .cornerRadius(12)
-                        }
-                        .disabled(isGeneratingQuestions || isLoading)
+                            .disabled(isGeneratingQuestions || isLoading)
 
-                        if let generateQuestionsError {
-                            Text(generateQuestionsError)
-                                .font(.caption2)
-                                .foregroundColor(.orange)
+                            if let generateQuestionsError {
+                                Text(generateQuestionsError)
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
                         }
                         
                         if isLoading {
@@ -1375,11 +1376,28 @@ struct AIAnalyticsSheet: View {
                                 .tint(.white)
                         }
                         
-                        if fullAnswer != nil {
+                        if isShowingAnswer {
                             VStack(alignment: .leading, spacing: 8) {
-                                L10nText("Answer")
-                                    .font(.caption.bold())
-                                    .foregroundColor(.white.opacity(0.8))
+                                HStack {
+                                    L10nText("Answer")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.white.opacity(0.8))
+                                    Spacer()
+                                    if shareableAnswerText != nil {
+                                        Button {
+                                            isShareSheetPresented = true
+                                        } label: {
+                                            Label {
+                                                L10nText("Share")
+                                            } icon: {
+                                                Image(systemName: "square.and.arrow.up")
+                                            }
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundColor(.white)
+                                        }
+                                        .disabled(isLoading)
+                                    }
+                                }
                                 ScrollView {
                                     Text(displayedAnswer)
                                         .font(.body)
@@ -1461,12 +1479,57 @@ struct AIAnalyticsSheet: View {
         .adaptiveSheet(isPresented: $isGeneratedQuestionsSheetPresented) {
             generatedQuestionsSheet
         }
+        .adaptiveSheet(isPresented: $isShareSheetPresented) {
+            if let shareableAnswerText {
+                ShareSheet(items: [shareableAnswerText])
+            }
+        }
         .onAppear {
             syncSelectedQuestionPick()
         }
         .onChange(of: selectedContext) { _ in
             syncSelectedQuestionPick()
         }
+    }
+
+    private func collapseSectionsForAnswerFocus() {
+        withAnimation(.easeInOut) {
+            isResultsBasisExpanded = false
+            isContextExpanded = false
+            isQuestionExpanded = false
+        }
+    }
+
+    @ViewBuilder
+    private func aiCollapsibleSection<Content: View>(
+        title: String,
+        isExpanded: Binding<Bool>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isExpanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    L10nText(title)
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.8))
+                    Spacer()
+                    Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded.wrappedValue {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var selectedQuestionDisplayTitle: String {
@@ -1877,6 +1940,7 @@ struct AIAnalyticsSheet: View {
                 errorMessage = nil
                 fullAnswer = textToShow
                 isLoading = false
+                collapseSectionsForAnswerFocus()
             }
             await typeOut(textToShow)
             return
@@ -1887,6 +1951,7 @@ struct AIAnalyticsSheet: View {
             errorMessage = nil
             fullAnswer = nil
             displayedAnswer = ""
+            collapseSectionsForAnswerFocus()
         }
         
         struct GeminiRequest: Encodable {
