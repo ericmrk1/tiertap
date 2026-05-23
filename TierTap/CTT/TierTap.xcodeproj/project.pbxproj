@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */; };
 		2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2D86C8432C78C1F310B3E /* HistoryView.swift */; };
+		HISTGRDB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */; };
+		HISTGRNGB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */; };
 		TAXPPREPB01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */; };
 		ZIPTAXPR01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */; };
 		2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */; };
@@ -244,6 +246,8 @@
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
 		COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityPublisher.swift; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridView.swift; sourceTree = "<group>"; };
+		HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridEngine.swift; sourceTree = "<group>"; };
 		TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTaxPrepView.swift; sourceTree = "<group>"; };
 		ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxPrepZipArchive.swift; sourceTree = "<group>"; };
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
@@ -392,6 +396,8 @@
 				TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */,
 				TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */,
 				E4D2D86C8432C78C1F310B3E /* HistoryView.swift */,
+				HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */,
+				HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */,
 				TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */,
 				2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */,
 				ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */,
@@ -898,6 +904,8 @@
 				TTAI2E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift in Sources */,
 				2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */,
 				2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */,
+				HISTGRDB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift in Sources */,
+				HISTGRNGB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift in Sources */,
 				TAXPPREPB01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift in Sources */,
 				ZIPTAXPR01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift in Sources */,
 				2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */,

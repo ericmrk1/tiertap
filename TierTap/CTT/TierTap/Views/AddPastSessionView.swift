@@ -77,8 +77,8 @@ struct AddPastSessionView: View {
         return hasGame && !casino.isEmpty &&
             endTime > startTime &&
             buyOK && Int(cashOut) != nil &&
-            (Int(startingTier) ?? 0) > 0 && Int(endingTier) != nil &&
-            Int(avgBetActual) != nil && Int(avgBetRated) != nil
+            (Int(startingTier) ?? 0) > 0 && Int(endingTier) != nil
+        // Avg bet fields are optional; buy-in and cash-out are the required money fields.
     }
 
     private let blindPickerValues: [Int] = [0, 1, 2, 3, 5, 10, 20, 40, 80, 100, 200, 300, 400, 500, 600, 800, 1000]
@@ -779,8 +779,7 @@ struct AddPastSessionView: View {
         }
 
         guard let bi = Int(totalBuyIn), let co = Int(cashOut),
-              let st = Int(startingTier), st > 0, let et = Int(endingTier),
-              let aba = Int(avgBetActual), let abr = Int(avgBetRated) else { return }
+              let st = Int(startingTier), st > 0, let et = Int(endingTier) else { return }
         let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
         let cal = Calendar.current
         let dc = cal.dateComponents([.year,.month,.day], from: date)
@@ -821,8 +820,8 @@ struct AddPastSessionView: View {
             buyInEvents: [ev],
             freePlayEvents: fpEvents,
             cashOut: co,
-            avgBetActual: aba,
-            avgBetRated: abr,
+            avgBetActual: Int(avgBetActual),
+            avgBetRated: Int(avgBetRated),
             isLive: false,
             status: .complete,
             sessionMood: nil,

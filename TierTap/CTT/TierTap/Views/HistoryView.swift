@@ -1,5 +1,19 @@
 import SwiftUI
 
+private enum HistoryContentTab: String, CaseIterable {
+    case grid
+    case verified
+    case unverified
+
+    var tierPointsFilter: SessionTierPointsVerification? {
+        switch self {
+        case .grid: return nil
+        case .verified: return .verified
+        case .unverified: return .unverified
+        }
+    }
+}
+
 struct HistoryView: View {
     @EnvironmentObject var store: SessionStore
     @EnvironmentObject var settingsStore: SettingsStore
@@ -22,8 +36,8 @@ struct HistoryView: View {
     @State private var isHistoryDateSectionExpanded: Bool = false
     @State private var isHistoryGameSectionExpanded: Bool = false
     @State private var isHistoryLocationSectionExpanded: Bool = false
-    /// Single choice below Filters; legacy sessions without stored verification count as verified.
-    @State private var historyTierPointsFilter: SessionTierPointsVerification = .verified
+    @State private var historyContentTab: HistoryContentTab = .grid
+    @State private var historyGridMetricMode: HistoryGridMetricMode = .profitLoss
     @State private var showTaxPrep = false
     @State private var showPhotoFeed = false
     @State private var isToolsMenuPresented = false
@@ -65,8 +79,8 @@ struct HistoryView: View {
             }
         }
 
-        if includeTierPointsVerification {
-            sessions = sessions.filter { $0.effectiveTierPointsVerification == historyTierPointsFilter }
+        if includeTierPointsVerification, let filter = historyContentTab.tierPointsFilter {
+            sessions = sessions.filter { $0.effectiveTierPointsVerification == filter }
         }
 
         return sessions
@@ -242,20 +256,20 @@ struct HistoryView: View {
         .padding(.top, 8)
     }
 
-    private var historyTierPointsVerificationSegment: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            L10nText("Tier points")
-                .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.85))
-            Picker("", selection: $historyTierPointsFilter) {
-                Text("Verified").tag(SessionTierPointsVerification.verified)
-                Text("Unverified").tag(SessionTierPointsVerification.unverified)
-            }
-            .pickerStyle(.segmented)
-            .tint(.green)
+    private var historyContentTabSegment: some View {
+        Picker("", selection: $historyContentTab) {
+            Text("Grid").tag(HistoryContentTab.grid)
+            Text("Verified").tag(HistoryContentTab.verified)
+            Text("Unverified").tag(HistoryContentTab.unverified)
         }
+        .pickerStyle(.segmented)
+        .tint(.green)
         .padding(.horizontal)
         .padding(.top, 10)
+    }
+
+    private var gridSessions: [Session] {
+        sessionsApplyingHistoryFilters(includeTierPointsVerification: false)
     }
 
     private var historyDateRangeSection: some View {
@@ -494,9 +508,16 @@ struct HistoryView: View {
     private var historyContentView: some View {
         VStack(spacing: 0) {
             historyStickyFilterBubble
-            historyTierPointsVerificationSegment
-            sessionListContent
-                .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            historyContentTabSegment
+            if historyContentTab == .grid {
+                ScrollView {
+                    HistoryActivityGridView(sessions: gridSessions, metricMode: $historyGridMetricMode)
+                }
+                .scrollIndicators(.hidden)
+            } else {
+                sessionListContent
+                    .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            }
         }
     }
 
