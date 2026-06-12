@@ -14,6 +14,8 @@ struct TimerActivityAttributes: ActivityAttributes {
         var totalComp: Int
         var liveTrackedStackAmount: Int?
         var currencySymbol: String
+        /// When true, live summary omits stack (slots sessions close out only).
+        var isSlotsSession: Bool = false
     }
     var sessionID: String
 }
@@ -33,18 +35,13 @@ enum LiveSessionSummaryMetricsBuilder {
         totalFreePlay: Int,
         totalComp: Int,
         liveTrackedStackAmount: Int?,
-        currencySymbol: String
+        currencySymbol: String,
+        isSlotsSession: Bool = false
     ) -> [LiveSessionSummaryMetric] {
         func money(_ amount: Int) -> String {
             "\(currencySymbol)\(amount.formatted(.number.grouping(.automatic)))"
         }
-        let stackValue: String = {
-            if let stack = liveTrackedStackAmount {
-                return money(stack)
-            }
-            return "—"
-        }()
-        return [
+        var metrics: [LiveSessionSummaryMetric] = [
             LiveSessionSummaryMetric(id: "location", title: "Location", value: casino),
             LiveSessionSummaryMetric(id: "game", title: "Game", value: game),
             LiveSessionSummaryMetric(
@@ -55,8 +52,17 @@ enum LiveSessionSummaryMetricsBuilder {
             LiveSessionSummaryMetric(id: "buyIn", title: "Buy-In", value: money(totalBuyIn)),
             LiveSessionSummaryMetric(id: "freePlay", title: "Free Play", value: money(totalFreePlay)),
             LiveSessionSummaryMetric(id: "comps", title: "Comps", value: money(totalComp)),
-            LiveSessionSummaryMetric(id: "stack", title: "Stack", value: stackValue),
         ]
+        if !isSlotsSession {
+            let stackValue: String = {
+                if let stack = liveTrackedStackAmount {
+                    return money(stack)
+                }
+                return "—"
+            }()
+            metrics.append(LiveSessionSummaryMetric(id: "stack", title: "Stack", value: stackValue))
+        }
+        return metrics
     }
 }
 
@@ -70,7 +76,8 @@ extension TimerActivityAttributes.ContentState {
             totalFreePlay: totalFreePlay,
             totalComp: totalComp,
             liveTrackedStackAmount: liveTrackedStackAmount,
-            currencySymbol: currencySymbol
+            currencySymbol: currencySymbol,
+            isSlotsSession: isSlotsSession
         )
     }
 }

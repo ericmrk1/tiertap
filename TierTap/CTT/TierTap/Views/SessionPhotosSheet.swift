@@ -70,8 +70,9 @@ struct SessionPhotoContextTagPicker: View {
                     .font(.caption.bold())
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(customDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.gray : Color.black)
+                    .background(Color.black)
                     .foregroundColor(.white)
+                    .opacity(customDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.45 : 1)
                     .cornerRadius(10)
                     .disabled(customDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
@@ -267,6 +268,7 @@ struct SessionPhotosSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
+                        .foregroundColor(.green)
                 }
             }
             .adaptiveSheet(item: $photoSource) { source in
@@ -546,6 +548,7 @@ private struct SessionPhotoPreviewSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
+                        .foregroundColor(.green)
                 }
             }
             .onAppear { syncContextTagsFromSession() }

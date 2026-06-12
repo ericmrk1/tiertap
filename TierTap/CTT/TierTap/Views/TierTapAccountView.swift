@@ -111,6 +111,110 @@ struct LockDownTierTapSection: View {
     }
 }
 
+struct TierTapRecentAccountsSection: View {
+    @EnvironmentObject var authStore: AuthStore
+    var compact: Bool = false
+    @Binding var emailInput: String
+
+    var body: some View {
+        let accounts = authStore.rememberedAccounts.accounts
+        if !accounts.isEmpty {
+            VStack(alignment: .leading, spacing: compact ? 6 : 8) {
+                L10nText("Recent on this device")
+                    .font(compact ? .caption.bold() : .subheadline.bold())
+                    .foregroundColor(.white)
+
+                ForEach(accounts) { account in
+                    Button {
+                        selectRememberedAccount(account)
+                    } label: {
+                        HStack(spacing: 10) {
+                            rememberedAvatar(for: account)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(account.displayLabel)
+                                    .font(.subheadline.bold())
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                if let subtitle = account.subtitle {
+                                    Text(subtitle)
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.85))
+                                        .lineLimit(1)
+                                }
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right")
+                                .font(.caption.bold())
+                                .foregroundColor(.white.opacity(0.5))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, compact ? 8 : 10)
+                        .background(Color.white.opacity(0.12))
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(authStore.isLoading)
+                    .contextMenu {
+                        Button("Remove from this device", role: .destructive) {
+                            authStore.rememberedAccounts.removeAccount(id: account.id)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func rememberedAvatar(for account: RememberedTierTapAccount) -> some View {
+        let size: CGFloat = compact ? 36 : 40
+        if let image = authStore.localProfilePhotoImage(for: account.id) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+        } else if let emojis = account.profileEmojis, !emojis.isEmpty {
+            Text(emojis)
+                .font(.title3)
+                .frame(width: size, height: size)
+                .background(Color.white.opacity(0.15))
+                .clipShape(Circle())
+        } else {
+            Image(systemName: signInMethodIcon(account.signInMethod))
+                .font(.body)
+                .foregroundColor(.white)
+                .frame(width: size, height: size)
+                .background(Color.white.opacity(0.15))
+                .clipShape(Circle())
+        }
+    }
+
+    private func signInMethodIcon(_ method: RememberedSignInMethod) -> String {
+        switch method {
+        case .apple: return "apple.logo"
+        case .google: return "globe"
+        case .email: return "envelope.fill"
+        }
+    }
+
+    private func selectRememberedAccount(_ account: RememberedTierTapAccount) {
+        authStore.errorMessage = nil
+        authStore.infoMessage = nil
+        switch account.signInMethod {
+        case .apple:
+            authStore.signInWithApple()
+        case .google:
+            authStore.signInWithGoogle()
+        case .email:
+            if let email = account.email, !email.isEmpty {
+                emailInput = email
+            } else if !account.displayLabel.isEmpty, account.displayLabel.contains("@") {
+                emailInput = account.displayLabel
+            }
+        }
+    }
+}
+
 struct TierTapAccountSignInSection: View {
     @EnvironmentObject var authStore: AuthStore
     @Binding var emailInput: String
@@ -120,6 +224,8 @@ struct TierTapAccountSignInSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: compact ? 10 : 12) {
+            TierTapRecentAccountsSection(compact: compact, emailInput: $emailInput)
+
             if showsBenefitsPitch {
                 VStack(alignment: .leading, spacing: 6) {
                     L10nText("Why create an account?")

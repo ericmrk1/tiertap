@@ -22,7 +22,8 @@ class LiveActivityManager {
             totalFreePlay: session.totalFreePlay,
             totalComp: session.totalComp,
             liveTrackedStackAmount: session.liveTrackedStackAmount,
-            currencySymbol: resolvedCurrencySymbol()
+            currencySymbol: resolvedCurrencySymbol(),
+            isSlotsSession: session.isSlotsSession
         )
     }
 

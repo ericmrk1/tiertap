@@ -104,12 +104,19 @@ class SessionStore: ObservableObject {
                 guard let game = params["game"] as? String, let casino = params["casino"] as? String,
                       let st = params["startingTier"] as? Int, let bi = params["initialBuyIn"] as? Int else { return nil }
                 let program = params["rewardsProgramName"] as? String
-                self.startSession(game: game, casino: casino, startingTier: st, initialBuyIn: bi, rewardsProgramName: program)
+                self.startSession(
+                    game: game,
+                    casino: casino,
+                    startingTier: st,
+                    initialBuyIn: bi,
+                    rewardsProgramName: program,
+                    capturedOnAppleWatch: true
+                )
                 return self.watchConnectivityReply()
             case "fastStartSession":
                 guard let raw = params["category"] as? String,
                       let category = SessionGameCategory(rawValue: raw) else { return nil }
-                self.fastStartSession(category: category)
+                self.fastStartSession(category: category, capturedOnAppleWatch: true)
                 return self.watchConnectivityReply()
             case "addBuyIn":
                 guard let amount = params["amount"] as? Int else { return nil }
@@ -308,8 +315,9 @@ class SessionStore: ObservableObject {
         #endif
     }
 
-    /// Adjusts live stack when buy-in or free play is added (baseline is cash buy-in + free play).
+    /// Adjusts live stack when buy-in or free play is added (baseline is cash buy-in + free play). Skipped for slots.
     private func bumpLiveStack(for session: inout Session, by addedChips: Int) {
+        guard !session.isSlotsSession else { return }
         guard addedChips > 0 else { return }
         let now = Date()
         if let currentStack = session.liveTrackedStackAmount {
@@ -334,7 +342,8 @@ class SessionStore: ObservableObject {
         rewardsProgramName: String? = nil,
         casinoLatitude: Double? = nil,
         casinoLongitude: Double? = nil,
-        linkedRewardWalletCardId: UUID? = nil
+        linkedRewardWalletCardId: UUID? = nil,
+        capturedOnAppleWatch: Bool = false
     ) {
         #if os(watchOS)
         var p: [String: Any] = [
@@ -369,7 +378,8 @@ class SessionStore: ObservableObject {
             stackUpdateEvents: stackEvents,
             isLive: true,
             rewardsProgramName: rewardsProgramName,
-            linkedRewardWalletCardId: linkedRewardWalletCardId
+            linkedRewardWalletCardId: linkedRewardWalletCardId,
+            capturedOnAppleWatch: capturedOnAppleWatch
         )
         liveSession = s
         saveLive()
@@ -443,7 +453,7 @@ class SessionStore: ObservableObject {
         }
         return
         #endif
-        guard var s = liveSession else { return }
+        guard var s = liveSession, !s.isSlotsSession else { return }
         s.liveTrackedStackAmount = clamped
         s.stackUpdateEvents.append(StackUpdateEvent(amount: clamped, timestamp: Date()))
         liveSession = s
@@ -454,7 +464,7 @@ class SessionStore: ObservableObject {
         #endif
     }
 
-    func fastStartSession(category: SessionGameCategory) {
+    func fastStartSession(category: SessionGameCategory, capturedOnAppleWatch: Bool = false) {
         #if os(watchOS)
         SessionSyncManager.shared.sendAction("fastStartSession", params: ["category": category.rawValue]) { [weak self] sessions, liveSession, _ in
             DispatchQueue.main.async { self?.applySyncedState(sessions: sessions, liveSession: liveSession) }
@@ -473,7 +483,8 @@ class SessionStore: ObservableObject {
             rewardsProgramName: template.rewardsProgramName,
             casinoLatitude: template.casinoLatitude,
             casinoLongitude: template.casinoLongitude,
-            linkedRewardWalletCardId: template.linkedRewardWalletCardId
+            linkedRewardWalletCardId: template.linkedRewardWalletCardId,
+            capturedOnAppleWatch: capturedOnAppleWatch
         )
         let slotMeta = Session.persistedSlotMetadata(
             gameCategory: template.gameCategory,
@@ -578,7 +589,12 @@ class SessionStore: ObservableObject {
         #endif
         _ = afterWatchCloseSync
         guard var s = liveSession else { return }
-        let defaultCashOut = s.liveTrackedStackAmount ?? s.totalStackBaseline
+        let defaultCashOut: Int
+        if s.isSlotsSession {
+            defaultCashOut = s.totalBuyIn
+        } else {
+            defaultCashOut = s.liveTrackedStackAmount ?? s.totalStackBaseline
+        }
         let cashOut = max(0, cashOutOverride ?? defaultCashOut)
         let endingTier: Int
         if s.startingTierPoints > 0 {

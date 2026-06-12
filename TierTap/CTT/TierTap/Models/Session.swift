@@ -365,6 +365,9 @@ struct Session: Identifiable, Codable, Equatable {
     /// Optional structured metadata describing the type of game.
     /// Older sessions may have these unset; fall back to `game` string if needed.
     var gameCategory: SessionGameCategory?
+
+    /// True when this session was started as a slots session (no chip stack tracking).
+    var isSlotsSession: Bool { gameCategory == .slots }
     var pokerGameKind: SessionPokerGameKind?
     var pokerAllowsRebuy: Bool?
     var pokerAllowsAddOn: Bool?
@@ -387,6 +390,8 @@ struct Session: Identifiable, Codable, Equatable {
     var slotFeatureOther: String?
     /// Freeform notes (denom, room, etc.).
     var slotNotes: String?
+    /// True when the session was started from Apple Watch (live tracking initiated on the watch).
+    var capturedOnAppleWatch: Bool = false
 
     var isComplete: Bool { status == .complete }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
@@ -404,6 +409,7 @@ struct Session: Identifiable, Codable, Equatable {
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
         case slotFormat, slotFormatOther, slotFeature, slotFeatureOther, slotNotes
+        case capturedOnAppleWatch
     }
 
     init(from decoder: Decoder) throws {
@@ -453,6 +459,7 @@ struct Session: Identifiable, Codable, Equatable {
         slotFeature = try c.decodeIfPresent(SessionSlotFeature.self, forKey: .slotFeature)
         slotFeatureOther = try c.decodeIfPresent(String.self, forKey: .slotFeatureOther)
         slotNotes = try c.decodeIfPresent(String.self, forKey: .slotNotes)
+        capturedOnAppleWatch = try c.decodeIfPresent(Bool.self, forKey: .capturedOnAppleWatch) ?? false
     }
 
     init(id: UUID = UUID(), game: String, casino: String, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil,
@@ -487,7 +494,8 @@ struct Session: Identifiable, Codable, Equatable {
          slotFormatOther: String? = nil,
          slotFeature: SessionSlotFeature? = nil,
          slotFeatureOther: String? = nil,
-         slotNotes: String? = nil) {
+         slotNotes: String? = nil,
+         capturedOnAppleWatch: Bool = false) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -533,6 +541,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.slotFeature = slotFeature
         self.slotFeatureOther = slotFeatureOther
         self.slotNotes = slotNotes
+        self.capturedOnAppleWatch = capturedOnAppleWatch
     }
 
     func encode(to encoder: Encoder) throws {
@@ -586,6 +595,9 @@ struct Session: Identifiable, Codable, Equatable {
         try c.encodeIfPresent(slotFeature, forKey: .slotFeature)
         try c.encodeIfPresent(slotFeatureOther, forKey: .slotFeatureOther)
         try c.encodeIfPresent(slotNotes, forKey: .slotNotes)
+        if capturedOnAppleWatch {
+            try c.encode(capturedOnAppleWatch, forKey: .capturedOnAppleWatch)
+        }
     }
 
     /// Sum of cash buy-ins only (excludes free play).

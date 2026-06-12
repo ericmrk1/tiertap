@@ -35,6 +35,7 @@ struct HomeView: View {
     @State private var showSubscriptionPaywall = false
     @State private var showSessionReminderSettings = false
     @State private var showLevelUpCelebration = false
+    @State private var showMissingInfoAlert = false
     @State private var levelUpReached: TapLevel?
     /// In-memory last computed level; popup only when level increases from this (not on first load).
     @State private var lastComputedLevel: Int?
@@ -46,6 +47,35 @@ struct HomeView: View {
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var isSlotsLiveSession: Bool {
+        store.liveSession?.isSlotsSession == true
+    }
+
+    /// Required fields that must be set before fast close-out.
+    private var missingInfoFields: [String] {
+        guard let live = store.liveSession else { return [] }
+        var missing: [String] = []
+        if live.game.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Game") }
+        if live.casino.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { missing.append("Casino / Location") }
+        if live.totalBuyIn == 0 && live.totalFreePlay == 0 {
+            missing.append("Buy-in or free play")
+        }
+        return missing
+    }
+
+    private var hasMissingInfo: Bool { !missingInfoFields.isEmpty }
+
+    private func performFastCloseOut() {
+        if hasMissingInfo {
+            showMissingInfoAlert = true
+            return
+        }
+        if let live = store.liveSession {
+            settingsStore.recordLastPlayedGameChoices(from: live)
+        }
+        store.fastCloseSessionWithDefaultsUnverified()
     }
 
     var body: some View {
@@ -140,18 +170,28 @@ struct HomeView: View {
                                         .lineLimit(1)
                                 }
                                 Button {
-                                    showUpdateStackSheet = true
+                                    if isSlotsLiveSession {
+                                        performFastCloseOut()
+                                    } else {
+                                        showUpdateStackSheet = true
+                                    }
                                 } label: {
-                                    LocalizedChipStackLabel(title: "Stack")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 18)
-                                        .padding(.horizontal, 4)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.green)
-                                        .cornerRadius(16)
-                                        .font(.body.weight(.semibold))
-                                        .minimumScaleFactor(0.75)
-                                        .lineLimit(1)
+                                    Group {
+                                        if isSlotsLiveSession {
+                                            LocalizedFastCloseOutLabel()
+                                        } else {
+                                            LocalizedChipStackLabel(title: "Stack")
+                                        }
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
+                                    .padding(.horizontal, 4)
+                                    .background(Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(16)
+                                    .font(.body.weight(.semibold))
+                                    .minimumScaleFactor(0.75)
+                                    .lineLimit(isSlotsLiveSession ? 2 : 1)
                                 }
                                 Button {
                                     showBuyInSheet = true
@@ -394,7 +434,7 @@ struct HomeView: View {
             .environmentObject(settingsStore)
         }
         .adaptiveSheet(isPresented: $showUpdateStackSheet) {
-            if let live = store.liveSession {
+            if let live = store.liveSession, !live.isSlotsSession {
                 UpdateStackSheet(
                     sessionID: live.id,
                     game: live.game,
@@ -466,6 +506,11 @@ struct HomeView: View {
             SessionReminderSettingsSheet()
                 .environmentObject(settingsStore)
                 .environmentObject(store)
+        }
+        .alert("Missing Information", isPresented: $showMissingInfoAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Please complete the following before closing out: \(missingInfoFields.joined(separator: ", ")). You can add buy-ins here, but game and location must be set when you check in.")
         }
     }
 }
@@ -664,7 +709,8 @@ struct LiveNowCard: View {
             totalFreePlay: currentSession.totalFreePlay,
             totalComp: currentSession.totalComp,
             liveTrackedStackAmount: currentSession.liveTrackedStackAmount,
-            currencySymbol: settingsStore.currencySymbol
+            currencySymbol: settingsStore.currencySymbol,
+            isSlotsSession: currentSession.isSlotsSession
         )
     }
 

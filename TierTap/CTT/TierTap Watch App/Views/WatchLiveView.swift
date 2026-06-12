@@ -265,6 +265,7 @@ struct WatchLiveView: View {
     @State private var tierSuccessPulse = 0
     @State private var stackSuccessPulse = 0
     @State private var lastObservedStack: Int?
+    @State private var showConfirmFastClose = false
 
     private var s: Session? { store.liveSession }
     private var hasLiveSession: Bool { store.liveSession != nil }
@@ -347,6 +348,18 @@ struct WatchLiveView: View {
                 stackSuccessPulse += 1
             }
             lastObservedStack = newStack
+        }
+        .alert("Fast close-out?", isPresented: $showConfirmFastClose) {
+            Button("No", role: .cancel) {}
+            Button("Yes") {
+                let immediate = SessionSyncManager.shared.isReachable
+                store.fastCloseSessionWithDefaultsUnverified()
+                feedbackMessage = immediate ? "Fast close-out sent" : "Fast close-out queued"
+                feedbackColor = immediate ? theme.successColor : theme.queuedColor
+                playConfiguredHaptic(style: immediate ? .success : .queue)
+            }
+        } message: {
+            Text("Stops the timer and closes the slots session on iPhone with default cash-out and ending tier.")
         }
     }
 
@@ -511,7 +524,7 @@ struct WatchLiveView: View {
 
                     quickActionTile
                         .buttonStyle(WatchQuickTilePressStyle(enabled: watchAnimationsAllowMotion))
-                        .id("watch-quick-stack")
+                        .id(isSlotsSession ? "watch-quick-fast-close" : "watch-quick-stack")
                 }
             }
             .padding()
@@ -633,23 +646,42 @@ struct WatchLiveView: View {
         }
     }
 
+    private var isSlotsSession: Bool { s?.isSlotsSession == true }
+
     private var quickStackTileValue: String {
         let stack = s?.resolvedLiveStackAmount ?? 0
         return "\(currencySymbol)\(stack.formatted(.number.grouping(.automatic)))"
     }
 
     private var quickActionTile: some View {
-        NavigationLink {
-            WatchUpdateStackSheet().environmentObject(store)
-        } label: {
-            metricButton(
-                title: "Stack",
-                value: quickStackTileValue,
-                icon: TierTapLabelIcon.chipStackSentinel,
-                accent: theme.metricAccent(at: 4),
-                successPulse: stackSuccessPulse,
-                animateValueDigits: false
-            )
+        Group {
+            if isSlotsSession {
+                Button {
+                    showConfirmFastClose = true
+                } label: {
+                    metricButton(
+                        title: "Fast Close Out",
+                        value: "Close",
+                        icon: "bolt.fill",
+                        accent: theme.metricAccent(at: 4),
+                        successPulse: 0,
+                        animateValueDigits: false
+                    )
+                }
+            } else {
+                NavigationLink {
+                    WatchUpdateStackSheet().environmentObject(store)
+                } label: {
+                    metricButton(
+                        title: "Stack",
+                        value: quickStackTileValue,
+                        icon: TierTapLabelIcon.chipStackSentinel,
+                        accent: theme.metricAccent(at: 4),
+                        successPulse: stackSuccessPulse,
+                        animateValueDigits: false
+                    )
+                }
+            }
         }
     }
 

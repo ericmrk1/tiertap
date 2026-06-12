@@ -16,13 +16,23 @@ struct RiskOfRuinResult {
     let winRate: Double?
     /// Number of closed sessions with valid win/loss
     let sessionCount: Int
-    /// Whether current bet (e.g. buy-in or avg bet) exceeds recommended unit size
-    let betExceedsTarget: Bool
-    /// Recommended unit size from settings
-    let recommendedUnitSize: Int
 }
 
 enum RiskOfRuinMath {
+
+    /// Reference bet size for RoR formulas, derived from session history or bankroll.
+    static func derivedReferenceBetSize(sessions: [Session], bankroll: Int) -> Int {
+        let closed = sessions.filter { $0.winLoss != nil && $0.gameCategory != .poker }
+        let bets = closed.compactMap { session -> Int? in
+            if let avg = session.avgBetActual, avg > 0 { return avg }
+            if session.totalBuyIn > 0 { return session.totalBuyIn }
+            return nil
+        }
+        if !bets.isEmpty {
+            return max(1, bets.reduce(0, +) / bets.count)
+        }
+        return max(1, bankroll / 50)
+    }
 
     /// Session-based Risk of Ruin: RoR = (q/p)^(bankroll/unit)
     /// where p = proportion of winning sessions, q = proportion of losing sessions.
@@ -64,9 +74,7 @@ enum RiskOfRuinMath {
     static func compute(
         sessions: [Session],
         bankroll: Int,
-        unitSize: Int,
         targetAveragePerSession: Double?,
-        currentBetAmount: Int? = nil,
         useExpectedValue: Bool = false
     ) -> RiskOfRuinResult {
         // Exclude poker sessions (only use table games for RoR).
@@ -82,31 +90,31 @@ enum RiskOfRuinMath {
             ? Double(closed.map { outcome($0) }.reduce(0, +)) / Double(total)
             : nil
 
+        let referenceBet = derivedReferenceBetSize(sessions: sessions, bankroll: bankroll)
+
         let sessionBasedRoR = sessionBasedRiskOfRuin(
             bankroll: bankroll,
-            unitSize: unitSize > 0 ? unitSize : 1,
+            unitSize: referenceBet,
             winningSessions: wins,
             losingSessions: losses,
             totalSessions: total
         )
 
         var edgeBasedRoR = 1.0
-        if let avg = actualAvg, unitSize > 0 {
-            let edgePerUnit = avg / Double(unitSize)
+        if let avg = actualAvg {
+            let edgePerUnit = avg / Double(referenceBet)
             edgeBasedRoR = edgeBasedRiskOfRuin(
                 bankroll: bankroll,
-                unitSize: unitSize,
+                unitSize: referenceBet,
                 edgePerUnitPerSession: edgePerUnit
             )
         }
 
         let winRate = total > 0 ? Double(wins) / Double(total) : nil
-        let betExceeds = (currentBetAmount ?? 0) > 0 && unitSize > 0 && (currentBetAmount ?? 0) > unitSize
-        let recommendedUnit = unitSize
         let finalRoR: Double
         if total >= 3 {
             finalRoR = sessionBasedRoR
-        } else if total > 0, let _ = actualAvg, unitSize > 0 {
+        } else if total > 0, actualAvg != nil {
             finalRoR = edgeBasedRoR
         } else {
             finalRoR = 1.0
@@ -117,9 +125,7 @@ enum RiskOfRuinMath {
             actualAveragePerSession: actualAvg,
             targetAveragePerSession: targetAveragePerSession,
             winRate: winRate,
-            sessionCount: total,
-            betExceedsTarget: betExceeds,
-            recommendedUnitSize: recommendedUnit
+            sessionCount: total
         )
     }
 }

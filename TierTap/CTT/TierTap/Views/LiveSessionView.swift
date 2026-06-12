@@ -43,6 +43,8 @@ struct LiveSessionView: View {
 
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
+    private var isSlotsSession: Bool { s.isSlotsSession }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -66,26 +68,44 @@ struct LiveSessionView: View {
                             .foregroundColor(.green)
                             .padding(.vertical, 4)
 
-                        Button {
-                            showUpdateStackSheet = true
-                        } label: {
-                            Text("\(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))")
-                                .font(.system(size: 52, weight: .bold, design: .rounded))
-                                .foregroundColor(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                                .padding(.horizontal, 28)
-                                .padding(.vertical, 14)
-                                .background(
-                                    Capsule()
-                                        .fill(Color.black.opacity(0.68))
-                                )
-                                .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                        if isSlotsSession {
+                            VStack(spacing: 4) {
+                                Text("\(settingsStore.currencySymbol)\(s.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
+                                L10nText("Total buy-in")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.horizontal, 28)
+                            .padding(.vertical, 14)
+                            .padding(.top, 2)
+                            .padding(.bottom, 6)
+                            .accessibilityLabel("Total buy-in \(settingsStore.currencySymbol)\(s.totalBuyIn.formatted(.number.grouping(.automatic)))")
+                        } else {
+                            Button {
+                                showUpdateStackSheet = true
+                            } label: {
+                                Text("\(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))")
+                                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
+                                    .padding(.horizontal, 28)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.black.opacity(0.68))
+                                    )
+                                    .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 2)
+                            .padding(.bottom, 6)
+                            .accessibilityLabel("Stack \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic))). Tap to update.")
                         }
-                        .buttonStyle(.plain)
-                        .padding(.top, 2)
-                        .padding(.bottom, 6)
-                        .accessibilityLabel("Stack \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic))). Tap to update.")
 
                         HStack(spacing: 10) {
                             
@@ -234,19 +254,21 @@ struct LiveSessionView: View {
                                             .foregroundColor(.green)
                                             .cornerRadius(14)
                                     }
-                                    Button {
-                                        showUpdateStackSheet = true
-                                    } label: {
-                                        LocalizedChipStackLabel(
-                                            title: "Stack: \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))"
-                                        )
-                                            .font(.headline)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 14)
-                                            .padding(.horizontal)
-                                            .background(Color(.systemGray6).opacity(0.25))
-                                            .foregroundColor(.green)
-                                            .cornerRadius(14)
+                                    if !isSlotsSession {
+                                        Button {
+                                            showUpdateStackSheet = true
+                                        } label: {
+                                            LocalizedChipStackLabel(
+                                                title: "Stack: \(settingsStore.currencySymbol)\(s.resolvedLiveStackAmount.formatted(.number.grouping(.automatic)))"
+                                            )
+                                                .font(.headline)
+                                                .frame(maxWidth: .infinity)
+                                                .padding(.vertical, 14)
+                                                .padding(.horizontal)
+                                                .background(Color(.systemGray6).opacity(0.25))
+                                                .foregroundColor(.green)
+                                                .cornerRadius(14)
+                                        }
                                     }
                                 }
                             }
@@ -312,12 +334,20 @@ struct LiveSessionView: View {
                                     store.fastCloseSessionWithDefaultsUnverified()
                                 }
                             } label: {
-                                LocalizedLabel(title: "Fast Close Out", systemImage: "bolt.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 16)
-                                    .background(Color.orange.opacity(0.9))
-                                    .foregroundColor(.white).cornerRadius(14).font(.headline)
+                                Group {
+                                    if isSlotsSession {
+                                        LocalizedFastCloseOutLabel()
+                                    } else {
+                                        LocalizedLabel(title: "Fast Close Out", systemImage: "bolt.fill")
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                                .padding(.horizontal, 16)
+                                .background(isSlotsSession ? Color(.systemGray6).opacity(0.25) : Color.orange.opacity(0.9))
+                                .foregroundColor(isSlotsSession ? .green : .white)
+                                .cornerRadius(14)
+                                .font(.headline)
                             }
 
                             Button {
@@ -413,7 +443,7 @@ struct LiveSessionView: View {
                 .environmentObject(settingsStore)
             }
             .adaptiveSheet(isPresented: $showUpdateStackSheet) {
-                if let live = store.liveSession {
+                if let live = store.liveSession, !live.isSlotsSession {
                     UpdateStackSheet(
                         sessionID: live.id,
                         game: live.game,

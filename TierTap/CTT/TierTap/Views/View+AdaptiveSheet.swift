@@ -30,6 +30,28 @@ extension View {
     ) -> some View {
         modifier(HalfScreenSheetModifier(isPresented: isPresented, onDismiss: onDismiss, sheetContent: content))
     }
+
+    /// Branded two-button confirmation (high-contrast Cancel + green confirm), consistent with comp estimate and other TierTap sheets.
+    func tierTapConfirmationSheet(
+        isPresented: Binding<Bool>,
+        title: String,
+        message: String,
+        cancelTitle: String = "Cancel",
+        confirmTitle: String,
+        onCancel: @escaping () -> Void = {},
+        onConfirm: @escaping () -> Void
+    ) -> some View {
+        halfScreenSheet(isPresented: isPresented) {
+            TierTapConfirmationSheet(
+                title: title,
+                message: message,
+                cancelTitle: cancelTitle,
+                confirmTitle: confirmTitle,
+                onCancel: onCancel,
+                onConfirm: onConfirm
+            )
+        }
+    }
 }
 
 private struct HalfScreenSheetModifier<SheetContent: View>: ViewModifier {

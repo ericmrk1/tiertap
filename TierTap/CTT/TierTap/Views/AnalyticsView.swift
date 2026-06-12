@@ -627,9 +627,7 @@ struct AnalyticsView: View {
             let ror = RiskOfRuinMath.compute(
                 sessions: closedSessions,
                 bankroll: settingsStore.bankroll,
-                unitSize: settingsStore.unitSize,
                 targetAveragePerSession: settingsStore.targetAveragePerSession,
-                currentBetAmount: nil,
                 useExpectedValue: settingsStore.analyticsUseExpectedValue
             )
             if ror.sessionCount == 0 { return "—" }
@@ -938,7 +936,6 @@ private func aiAnalysisRelaxedFingerprint(
     tone: String,
     outputLanguage: String,
     bankroll: Int,
-    unitSize: Int,
     total: Int,
     wins: Int,
     losses: Int,
@@ -948,7 +945,6 @@ private func aiAnalysisRelaxedFingerprint(
     sessionOutcome: (Session) -> Int
 ) -> String {
     let bankrollBucket = (bankroll / 500) * 500
-    let unitBucket = (unitSize / 25) * 25
     let netBucket = aiAnalysisRelaxedOutcomeBucket(net)
     // Order by id so recency (timestamps) does not affect the fingerprint.
     let recentSig = recentSessions
@@ -967,7 +963,6 @@ private func aiAnalysisRelaxedFingerprint(
         tone,
         "lang:\(outputLanguage)",
         "br:\(bankrollBucket)",
-        "u:\(unitBucket)",
         "t:\(total)",
         "w:\(wins)-\(losses)-\(breakeven)",
         "net:\(netBucket)",
@@ -1786,9 +1781,7 @@ struct AIAnalyticsSheet: View {
         let rorResult = RiskOfRuinMath.compute(
             sessions: closedSessions,
             bankroll: settingsStore.bankroll,
-            unitSize: settingsStore.unitSize,
             targetAveragePerSession: settingsStore.targetAveragePerSession,
-            currentBetAmount: nil,
             useExpectedValue: useEV
         )
         
@@ -1868,7 +1861,7 @@ struct AIAnalyticsSheet: View {
         }()
         
         let statsBlock = """
-        Settings: bankroll \(currency)\(settingsStore.bankroll), unit \(currency)\(settingsStore.unitSize)
+        Settings: bankroll \(currency)\(settingsStore.bankroll)
         Results basis for counts/net/win rate below: \(basisName) (user-selected in Analytics).
         Summary (\(basisName)): sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString) (table games only; poker excluded from RoR).
         Aggregates for comparison: cash net total \(cashNetAggString), EV total \(evAggString), comps logged \(currency)\(compsLoggedTotal), free play logged \(currency)\(freePlayLoggedTotal) (free play excluded from win/loss and tax; use for promotional-value context only).
@@ -1919,7 +1912,6 @@ struct AIAnalyticsSheet: View {
             tone: toneInstruction,
             outputLanguage: settingsStore.appLanguage.rawValue,
             bankroll: settingsStore.bankroll,
-            unitSize: settingsStore.unitSize,
             total: total,
             wins: wins,
             losses: losses,

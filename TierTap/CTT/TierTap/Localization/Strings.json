@@ -2053,6 +2053,19 @@
     "fr": "Consultez l’appli de fidélité du casino. Sélection rapide 1 000–50 000 ou saisissez le montant exact (pas zéro).",
     "hi": "अपने कैसीनो लॉयल्टी ऐप में देखें। 1,000–50,000 त्वरित चुनें या सटीक अंक दर्ज करें (शून्य नहीं)।"
   },
+  "ui.a772a560c4054f2b2b74130f": {
+    "en": "Starting at zero tier points means tier earned, tier rate, and level progress won't be calculated for this session.",
+    "zh-Hans": "从零开始的等级积分意味着本次会话将无法计算获得的等级积分、等级费率和等级进度。",
+    "ja": "ティアポイントをゼロから開始すると、このセッションでは獲得ティア、ティアレート、レベル進行が計算されません。",
+    "ko": "등급 포인트를 0부터 시작하면 이번 세션에서 획득 등급, 등급 비율, 레벨 진행이 계산되지 않습니다.",
+    "vi": "Bắt đầu với 0 điểm cấp có nghĩa là điểm cấp kiếm được, tỷ lệ cấp và tiến trình cấp sẽ không được tính cho phiên này.",
+    "es": "Empezar con cero puntos de nivel significa que los puntos ganados, la tasa de nivel y el progreso de nivel no se calcularán para esta sesión.",
+    "ar": "البدء بصفر نقاط مستوى يعني أنه لن يتم حساب نقاط المستوى المكتسبة ومعدل المستوى وتقدم المستوى لهذه الجلسة.",
+    "he": "התחלה מאפס נקודות שכבה פירושה שנקודות שכבה שנצברו, קצב שכבה והתקדמות רמה לא יחושבו עבור הפעלה זו.",
+    "de": "Bei null Start-Stufenpunkten werden verdiente Stufenpunkte, Stufenrate und Stufenfortschritt für diese Sitzung nicht berechnet.",
+    "fr": "Commencer avec zéro point de niveau signifie que les points gagnés, le taux de niveau et la progression de niveau ne seront pas calculés pour cette session.",
+    "hi": "शून्य टियर अंकों से शुरू करने का मतलब है कि इस सत्र के लिए अर्जित टियर, टियर दर और स्तर प्रगति की गणना नहीं की जाएगी।"
+  },
   "ui.728ee21478bf45e0fe7d584d": {
     "en": "Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount. Starting at zero is allowed but harder to track.",
     "zh-Hans": "检查您的赌场忠诚度应用程序。快速选择 1,000–50,000 或输入任何准确的金额。从零开始是允许的，但更难跟踪。",

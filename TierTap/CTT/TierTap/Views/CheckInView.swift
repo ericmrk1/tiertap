@@ -19,7 +19,7 @@ struct CheckInView: View {
     @State private var selectedGame = ""
     @State private var casino = ""
     @State private var isCasinoPublic = true
-    @State private var startingTier = "0"
+    @State private var startingTier = ""
     @State private var initialBuyIn = ""
     @State private var initialFreePlay = ""
     @State private var initialFreePlayType = ""
@@ -135,12 +135,9 @@ struct CheckInView: View {
         return hasGame && !casino.isEmpty && hasSessionFunding
     }
 
-    /// True when tier field is empty, non-numeric, or zero or negative — session may still start after confirmation.
+    /// True when tier field is empty, non-numeric, or zero or negative — session may still start.
     private var needsTierTrackingWarning: Bool {
-        let s = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
-        if s.isEmpty { return true }
-        guard let t = Int(s) else { return true }
-        return t <= 0
+        TierPointsTracking.needsTrackingWarning(for: startingTier)
     }
 
     /// Discrete blind values used for SB / BB / Ante wheels and presets.
@@ -626,18 +623,6 @@ struct CheckInView: View {
                             .environmentObject(settingsStore)
                             .frame(maxWidth: .infinity)
                         }
-                        if settingsStore.unitSize > 0, parsedInitialBuyIn > settingsStore.unitSize {
-                            HStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.orange)
-                                Text("Buy-in (\(settingsStore.currencySymbol)\(initialBuyIn)) exceeds your unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)). Consider lowering to stay within bankroll target.")
-                                    .font(.caption).foregroundColor(.orange)
-                            }
-                            .padding(8)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.orange.opacity(0.15))
-                            .cornerRadius(8)
-                        }
                     }
                     .padding()
                     .background(Color(.systemGray6).opacity(0.15))
@@ -844,15 +829,13 @@ struct CheckInView: View {
             } message: {
                 L10nText("You have a live session. Resume it or end it to start a new one?")
             }
-            .alert(
-                Text(L10n.tr("Tier points", language: settingsStore.appLanguage)),
-                isPresented: $showTierTrackingWarning
-            ) {
-                Button("Cancel", role: .cancel) {}
-                Button("Start anyway") { go(skipTierTrackingWarning: true) }
-            } message: {
-                Text(L10n.tr("Starting sessions without a Tier rating will make it difficult to track Tier levels and points.", language: settingsStore.appLanguage))
-            }
+            .tierTapConfirmationSheet(
+                isPresented: $showTierTrackingWarning,
+                title: "Tier points",
+                message: "Starting at zero tier points means tier earned, tier rate, and level progress won't be calculated for this session.",
+                confirmTitle: "Start anyway",
+                onConfirm: { go(skipTierTrackingWarning: true) }
+            )
             .onAppear {
                 if casino.isEmpty, let recent = store.mostRecentCasino() {
                     casino = recent
@@ -885,7 +868,8 @@ struct CheckInView: View {
     /// not yet match a saved session.
     private func applyCasinoHistoryDefaults() {
         guard store.hasSessionHistory(forExactCasino: casino) else { return }
-        if let tier = store.defaultEndingTierPoints(for: casino) {
+        let trimmedTier = startingTier.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedTier.isEmpty, let tier = store.defaultEndingTierPoints(for: casino) {
             startingTier = "\(tier)"
         }
         if let buy = store.defaultInitialBuyIn(for: casino) {

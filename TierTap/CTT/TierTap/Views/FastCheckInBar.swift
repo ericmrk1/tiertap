@@ -573,20 +573,19 @@ struct FastCheckInBar: View {
         } message: {
             L10nText("You have a live session. Resume it or end it to start a new one?")
         }
-        .alert(
-            Text(L10n.tr("Tier points", language: settingsStore.appLanguage)),
-            isPresented: $showTierTrackingWarning
-        ) {
-            Button("Cancel", role: .cancel) { pendingTierWarningPlan = nil }
-            Button("Start anyway") {
+        .tierTapConfirmationSheet(
+            isPresented: $showTierTrackingWarning,
+            title: "Tier points",
+            message: "Starting at zero tier points means tier earned, tier rate, and level progress won't be calculated for this session.",
+            confirmTitle: "Start anyway",
+            onCancel: { pendingTierWarningPlan = nil },
+            onConfirm: {
                 if let plan = pendingTierWarningPlan {
                     pendingTierWarningPlan = nil
                     FastCheckInHelper.performFastCheckIn(plan: plan, store: store, settingsStore: settingsStore)
                 }
             }
-        } message: {
-            Text(L10n.tr("Starting sessions without a Tier rating will make it difficult to track Tier levels and points.", language: settingsStore.appLanguage))
-        }
+        )
     }
 
     private func startFastCheckInOrWarn(for category: SessionGameCategory) {

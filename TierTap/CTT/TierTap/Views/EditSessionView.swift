@@ -605,7 +605,8 @@ struct EditSessionView: View {
             slotFormatOther: slotMeta.formatOther,
             slotFeature: slotMeta.feature,
             slotFeatureOther: slotMeta.featureOther,
-            slotNotes: slotMeta.notes
+            slotNotes: slotMeta.notes,
+            capturedOnAppleWatch: session.capturedOnAppleWatch
         )
         updated.pruneOrphanPhotoContextTags()
         store.updateSession(updated)
@@ -856,7 +857,7 @@ private struct EditCompEventSheet: View {
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(Color.blue.opacity(0.9))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(16)
                                 }
@@ -867,7 +868,7 @@ private struct EditCompEventSheet: View {
                                         .font(.caption.bold())
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(16)
                                 }

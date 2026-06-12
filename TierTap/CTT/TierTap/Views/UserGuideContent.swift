@@ -221,7 +221,7 @@ enum UserGuideContent {
             .h2(loc("Bankroll", language)),
             .paragraph(loc("What it does: Tracks bankroll-related views tied to your settings and play (alongside bankroll fields in Settings).", language)),
             .paragraph(loc("How to use it: Open from the Sessions tab when you want a focused bankroll screen during or between trips.", language)),
-            .paragraph(loc("Tips: Keep bankroll and unit size in Settings updated so risk views stay meaningful.", language)),
+            .paragraph(loc("Tips: Keep bankroll in Settings updated so risk views stay meaningful.", language)),
 
             .h2(loc("TierTap Wallet", language)),
             .paragraph(loc("What it does: Stores photos of your loyalty cards or status screens with quick card details and optional tier-history overlay.", language)),

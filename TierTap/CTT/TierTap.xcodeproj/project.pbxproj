@@ -54,6 +54,7 @@
 		ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */; };
 		ARPTJ2E2F3A4B5C6D7E8F9A0B1 /* Airports.json in Resources */ = {isa = PBXBuildFile; fileRef = ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */; };
 		AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */; };
+		RMACC2E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */; };
 		BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */; };
 		BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */; };
 		C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
@@ -236,6 +237,7 @@
 		ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirlineCatalog.swift; sourceTree = "<group>"; };
 		ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Airports.json; sourceTree = "<group>"; };
 		AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
+		RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RememberedAccountsStore.swift; sourceTree = "<group>"; };
 		B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPastSessionView.swift; sourceTree = "<group>"; };
@@ -509,6 +511,7 @@
 				ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */,
 				LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */,
 				AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */,
+				RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */,
 				2E9D7B912F646A24004015F4 /* SubscriptionStore 2.swift */,
 			);
 			path = ViewModels;
@@ -935,6 +938,7 @@
 				PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */,
 				2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */,
 				AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */,
+				RMACC2E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

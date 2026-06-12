@@ -24,6 +24,8 @@ final class AuthStore: ObservableObject {
     /// Prevents concurrent `auth.update` calls that remove legacy `profile_photo_url` from metadata.
     private var profilePhotoMetadataWipeInFlight = false
 
+    let rememberedAccounts = RememberedAccountsStore()
+
     var isSignedIn: Bool { session != nil }
     var userEmail: String? { session?.user.email }
 
@@ -158,7 +160,7 @@ final class AuthStore: ObservableObject {
         guard let userId = session?.user.id else {
             throw AuthError.notSignedIn
         }
-        let url = try localProfilePhotoFileURL(for: userId)
+        let url = try profilePhotoFileURL(for: userId)
         try data.write(to: url, options: .atomic)
         localProfilePhoto = url
     }
@@ -168,14 +170,21 @@ final class AuthStore: ObservableObject {
         guard let userId = session?.user.id else {
             throw AuthError.notSignedIn
         }
-        let url = try localProfilePhotoFileURL(for: userId)
+        let url = try profilePhotoFileURL(for: userId)
         if FileManager.default.fileExists(atPath: url.path) {
             try FileManager.default.removeItem(at: url)
         }
         localProfilePhoto = nil
     }
 
-    private func localProfilePhotoFileURL(for userId: UUID) throws -> URL {
+    func localProfilePhotoImage(for userId: UUID) -> UIImage? {
+        guard let url = try? profilePhotoFileURL(for: userId),
+              url.isFileURL,
+              FileManager.default.fileExists(atPath: url.path) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+
+    private func profilePhotoFileURL(for userId: UUID) throws -> URL {
         let base = try FileManager.default.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
@@ -192,7 +201,7 @@ final class AuthStore: ObservableObject {
             localProfilePhoto = nil
             return
         }
-        guard let url = try? localProfilePhotoFileURL(for: userId),
+        guard let url = try? profilePhotoFileURL(for: userId),
               FileManager.default.fileExists(atPath: url.path) else {
             localProfilePhoto = nil
             return
@@ -247,6 +256,9 @@ final class AuthStore: ObservableObject {
                     self.errorMessage = nil
                     self.refreshLocalProfilePhotoFromDisk()
                     self.scheduleWipeProfilePhotoURLFromMetadataIfNeeded()
+                    if let session = state.session, state.event != .signedOut {
+                        self.rememberedAccounts.recordAccount(from: session)
+                    }
                 }
             }
         }
@@ -379,12 +391,10 @@ final class AuthStore: ObservableObject {
 
     func signOut() {
         guard let client = supabase else { return }
-        let userId = session?.user.id
+        if let session {
+            rememberedAccounts.recordAccount(from: session)
+        }
         Task {
-            if let userId, let url = try? localProfilePhotoFileURL(for: userId),
-               FileManager.default.fileExists(atPath: url.path) {
-                try? FileManager.default.removeItem(at: url)
-            }
             try? await client.auth.signOut()
             await MainActor.run {
                 session = nil

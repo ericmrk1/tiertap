@@ -6,7 +6,6 @@ import UIKit
 #endif
 
 private let keyBankroll = "ctt_bankroll"
-private let keyUnitSize = "ctt_unit_size"
 private let keyTargetAverage = "ctt_target_average"
 private let keyCurrencyCode = "ctt_currency_code"
 private let keyAppleSignedIn = "ctt_apple_signed_in"
@@ -348,7 +347,7 @@ final class SettingsStore: ObservableObject {
         "Take a break.",
         "Quit while you're ahead.",
         "Protect your bankroll.",
-        "Stick to your unit size.",
+        "Stick to your bankroll plan.",
         "Stay disciplined and avoid tilt.",
         "Set a stop-loss and honor it."
     ]
@@ -359,11 +358,8 @@ final class SettingsStore: ObservableObject {
 
     /// Resets of the bankroll (date and new value). Stored in dedicated SQLite DB for analytics.
     @Published var bankrollResets: [BankrollResetEvent] = []
-    @Published var unitSize: Int {
-        didSet { UserDefaults.standard.set(unitSize, forKey: keyUnitSize) }
-    }
 
-    /// Selected currency for bankroll, unit size, and monetary amounts (ISO code; default USD).
+    /// Selected currency for bankroll and monetary amounts (ISO code; default USD).
     @Published var currencyCode: String {
         didSet { UserDefaults.standard.set(currencyCode, forKey: keyCurrencyCode) }
     }
@@ -941,8 +937,6 @@ final class SettingsStore: ObservableObject {
         let b = UserDefaults.standard.integer(forKey: keyBankroll)
         self.bankroll = b > 0 ? b : 2000
         self.bankrollResets = BankrollDatabase.shared.fetchResets()
-        let u = UserDefaults.standard.integer(forKey: keyUnitSize)
-        self.unitSize = u > 0 ? u : 50
         let storedCurrency = UserDefaults.standard.string(forKey: keyCurrencyCode) ?? Currency.usd.code
         self.currencyCode = Currency.byCode(storedCurrency).code
         if let v = UserDefaults.standard.object(forKey: keyTargetAverage) as? Double {

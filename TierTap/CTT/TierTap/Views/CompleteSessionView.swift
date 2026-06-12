@@ -81,19 +81,6 @@ struct CompleteSessionView: View {
                             InputRow(label: "Avg Bet Actual (\(settingsStore.currencySymbol))", placeholder: "Actual avg bet", value: $avgBetActual)
                             InputRow(label: "Avg Bet Rated (\(settingsStore.currencySymbol))", placeholder: "Rated avg bet", value: $avgBetRated)
                             InputRow(label: "Ending Tier Points", placeholder: "From loyalty app", value: $endingTier, dialPadNavigationTitle: "Tier points")
-                            if settingsStore.unitSize > 0,
-                               (Int(avgBetActual) ?? 0) > settingsStore.unitSize || (Int(avgBetRated) ?? 0) > settingsStore.unitSize || session.totalBuyIn > settingsStore.unitSize {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .foregroundColor(.orange)
-                                    Text("Bet or buy-in exceeds unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)).")
-                                        .font(.caption).foregroundColor(.orange)
-                                }
-                                .padding(8)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.orange.opacity(0.15))
-                                .cornerRadius(8)
-                            }
                         }
 
                         if isValid {
@@ -176,7 +163,7 @@ struct CompleteSessionView: View {
                                     .font(.caption.bold())
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 8)
-                                    .background(Color.blue.opacity(0.9))
+                                    .background(Color.black)
                                     .foregroundColor(.white)
                                     .cornerRadius(16)
                                 }

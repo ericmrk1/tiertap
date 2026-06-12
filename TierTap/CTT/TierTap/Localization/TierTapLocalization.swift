@@ -320,6 +320,25 @@ struct LocalizedChipStackLabel: View {
     }
 }
 
+/// Two-line fast close-out label: "Fast" / "Close Out" with bolt icon (slots home quick action).
+struct LocalizedFastCloseOutLabel: View {
+    @Environment(\.appLanguage) private var language
+
+    var body: some View {
+        Label {
+            VStack(spacing: 1) {
+                Text(L10n.tr("Close Out", language: language))
+            }
+            .multilineTextAlignment(.center)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+        } icon: {
+            Image(systemName: "bolt.fill")
+        }
+        .labelStyle(.titleAndIcon)
+    }
+}
+
 // MARK: - Gemini (client + edge)
 
 enum GeminiPromptLanguage {

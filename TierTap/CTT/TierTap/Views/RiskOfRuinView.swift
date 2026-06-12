@@ -6,13 +6,10 @@ struct RiskOfRuinView: View {
     @EnvironmentObject var authStore: AuthStore
 
     private var result: RiskOfRuinResult {
-        let currentBet: Int? = sessionStore.liveSession.map { max($0.totalBuyIn, $0.avgBetActual ?? 0) }
         return RiskOfRuinMath.compute(
             sessions: sessionStore.sessions,
             bankroll: settingsStore.bankroll,
-            unitSize: settingsStore.unitSize,
             targetAveragePerSession: settingsStore.targetAveragePerSession,
-            currentBetAmount: currentBet,
             useExpectedValue: settingsStore.analyticsUseExpectedValue
         )
     }
@@ -25,8 +22,7 @@ struct RiskOfRuinView: View {
                     VStack(spacing: 20) {
                         chanceOfBustingCard
                         averageVsTargetCard
-                        if result.betExceedsTarget { betWarningCard }
-                        unitAndSessionsCard
+                        sessionsCard
                         mathNoteCard
                     }
                     .padding()
@@ -103,8 +99,8 @@ struct RiskOfRuinView: View {
                 Spacer()
             }
             Text(settingsStore.analyticsUseExpectedValue
-                 ? "risk of ruin — based on table‑game sessions (poker excluded), using EV (cash net plus logged comps) for win/loss per session, with your bankroll/unit settings."
-                 : "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll/unit settings, using cash net per session.")
+                 ? "risk of ruin — based on table‑game sessions (poker excluded), using EV (cash net plus logged comps) for win/loss per session, with your bankroll settings."
+                 : "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll settings, using cash net per session.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()
@@ -184,28 +180,9 @@ struct RiskOfRuinView: View {
         .cornerRadius(16)
     }
 
-    private var betWarningCard: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "exclamationmark.octagon.fill")
-                .font(.title2).foregroundColor(.orange)
-            VStack(alignment: .leading, spacing: 4) {
-                L10nText("Bet exceeds target unit")
-                    .font(.headline).foregroundColor(.orange)
-                Text("Your current buy-in or average bet is above your set unit size (\(settingsStore.currencySymbol)\(result.recommendedUnitSize)). Consider lowering bet size to stay within bankroll management target.")
-                    .font(.caption).foregroundColor(.gray)
-            }
-            Spacer()
-        }
-        .padding()
-        .background(Color.orange.opacity(0.15))
-        .cornerRadius(16)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.orange.opacity(0.5), lineWidth: 1))
-    }
-
-    private var unitAndSessionsCard: some View {
+    private var sessionsCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             DetailRow(label: "Bankroll", value: "\(settingsStore.currencySymbol)\(settingsStore.bankroll)")
-            DetailRow(label: "Unit size", value: "\(settingsStore.currencySymbol)\(settingsStore.unitSize)")
             DetailRow(label: "Sessions used", value: "\(result.sessionCount)")
         }
         .padding()
@@ -218,8 +195,8 @@ struct RiskOfRuinView: View {
             L10nText("How it's calculated")
                 .font(.caption.bold()).foregroundColor(.gray)
             Text(settingsStore.analyticsUseExpectedValue
-                 ? "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings. Match “Results basis” on Analytics."
-                 : "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll and unit size in Settings.")
+                 ? "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll in Settings. Match “Results basis” on Analytics."
+                 : "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll in Settings.")
                 .font(.caption).foregroundColor(.gray)
         }
         .padding()

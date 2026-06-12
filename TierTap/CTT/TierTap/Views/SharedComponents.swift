@@ -1192,6 +1192,102 @@ struct NumericEntryWithDialPad: View {
     }
 }
 
+// MARK: - Tier points tracking warning
+
+enum TierPointsTracking {
+    /// True when tier field is empty, non-numeric, or zero or negative.
+    static func needsTrackingWarning(for text: String) -> Bool {
+        let s = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if s.isEmpty { return true }
+        guard let t = Int(s) else { return true }
+        return t <= 0
+    }
+}
+
+/// Branded confirmation sheet with high-contrast action buttons (matches comp estimate and other TierTap pop-ups).
+struct TierTapConfirmationSheet: View {
+    let title: String
+    let message: String
+    var cancelTitle: String = "Cancel"
+    let confirmTitle: String
+    let onCancel: () -> Void
+    let onConfirm: () -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.appLanguage) private var language
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.title2)
+                                .foregroundColor(.orange)
+                            Text(L10n.tr(message, language: language))
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.95))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
+
+                    Spacer(minLength: 0)
+
+                    HStack(spacing: 12) {
+                        Button {
+                            dismiss()
+                            onCancel()
+                        } label: {
+                            Text(L10n.tr(cancelTitle, language: language))
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                                .background(Color.white.opacity(0.22))
+                                .foregroundColor(.white)
+                                .cornerRadius(16)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            dismiss()
+                            onConfirm()
+                        } label: {
+                            Text(L10n.tr(confirmTitle, language: language))
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                                .background(Color.green)
+                                .foregroundColor(.black)
+                                .cornerRadius(16)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .padding(.bottom, 16)
+                    .background(Color.black.opacity(0.12))
+                }
+            }
+            .localizedNavigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+        }
+    }
+}
+
 /// Quick-pick grid (1k–50k) plus exact field and dial pad for tier points (starting or ending).
 struct TierPointsQuickPickRow: View {
     @Binding var tierPointsText: String
@@ -1892,7 +1988,7 @@ struct FreePlayQuickAddSheet: View {
                         .font(.subheadline.bold())
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .background(Color(.systemGray6).opacity(0.3))
+                        .background(Color.black)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
@@ -1905,7 +2001,7 @@ struct FreePlayQuickAddSheet: View {
                     .font(.subheadline.bold())
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color(.systemGray6).opacity(0.3))
+                    .background(Color.black)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
@@ -2731,7 +2827,7 @@ struct CompQuickAddSheet: View {
                                 .font(.subheadline.bold())
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
-                                .background(Color(.systemGray6).opacity(0.3))
+                                .background(Color.black)
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                         }
@@ -2747,7 +2843,7 @@ struct CompQuickAddSheet: View {
                             .font(.subheadline.bold())
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
-                            .background(Color(.systemGray6).opacity(0.3))
+                            .background(Color.black)
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }

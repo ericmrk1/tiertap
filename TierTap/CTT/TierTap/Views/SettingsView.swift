@@ -15,7 +15,6 @@ struct SettingsView: View {
     @EnvironmentObject var authStore: AuthStore
     @EnvironmentObject var subscriptionStore: SubscriptionStore
     @State private var bankrollText: String = ""
-    @State private var unitSizeText: String = ""
     @State private var targetAverageText: String = ""
     @State private var denominationsText: String = ""
     @State private var primaryColorSelection: Color = .black
@@ -78,7 +77,6 @@ struct SettingsView: View {
             .onAppear {
                 settingsStore.reloadThemeFromSharedStorage()
                 bankrollText = settingsStore.bankroll > 0 ? "\(settingsStore.bankroll)" : ""
-                unitSizeText = settingsStore.unitSize > 0 ? "\(settingsStore.unitSize)" : ""
                 if let t = settingsStore.targetAveragePerSession {
                     targetAverageText = String(format: "%.0f", t)
                 } else {
@@ -175,15 +173,6 @@ struct SettingsView: View {
                     .onChange(of: bankrollText) { new in
                         if let v = Int(new.filter { $0.isNumber }) { settingsStore.bankroll = v }
                     }
-                InputRow(
-                    label: "Unit size (\(settingsStore.currencySymbol))",
-                    placeholder: "Max bet per unit (recommended 1–2% of bankroll)",
-                    value: $unitSizeText,
-                    dialPadNavigationTitle: "Unit size"
-                )
-                    .onChange(of: unitSizeText) { new in
-                        if let v = Int(new.filter { $0.isNumber }) { settingsStore.unitSize = v }
-                    }
 
                 VStack(alignment: .leading, spacing: 6) {
                     L10nText("Currency")
@@ -221,7 +210,7 @@ struct SettingsView: View {
                 }
                 .padding(.top, 4)
             }
-            L10nText("Risk of Ruin for table games uses bankroll and unit size. Keep table-game bets at or below unit size to stay within target risk; poker sessions are not included.")
+            L10nText("Risk of Ruin for table games uses your bankroll and session history. Poker sessions are not included.")
                 .font(.caption).foregroundColor(.gray)
         }
     }

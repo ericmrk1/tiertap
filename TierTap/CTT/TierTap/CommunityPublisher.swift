@@ -88,7 +88,8 @@ struct CommunityPublisher {
                 start_time: start,
                 end_time: end,
                 comment: comment.flatMap { let t = $0.trimmingCharacters(in: .whitespacesAndNewlines); return t.isEmpty ? nil : t },
-                screen_name: screenNameForPost
+                screen_name: screenNameForPost,
+                captured_on_apple_watch: s.capturedOnAppleWatch
             )
 
             let includeCompSummary = publishCompDetails && !s.compEvents.isEmpty
@@ -150,6 +151,8 @@ struct TableGamePostSessionDetails: Codable {
     let comment: String?
     /// TierTap account screen name at publish time; shown in Community and used for filters.
     let screen_name: String?
+    /// Present when the session was tracked from Apple Watch.
+    let captured_on_apple_watch: Bool?
 }
 
 /// JSON body stored in the `metrics` column when reading from the feed.

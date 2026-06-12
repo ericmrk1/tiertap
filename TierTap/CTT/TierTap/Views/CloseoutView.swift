@@ -50,9 +50,12 @@ struct CloseoutView: View {
         return base.isEmpty ? [25, 50, 100, 200, 500, 1000] : base
     }
 
-    /// Default close-out cash amount: most recent tracked stack, falling back to total buy-in.
+    /// Default close-out cash amount: most recent tracked stack (table games), or total buy-in for slots.
     private var defaultCloseoutCashOut: Int {
-        s.liveTrackedStackAmount ?? s.totalStackBaseline
+        if s.isSlotsSession {
+            return s.totalBuyIn
+        }
+        return s.liveTrackedStackAmount ?? s.totalStackBaseline
     }
 
     var isValid: Bool {
@@ -279,7 +282,7 @@ struct CloseoutView: View {
                         // Inputs (compact)
                         VStack(spacing: 8) {
                             HStack(alignment: .center, spacing: 12) {
-                                Text("Cash Out (\(settingsStore.currencySymbol))")
+                                Text(s.isSlotsSession ? "Total Cash Out (\(settingsStore.currencySymbol))" : "Cash Out (\(settingsStore.currencySymbol))")
                                     .font(.subheadline.bold())
                                     .foregroundColor(.white)
                                     .fixedSize(horizontal: true, vertical: false)
@@ -386,17 +389,6 @@ struct CloseoutView: View {
                                 .tint(.green)
                             }
                             .padding(.vertical, 4)
-                            if settingsStore.unitSize > 0,
-                               s.totalBuyIn > settingsStore.unitSize {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.orange).font(.caption2)
-                                    Text("Exceeds unit \(settingsStore.currencySymbol)\(settingsStore.unitSize).").font(.caption2).foregroundColor(.orange)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(6)
-                                .background(Color.orange.opacity(0.15))
-                                .cornerRadius(6)
-                            }
                         }
 
                         // Private notes (local only, not shared)
@@ -935,7 +927,7 @@ struct ChipEstimatorSheetView: View {
                                         .font(.subheadline.bold())
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 10)
-                                        .background(Color.blue.opacity(0.95))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(18)
                                 }
@@ -947,7 +939,7 @@ struct ChipEstimatorSheetView: View {
                                         .font(.subheadline.bold())
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 10)
-                                        .background(Color(.systemGray6).opacity(0.35))
+                                        .background(Color.black)
                                         .foregroundColor(.white)
                                         .cornerRadius(18)
                                 }

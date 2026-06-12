@@ -524,18 +524,6 @@ struct AddPastSessionView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            if settingsStore.unitSize > 0, (Int(totalBuyIn) ?? 0) > settingsStore.unitSize {
-                HStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
-                    Text("Buy-in (\(settingsStore.currencySymbol)\(totalBuyIn)) exceeds your unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)). Consider lowering to stay within bankroll target.")
-                        .font(.caption).foregroundColor(.orange)
-                }
-                .padding(8)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.orange.opacity(0.15))
-                .cornerRadius(8)
-            }
 
             Divider().background(Color.gray.opacity(0.35))
 
@@ -659,7 +647,6 @@ struct AddPastSessionView: View {
                 CommonAmountButtons(amounts: quickDenominations, selected: $avgBetRated)
             }
             quickAddButtons
-            unitSizeWarning
         }
         .padding()
         .background(Color(.systemGray6).opacity(0.15))
@@ -703,25 +690,6 @@ struct AddPastSessionView: View {
                     }
                 }
             }
-        }
-    }
-
-    @ViewBuilder private var unitSizeWarning: some View {
-        if settingsStore.unitSize > 0,
-           (Int(cashOut) ?? 0) > settingsStore.unitSize ||
-           (Int(avgBetActual) ?? 0) > settingsStore.unitSize ||
-           (Int(avgBetRated) ?? 0) > settingsStore.unitSize {
-            HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.orange)
-                Text("Cash out or bet exceeds unit size (\(settingsStore.currencySymbol)\(settingsStore.unitSize)). Set unit in Settings to match your bankroll plan.")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            }
-            .padding(8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.orange.opacity(0.15))
-            .cornerRadius(8)
         }
     }
 
