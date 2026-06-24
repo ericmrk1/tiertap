@@ -67,6 +67,9 @@ class SessionStore: ObservableObject {
         }
         #else
         load()
+        #if os(iOS)
+        publishHomeWidgetSnapshot()
+        #endif
         #endif
         #if os(iOS)
         SessionSyncManager.shared.stateSnapshotProvider = { [weak self] in
@@ -75,6 +78,16 @@ class SessionStore: ObservableObject {
         }
         #endif
         setupSync()
+        #if os(iOS)
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("RepublishHomeWidgetSnapshot"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.publishHomeWidgetSnapshot()
+            self?.reloadTierTapComplicationTimelines()
+        }
+        #endif
         #if os(iOS) || os(watchOS)
         SessionReminderScheduler.shared.refresh(liveSession: liveSession)
         #endif
@@ -1268,6 +1281,7 @@ class SessionStore: ObservableObject {
         if let d = try? JSONEncoder().encode(sessions) { defaults.set(d, forKey: sessKey) }
         #if os(iOS)
         SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
+        publishHomeWidgetSnapshot()
         #endif
         reloadTierTapComplicationTimelines()
     }
@@ -1275,11 +1289,15 @@ class SessionStore: ObservableObject {
         if let d = try? JSONEncoder().encode(liveSession) { defaults.set(d, forKey: liveKey) }
         #if os(iOS)
         SessionSyncManager.shared.writeSimulatorMirrorFromDiskSessions(sessions: sessions, liveSession: liveSession)
+        publishHomeWidgetSnapshot()
         #endif
         reloadTierTapComplicationTimelines()
     }
     private func clearLive() {
         defaults.removeObject(forKey: liveKey)
+        #if os(iOS)
+        publishHomeWidgetSnapshot()
+        #endif
         reloadTierTapComplicationTimelines()
     }
 
@@ -1289,8 +1307,34 @@ class SessionStore: ObservableObject {
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchStackComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchStackWinLossComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchBuyInComplication")
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapHomeWidget")
         #endif
     }
+
+    #if os(iOS)
+    private func publishHomeWidgetSnapshot() {
+        let currencyCode = defaults.string(forKey: TierTapWidgetSnapshotStore.currencyCodeKey)
+            ?? UserDefaults.standard.string(forKey: TierTapWidgetSnapshotStore.currencyCodeKey)
+            ?? "USD"
+        let useEV = defaults.object(forKey: TierTapWidgetSnapshotStore.analyticsUseEVKey) as? Bool
+            ?? UserDefaults.standard.bool(forKey: TierTapWidgetSnapshotStore.analyticsUseEVKey)
+        let settingsBankroll = defaults.integer(forKey: TierTapWidgetSnapshotStore.bankrollKey)
+        let resolvedBankroll = settingsBankroll > 0
+            ? settingsBankroll
+            : max(UserDefaults.standard.integer(forKey: "ctt_bankroll"), 2000)
+        let theme = TierTapThemeSettings.load()
+        let snapshot = TierTapWidgetSnapshotBuilder.build(
+            sessions: sessions,
+            liveSession: liveSession,
+            currencyCode: currencyCode,
+            useExpectedValue: useEV,
+            primaryColorHex: theme.primaryColorHex,
+            settingsBankroll: resolvedBankroll,
+            bankrollResets: BankrollDatabase.shared.fetchResets()
+        )
+        TierTapWidgetSnapshotStore.save(snapshot)
+    }
+    #endif
 
     // MARK: - Defaults / Helpers
 

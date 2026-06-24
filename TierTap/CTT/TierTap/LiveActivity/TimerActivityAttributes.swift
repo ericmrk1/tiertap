@@ -155,6 +155,11 @@ private enum LiveSessionSummaryMetricIcons {
         case "buyIn": "plus.circle"
         case "freePlay": "ticket.fill"
         case "comps": "gift.fill"
+        case "timer": "clock.fill"
+        case "bankroll": "dollarsign.circle.fill"
+        case "today": "calendar"
+        case "winRate": "percent"
+        case "tierChange": "arrow.up.arrow.down"
         default: nil
         }
     }

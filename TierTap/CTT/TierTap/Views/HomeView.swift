@@ -512,6 +512,17 @@ struct HomeView: View {
         } message: {
             Text("Please complete the following before closing out: \(missingInfoFields.joined(separator: ", ")). You can add buy-ins here, but game and location must be set when you check in.")
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenCheckInFromDeepLink"))) { _ in
+            showCheckIn = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenLiveFromDeepLink"))) { _ in
+            if store.liveSession != nil {
+                showLive = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenHistoryFromDeepLink"))) { _ in
+            showHistory = true
+        }
     }
 }
 

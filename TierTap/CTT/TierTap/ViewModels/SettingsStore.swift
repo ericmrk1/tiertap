@@ -353,7 +353,11 @@ final class SettingsStore: ObservableObject {
     ]
 
     @Published var bankroll: Int {
-        didSet { UserDefaults.standard.set(bankroll, forKey: keyBankroll) }
+        didSet {
+            UserDefaults.standard.set(bankroll, forKey: keyBankroll)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(bankroll, forKey: TierTapWidgetSnapshotStore.bankrollKey)
+            NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
+        }
     }
 
     /// Resets of the bankroll (date and new value). Stored in dedicated SQLite DB for analytics.
@@ -361,7 +365,10 @@ final class SettingsStore: ObservableObject {
 
     /// Selected currency for bankroll and monetary amounts (ISO code; default USD).
     @Published var currencyCode: String {
-        didSet { UserDefaults.standard.set(currencyCode, forKey: keyCurrencyCode) }
+        didSet {
+            UserDefaults.standard.set(currencyCode, forKey: keyCurrencyCode)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(currencyCode, forKey: keyCurrencyCode)
+        }
     }
     /// Target average win per session ($). Nil = not set.
     @Published var targetAveragePerSession: Double? {
@@ -672,7 +679,10 @@ final class SettingsStore: ObservableObject {
 
     /// When true, analytics (and matching AI summaries) treat session results as **EV** (cash net + comps). When false, **cash net** only.
     @Published var analyticsUseExpectedValue: Bool {
-        didSet { UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue) }
+        didSet {
+            UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue)
+            UserDefaults(suiteName: appGroupSuiteName)?.set(analyticsUseExpectedValue, forKey: TierTapWidgetSnapshotStore.analyticsUseEVKey)
+        }
     }
 
     /// UI language (also synced to the app group for watch extensions).
@@ -1173,6 +1183,9 @@ final class SettingsStore: ObservableObject {
         self.lifetimeTierTapPlusTokensPurchased = lifetimePurchased
 
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.appLanguage.rawValue, forKey: keyAppLanguage)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.currencyCode, forKey: keyCurrencyCode)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.bankroll, forKey: TierTapWidgetSnapshotStore.bankrollKey)
+        UserDefaults(suiteName: appGroupSuiteName)?.set(self.analyticsUseExpectedValue, forKey: TierTapWidgetSnapshotStore.analyticsUseEVKey)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticsEnabled, forKey: keyWatchHapticsEnabled)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchHapticProfile.rawValue, forKey: keyWatchHapticProfile)
         UserDefaults(suiteName: appGroupSuiteName)?.set(self.watchSessionPulseEnabled, forKey: keyWatchSessionPulseEnabled)

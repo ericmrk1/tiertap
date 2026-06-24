@@ -64,6 +64,11 @@
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
+		WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */; };
+		WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */; };
+		WGTSNP2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
+		WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
+		WGTSBLD2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
@@ -188,6 +193,10 @@
 /* Begin PBXFileReference section */
 		12AACDC5094128715EAA64A9 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
 		225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerLiveActivity.swift; sourceTree = "<group>"; };
+		WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapHomeWidget.swift; sourceTree = "<group>"; };
+		WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetIntents.swift; sourceTree = "<group>"; };
+		WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshot.swift; sourceTree = "<group>"; };
+		WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshotBuilder.swift; sourceTree = "<group>"; };
 		282155DBCB51F96C8840E98B /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E1876422F9FF5EC009D42A3 /* CasinoTimerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CasinoTimerWidget.entitlements; sourceTree = "<group>"; };
@@ -445,6 +454,7 @@
 				TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */,
 				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
 				GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */,
+				WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -487,6 +497,8 @@
 				2E1876422F9FF5EC009D42A3 /* CasinoTimerWidget.entitlements */,
 				E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */,
 				225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */,
+				WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */,
+				WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */,
 				4E7914876B5DF969011894CE /* Assets.xcassets */,
 				3033F08B21E05E979C40C043 /* Info.plist */,
 			);
@@ -507,6 +519,7 @@
 			isa = PBXGroup;
 			children = (
 				9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */,
+				WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */,
 				TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */,
 				ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */,
 				LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */,
@@ -845,6 +858,9 @@
 				7EF7AB1EEB44C261BF43C4A0 /* TimerActivityAttributes.swift in Sources */,
 				4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */,
 				E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */,
+				WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */,
+				WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */,
+				WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -876,6 +892,7 @@
 				CBC5F05A95C22DE1BD7EE0A5 /* GamesList.swift in Sources */,
 				SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */,
 				4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */,
+				WGTSBLD2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift in Sources */,
 				TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */,
 				2E9D7B902F646A05004015F4 /* TierTapPaywallView 2.swift in Sources */,
 				821E6DDA382E0CE1E1946481 /* SharedComponents.swift in Sources */,
@@ -922,6 +939,7 @@
 				CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */,
 				ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */,
 				TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */,
+				WGTSNP2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */,
 				ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */,
 				ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */,
 				APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */,

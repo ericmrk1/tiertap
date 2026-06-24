@@ -131,6 +131,7 @@ private struct TierTapAppRoot: View {
             }
             if newPhase == .active {
                 Task { await settingsStore.refreshRemoteAppDefaults() }
+                handlePendingWidgetDestination()
                 // Ensure watch receives a fresh bootstrap snapshot whenever iPhone foregrounds.
                 SessionSyncManager.shared.pushContext(
                     sessions: store.sessions,
@@ -148,12 +149,10 @@ private struct TierTapAppRoot: View {
         }
         .onOpenURL { url in
             authStore.handleOpenURL(url)
-            guard let scheme = url.scheme?.lowercased(), scheme == "com.app.tiertap" else { return }
-            let host = (url.host ?? "").lowercased()
-            let path = url.path.lowercased()
-            if host == "watch", path == "/live" {
-                NotificationCenter.default.post(name: NSNotification.Name("OpenSessionsTabFromDeepLink"), object: nil)
-            }
+            handleTierTapDeepLink(url)
+        }
+        .onAppear {
+            handlePendingWidgetDestination()
         }
         .adaptiveSheet(isPresented: $showWelcome) {
             CommunityAuthSheet(
@@ -192,6 +191,69 @@ private struct TierTapAppRoot: View {
         guard !showSplash, appSessionUnlocked, !authStore.isSignedIn, !didOfferWelcomeThisSession else { return }
         didOfferWelcomeThisSession = true
         showWelcome = true
+    }
+
+    private func handleTierTapDeepLink(_ url: URL) {
+        guard let scheme = url.scheme?.lowercased(), scheme == "com.app.tiertap" else { return }
+        let host = (url.host ?? "").lowercased()
+        let path = url.path.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+
+        if host == "watch", path == "live" {
+            postWidgetNavigation(.live)
+            return
+        }
+        if host == "watch" {
+            postWidgetNavigation(.home)
+            return
+        }
+        if host == "analytics" || path == "analytics" {
+            postWidgetNavigation(.analytics)
+            return
+        }
+        if host == "sessions" {
+            switch path {
+            case "checkin":
+                postWidgetNavigation(.checkIn)
+            case "live":
+                postWidgetNavigation(.live)
+            case "history":
+                postWidgetNavigation(.history)
+            default:
+                postWidgetNavigation(.home)
+            }
+        }
+    }
+
+    private func handlePendingWidgetDestination() {
+        guard let destination = TierTapWidgetIntentRouter.consumePendingDestination() else { return }
+        switch destination {
+        case .checkIn: postWidgetNavigation(.checkIn)
+        case .live: postWidgetNavigation(.live)
+        case .analytics: postWidgetNavigation(.analytics)
+        case .history: postWidgetNavigation(.history)
+        case .home: postWidgetNavigation(.home)
+        }
+    }
+
+    private func postWidgetNavigation(_ destination: TierTapWidgetIntentRouter.Destination) {
+        switch destination {
+        case .analytics:
+            NotificationCenter.default.post(name: NSNotification.Name("OpenAnalyticsTabFromDeepLink"), object: nil)
+        case .checkIn, .live, .history, .home:
+            NotificationCenter.default.post(name: NSNotification.Name("OpenSessionsTabFromDeepLink"), object: nil)
+            let actionName: String
+            switch destination {
+            case .checkIn: actionName = "OpenCheckInFromDeepLink"
+            case .live: actionName = "OpenLiveFromDeepLink"
+            case .history: actionName = "OpenHistoryFromDeepLink"
+            default: actionName = ""
+            }
+            if !actionName.isEmpty {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    NotificationCenter.default.post(name: NSNotification.Name(actionName), object: nil)
+                }
+            }
+        }
     }
 }
 

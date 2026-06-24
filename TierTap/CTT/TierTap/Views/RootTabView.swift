@@ -60,6 +60,9 @@ struct RootTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSessionsTabFromDeepLink"))) { _ in
             selectedTab = .sessions
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenAnalyticsTabFromDeepLink"))) { _ in
+            selectedTab = .analytics
+        }
         #if os(iOS)
         .adaptiveSheet(isPresented: $showGASupportFromMoodDownswing) {
             GASupportSheet(onDismiss: {
