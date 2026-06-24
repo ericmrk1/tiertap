@@ -313,6 +313,9 @@ class SessionStore: ObservableObject {
                     publishFreePlayTotal: true,
                     attachScreenName: true
                 )
+                await MainActor.run {
+                    markSessionsPublished([session.id])
+                }
             } catch {
                 #if DEBUG
                 print("[Watch→Community] publish failed: \(error.localizedDescription)")
@@ -1217,6 +1220,23 @@ class SessionStore: ObservableObject {
         if prev.status == .requiringMoreInfo && s.status == .complete {
             schedulePostCloseoutSharePrompt(sessionId: s.id)
         }
+        pushContext()
+        #endif
+    }
+
+    /// Marks sessions as published to Community after a successful upload.
+    func markSessionsPublished(_ ids: Set<UUID>, at date: Date = Date()) {
+        guard !ids.isEmpty else { return }
+        var changed = false
+        for idx in sessions.indices where ids.contains(sessions[idx].id) {
+            if sessions[idx].publishedToCommunityAt == nil {
+                sessions[idx].publishedToCommunityAt = date
+                changed = true
+            }
+        }
+        guard changed else { return }
+        saveSessions()
+        #if os(iOS)
         pushContext()
         #endif
     }

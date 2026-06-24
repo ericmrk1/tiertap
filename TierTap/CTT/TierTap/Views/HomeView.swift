@@ -78,18 +78,174 @@ struct HomeView: View {
         store.fastCloseSessionWithDefaultsUnverified()
     }
 
+    @ViewBuilder
+    private func homeActionsStack(tapLevelSpacing: CGFloat) -> some View {
+        VStack(spacing: tapLevelSpacing) {
+            if store.liveSession == nil {
+                TapLevelCard(tapLevel: TapLevel.compute(from: store.sessions))
+                    .environmentObject(settingsStore)
+            }
+            if store.liveSession != nil {
+                HStack(spacing: 12) {
+                    Button { showAddPast = true } label: {
+                        LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
+                            .frame(maxWidth: .infinity).padding()
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                    }
+                    Button { showHistory = true } label: {
+                        LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
+                            .frame(maxWidth: .infinity).padding()
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                    }
+                }
+                HStack(spacing: 12) {
+                    homeSecondaryActionButton(title: "Bankroll", systemImage: "dollarsign.circle.fill") {
+                        showBankroll = true
+                    }
+                    homeSecondaryActionButton(title: "Wallet", systemImage: "wallet.pass.fill") {
+                        showWallet = true
+                    }
+                }
+                Button { showLive = true } label: {
+                    LocalizedLabel(title: "Finish Live Session", systemImage: "play.circle.fill")
+                        .frame(maxWidth: .infinity).padding()
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .background(GameCategoryBubbleBackground(cornerRadius: 14))
+                }
+                HStack(spacing: 10) {
+                    Button {
+                        showCompSheet = true
+                    } label: {
+                        LocalizedLabel(title: "Comp", systemImage: "gift.fill")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                            .padding(.horizontal, 4)
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.green)
+                            .cornerRadius(16)
+                            .font(.body.weight(.semibold))
+                            .minimumScaleFactor(0.75)
+                            .lineLimit(1)
+                    }
+                    Button {
+                        if isSlotsLiveSession {
+                            performFastCloseOut()
+                        } else {
+                            showUpdateStackSheet = true
+                        }
+                    } label: {
+                        Group {
+                            if isSlotsLiveSession {
+                                LocalizedFastCloseOutLabel()
+                            } else {
+                                LocalizedChipStackLabel(title: "Stack")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .padding(.horizontal, 4)
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.green)
+                        .cornerRadius(16)
+                        .font(.body.weight(.semibold))
+                        .minimumScaleFactor(0.75)
+                        .lineLimit(isSlotsLiveSession ? 2 : 1)
+                    }
+                    Button {
+                        showBuyInSheet = true
+                    } label: {
+                        LocalizedLabel(title: "Buy-In", systemImage: "plus.circle")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 18)
+                            .padding(.horizontal, 4)
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.green)
+                            .cornerRadius(16)
+                            .font(.body.weight(.semibold))
+                            .minimumScaleFactor(0.75)
+                            .lineLimit(1)
+                    }
+                }
+            } else {
+                HStack(spacing: 12) {
+                    homeSecondaryActionButton(title: "Bankroll", systemImage: "dollarsign.circle.fill") {
+                        showBankroll = true
+                    }
+                    homeSecondaryActionButton(title: "Wallet", systemImage: "wallet.pass.fill") {
+                        showWallet = true
+                    }
+                }
+            }
+            if store.liveSession == nil {
+                HStack(spacing: 12) {
+                    Button { showAddPast = true } label: {
+                        LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
+                            .frame(maxWidth: .infinity).padding()
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                    }
+                    Button { showHistory = true } label: {
+                        LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
+                            .frame(maxWidth: .infinity).padding()
+                            .background(Color(.systemGray6).opacity(0.25))
+                            .foregroundColor(.white).cornerRadius(14).font(.subheadline)
+                    }
+                }
+            }
+            if store.liveSession == nil {
+                Button {
+                    checkInSaveFastConfigurationMode = false
+                    checkInPresetGameCategory = nil
+                    showCheckIn = true
+                } label: {
+                    LocalizedLabel(title: "Check In", systemImage: "plus.circle.fill")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .padding(.horizontal)
+                        .font(.title2.bold())
+                        .foregroundColor(.white)
+                        .background(GameCategoryBubbleBackground(cornerRadius: 16))
+                }
+                FastCheckInBar(showSettingsSheet: $showFastCheckInSettings)
+                    .environmentObject(store)
+                    .environmentObject(settingsStore)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 44)
+    }
+
+    private func homeSecondaryActionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            LocalizedLabel(title: title, systemImage: systemImage)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(.systemGray6).opacity(0.25))
+                .foregroundColor(.white)
+                .cornerRadius(14)
+                .font(.subheadline)
+        }
+    }
+
+    /// When the user has session history, keep Tap Level under the hero so Pro-height screens don't clip the metrics header.
+    private var stacksTapLevelUnderHero: Bool {
+        store.liveSession == nil && !store.sessions.isEmpty
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
-                VStack(spacing: store.liveSession != nil ? 16 : 24) {
+                VStack(spacing: store.liveSession != nil ? 16 : (stacksTapLevelUnderHero ? 12 : 24)) {
                     if store.liveSession == nil {
-                        HomeBrandLogo.image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxHeight: 240)
-                            .padding(.horizontal, 24)
-                            .padding(.top, 8)
+                        HomeHeroMetricsSection(
+                            sessions: store.sessions,
+                            isLive: false,
+                            onOpenHistory: { showHistory = true }
+                        )
                     } else {
                         Color.clear
                             .frame(height: 96)
@@ -104,169 +260,15 @@ struct HomeView: View {
                             .padding(.horizontal)
                     }
 
-                    Spacer()
+                    if stacksTapLevelUnderHero {
+                        homeActionsStack(tapLevelSpacing: 8)
+                    } else {
+                        Spacer(minLength: 0)
 
-                    VStack(spacing: 12) {
-                        if store.liveSession == nil {
-                            TapLevelCard(tapLevel: TapLevel.compute(from: store.sessions))
-                                .environmentObject(settingsStore)
-                                .padding(.horizontal)
-                        }
-                        if store.liveSession != nil {
-                            HStack(spacing: 12) {
-                                Button { showAddPast = true } label: {
-                                    LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
-                                        .frame(maxWidth: .infinity).padding()
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                                }
-                                Button { showHistory = true } label: {
-                                    LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
-                                        .frame(maxWidth: .infinity).padding()
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                                }
-                            }
-                            HStack(spacing: 12) {
-                                Button { showBankroll = true } label: {
-                                    LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 20)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                        .font(.title3.bold())
-                                }
-                                Button { showWallet = true } label: {
-                                    LocalizedLabel(title: "Wallet", systemImage: "wallet.pass.fill")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 20)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                        .font(.title3.bold())
-                                }
-                            }
-                            Button { showLive = true } label: {
-                                LocalizedLabel(title: "Finish Live Session", systemImage: "play.circle.fill")
-                                    .frame(maxWidth: .infinity).padding()
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .background(GameCategoryBubbleBackground(cornerRadius: 14))
-                            }
-                            HStack(spacing: 10) {
-                                Button {
-                                    showCompSheet = true
-                                } label: {
-                                    LocalizedLabel(title: "Comp", systemImage: "gift.fill")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 18)
-                                        .padding(.horizontal, 4)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.green)
-                                        .cornerRadius(16)
-                                        .font(.body.weight(.semibold))
-                                        .minimumScaleFactor(0.75)
-                                        .lineLimit(1)
-                                }
-                                Button {
-                                    if isSlotsLiveSession {
-                                        performFastCloseOut()
-                                    } else {
-                                        showUpdateStackSheet = true
-                                    }
-                                } label: {
-                                    Group {
-                                        if isSlotsLiveSession {
-                                            LocalizedFastCloseOutLabel()
-                                        } else {
-                                            LocalizedChipStackLabel(title: "Stack")
-                                        }
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 18)
-                                    .padding(.horizontal, 4)
-                                    .background(Color(.systemGray6).opacity(0.25))
-                                    .foregroundColor(.green)
-                                    .cornerRadius(16)
-                                    .font(.body.weight(.semibold))
-                                    .minimumScaleFactor(0.75)
-                                    .lineLimit(isSlotsLiveSession ? 2 : 1)
-                                }
-                                Button {
-                                    showBuyInSheet = true
-                                } label: {
-                                    LocalizedLabel(title: "Buy-In", systemImage: "plus.circle")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 18)
-                                        .padding(.horizontal, 4)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.green)
-                                        .cornerRadius(16)
-                                        .font(.body.weight(.semibold))
-                                        .minimumScaleFactor(0.75)
-                                        .lineLimit(1)
-                                }
-                            }
-                        } else {
-                            HStack(spacing: 12) {
-                                Button { showBankroll = true } label: {
-                                    LocalizedLabel(title: "Bankroll", systemImage: "dollarsign.circle.fill")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 20)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                        .font(.title3.bold())
-                                }
-                                Button { showWallet = true } label: {
-                                    LocalizedLabel(title: "Wallet", systemImage: "wallet.pass.fill")
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 20)
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white)
-                                        .cornerRadius(16)
-                                        .font(.title3.bold())
-                                }
-                            }
-                        }
-                        if store.liveSession == nil {
-                            HStack(spacing: 12) {
-                                Button { showAddPast = true } label: {
-                                    LocalizedLabel(title: "Add Past Session", systemImage: "clock.arrow.circlepath")
-                                        .frame(maxWidth: .infinity).padding()
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                                }
-                                Button { showHistory = true } label: {
-                                    LocalizedLabel(title: "History", systemImage: "list.bullet.rectangle")
-                                        .frame(maxWidth: .infinity).padding()
-                                        .background(Color(.systemGray6).opacity(0.25))
-                                        .foregroundColor(.white).cornerRadius(14).font(.subheadline)
-                                }
-                            }
-                        }
-                        if store.liveSession == nil {
-                            Button {
-                                checkInSaveFastConfigurationMode = false
-                                checkInPresetGameCategory = nil
-                                showCheckIn = true
-                            } label: {
-                                LocalizedLabel(title: "Check In", systemImage: "plus.circle.fill")
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal)
-                                    .font(.title2.bold())
-                                    .foregroundColor(.white)
-                                    .background(GameCategoryBubbleBackground(cornerRadius: 16))
-                            }
-                            FastCheckInBar(showSettingsSheet: $showFastCheckInSettings)
-                                .environmentObject(store)
-                                .environmentObject(settingsStore)
-                        }
+                        homeActionsStack(tapLevelSpacing: 12)
                     }
-                    .padding(.horizontal).padding(.bottom, 44)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -549,6 +551,142 @@ private enum HomeBrandLogo {
             return Image(uiImage: processed)
         }
         return Image("LogoSplash")
+    }
+}
+
+/// Home hero: logo dissolves into closing-metrics rings when sessions exist and nothing is live.
+private struct HomeHeroMetricsSection: View {
+    let sessions: [Session]
+    let isLive: Bool
+    var onOpenHistory: () -> Void = {}
+
+    @State private var showClosingMetrics = false
+    @State private var isSectionExpanded = true
+    @State private var dissolveTask: Task<Void, Never>?
+
+    private var hasSessions: Bool { !sessions.isEmpty }
+    private var shouldShowMetrics: Bool { hasSessions && !isLive }
+
+    /// Pro-height phones have less vertical room below the nav bar than Max models.
+    private var usesCompactHomeHeight: Bool {
+        UIScreen.main.bounds.height < 920
+    }
+
+    private var heroTopPadding: CGFloat {
+        if shouldShowMetrics && showClosingMetrics {
+            return usesCompactHomeHeight ? 36 : 28
+        }
+        return usesCompactHomeHeight ? 16 : 24
+    }
+
+    var body: some View {
+        Group {
+            if shouldShowMetrics && showClosingMetrics {
+                collapsibleMetricsSection
+            } else {
+                logoView
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .top)
+        .padding(.horizontal, 24)
+        .padding(.top, heroTopPadding)
+        .padding(.bottom, shouldShowMetrics && showClosingMetrics ? 4 : 0)
+        .animation(.easeInOut(duration: 0.9), value: showClosingMetrics)
+        .animation(.easeInOut(duration: 0.25), value: isSectionExpanded)
+        .onAppear { resetDissolveSchedule() }
+        .onChange(of: isLive) { live in
+            if live {
+                cancelDissolveSchedule()
+                showClosingMetrics = false
+            } else {
+                resetDissolveSchedule()
+            }
+        }
+        .onChange(of: sessions) { _ in
+            if !hasSessions {
+                cancelDissolveSchedule()
+                showClosingMetrics = false
+            } else if !isLive && !showClosingMetrics {
+                resetDissolveSchedule()
+            }
+        }
+    }
+
+    private var logoView: some View {
+        HomeBrandLogo.image
+            .resizable()
+            .scaledToFit()
+            .frame(maxHeight: shouldShowMetrics && showClosingMetrics ? 0 : (usesCompactHomeHeight ? 200 : 240))
+            .opacity(shouldShowMetrics && showClosingMetrics ? 0 : 1)
+            .scaleEffect(shouldShowMetrics && showClosingMetrics ? 0.86 : 1)
+            .blur(radius: shouldShowMetrics && showClosingMetrics ? 8 : 0)
+    }
+
+    private var collapsibleMetricsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    isSectionExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Label("TierTap Sessions", systemImage: "chart.pie")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white)
+                    Spacer()
+                    Image(systemName: isSectionExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.75))
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("TierTap Sessions")
+            .accessibilityValue(isSectionExpanded ? "Expanded" : "Collapsed")
+            .accessibilityHint(isSectionExpanded ? "Collapse section" : "Expand section")
+
+            if isSectionExpanded {
+                SessionClosingMetricsRingsView(
+                    sessions: sessions,
+                    isRevealed: showClosingMetrics,
+                    onRingTap: onOpenHistory
+                )
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 14)
+        .padding(.bottom, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.systemGray6).opacity(0.18))
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        }
+    }
+
+    private func resetDissolveSchedule() {
+        cancelDissolveSchedule()
+        guard shouldShowMetrics else {
+            showClosingMetrics = false
+            return
+        }
+        showClosingMetrics = false
+        isSectionExpanded = true
+        dissolveTask = Task {
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled, shouldShowMetrics else { return }
+            await MainActor.run {
+                withAnimation(.easeInOut(duration: 0.9)) {
+                    showClosingMetrics = true
+                }
+            }
+        }
+    }
+
+    private func cancelDissolveSchedule() {
+        dissolveTask?.cancel()
+        dissolveTask = nil
     }
 }
 

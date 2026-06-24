@@ -392,8 +392,11 @@ struct Session: Identifiable, Codable, Equatable {
     var slotNotes: String?
     /// True when the session was started from Apple Watch (live tracking initiated on the watch).
     var capturedOnAppleWatch: Bool = false
+    /// Set locally when the session is published to Community; used for home closing-metrics rings.
+    var publishedToCommunityAt: Date?
 
     var isComplete: Bool { status == .complete }
+    var isPublishedToCommunity: Bool { publishedToCommunityAt != nil }
     var requiresMoreInfo: Bool { status == .requiringMoreInfo }
 
     /// For filtering and display: legacy sessions without `tierPointsVerification` count as verified.
@@ -409,7 +412,7 @@ struct Session: Identifiable, Codable, Equatable {
         case gameCategory, pokerGameKind, pokerAllowsRebuy, pokerAllowsAddOn, pokerHasFreeOut, pokerVariant
         case pokerSmallBlind, pokerBigBlind, pokerAnte, pokerLevelMinutes, pokerStartingStack
         case slotFormat, slotFormatOther, slotFeature, slotFeatureOther, slotNotes
-        case capturedOnAppleWatch
+        case capturedOnAppleWatch, publishedToCommunityAt
     }
 
     init(from decoder: Decoder) throws {
@@ -460,6 +463,7 @@ struct Session: Identifiable, Codable, Equatable {
         slotFeatureOther = try c.decodeIfPresent(String.self, forKey: .slotFeatureOther)
         slotNotes = try c.decodeIfPresent(String.self, forKey: .slotNotes)
         capturedOnAppleWatch = try c.decodeIfPresent(Bool.self, forKey: .capturedOnAppleWatch) ?? false
+        publishedToCommunityAt = try c.decodeIfPresent(Date.self, forKey: .publishedToCommunityAt)
     }
 
     init(id: UUID = UUID(), game: String, casino: String, casinoLatitude: Double? = nil, casinoLongitude: Double? = nil,
@@ -495,7 +499,8 @@ struct Session: Identifiable, Codable, Equatable {
          slotFeature: SessionSlotFeature? = nil,
          slotFeatureOther: String? = nil,
          slotNotes: String? = nil,
-         capturedOnAppleWatch: Bool = false) {
+         capturedOnAppleWatch: Bool = false,
+         publishedToCommunityAt: Date? = nil) {
         self.id = id
         self.game = game
         self.casino = casino
@@ -542,6 +547,7 @@ struct Session: Identifiable, Codable, Equatable {
         self.slotFeatureOther = slotFeatureOther
         self.slotNotes = slotNotes
         self.capturedOnAppleWatch = capturedOnAppleWatch
+        self.publishedToCommunityAt = publishedToCommunityAt
     }
 
     func encode(to encoder: Encoder) throws {

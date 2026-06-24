@@ -442,6 +442,7 @@ struct CommunitySessionsView: View {
                 }
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+                .environmentObject(sessionStore)
             }
             .adaptiveSheet(isPresented: $showMapSheet) {
                 CommunityFeedMapSheet(
@@ -2143,6 +2144,7 @@ struct CommunitySessionPublishSelectionView: View {
 
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var store: SessionStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var selectedSessionIDs: Set<UUID>
@@ -2464,6 +2466,7 @@ struct CommunitySessionPublishSelectionView: View {
             )
             await MainActor.run {
                 isPublishing = false
+                store.markSessionsPublished(selectedSessionIDs)
                 onFinished(.success(publishedCount))
                 dismiss()
             }

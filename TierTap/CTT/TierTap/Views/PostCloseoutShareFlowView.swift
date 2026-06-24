@@ -48,6 +48,7 @@ struct PostCloseoutShareFlowView: View {
                 )
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
+                .environmentObject(store)
             case .sessionArt:
                 NavigationStack {
                     SessionArtGeneratorView(sessionId: sessionId) {
