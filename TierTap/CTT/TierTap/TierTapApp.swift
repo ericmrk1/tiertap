@@ -218,6 +218,8 @@ private struct TierTapAppRoot: View {
                 postWidgetNavigation(.live)
             case "history":
                 postWidgetNavigation(.history)
+            case "bankroll":
+                postWidgetNavigation(.bankroll)
             default:
                 postWidgetNavigation(.home)
             }
@@ -231,6 +233,7 @@ private struct TierTapAppRoot: View {
         case .live: postWidgetNavigation(.live)
         case .analytics: postWidgetNavigation(.analytics)
         case .history: postWidgetNavigation(.history)
+        case .bankroll: postWidgetNavigation(.bankroll)
         case .home: postWidgetNavigation(.home)
         }
     }
@@ -239,13 +242,14 @@ private struct TierTapAppRoot: View {
         switch destination {
         case .analytics:
             NotificationCenter.default.post(name: NSNotification.Name("OpenAnalyticsTabFromDeepLink"), object: nil)
-        case .checkIn, .live, .history, .home:
+        case .checkIn, .live, .history, .home, .bankroll:
             NotificationCenter.default.post(name: NSNotification.Name("OpenSessionsTabFromDeepLink"), object: nil)
             let actionName: String
             switch destination {
             case .checkIn: actionName = "OpenCheckInFromDeepLink"
             case .live: actionName = "OpenLiveFromDeepLink"
             case .history: actionName = "OpenHistoryFromDeepLink"
+            case .bankroll: actionName = "OpenBankrollFromDeepLink"
             default: actionName = ""
             }
             if !actionName.isEmpty {

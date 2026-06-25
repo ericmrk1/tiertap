@@ -64,11 +64,11 @@ struct SessionClosingMetricsSnapshot: Equatable {
 
 struct SessionClosingMetricsRingsView: View {
     let sessions: [Session]
+    @Binding var period: SessionClosingMetricsPeriod
     /// When true, rings animate from 0% up to their current levels.
     var isRevealed: Bool = true
     var onRingTap: () -> Void = {}
 
-    @State private var period: SessionClosingMetricsPeriod = .month
     @State private var animatedVerified: Double = 0
     @State private var animatedPublished: Double = 0
 
@@ -121,14 +121,6 @@ struct SessionClosingMetricsRingsView: View {
                     percent: Int((snapshot.publishedFraction * 100).rounded())
                 )
             }
-
-            Picker("Period", selection: $period) {
-                ForEach(SessionClosingMetricsPeriod.allCases) { item in
-                    Text(item.label).tag(item)
-                }
-            }
-            .pickerStyle(.segmented)
-            .colorScheme(.dark)
         }
         .frame(maxWidth: .infinity)
         .onAppear {

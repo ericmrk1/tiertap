@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State private var isSessionsExpanded: Bool = false
     @State private var isFavoritesExpanded: Bool = false
     @State private var isThemeExpanded: Bool = false
+    @State private var widgetLayoutConfig: TierTapWidgetLayoutConfig = .default
     @State private var isWatchExperienceExpanded: Bool = false
     @State private var isDataExportExpanded: Bool = false
     @State private var isAboutExpanded: Bool = false
@@ -85,6 +86,7 @@ struct SettingsView: View {
                 denominationsText = settingsStore.commonDenominations.map { "\($0)" }.joined(separator: ", ")
                 primaryColorSelection = settingsStore.primaryColor
                 secondaryColorSelection = settingsStore.secondaryColor
+                widgetLayoutConfig = TierTapWidgetSnapshotStore.loadLayoutConfig()
                 exportGameCategory = settingsStore.defaultGameCategory
             }
             .onChange(of: gamePickerSelection) { new in
@@ -446,6 +448,32 @@ struct SettingsView: View {
                 tokensMetricTotalsFooter(metric: tokensChartMetric)
             }
         }
+    }
+
+    private func smallMetricBinding(index: Int) -> Binding<TierTapWidgetMetricKind> {
+        Binding(
+            get: { widgetLayoutConfig.smallMetrics[index] },
+            set: { newValue in
+                widgetLayoutConfig.smallMetrics[index] = newValue
+                persistWidgetLayoutConfig()
+            }
+        )
+    }
+
+    private func standardMetricBinding(index: Int) -> Binding<TierTapWidgetMetricKind> {
+        Binding(
+            get: { widgetLayoutConfig.standardMetrics[index] },
+            set: { newValue in
+                widgetLayoutConfig.standardMetrics[index] = newValue
+                persistWidgetLayoutConfig()
+            }
+        )
+    }
+
+    private func persistWidgetLayoutConfig() {
+        widgetLayoutConfig = TierTapWidgetLayoutConfig.normalized(widgetLayoutConfig)
+        TierTapWidgetSnapshotStore.saveLayoutConfig(widgetLayoutConfig)
+        NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
     }
 
     private func tokensChartMonthTitle() -> String {
@@ -1044,6 +1072,47 @@ struct SettingsView: View {
                                 }
                         }
                     }
+                }
+
+                Divider().background(Color.gray.opacity(0.3))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    L10nText("Home widget metrics")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+
+                    Text("Small widget")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.75))
+
+                    ForEach(0..<TierTapWidgetLayoutConfig.smallSlotCount, id: \.self) { index in
+                        Picker("Small metric \(index + 1)", selection: smallMetricBinding(index: index)) {
+                            ForEach(TierTapWidgetMetricKind.allCases) { kind in
+                                Text(kind.displayName).tag(kind)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.green)
+                    }
+
+                    Text("Medium & large widgets")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.75))
+                        .padding(.top, 4)
+
+                    ForEach(0..<TierTapWidgetLayoutConfig.standardSlotCount, id: \.self) { index in
+                        Picker("Widget metric \(index + 1)", selection: standardMetricBinding(index: index)) {
+                            ForEach(TierTapWidgetMetricKind.allCases) { kind in
+                                Text(kind.displayName).tag(kind)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.green)
+                    }
+
+                    Text("Choose which metrics appear on each home screen widget size.")
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
 
                 RoundedRectangle(cornerRadius: 12)

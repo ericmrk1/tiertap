@@ -33,6 +33,7 @@
 		2E9D7BC62F650006004015F4 /* HistoryPhotoFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
 		SCRNGBLD01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */; };
+		HSMWGBLD01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
 		AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */; };
 		AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */; };
@@ -239,6 +240,7 @@
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionClosingMetricsRingsView.swift; sourceTree = "<group>"; };
+		HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSessionsMetricsWidget.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
 		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
@@ -395,6 +397,7 @@
 				ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */,
 				7E68A7C0EAF309AC9F041237 /* HomeView.swift */,
 				SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */,
+				HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */,
 				UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */,
 				UGVWFILE01B2C3D4E5F6789012 /* UserGuideView.swift */,
 				UGPDFFILE01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift */,
@@ -902,6 +905,7 @@
 				SUFB01E2F3A4B5C6D7E8F9A0B1 /* StackUpdateConfetti.swift in Sources */,
 				363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */,
 				SCRNGBLD01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift in Sources */,
+				HSMWGBLD01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift in Sources */,
 				UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */,
 				UGVWBUILD01B2C3D4E5F6789012 /* UserGuideView.swift in Sources */,
 				UGPDFBUILD01B2C3D4E5F6789012 /* UserGuidePDFExporter.swift in Sources */,

@@ -525,6 +525,9 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenHistoryFromDeepLink"))) { _ in
             showHistory = true
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenBankrollFromDeepLink"))) { _ in
+            showBankroll = true
+        }
     }
 }
 
@@ -645,10 +648,10 @@ private struct HomeHeroMetricsSection: View {
             .accessibilityHint(isSectionExpanded ? "Collapse section" : "Expand section")
 
             if isSectionExpanded {
-                SessionClosingMetricsRingsView(
+                HomeSessionsMetricsWidget(
                     sessions: sessions,
                     isRevealed: showClosingMetrics,
-                    onRingTap: onOpenHistory
+                    onOpenHistory: onOpenHistory
                 )
             }
         }

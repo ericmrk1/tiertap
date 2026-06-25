@@ -368,6 +368,7 @@ final class SettingsStore: ObservableObject {
         didSet {
             UserDefaults.standard.set(currencyCode, forKey: keyCurrencyCode)
             UserDefaults(suiteName: appGroupSuiteName)?.set(currencyCode, forKey: keyCurrencyCode)
+            NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
         }
     }
     /// Target average win per session ($). Nil = not set.
@@ -682,6 +683,7 @@ final class SettingsStore: ObservableObject {
         didSet {
             UserDefaults.standard.set(analyticsUseExpectedValue, forKey: keyAnalyticsUseExpectedValue)
             UserDefaults(suiteName: appGroupSuiteName)?.set(analyticsUseExpectedValue, forKey: TierTapWidgetSnapshotStore.analyticsUseEVKey)
+            NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
         }
     }
 
@@ -1218,6 +1220,7 @@ final class SettingsStore: ObservableObject {
                 themePresets: themePresets
             )
         )
+        NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
     }
 
     /// Adds a rewards program name to the shared custom list if it is not already present (case-insensitive).
@@ -1504,6 +1507,7 @@ final class SettingsStore: ObservableObject {
         let event = BankrollResetEvent(date: Date(), value: newValue)
         BankrollDatabase.shared.insertReset(date: event.date, value: event.value)
         bankrollResets = BankrollDatabase.shared.fetchResets()
+        NotificationCenter.default.post(name: NSNotification.Name("RepublishHomeWidgetSnapshot"), object: nil)
     }
 
     // MARK: - Last game defaults

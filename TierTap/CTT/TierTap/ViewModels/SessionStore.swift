@@ -1349,6 +1349,8 @@ class SessionStore: ObservableObject {
             currencyCode: currencyCode,
             useExpectedValue: useEV,
             primaryColorHex: theme.primaryColorHex,
+            secondaryColorHex: theme.secondaryColorHex,
+            layoutConfig: TierTapWidgetSnapshotStore.loadLayoutConfig(),
             settingsBankroll: resolvedBankroll,
             bankrollResets: BankrollDatabase.shared.fetchResets()
         )

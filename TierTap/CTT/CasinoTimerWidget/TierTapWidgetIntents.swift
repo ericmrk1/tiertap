@@ -51,6 +51,17 @@ struct TierTapOpenHistoryIntent: AppIntent {
 }
 
 @available(iOS 17.0, *)
+struct TierTapWidgetConfigurationIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "TierTap Dashboard"
+    static var description = IntentDescription("Customize widget metrics in TierTap Settings.")
+
+    func perform() async throws -> some IntentResult {
+        TierTapWidgetIntentRouter.destination = .home
+        return .result()
+    }
+}
+
+@available(iOS 17.0, *)
 struct TierTapWidgetShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(

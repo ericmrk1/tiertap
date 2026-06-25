@@ -53,7 +53,8 @@ enum HistoryActivityGridEngine {
         for availableWidth: CGFloat,
         periodOffset: Int = 0,
         calendar: Calendar = .current,
-        forExport: Bool = false
+        forExport: Bool = false,
+        maxCellSize: CGFloat? = nil
     ) -> HistoryActivityGridLayout {
         let bounds = periodBounds(offset: periodOffset, calendar: calendar)
         let allWeekStarts = weekStarts(from: bounds.start, through: bounds.end, calendar: calendar)
@@ -92,6 +93,9 @@ enum HistoryActivityGridEngine {
             let filled = max(minCellSize, rawCellSize)
             if forExport {
                 return min(exportMaxCellSize, filled)
+            }
+            if let maxCellSize {
+                return min(maxCellSize, filled)
             }
             return filled
         }()
