@@ -1210,6 +1210,7 @@ struct TierTapConfirmationSheet: View {
     let message: String
     var cancelTitle: String = "Cancel"
     let confirmTitle: String
+    var confirmIsDestructive: Bool = false
     let onCancel: () -> Void
     let onConfirm: () -> Void
 
@@ -1268,8 +1269,8 @@ struct TierTapConfirmationSheet: View {
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 20)
-                                .background(Color.green)
-                                .foregroundColor(.black)
+                                .background(confirmIsDestructive ? Color.red : Color.green)
+                                .foregroundColor(confirmIsDestructive ? .white : .black)
                                 .cornerRadius(16)
                         }
                         .buttonStyle(.plain)

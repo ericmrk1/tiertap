@@ -38,6 +38,7 @@ extension View {
         message: String,
         cancelTitle: String = "Cancel",
         confirmTitle: String,
+        confirmIsDestructive: Bool = false,
         onCancel: @escaping () -> Void = {},
         onConfirm: @escaping () -> Void
     ) -> some View {
@@ -47,6 +48,7 @@ extension View {
                 message: message,
                 cancelTitle: cancelTitle,
                 confirmTitle: confirmTitle,
+                confirmIsDestructive: confirmIsDestructive,
                 onCancel: onCancel,
                 onConfirm: onConfirm
             )

@@ -1,17 +1,8 @@
 import SwiftUI
 
 private enum HistoryContentTab: String, CaseIterable {
+    case sessions
     case grid
-    case verified
-    case unverified
-
-    var tierPointsFilter: SessionTierPointsVerification? {
-        switch self {
-        case .grid: return nil
-        case .verified: return .verified
-        case .unverified: return .unverified
-        }
-    }
 }
 
 struct HistoryView: View {
@@ -36,7 +27,7 @@ struct HistoryView: View {
     @State private var isHistoryDateSectionExpanded: Bool = false
     @State private var isHistoryGameSectionExpanded: Bool = false
     @State private var isHistoryLocationSectionExpanded: Bool = false
-    @State private var historyContentTab: HistoryContentTab = .grid
+    @State private var historyContentTab: HistoryContentTab = .sessions
     @State private var historyGridMetricMode: HistoryGridMetricMode = .profitLoss
     @State private var showTaxPrep = false
     @State private var showPhotoFeed = false
@@ -49,12 +40,8 @@ struct HistoryView: View {
         )
     }
 
-    /// Sessions for the scrolling list: date, location, game, search, and **tier-points segment**.
+    /// Sessions for the list and grid: date, location, game, and search filters.
     private var filteredSessions: [Session] {
-        sessionsApplyingHistoryFilters(includeTierPointsVerification: true)
-    }
-
-    private func sessionsApplyingHistoryFilters(includeTierPointsVerification: Bool) -> [Session] {
         var sessions = store.sessions
 
         if useDateRangeFilter {
@@ -77,10 +64,6 @@ struct HistoryView: View {
                 session.casino.localizedCaseInsensitiveContains(trimmedSearch) ||
                 session.game.localizedCaseInsensitiveContains(trimmedSearch)
             }
-        }
-
-        if includeTierPointsVerification, let filter = historyContentTab.tierPointsFilter {
-            sessions = sessions.filter { $0.effectiveTierPointsVerification == filter }
         }
 
         return sessions
@@ -258,18 +241,13 @@ struct HistoryView: View {
 
     private var historyContentTabSegment: some View {
         Picker("", selection: $historyContentTab) {
+            Text("Sessions").tag(HistoryContentTab.sessions)
             Text("Grid").tag(HistoryContentTab.grid)
-            Text("Verified").tag(HistoryContentTab.verified)
-            Text("Unverified").tag(HistoryContentTab.unverified)
         }
         .pickerStyle(.segmented)
         .tint(.green)
         .padding(.horizontal)
         .padding(.top, 10)
-    }
-
-    private var gridSessions: [Session] {
-        sessionsApplyingHistoryFilters(includeTierPointsVerification: false)
     }
 
     private var historyDateRangeSection: some View {
@@ -509,14 +487,14 @@ struct HistoryView: View {
         VStack(spacing: 0) {
             historyStickyFilterBubble
             historyContentTabSegment
-            if historyContentTab == .grid {
-                ScrollView {
-                    HistoryActivityGridView(sessions: gridSessions, metricMode: $historyGridMetricMode)
-                }
-                .scrollIndicators(.hidden)
-            } else {
+            if historyContentTab == .sessions {
                 sessionListContent
                     .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    HistoryActivityGridView(sessions: filteredSessions, metricMode: $historyGridMetricMode)
+                }
+                .scrollIndicators(.hidden)
             }
         }
     }
@@ -664,6 +642,11 @@ private struct HistoryToolsMenuPresentation: ViewModifier {
 struct SessionRow: View {
     let session: Session
     @EnvironmentObject var settingsStore: SettingsStore
+
+    private var isVerified: Bool {
+        session.effectiveTierPointsVerification == .verified
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
@@ -677,15 +660,13 @@ struct SessionRow: View {
                         .background(Color.orange.opacity(0.25))
                         .cornerRadius(4)
                 }
-                if session.effectiveTierPointsVerification == .unverified {
-                    Text("Unverified")
-                        .font(.caption2.bold())
-                        .foregroundColor(.yellow.opacity(0.95))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.yellow.opacity(0.18))
-                        .cornerRadius(4)
-                }
+                Text(isVerified ? "Verified" : "Unverified")
+                    .font(.caption2.bold())
+                    .foregroundColor(isVerified ? Color(red: 0.28, green: 0.92, blue: 0.48) : Color.yellow.opacity(0.95))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background((isVerified ? Color(red: 0.28, green: 0.92, blue: 0.48) : Color.yellow).opacity(0.18))
+                    .cornerRadius(4)
                 Spacer()
                 if let e = session.tierPointsEarned {
                     Text("\(e >= 0 ? "+" : "")\(e) pts")

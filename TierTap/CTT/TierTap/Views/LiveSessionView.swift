@@ -13,7 +13,7 @@ struct LiveSessionView: View {
     @State private var showUpdateStackSheet = false
     @State private var showCompSheet = false
     @State private var showCloseout = false
-    @State private var showStrategyOdds = false
+    @State private var showAbortConfirmation = false
     @State private var showPrivateNotes = false
     @State private var showMissingInfoAlert = false
     #if os(iOS)
@@ -119,15 +119,16 @@ struct LiveSessionView: View {
                                 }
                                 .accessibilityLabel("Private notes")
 
-                                Button { showStrategyOdds = true } label: {
-                                    L10nText("Info")
+                                Button { showAbortConfirmation = true } label: {
+                                    L10nText("Abort")
                                         .font(.subheadline.weight(.medium))
-                                        .foregroundColor(.green)
+                                        .foregroundColor(.red)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
                                         .background(Color(.systemGray6).opacity(0.25))
                                         .cornerRadius(10)
                                 }
+                                .accessibilityLabel("Abort session")
                             #if os(iOS)
                                 Button {
                                     liveSessionShareRef = PostCloseoutSessionRef(id: s.id)
@@ -492,10 +493,14 @@ struct LiveSessionView: View {
                     .environmentObject(authStore)
                     .environmentObject(subscriptionStore)
             }
-            .adaptiveSheet(isPresented: $showStrategyOdds) {
-                StrategyOddsSheet(gameName: s.game)
-                    .environmentObject(settingsStore)
-            }
+            .tierTapConfirmationSheet(
+                isPresented: $showAbortConfirmation,
+                title: "Abort session?",
+                message: "Permanently deletes this live session. It will not appear in history.",
+                confirmTitle: "Abort",
+                confirmIsDestructive: true,
+                onConfirm: { store.discardLiveSession() }
+            )
             .halfScreenSheet(isPresented: $showPrivateNotes) {
                 PrivateNotesSheet(
                     notes: Binding(

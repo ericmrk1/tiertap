@@ -30,6 +30,7 @@ struct HomeView: View {
     @State private var showCompSheet = false
     @State private var showAddPast = false
     @State private var showHistory = false
+    @State private var selectedSessionDetail: Session?
     @State private var showBankroll = false
     @State private var showWallet = false
     @State private var showSubscriptionPaywall = false
@@ -240,13 +241,14 @@ struct HomeView: View {
             ZStack {
                 settingsStore.primaryGradient.ignoresSafeArea()
                 VStack(spacing: store.liveSession != nil ? 16 : (stacksTapLevelUnderHero ? 12 : 24)) {
-                    if store.liveSession == nil {
+                    if store.liveSession == nil && !store.sessions.isEmpty {
                         HomeHeroMetricsSection(
                             sessions: store.sessions,
                             isLive: false,
-                            onOpenHistory: { showHistory = true }
+                            onOpenHistory: { showHistory = true },
+                            onSessionTap: { selectedSessionDetail = $0 }
                         )
-                    } else {
+                    } else if store.liveSession != nil {
                         Color.clear
                             .frame(height: 96)
                             .frame(maxWidth: .infinity)
@@ -492,6 +494,14 @@ struct HomeView: View {
                 .environmentObject(authStore)
                 .environmentObject(subscriptionStore)
         }
+        .adaptiveSheet(item: $selectedSessionDetail) { session in
+            SessionDetailView(session: session)
+                .environmentObject(store)
+                .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+        }
         .adaptiveSheet(isPresented: $showBankroll) { BankrollView().environmentObject(store).environmentObject(settingsStore) }
         .adaptiveSheet(isPresented: $showWallet) {
             TierTapWalletView()
@@ -562,6 +572,7 @@ private struct HomeHeroMetricsSection: View {
     let sessions: [Session]
     let isLive: Bool
     var onOpenHistory: () -> Void = {}
+    var onSessionTap: (Session) -> Void = { _ in }
 
     @State private var showClosingMetrics = false
     @State private var isSectionExpanded = true
@@ -584,7 +595,9 @@ private struct HomeHeroMetricsSection: View {
 
     var body: some View {
         Group {
-            if shouldShowMetrics && showClosingMetrics {
+            if !hasSessions {
+                EmptyView()
+            } else if shouldShowMetrics && showClosingMetrics {
                 collapsibleMetricsSection
             } else {
                 logoView
@@ -651,7 +664,8 @@ private struct HomeHeroMetricsSection: View {
                 HomeSessionsMetricsWidget(
                     sessions: sessions,
                     isRevealed: showClosingMetrics,
-                    onOpenHistory: onOpenHistory
+                    onOpenHistory: onOpenHistory,
+                    onSessionTap: onSessionTap
                 )
             }
         }
@@ -811,6 +825,7 @@ private struct LiveNowBrandLogo: View {
 private struct LiveNowIconActionButton: View {
     let systemImage: String
     let accessibilityLabel: String
+    var foregroundColor: Color = .green
     let action: () -> Void
 
     private var iconFont: Font {
@@ -822,7 +837,7 @@ private struct LiveNowIconActionButton: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(iconFont)
-                .foregroundColor(.green)
+                .foregroundColor(foregroundColor)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
         }
@@ -837,7 +852,7 @@ struct LiveNowCard: View {
     @EnvironmentObject var settingsStore: SettingsStore
     @EnvironmentObject var authStore: AuthStore
     @State private var elapsed: TimeInterval = 0
-    @State private var showStrategyOdds = false
+    @State private var showAbortConfirmation = false
     @State private var showPrivateNotes = false
     @State private var metricTrendReference: LiveSessionMetricSnapshot?
     @State private var displayedMetricTrends: [String: LiveSessionMetricTrend] = [:]
@@ -919,8 +934,8 @@ struct LiveNowCard: View {
                 LiveNowIconActionButton(systemImage: "note.text", accessibilityLabel: "Private notes") {
                     showPrivateNotes = true
                 }
-                LiveNowIconActionButton(systemImage: "info.circle", accessibilityLabel: "Strategy and odds") {
-                    showStrategyOdds = true
+                LiveNowIconActionButton(systemImage: "xmark.circle", accessibilityLabel: "Abort session", foregroundColor: .red) {
+                    showAbortConfirmation = true
                 }
                 LiveNowBrandLogo()
                 #if os(iOS)
@@ -955,10 +970,14 @@ struct LiveNowCard: View {
             metricTrendReference = snapshot
             displayedMetricTrends = [:]
         }
-        .adaptiveSheet(isPresented: $showStrategyOdds) {
-            StrategyOddsSheet(gameName: currentSession.game)
-                .environmentObject(settingsStore)
-        }
+        .tierTapConfirmationSheet(
+            isPresented: $showAbortConfirmation,
+            title: "Abort session?",
+            message: "Permanently deletes this live session. It will not appear in history.",
+            confirmTitle: "Abort",
+            confirmIsDestructive: true,
+            onConfirm: { store.discardLiveSession() }
+        )
         .halfScreenSheet(isPresented: $showPrivateNotes) {
             PrivateNotesSheet(
                 notes: Binding(
