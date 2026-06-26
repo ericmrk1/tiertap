@@ -559,8 +559,8 @@ struct CheckInView: View {
                                     Image(systemName: "chevron.right")
                                 }
                                 .padding(12)
-                                .background(Color(.systemGray6).opacity(0.25))
-                                .foregroundColor(.white)
+                                .background(Color.green)
+                                .foregroundColor(.black)
                                 .cornerRadius(10)
                             }
                         }

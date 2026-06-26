@@ -27,9 +27,15 @@ struct CasinoLocationPickerView: View {
     )
     @State private var nearbyCasinos: [NearbyCasino] = []
     @State private var isSearching = false
-    @State private var hasSearchedOnce = false
+    @State private var hasAutoSearchedOnce = false
     @State private var searchError: String?
     @State private var addressQuery: String = ""
+    @State private var pendingCurrentLocationSearch = false
+
+    /// ~1 km — tight enough to surface the casino you're standing in on a dense strip.
+    private let preciseSearchSpan = MKCoordinateSpan(latitudeDelta: 0.009, longitudeDelta: 0.009)
+    /// ~25 km — broader lookup when geocoding a city or ZIP.
+    private let addressSearchSpan = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
 
     var body: some View {
         NavigationStack {
@@ -58,10 +64,13 @@ struct CasinoLocationPickerView: View {
                 }
             }
             .onAppear {
-                locationManager.requestWhenInUse()
+                searchNearCurrentLocation()
             }
             .onChange(of: locationManager.lastLocation) { _ in
-                triggerSearchIfNeeded()
+                handleLocationUpdate()
+            }
+            .onChange(of: locationManager.authorizationStatus) { _ in
+                handleAuthorizationChange()
             }
         }
     }
@@ -70,11 +79,30 @@ struct CasinoLocationPickerView: View {
 
     private var mapSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Manual search by ZIP or address
-            VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center) {
                 L10nText("Search by ZIP code or address")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.9))
+                Spacer(minLength: 8)
+                Button {
+                    searchNearCurrentLocation()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "location.fill")
+                        L10nText("Current location")
+                    }
+                    .font(.caption.bold())
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(Color.green)
+                    .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal)
+
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     TextField("e.g. 89109 or 123 Main St", text: $addressQuery)
                         .textInputAutocapitalization(.never)
@@ -189,7 +217,7 @@ struct CasinoLocationPickerView: View {
                 .foregroundColor(.white)
 
             if nearbyCasinos.isEmpty {
-                if !isSearching && hasSearchedOnce {
+                if !isSearching && hasAutoSearchedOnce {
                     L10nText("No nearby casinos found. Try again closer to a property or check saved locations.")
                         .font(.caption)
                         .foregroundColor(.gray)
@@ -233,22 +261,59 @@ struct CasinoLocationPickerView: View {
         case .denied, .restricted:
             return "Location access is turned off. Enable it in Settings to see nearby casinos, or use your saved locations."
         case .notDetermined:
-            return "Grant location access to help find casinos near you, or search by ZIP/address or pick from your saved locations."
+            return "Grant location access to search casinos near you, or search by ZIP/address or pick from saved locations."
         default:
             return nil
         }
     }
 
-    private func triggerSearchIfNeeded() {
-        guard let loc = locationManager.lastLocation, !hasSearchedOnce else { return }
-        hasSearchedOnce = true
-        isSearching = true
-        searchError = nil
+    private func handleLocationUpdate() {
+        guard pendingCurrentLocationSearch, let loc = locationManager.lastLocation else { return }
+        pendingCurrentLocationSearch = false
+        applyPreciseSearch(around: loc)
+    }
 
-        let span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
-        let newRegion = MKCoordinateRegion(center: loc.coordinate, span: span)
+    private func handleAuthorizationChange() {
+        guard pendingCurrentLocationSearch else { return }
+        switch locationManager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways:
+            if let loc = locationManager.lastLocation {
+                pendingCurrentLocationSearch = false
+                applyPreciseSearch(around: loc)
+            } else {
+                locationManager.requestSingleLocationUpdate()
+            }
+        default:
+            break
+        }
+    }
+
+    private func searchNearCurrentLocation() {
+        searchError = nil
+        switch locationManager.authorizationStatus {
+        case .denied, .restricted:
+            searchError = "Location is off. Enable it in Settings to search near your current position."
+            return
+        case .notDetermined:
+            pendingCurrentLocationSearch = true
+            locationManager.requestWhenInUse()
+            return
+        default:
+            break
+        }
+        if let loc = locationManager.lastLocation {
+            applyPreciseSearch(around: loc)
+            return
+        }
+        pendingCurrentLocationSearch = true
+        locationManager.requestSingleLocationUpdate()
+    }
+
+    private func applyPreciseSearch(around location: CLLocation) {
+        hasAutoSearchedOnce = true
+        let newRegion = MKCoordinateRegion(center: location.coordinate, span: preciseSearchSpan)
         region = newRegion
-        performCasinoSearch(in: newRegion)
+        performCasinoSearch(in: newRegion, sortFrom: location.coordinate)
     }
 
     private func searchByAddressOrZip() {
@@ -272,15 +337,14 @@ struct CasinoLocationPickerView: View {
                     return
                 }
 
-                let span = MKCoordinateSpan(latitudeDelta: 0.25, longitudeDelta: 0.25)
-                let newRegion = MKCoordinateRegion(center: coordinate, span: span)
+                let newRegion = MKCoordinateRegion(center: coordinate, span: self.addressSearchSpan)
                 self.region = newRegion
-                self.performCasinoSearch(in: newRegion)
+                self.performCasinoSearch(in: newRegion, sortFrom: coordinate)
             }
         }
     }
 
-    private func performCasinoSearch(in region: MKCoordinateRegion) {
+    private func performCasinoSearch(in region: MKCoordinateRegion, sortFrom center: CLLocationCoordinate2D) {
         isSearching = true
         searchError = nil
 
@@ -300,12 +364,25 @@ struct CasinoLocationPickerView: View {
                     self.nearbyCasinos = []
                     return
                 }
-                self.nearbyCasinos = items.compactMap { item in
+                let origin = CLLocation(latitude: center.latitude, longitude: center.longitude)
+                let sortedItems = items.sorted {
+                    let a = $0.placemark.location ?? CLLocation(latitude: $0.placemark.coordinate.latitude, longitude: $0.placemark.coordinate.longitude)
+                    let b = $1.placemark.location ?? CLLocation(latitude: $1.placemark.coordinate.latitude, longitude: $1.placemark.coordinate.longitude)
+                    return origin.distance(from: a) < origin.distance(from: b)
+                }
+                self.nearbyCasinos = sortedItems.compactMap { item in
                     let placemark = item.placemark
                     let name = item.name ?? "Casino"
                     let locality = placemark.locality
                     let admin = placemark.administrativeArea
-                    let subtitle = [locality, admin].compactMap { $0 }.joined(separator: ", ")
+                    let locationLine = [locality, admin].compactMap { $0 }.joined(separator: ", ")
+                    let casinoLocation = placemark.location ?? CLLocation(
+                        latitude: placemark.coordinate.latitude,
+                        longitude: placemark.coordinate.longitude
+                    )
+                    let miles = origin.distance(from: casinoLocation) / 1609.34
+                    let distanceLine = miles < 0.1 ? "Right nearby" : String(format: "%.1f mi away", miles)
+                    let subtitle = locationLine.isEmpty ? distanceLine : "\(distanceLine) · \(locationLine)"
                     let isoCountry = placemark.isoCountryCode
 
                     var addressDict: [String: String] = [:]
