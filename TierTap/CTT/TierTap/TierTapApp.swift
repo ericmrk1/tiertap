@@ -132,6 +132,7 @@ private struct TierTapAppRoot: View {
             if newPhase == .active {
                 Task { await settingsStore.refreshRemoteAppDefaults() }
                 handlePendingWidgetDestination()
+                LiveActivityManager.shared.reconcile(liveSession: store.liveSession)
                 // Ensure watch receives a fresh bootstrap snapshot whenever iPhone foregrounds.
                 SessionSyncManager.shared.pushContext(
                     sessions: store.sessions,

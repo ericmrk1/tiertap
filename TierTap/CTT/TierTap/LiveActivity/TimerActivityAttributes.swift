@@ -16,6 +16,8 @@ struct TimerActivityAttributes: ActivityAttributes {
         var currencySymbol: String
         /// When true, live summary omits stack (slots sessions close out only).
         var isSlotsSession: Bool = false
+        /// When set, the session timer is frozen (close-out flow) instead of counting up.
+        var timerPausedAt: Date? = nil
     }
     var sessionID: String
 }

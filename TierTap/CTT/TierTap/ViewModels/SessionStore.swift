@@ -69,6 +69,7 @@ class SessionStore: ObservableObject {
         load()
         #if os(iOS)
         publishHomeWidgetSnapshot()
+        LiveActivityManager.shared.reconcile(liveSession: liveSession)
         #endif
         #endif
         #if os(iOS)
@@ -225,7 +226,6 @@ class SessionStore: ObservableObject {
         #if os(iOS) || os(watchOS)
         SessionReminderScheduler.shared.refresh(liveSession: nil)
         #endif
-        LiveActivityManager.shared.end()
         pushContext()
         return watchConnectivityReply(extras: ["stoppedSessionId": sessionId.uuidString])
     }
@@ -263,6 +263,9 @@ class SessionStore: ObservableObject {
         s.isLive = false
         sessions[idx] = s
         saveSessions()
+        #if os(iOS)
+        LiveActivityManager.shared.end()
+        #endif
         pushContext()
         return [:]
     }
@@ -327,6 +330,9 @@ class SessionStore: ObservableObject {
 
     private func pushContext() {
         #if os(iOS)
+        if liveSession == nil {
+            LiveActivityManager.shared.end()
+        }
         SessionSyncManager.shared.pushContext(sessions: sessions, liveSession: liveSession)
         #endif
     }
@@ -651,7 +657,6 @@ class SessionStore: ObservableObject {
         SessionReminderScheduler.shared.refresh(liveSession: liveSession)
         #endif
         #if os(iOS)
-        LiveActivityManager.shared.end()
         pushContext()
         if presentPostCloseoutSharePrompt {
             schedulePostCloseoutSharePrompt(sessionId: s.id)
@@ -793,7 +798,6 @@ class SessionStore: ObservableObject {
         SessionReminderScheduler.shared.refresh(liveSession: liveSession)
         #endif
         #if os(iOS)
-        LiveActivityManager.shared.end()
         pushContext()
         #endif
     }
@@ -1105,7 +1109,6 @@ class SessionStore: ObservableObject {
         SessionReminderScheduler.shared.refresh(liveSession: liveSession)
         #endif
         #if os(iOS)
-        LiveActivityManager.shared.end()
         pushContext()
         #endif
     }
@@ -1317,6 +1320,7 @@ class SessionStore: ObservableObject {
         defaults.removeObject(forKey: liveKey)
         #if os(iOS)
         publishHomeWidgetSnapshot()
+        LiveActivityManager.shared.end()
         #endif
         reloadTierTapComplicationTimelines()
     }

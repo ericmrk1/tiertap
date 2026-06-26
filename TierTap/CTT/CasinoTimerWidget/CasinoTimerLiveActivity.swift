@@ -3,6 +3,42 @@ import WidgetKit
 import SwiftUI
 import Foundation
 
+private struct LiveActivityElapsedTimerText: View {
+    let startTime: Date
+    var pausedAt: Date? = nil
+    let font: Font
+    var foregroundColor: Color = .green
+
+    private var elapsed: TimeInterval {
+        let end = pausedAt ?? Date()
+        return max(0, end.timeIntervalSince(startTime))
+    }
+
+    private var elapsedLabel: String {
+        let total = Int(elapsed.rounded(.down))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        }
+        return String(format: "%d:%02d", minutes, seconds)
+    }
+
+    var body: some View {
+        Group {
+            if pausedAt != nil {
+                Text(elapsedLabel)
+            } else {
+                Text(startTime, style: .timer)
+            }
+        }
+        .font(font)
+        .foregroundColor(foregroundColor)
+        .monospacedDigit()
+    }
+}
+
 struct CasinoTimerLiveActivity: Widget {
     private func shortCode(_ value: String) -> String {
         let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -25,12 +61,13 @@ struct CasinoTimerLiveActivity: Widget {
                                 .foregroundColor(.red)
                         }
                         Spacer(minLength: 4)
-                        Text(context.state.startTime, style: .timer)
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
-                            .foregroundColor(.green)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        LiveActivityElapsedTimerText(
+                            startTime: context.state.startTime,
+                            pausedAt: context.state.timerPausedAt,
+                            font: .system(size: 14, weight: .bold, design: .monospaced)
+                        )
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     }
                     LiveSessionSummaryGrid(
                         metrics: context.state.summaryMetrics,
@@ -65,9 +102,11 @@ struct CasinoTimerLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     VStack(alignment: .trailing, spacing: 3) {
-                        Text(context.state.startTime, style: .timer)
-                            .font(.system(.caption, design: .monospaced).bold())
-                            .foregroundColor(.green)
+                        LiveActivityElapsedTimerText(
+                            startTime: context.state.startTime,
+                            pausedAt: context.state.timerPausedAt,
+                            font: .system(.caption, design: .monospaced).bold()
+                        )
                         Text("In $\(context.state.totalBuyIn.formatted(.number.grouping(.automatic)))")
                             .font(.caption2).foregroundColor(.gray)
                     }
@@ -84,11 +123,12 @@ struct CasinoTimerLiveActivity: Widget {
                     .font(.system(.caption2, design: .rounded).bold())
                     .foregroundColor(.green)
             } compactTrailing: {
-                Text(context.state.startTime, style: .timer)
-                    .font(.system(.caption2, design: .monospaced))
-                    .foregroundColor(.green)
-                    .monospacedDigit()
-                    .frame(width: 44)
+                LiveActivityElapsedTimerText(
+                    startTime: context.state.startTime,
+                    pausedAt: context.state.timerPausedAt,
+                    font: .system(.caption2, design: .monospaced)
+                )
+                .frame(width: 44)
             } minimal: {
                 Text(shortCode(context.state.game))
                     .font(.system(.caption2, design: .rounded).bold())
