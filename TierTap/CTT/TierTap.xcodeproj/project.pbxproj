@@ -67,6 +67,7 @@
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
 		WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */; };
+		WGTRSS2B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */; };
 		WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */; };
 		WGTSNP2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
 		WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
@@ -196,6 +197,7 @@
 		12AACDC5094128715EAA64A9 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
 		225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerLiveActivity.swift; sourceTree = "<group>"; };
 		WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapHomeWidget.swift; sourceTree = "<group>"; };
+		WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapRecentSessionsWidget.swift; sourceTree = "<group>"; };
 		WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetIntents.swift; sourceTree = "<group>"; };
 		WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshot.swift; sourceTree = "<group>"; };
 		WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshotBuilder.swift; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 				E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */,
 				225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */,
 				WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */,
+				WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */,
 				WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */,
 				4E7914876B5DF969011894CE /* Assets.xcassets */,
 				3033F08B21E05E979C40C043 /* Info.plist */,
@@ -865,6 +868,7 @@
 				4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */,
 				E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */,
 				WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */,
+				WGTRSS2B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift in Sources */,
 				WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */,
 				WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */,
 			);

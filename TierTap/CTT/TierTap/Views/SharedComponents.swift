@@ -1005,25 +1005,10 @@ private enum StartingTierAuxSheet: String, Identifiable {
     var id: String { rawValue }
 }
 
-/// Numeric pad (digits only). ~60% screen height; keys aligned toward the bottom. `navigationTitle` is the English source for localization.
-struct NumericDialPadSheet: View {
-    @Binding var value: String
-    let navigationTitle: String
-    /// When true, the large preview uses locale-aware thousands grouping (e.g. 1,234).
-    var formatPreviewWithGrouping: Bool = false
-    @EnvironmentObject var settingsStore: SettingsStore
-    @Environment(\.dismiss) var dismiss
-    @State private var digits: String = ""
-
-    private let maxDigits = 12
-
-    private var previewText: String {
-        let digitRun = digits.isEmpty ? "0" : digits
-        if formatPreviewWithGrouping, let n = Int(digitRun) {
-            return n.formatted(.number.grouping(.automatic))
-        }
-        return digitRun
-    }
+/// Shared on-screen digit grid for currency and other numeric entry.
+struct NumericKeypadGrid: View {
+    @Binding var digits: String
+    var maxDigits: Int = 12
 
     private func appendDigit(_ d: String) {
         guard d.count == 1, d.first?.isNumber == true else { return }
@@ -1037,15 +1022,6 @@ struct NumericDialPadSheet: View {
 
     private func clearAll() {
         digits = ""
-    }
-
-    private func applyValueAndDismiss() {
-        if digits.isEmpty {
-            value = ""
-        } else if let n = Int(digits) {
-            value = "\(n)"
-        }
-        dismiss()
     }
 
     private func dialButton(_ title: String) -> some View {
@@ -1062,7 +1038,7 @@ struct NumericDialPadSheet: View {
         }
     }
 
-    private var keypadRows: some View {
+    var body: some View {
         VStack(spacing: 12) {
             ForEach([[1, 2, 3], [4, 5, 6], [7, 8, 9]], id: \.self) { row in
                 HStack(spacing: 12) {
@@ -1094,6 +1070,34 @@ struct NumericDialPadSheet: View {
             }
         }
     }
+}
+
+/// Numeric pad (digits only). ~60% screen height; keys aligned toward the bottom. `navigationTitle` is the English source for localization.
+struct NumericDialPadSheet: View {
+    @Binding var value: String
+    let navigationTitle: String
+    /// When true, the large preview uses locale-aware thousands grouping (e.g. 1,234).
+    var formatPreviewWithGrouping: Bool = false
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+    @State private var digits: String = ""
+
+    private var previewText: String {
+        let digitRun = digits.isEmpty ? "0" : digits
+        if formatPreviewWithGrouping, let n = Int(digitRun) {
+            return n.formatted(.number.grouping(.automatic))
+        }
+        return digitRun
+    }
+
+    private func applyValueAndDismiss() {
+        if digits.isEmpty {
+            value = ""
+        } else if let n = Int(digits) {
+            value = "\(n)"
+        }
+        dismiss()
+    }
 
     @ViewBuilder
     private var navigationContent: some View {
@@ -1110,7 +1114,7 @@ struct NumericDialPadSheet: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 8)
 
-                    keypadRows
+                    NumericKeypadGrid(digits: $digits)
                 }
                 .padding()
             }
@@ -1139,6 +1143,101 @@ struct NumericDialPadSheet: View {
         navigationContent
             .presentationDetents([.fraction(0.6)])
             .presentationDragIndicator(.visible)
+    }
+}
+
+/// Fast close-out: enter total cash-out on a bottom sheet, then save as an unverified session.
+struct FastCloseOutCashSheet: View {
+    let defaultCashOut: Int
+    let totalBuyIn: Int
+    let onCloseOut: (Int) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var digits: String = ""
+
+    private var parsedCashOut: Int? {
+        if digits.isEmpty { return 0 }
+        return Int(digits)
+    }
+
+    private var previewAmount: Int {
+        parsedCashOut ?? defaultCashOut
+    }
+
+    private var previewColor: Color {
+        previewAmount > 0 ? .green : .red
+    }
+
+    private var previewWinLoss: Int {
+        previewAmount - totalBuyIn
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 16) {
+                    Spacer(minLength: 0)
+                    Text("\(settingsStore.currencySymbol)\(previewAmount.formatted(.number.grouping(.automatic)))")
+                        .font(.system(size: 40, weight: .semibold, design: .rounded))
+                        .foregroundColor(previewColor)
+                        .minimumScaleFactor(0.35)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 8)
+
+                    HStack(spacing: 16) {
+                        VStack(spacing: 2) {
+                            L10nText("Buy-in").font(.caption2).foregroundColor(.gray)
+                            Text("\(settingsStore.currencySymbol)\(totalBuyIn.formatted(.number.grouping(.automatic)))")
+                                .font(.caption.bold())
+                                .foregroundColor(.white)
+                        }
+                        VStack(spacing: 2) {
+                            L10nText("W/L").font(.caption2).foregroundColor(.gray)
+                            Text(previewWinLoss >= 0
+                                 ? "+\(settingsStore.currencySymbol)\(previewWinLoss.formatted(.number.grouping(.automatic)))"
+                                 : "-\(settingsStore.currencySymbol)\(abs(previewWinLoss).formatted(.number.grouping(.automatic)))")
+                                .font(.caption.bold())
+                                .foregroundColor(previewWinLoss >= 0 ? .green : .red)
+                        }
+                    }
+
+                    NumericKeypadGrid(digits: $digits)
+
+                    Button {
+                        guard let cashOut = parsedCashOut else { return }
+                        onCloseOut(max(0, cashOut))
+                        dismiss()
+                    } label: {
+                        LocalizedLabel(title: "Close Out", systemImage: "bolt.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(parsedCashOut != nil ? Color.green : Color.gray)
+                            .foregroundColor(parsedCashOut != nil ? .black : .white)
+                            .cornerRadius(14)
+                    }
+                    .disabled(parsedCashOut == nil)
+                }
+                .padding()
+            }
+            .localizedNavigationTitle("Total Cash Out")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.foregroundColor(.green)
+                }
+            }
+            .onAppear {
+                digits = "\(max(0, defaultCashOut))"
+            }
+        }
+        .presentationDetents([.fraction(0.68)])
+        .presentationDragIndicator(.visible)
     }
 }
 

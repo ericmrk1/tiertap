@@ -70,7 +70,12 @@ enum TierTapHomeWidgetPreviewData {
         tapLevelProgress: 0.64,
         lastPlayedLabel: "Bellagio · 2d ago",
         recentDayNets: [0, -80, 120, 0, 40, 160, 0, 0, 200, 0, 60, 0, 80, 240],
-        cumulativeOutcomes: [-120, 80, 240, 180, 420, 380, 520, 610, 720, 840]
+        cumulativeOutcomes: [-120, 80, 240, 180, 420, 380, 520, 610, 720, 840],
+        recentSessions: [
+            .init(id: UUID().uuidString, casino: "Bellagio", game: "Blackjack", timeLabel: "2:30 PM", winLossText: "+$420", tierPointsText: "+180 pts", isVerified: true),
+            .init(id: UUID().uuidString, casino: "Aria", game: "Slots", timeLabel: "Jun 24", winLossText: "-$120", tierPointsText: "+45 pts", isVerified: false),
+            .init(id: UUID().uuidString, casino: "Wynn", game: "Craps", timeLabel: "Jun 22", winLossText: "+$860", tierPointsText: "+220 pts", isVerified: true)
+        ]
     )
 }
 
@@ -976,7 +981,7 @@ private struct TierTapWidgetSparkline: View {
 
 // MARK: - Background
 
-private struct TierTapWidgetBackground: View {
+struct TierTapWidgetBackground: View {
     let snapshot: TierTapHomeWidgetSnapshot
 
     var body: some View {
@@ -992,7 +997,7 @@ private struct TierTapWidgetBackground: View {
     }
 }
 
-private struct TierTapWidgetContainerModifier: ViewModifier {
+struct TierTapWidgetContainerModifier: ViewModifier {
     let snapshot: TierTapHomeWidgetSnapshot
 
     func body(content: Content) -> some View {
@@ -1006,7 +1011,7 @@ private struct TierTapWidgetContainerModifier: ViewModifier {
     }
 }
 
-private extension View {
+extension View {
     func tierTapWidgetContainer(snapshot: TierTapHomeWidgetSnapshot) -> some View {
         modifier(TierTapWidgetContainerModifier(snapshot: snapshot))
     }
@@ -1018,6 +1023,10 @@ enum TierTapWidgetDeepLink {
     static let analytics = URL(string: "com.app.tiertap://analytics")!
     static let history = URL(string: "com.app.tiertap://sessions/history")!
     static let live = URL(string: "com.app.tiertap://sessions/live")!
+
+    static func sessionDetail(_ sessionID: String) -> URL {
+        URL(string: "com.app.tiertap://sessions/detail/\(sessionID)")!
+    }
 
     static func forMetric(_ metricId: String, isLive: Bool) -> URL {
         switch metricId {

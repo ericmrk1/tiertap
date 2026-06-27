@@ -114,6 +114,8 @@ struct TierTapHomeWidgetSnapshot: Codable, Equatable {
     let lastPlayedLabel: String?
     let recentDayNets: [Int]
     let cumulativeOutcomes: [Int]
+    /// Recent closed sessions for the sessions ticker widget (newest first).
+    let recentSessions: [TierTapWidgetRecentSession]?
 
     func metric(for kind: TierTapWidgetMetricKind) -> Metric? {
         if kind == .session {
@@ -136,6 +138,17 @@ struct TierTapHomeWidgetSnapshot: Codable, Equatable {
     func standardDisplayMetrics() -> [Metric] {
         layoutConfig.standardMetrics.compactMap { metric(for: $0) }
     }
+}
+
+/// Compact session row for the recent-sessions home screen widget.
+struct TierTapWidgetRecentSession: Codable, Equatable, Identifiable {
+    let id: String
+    let casino: String
+    let game: String
+    let timeLabel: String
+    let winLossText: String?
+    let tierPointsText: String?
+    let isVerified: Bool
 }
 
 enum TierTapWidgetIntentRouter {
@@ -168,6 +181,31 @@ enum TierTapWidgetIntentRouter {
     static func consumePendingDestination() -> Destination? {
         guard let pending = destination else { return nil }
         destination = nil
+        return pending
+    }
+}
+
+enum TierTapWidgetSessionDetailRouter {
+    private static let key = "ctt_widget_pending_session_detail"
+
+    static var pendingSessionID: UUID? {
+        get {
+            guard let raw = UserDefaults(suiteName: TierTapWidgetSnapshotStore.appGroupSuiteName)?.string(forKey: key) else { return nil }
+            return UUID(uuidString: raw)
+        }
+        set {
+            let defaults = UserDefaults(suiteName: TierTapWidgetSnapshotStore.appGroupSuiteName)
+            if let newValue {
+                defaults?.set(newValue.uuidString, forKey: key)
+            } else {
+                defaults?.removeObject(forKey: key)
+            }
+        }
+    }
+
+    static func consumePendingSessionID() -> UUID? {
+        guard let pending = pendingSessionID else { return nil }
+        pendingSessionID = nil
         return pending
     }
 }

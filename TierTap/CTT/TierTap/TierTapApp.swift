@@ -132,6 +132,7 @@ private struct TierTapAppRoot: View {
             if newPhase == .active {
                 Task { await settingsStore.refreshRemoteAppDefaults() }
                 handlePendingWidgetDestination()
+                handlePendingSessionDetailFromWidget()
                 LiveActivityManager.shared.reconcile(liveSession: store.liveSession)
                 // Ensure watch receives a fresh bootstrap snapshot whenever iPhone foregrounds.
                 SessionSyncManager.shared.pushContext(
@@ -154,6 +155,7 @@ private struct TierTapAppRoot: View {
         }
         .onAppear {
             handlePendingWidgetDestination()
+            handlePendingSessionDetailFromWidget()
         }
         .adaptiveSheet(isPresented: $showWelcome) {
             CommunityAuthSheet(
@@ -212,6 +214,17 @@ private struct TierTapAppRoot: View {
             return
         }
         if host == "sessions" {
+            if path.hasPrefix("detail/") {
+                let idString = String(path.dropFirst("detail/".count))
+                if let uuid = UUID(uuidString: idString) {
+                    TierTapWidgetSessionDetailRouter.pendingSessionID = uuid
+                    postWidgetNavigation(.home)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        handlePendingSessionDetailFromWidget()
+                    }
+                    return
+                }
+            }
             switch path {
             case "checkin":
                 postWidgetNavigation(.checkIn)
@@ -236,6 +249,16 @@ private struct TierTapAppRoot: View {
         case .history: postWidgetNavigation(.history)
         case .bankroll: postWidgetNavigation(.bankroll)
         case .home: postWidgetNavigation(.home)
+        }
+    }
+
+    private func handlePendingSessionDetailFromWidget() {
+        guard let sessionID = TierTapWidgetSessionDetailRouter.consumePendingSessionID() else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            NotificationCenter.default.post(
+                name: NSNotification.Name("OpenSessionDetailFromDeepLink"),
+                object: sessionID
+            )
         }
     }
 

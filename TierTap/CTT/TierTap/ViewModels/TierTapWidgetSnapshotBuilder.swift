@@ -3,6 +3,7 @@ import Foundation
 enum TierTapWidgetSnapshotBuilder {
     private static let chartPointLimit = 14
     private static let heatStripDays = 14
+    private static let recentSessionsLimit = 8
 
     static func build(
         sessions: [Session],
@@ -195,6 +196,11 @@ enum TierTapWidgetSnapshotBuilder {
             useExpectedValue: useExpectedValue,
             limit: 24
         )
+        let recentSessions = buildRecentSessions(
+            sessions: sessions,
+            currencySymbol: currencySymbol,
+            limit: recentSessionsLimit
+        )
 
         return TierTapHomeWidgetSnapshot(
             updatedAt: Date(),
@@ -218,8 +224,57 @@ enum TierTapWidgetSnapshotBuilder {
             tapLevelProgress: tap.progressToNext,
             lastPlayedLabel: isLive ? nil : lastClosed.map { relativeLastPlayed(casino: $0.casino, date: $0.startTime) },
             recentDayNets: recentDayNets,
-            cumulativeOutcomes: cumulativeOutcomes
+            cumulativeOutcomes: cumulativeOutcomes,
+            recentSessions: recentSessions
         )
+    }
+
+    private static func buildRecentSessions(
+        sessions: [Session],
+        currencySymbol: String,
+        limit: Int
+    ) -> [TierTapWidgetRecentSession] {
+        let calendar = Calendar.current
+        return sessions
+            .sorted { $0.startTime > $1.startTime }
+            .prefix(limit)
+            .map { session in
+                let timeLabel: String
+                if calendar.isDateInToday(session.startTime) {
+                    timeLabel = session.startTime.formatted(date: .omitted, time: .shortened)
+                } else {
+                    timeLabel = session.startTime.formatted(date: .abbreviated, time: .omitted)
+                }
+
+                let winLossText: String?
+                if let wl = session.winLoss {
+                    winLossText = wl >= 0
+                        ? "+\(currencySymbol)\(wl.formatted(.number.grouping(.automatic)))"
+                        : "-\(currencySymbol)\(abs(wl).formatted(.number.grouping(.automatic)))"
+                } else {
+                    winLossText = nil
+                }
+
+                let tierPointsText: String?
+                if let earned = session.tierPointsEarned {
+                    tierPointsText = "\(earned >= 0 ? "+" : "")\(earned.formatted(.number.grouping(.automatic))) pts"
+                } else {
+                    tierPointsText = nil
+                }
+
+                let casino = session.casino.trimmingCharacters(in: .whitespacesAndNewlines)
+                let game = session.game.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                return TierTapWidgetRecentSession(
+                    id: session.id.uuidString,
+                    casino: casino.isEmpty ? "Session" : casino,
+                    game: game.isEmpty ? "—" : game,
+                    timeLabel: timeLabel,
+                    winLossText: winLossText,
+                    tierPointsText: tierPointsText,
+                    isVerified: session.effectiveTierPointsVerification == .verified
+                )
+            }
     }
 
     private static func unavailableMetric(title: String, metricId: String) -> TierTapHomeWidgetSnapshot.Metric {

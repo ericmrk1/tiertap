@@ -16,6 +16,7 @@ struct LiveSessionView: View {
     @State private var showAbortConfirmation = false
     @State private var showPrivateNotes = false
     @State private var showMissingInfoAlert = false
+    @State private var showFastCloseOutSheet = false
     #if os(iOS)
     @State private var liveSessionShareRef: PostCloseoutSessionRef?
     @State private var showSessionPhotos = false
@@ -44,6 +45,20 @@ struct LiveSessionView: View {
     var s: Session { store.liveSession ?? Session(game: "", casino: "", startTime: Date(), startingTierPoints: 0) }
 
     private var isSlotsSession: Bool { s.isSlotsSession }
+
+    private func defaultFastCloseoutCashOut(for live: Session) -> Int {
+        if live.isSlotsSession {
+            return live.totalBuyIn
+        }
+        return live.liveTrackedStackAmount ?? live.totalStackBaseline
+    }
+
+    private func completeFastCloseOut(cashOut: Int) {
+        if let live = store.liveSession {
+            settingsStore.recordLastPlayedGameChoices(from: live)
+        }
+        store.fastCloseSessionWithDefaultsUnverified(cashOutOverride: cashOut)
+    }
 
     var body: some View {
         NavigationStack {
@@ -329,10 +344,7 @@ struct LiveSessionView: View {
                                 if hasMissingInfo {
                                     showMissingInfoAlert = true
                                 } else {
-                                    if let live = store.liveSession {
-                                        settingsStore.recordLastPlayedGameChoices(from: live)
-                                    }
-                                    store.fastCloseSessionWithDefaultsUnverified()
+                                    showFastCloseOutSheet = true
                                 }
                             } label: {
                                 Group {
@@ -492,6 +504,16 @@ struct LiveSessionView: View {
                     .environmentObject(rewardWalletStore)
                     .environmentObject(authStore)
                     .environmentObject(subscriptionStore)
+            }
+            .adaptiveSheet(isPresented: $showFastCloseOutSheet) {
+                if let live = store.liveSession {
+                    FastCloseOutCashSheet(
+                        defaultCashOut: defaultFastCloseoutCashOut(for: live),
+                        totalBuyIn: live.totalBuyIn,
+                        onCloseOut: { completeFastCloseOut(cashOut: $0) }
+                    )
+                    .environmentObject(settingsStore)
+                }
             }
             .tierTapConfirmationSheet(
                 isPresented: $showAbortConfirmation,

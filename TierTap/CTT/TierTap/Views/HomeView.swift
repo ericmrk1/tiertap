@@ -37,6 +37,7 @@ struct HomeView: View {
     @State private var showSessionReminderSettings = false
     @State private var showLevelUpCelebration = false
     @State private var showMissingInfoAlert = false
+    @State private var showFastCloseOutSheet = false
     @State private var levelUpReached: TapLevel?
     /// In-memory last computed level; popup only when level increases from this (not on first load).
     @State private var lastComputedLevel: Int?
@@ -68,15 +69,26 @@ struct HomeView: View {
 
     private var hasMissingInfo: Bool { !missingInfoFields.isEmpty }
 
+    private func defaultFastCloseoutCashOut(for live: Session) -> Int {
+        if live.isSlotsSession {
+            return live.totalBuyIn
+        }
+        return live.liveTrackedStackAmount ?? live.totalStackBaseline
+    }
+
     private func performFastCloseOut() {
         if hasMissingInfo {
             showMissingInfoAlert = true
             return
         }
+        showFastCloseOutSheet = true
+    }
+
+    private func completeFastCloseOut(cashOut: Int) {
         if let live = store.liveSession {
             settingsStore.recordLastPlayedGameChoices(from: live)
         }
-        store.fastCloseSessionWithDefaultsUnverified()
+        store.fastCloseSessionWithDefaultsUnverified(cashOutOverride: cashOut)
     }
 
     @ViewBuilder
@@ -456,6 +468,16 @@ struct HomeView: View {
                 .environment(\.appLanguage, settingsStore.appLanguage)
             }
         }
+        .adaptiveSheet(isPresented: $showFastCloseOutSheet) {
+            if let live = store.liveSession {
+                FastCloseOutCashSheet(
+                    defaultCashOut: defaultFastCloseoutCashOut(for: live),
+                    totalBuyIn: live.totalBuyIn,
+                    onCloseOut: { completeFastCloseOut(cashOut: $0) }
+                )
+                .environmentObject(settingsStore)
+            }
+        }
         .adaptiveSheet(isPresented: $showCompSheet) {
             CompQuickAddSheet(
                 existingSessionCompTotal: store.liveSession?.totalComp ?? 0,
@@ -534,6 +556,11 @@ struct HomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenHistoryFromDeepLink"))) { _ in
             showHistory = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenSessionDetailFromDeepLink"))) { notification in
+            guard let sessionID = notification.object as? UUID,
+                  let session = store.sessions.first(where: { $0.id == sessionID }) else { return }
+            selectedSessionDetail = session
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OpenBankrollFromDeepLink"))) { _ in
             showBankroll = true

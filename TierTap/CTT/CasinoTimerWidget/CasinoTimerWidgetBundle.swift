@@ -7,5 +7,6 @@ struct CasinoTimerWidgetBundle: WidgetBundle {
         CasinoTimerLiveActivity()
         TierTapWatchComplicationWidget()
         TierTapHomeWidget()
+        TierTapRecentSessionsWidget()
     }
 }

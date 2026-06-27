@@ -22,7 +22,7 @@ struct HomeSessionsMetricsWidget: View {
 
     var body: some View {
         TabView(selection: $selectedPage) {
-            HomeRecentSessionsStripView(sessions: sessions, onSessionTap: onSessionTap)
+            HomeRecentSessionsStripView(onSessionTap: onSessionTap)
                 .tag(HomeSessionsMetricsPage.recent)
 
             HomeSessionsCompactGridView(sessions: sessions, onTap: onOpenHistory)
@@ -92,47 +92,37 @@ private struct HomeSessionsMetricsPageIndicator: View {
 
 /// Horizontally scrollable recent-session tiles for the home hero.
 private struct HomeRecentSessionsStripView: View {
-    let sessions: [Session]
     var onSessionTap: (Session) -> Void = { _ in }
 
+    @EnvironmentObject private var store: SessionStore
     @State private var autoScrollEnabled = false
-    @State private var scrollOffset: CGFloat = 0
 
     private let maxTiles = 20
     private let cardTileWidth: CGFloat = 148
     private let tickerTileWidth: CGFloat = 168
     private let tileSpacing: CGFloat = 10
     private let carouselHeight: CGFloat = 148
-    /// Slow, steady ticker drift (points per second).
-    private let tickerPointsPerSecond: CGFloat = 22
-
-    private let tickerTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
 
     private var recentSessions: [Session] {
-        sessions
+        store.sessions
             .sorted { $0.startTime > $1.startTime }
             .prefix(maxTiles)
             .map { $0 }
     }
 
-    private var activeTileWidth: CGFloat {
-        autoScrollEnabled ? tickerTileWidth : cardTileWidth
-    }
-
-    private var carouselLoopWidth: CGFloat {
-        let count = CGFloat(recentSessions.count)
-        guard count > 0 else { return 0 }
-        return count * activeTileWidth + max(0, count - 1) * tileSpacing
-    }
-
-    private var carouselItems: [HomeCarouselSessionItem] {
-        let base = recentSessions
-        guard !base.isEmpty else { return [] }
-        let repeatCount = base.count <= 3 ? 3 : 2
-        let duplicated = Array(repeating: base, count: repeatCount).flatMap { $0 }
-        return duplicated.enumerated().map { index, session in
-            HomeCarouselSessionItem(id: "\(session.id.uuidString)-\(index)", session: session, index: index)
-        }
+    /// Changes when sessions are added, deleted, or edited so the ticker rebuilds instead of showing stale tiles.
+    private var sessionsRevision: String {
+        recentSessions.map { session in
+            [
+                session.id.uuidString,
+                String(session.startTime.timeIntervalSince1970),
+                session.casino,
+                session.game,
+                String(session.winLoss ?? 0),
+                String(session.tierPointsEarned ?? 0),
+                session.effectiveTierPointsVerification.rawValue
+            ].joined(separator: ";")
+        }.joined(separator: "|")
     }
 
     var body: some View {
@@ -144,7 +134,15 @@ private struct HomeRecentSessionsStripView: View {
                         .foregroundColor(.white.opacity(0.6))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if autoScrollEnabled {
-                    sessionTicker
+                    HomeSessionTickerStrip(
+                        sessions: recentSessions,
+                        sessionsRevision: sessionsRevision,
+                        tileWidth: tickerTileWidth,
+                        tileHeight: carouselHeight,
+                        tileSpacing: tileSpacing,
+                        onSessionTap: onSessionTap
+                    )
+                    .id(sessionsRevision)
                 } else {
                     manualSessionsScroll
                 }
@@ -153,32 +151,17 @@ private struct HomeRecentSessionsStripView: View {
 
             if !recentSessions.isEmpty {
                 Toggle(isOn: $autoScrollEnabled) {
-                    Text("Session ticker")
+                    Text("")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.85))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .green))
+                .scaleEffect(0.8, anchor: .trailing)
+                .frame(maxWidth: .infinity, minHeight: 16, maxHeight: 16, alignment: .trailing)
                 .padding(.horizontal, 2)
             }
         }
         .padding(.bottom, 6)
-        .onReceive(tickerTimer) { _ in
-            guard autoScrollEnabled else { return }
-            let loopWidth = carouselLoopWidth
-            guard loopWidth > 0 else { return }
-            scrollOffset -= tickerPointsPerSecond / 60.0
-            if scrollOffset <= -loopWidth {
-                scrollOffset += loopWidth
-            }
-        }
-        .onChange(of: autoScrollEnabled) { enabled in
-            if !enabled {
-                scrollOffset = 0
-            }
-        }
-        .onChange(of: recentSessions.map(\.id)) { _ in
-            scrollOffset = 0
-        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Recent sessions")
         .accessibilityHint(autoScrollEnabled ? "Session ticker is scrolling. Opens session details." : "Swipe for more sessions. Opens session details.")
@@ -188,26 +171,58 @@ private struct HomeRecentSessionsStripView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: tileSpacing) {
                 ForEach(recentSessions) { session in
-                    HomeRecentSessionTile(session: session, style: .card)
+                    HomeRecentSessionTile(sessionID: session.id, style: .card)
                         .frame(width: cardTileWidth, height: carouselHeight)
-                        .onTapGesture { onSessionTap(session) }
+                        .onTapGesture {
+                            if let current = store.sessions.first(where: { $0.id == session.id }) {
+                                onSessionTap(current)
+                            }
+                        }
                 }
             }
             .padding(.horizontal, 2)
         }
     }
+}
 
-    private var sessionTicker: some View {
+/// Auto-scrolling ticker — one tile per session (no duplicated strip) so deleted sessions cannot linger off-screen.
+private struct HomeSessionTickerStrip: View {
+    let sessions: [Session]
+    let sessionsRevision: String
+    let tileWidth: CGFloat
+    let tileHeight: CGFloat
+    let tileSpacing: CGFloat
+    var onSessionTap: (Session) -> Void = { _ in }
+
+    @EnvironmentObject private var store: SessionStore
+    @State private var scrollOffset: CGFloat = 0
+
+    private let pointsPerSecond: CGFloat = 22
+    private let tickerTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
+
+    private var liveSessions: [Session] {
+        let validIDs = Set(store.sessions.map(\.id))
+        return sessions.filter { validIDs.contains($0.id) }
+    }
+
+    private var loopWidth: CGFloat {
+        let count = CGFloat(liveSessions.count)
+        guard count > 0 else { return 0 }
+        return count * tileWidth + max(0, count - 1) * tileSpacing
+    }
+
+    var body: some View {
         GeometryReader { geo in
             HStack(spacing: tileSpacing) {
-                ForEach(carouselItems) { item in
-                    HomeRecentSessionTile(
-                        session: item.session,
-                        style: .ticker,
-                        animationSeed: Double(item.index % max(recentSessions.count, 1)) * 0.42
-                    )
-                    .frame(width: tickerTileWidth, height: geo.size.height)
-                    .onTapGesture { onSessionTap(item.session) }
+                ForEach(liveSessions) { session in
+                    HomeRecentSessionTile(sessionID: session.id, style: .ticker)
+                        .frame(width: tileWidth, height: geo.size.height)
+                        .id("\(session.id.uuidString)-\(sessionsRevision)")
+                        .onTapGesture {
+                            if let current = store.sessions.first(where: { $0.id == session.id }) {
+                                onSessionTap(current)
+                            }
+                        }
                 }
             }
             .offset(x: scrollOffset)
@@ -237,13 +252,21 @@ private struct HomeRecentSessionsStripView: View {
                 .padding(.vertical, 10)
         }
         .clipped()
+        .onReceive(tickerTimer) { _ in
+            let width = loopWidth
+            guard width > 0, liveSessions.count > 1 else { return }
+            scrollOffset -= pointsPerSecond / 60.0
+            if scrollOffset <= -width {
+                scrollOffset = 0
+            }
+        }
+        .onChange(of: sessionsRevision) { _ in
+            scrollOffset = 0
+        }
+        .onAppear {
+            scrollOffset = 0
+        }
     }
-}
-
-private struct HomeCarouselSessionItem: Identifiable {
-    let id: String
-    let session: Session
-    let index: Int
 }
 
 private enum HomeSessionTileStyle {
@@ -288,94 +311,123 @@ private struct HomeTickerPopMetric: View {
 }
 
 private struct HomeRecentSessionTile: View {
-    let session: Session
+    let sessionID: UUID
     var style: HomeSessionTileStyle = .card
     var animationSeed: Double = 0
 
+    @EnvironmentObject private var store: SessionStore
     @EnvironmentObject private var settingsStore: SettingsStore
 
+    private var session: Session? {
+        store.sessions.first(where: { $0.id == sessionID })
+    }
+
     private var verificationLabel: String {
-        session.effectiveTierPointsVerification == .verified ? "Verified" : "Unverified"
+        guard let session else { return "" }
+        return session.effectiveTierPointsVerification == .verified ? "Verified" : "Unverified"
     }
 
     private var verificationForeground: Color {
-        session.effectiveTierPointsVerification == .verified
+        guard let session else { return .white.opacity(0.45) }
+        return session.effectiveTierPointsVerification == .verified
             ? Color(red: 0.28, green: 0.92, blue: 0.48)
             : Color.yellow.opacity(0.95)
     }
 
     private var verificationBackground: Color {
-        session.effectiveTierPointsVerification == .verified
+        guard let session else { return .clear }
+        return session.effectiveTierPointsVerification == .verified
             ? Color(red: 0.28, green: 0.92, blue: 0.48).opacity(0.18)
             : Color.yellow.opacity(0.18)
     }
 
     private var winLossText: String? {
-        guard let wl = session.winLoss else { return nil }
+        guard let session, let wl = session.winLoss else { return nil }
         return wl >= 0
             ? "+\(settingsStore.currencySymbol)\(wl.formatted(.number.grouping(.automatic)))"
             : "-\(settingsStore.currencySymbol)\(abs(wl).formatted(.number.grouping(.automatic)))"
     }
 
     private var winLossColor: Color {
-        guard let wl = session.winLoss else { return .white.opacity(0.45) }
+        guard let session, let wl = session.winLoss else { return .white.opacity(0.45) }
         return wl >= 0 ? .green : .red
     }
 
     private var tierPointsText: String? {
-        guard let earned = session.tierPointsEarned else { return nil }
+        guard let session, let earned = session.tierPointsEarned else { return nil }
         return "\(earned >= 0 ? "+" : "")\(earned.formatted(.number.grouping(.automatic))) pts"
     }
 
     private var tierPointsColor: Color {
-        guard let earned = session.tierPointsEarned else { return .white.opacity(0.45) }
+        guard let session, let earned = session.tierPointsEarned else { return .white.opacity(0.45) }
         return earned >= 0 ? .green : .orange
     }
 
     private var sessionStartedToday: Bool {
-        Calendar.current.isDateInToday(session.startTime)
+        guard let session else { return false }
+        return Calendar.current.isDateInToday(session.startTime)
     }
 
     @ViewBuilder
     private var sessionStartLabel: some View {
-        if sessionStartedToday {
-            Text(session.startTime, style: .time)
-                .font(.caption2)
-                .foregroundColor(.white.opacity(0.55))
-        } else {
-            Text(session.startTime, style: .date)
-                .font(.caption2)
-                .foregroundColor(.white.opacity(0.55))
+        if let session {
+            if sessionStartedToday {
+                Text(session.startTime, style: .time)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.55))
+            } else {
+                Text(session.startTime, style: .date)
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.55))
+            }
+        }
+    }
+
+    /// Location, game, and time/date stacked so each line can use the full tile width.
+    @ViewBuilder
+    private var sessionDetailsColumn: some View {
+        if let session {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(session.casino.isEmpty ? "Session" : session.casino)
+                    .font(style == .ticker ? .caption.weight(.bold) : .subheadline.weight(.semibold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Text(session.game.isEmpty ? "—" : session.game)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(style == .ticker ? 0.78 : 0.72))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                sessionStartLabel
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
     var body: some View {
         Group {
-            switch style {
-            case .card:
-                cardBody
-            case .ticker:
-                tickerBody
+            if let session {
+                Group {
+                    switch style {
+                    case .card:
+                        cardBody
+                    case .ticker:
+                        tickerBody
+                    }
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(session.casino), \(session.game), \(verificationLabel)")
             }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(session.casino), \(session.game), \(verificationLabel)")
     }
 
     private var cardBody: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(session.casino.isEmpty ? "Session" : session.casino)
-                .font(.subheadline.weight(.semibold))
-                .foregroundColor(.white)
-                .lineLimit(2)
-                .minimumScaleFactor(0.85)
-
-            Text(session.game.isEmpty ? "—" : session.game)
-                .font(.caption)
-                .foregroundColor(.white.opacity(0.72))
-                .lineLimit(1)
-
-            sessionStartLabel
+            sessionDetailsColumn
 
             Spacer(minLength: 0)
 
@@ -414,19 +466,7 @@ private struct HomeRecentSessionTile: View {
     private var tickerBody: some View {
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 7) {
-                HStack(spacing: 5) {
-                    Text(session.casino.isEmpty ? "Session" : session.casino)
-                        .font(.caption.weight(.bold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                    Text("·")
-                        .font(.caption2.bold())
-                        .foregroundColor(.white.opacity(0.35))
-                    Text(session.game.isEmpty ? "—" : session.game)
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.78))
-                        .lineLimit(1)
-                }
+                sessionDetailsColumn
 
                 HStack(spacing: 10) {
                     if let winLossText {
@@ -446,20 +486,9 @@ private struct HomeRecentSessionTile: View {
                             windowStart: 0.2
                         )
                     }
-
-                    Group {
-                        if sessionStartedToday {
-                            Text(session.startTime, style: .time)
-                        } else {
-                            Text(session.startTime, style: .date)
-                        }
-                    }
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.45))
-                    .lineLimit(1)
                 }
 
-                if session.hoursPlayed > 0 {
+                if let session, session.hoursPlayed > 0 {
                     HomeTickerPopMetric(
                         text: String(format: "%.1f hr", session.hoursPlayed),
                         color: .white.opacity(0.82),

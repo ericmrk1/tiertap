@@ -1332,6 +1332,7 @@ class SessionStore: ObservableObject {
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchStackWinLossComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapWatchBuyInComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "TierTapHomeWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "TierTapRecentSessionsWidget")
         #endif
     }
 
