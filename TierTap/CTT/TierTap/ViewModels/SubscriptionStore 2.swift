@@ -98,33 +98,44 @@ final class SubscriptionStore: ObservableObject {
         errorMessage = nil
         let subscriptionIds = TierTapProductId.subscriptionPlans.map(\.rawValue)
         let consumableIds = [TierTapProductId.credits.rawValue]
+        let allIds = subscriptionIds + consumableIds
         let bundleId = Bundle.main.bundleIdentifier ?? "nil"
         let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "nil"
         let build = (Bundle.main.infoDictionary?["CFBundleVersion"] as? String) ?? "nil"
         print(
             "[SubscriptionStore] loadProducts bundleId=\(bundleId) version=\(version) (\(build)) "
-            + "subscriptionIds=\(subscriptionIds) consumableIds=\(consumableIds)"
+            + "productIds=\(allIds)"
         )
         defer { isLoading = false }
-        do {
-            async let subscriptionProductsRequest = Product.products(for: subscriptionIds)
-            async let consumableProductsRequest = Product.products(for: consumableIds)
-            let loadedSubscriptionProducts = try await subscriptionProductsRequest
-            let loadedConsumableProducts = try await consumableProductsRequest
-            products = loadedSubscriptionProducts + loadedConsumableProducts
-            products.sort { p1, p2 in
-                (p1.price as Decimal) < (p2.price as Decimal)
-            }
-            let loadedIds = products.map(\.id)
-            let loadedSubscriptionIds = loadedSubscriptionProducts.map(\.id)
-            subscriptionCatalogAvailable = !loadedSubscriptionIds.isEmpty
-            print(
-                "[SubscriptionStore] loadProducts OK count=\(products.count) loadedIds=\(loadedIds) "
-                + "subscriptionIds=\(loadedSubscriptionIds)"
-            )
-            // StoreKit returns [] (without throwing) for unknown IDs — typical when App Store Connect
-            // product IDs don’t match the app, or subscriptions aren’t cleared for sale yet.
-            if loadedSubscriptionIds.isEmpty {
+
+        var lastError: Error?
+        // StoreKit can briefly return an empty catalog right after launch; retry once.
+        for attempt in 1...2 {
+            do {
+                let loaded = try await Product.products(for: allIds)
+                products = loaded.sorted { ($0.price as Decimal) < ($1.price as Decimal) }
+                let loadedIds = products.map(\.id)
+                let loadedSubscriptionIds = products
+                    .filter { TierTapProductId(rawValue: $0.id)?.isSubscription == true }
+                    .map(\.id)
+                subscriptionCatalogAvailable = !loadedSubscriptionIds.isEmpty
+                print(
+                    "[SubscriptionStore] loadProducts OK attempt=\(attempt) count=\(products.count) "
+                    + "loadedIds=\(loadedIds) subscriptionIds=\(loadedSubscriptionIds)"
+                )
+
+                if !loadedSubscriptionIds.isEmpty {
+                    errorMessage = nil
+                    return
+                }
+
+                // Empty subscription list without throwing — typical when ASC product IDs don’t match
+                // or subscriptions aren’t cleared for sale / missing metadata yet.
+                if attempt < 2 {
+                    try? await Task.sleep(nanoseconds: 750_000_000)
+                    continue
+                }
+
                 if SupabaseConfig.isTestFlight {
                     errorMessage =
                         "Subscription products are not available from App Store Connect yet. "
@@ -132,27 +143,32 @@ final class SubscriptionStore: ObservableObject {
                         + "To test purchases, add these product IDs in App Store Connect: "
                         + subscriptionIds.joined(separator: ", ")
                 } else if SupabaseConfig.prefersBundledStoreKitTesting {
-                    if TierTapStoreKitLocalTesting.isActive {
-                        errorMessage =
-                            "Couldn’t load subscription plans from the bundled StoreKit test catalog. "
-                            + "Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected."
-                    } else {
-                        errorMessage =
-                            "Couldn’t load subscription plans from the bundled StoreKit test catalog. "
-                            + "Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected."
-                    }
+                    errorMessage =
+                        "Couldn’t load subscription plans from the bundled StoreKit test catalog. "
+                        + "Pull down to refresh, or run from Xcode with TierTapStoreKitConfig.storekit selected."
                 } else {
                     errorMessage =
                         "Couldn’t load subscription plans. Check your connection and try again. "
                         + "If this persists, confirm in App Store Connect that these product IDs exist for this app: "
                         + subscriptionIds.joined(separator: ", ")
                 }
+                return
+            } catch {
+                lastError = error
+                print(
+                    "[SubscriptionStore] loadProducts failed attempt=\(attempt) "
+                    + "error=\(error.localizedDescription)"
+                )
+                if attempt < 2 {
+                    try? await Task.sleep(nanoseconds: 750_000_000)
+                    continue
+                }
             }
-        } catch {
-            errorMessage = error.localizedDescription
-            print("[SubscriptionStore] loadProducts failed error=\(error.localizedDescription)")
-            products = []
         }
+
+        errorMessage = lastError?.localizedDescription
+        products = []
+        subscriptionCatalogAvailable = false
     }
 
     /// - Returns: StoreKit transaction id string on verified success, or `nil` otherwise.

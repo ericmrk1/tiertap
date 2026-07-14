@@ -39,7 +39,20 @@ After building, the Community tab will show “Sign in with Supabase” below th
 2. **Add your App ID** to the Apple provider's **Client IDs** list. Use your app's bundle ID (e.g. `com.app.tiertap`). Native Sign in with Apple does not require OAuth (Services ID, signing key, etc.); just add the bundle ID.
 3. The TierTap target already has the **Sign in with Apple** entitlement. In the Apple Developer portal, ensure your App ID has the Sign in with Apple capability.
 
-## 5. Sign in with Google (optional)
+## 5. Account deletion (required for App Store)
+
+The app offers **Delete Account** on **TierTap Account** and the Community Account sheet. Deletion:
+
+1. Calls GoTrue `DELETE /auth/v1/user` with the user’s access token.
+2. Falls back to the `delete_own_account()` Postgres function if needed.
+
+Apply the migration:
+
+- `supabase/migrations/20260714120000_delete_own_account.sql`
+
+on your Supabase project before submitting a build that depends on the RPC fallback.
+
+## 6. Sign in with Google (optional)
 
 Google sign-in uses the OAuth flow (in-app browser). The same redirect URL `com.app.tiertap://login-callback` is used.
 

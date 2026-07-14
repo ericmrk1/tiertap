@@ -81,12 +81,14 @@ struct TierTapPaywallView: View {
                             aiBudgetExhaustedNoticeSection
                             tierTapPlusSection
                             requirementsSection
+                            legalLinksRow
                             restoreSection
                             legalSection
                         } else {
                             requirementsSection
                             benefitsSection
                             productsSection
+                            legalLinksRow
                             tierTapPlusSection
                             restoreSection
                             legalSection
@@ -503,23 +505,35 @@ struct TierTapPaywallView: View {
         .frame(maxWidth: .infinity)
     }
 
+    /// Compact Terms + Privacy row placed near subscription offers (Guideline 3.1.2).
+    private var legalLinksRow: some View {
+        HStack(spacing: 10) {
+            PaywallLegalLinkBubble(title: "Terms of Use (EULA)", destination: appleEULAURL)
+            PaywallLegalLinkBubble(title: "Privacy Policy", destination: privacyPolicyURL)
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .contain)
+    }
+
     private var legalSection: some View {
         VStack(alignment: .leading, spacing: 12) {
+            L10nText("Legal")
+                .font(.caption.weight(.semibold))
+                .foregroundColor(.white)
+
+            HStack(spacing: 10) {
+                PaywallLegalLinkBubble(title: "Terms of Use (EULA)", destination: appleEULAURL)
+                PaywallLegalLinkBubble(title: "Privacy Policy", destination: privacyPolicyURL)
+            }
+            .accessibilityElement(children: .contain)
+
             L10nText("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage and cancel subscriptions in your device Settings under Apple ID → Subscriptions.")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
-
-            HStack(spacing: 16) {
-                Link("Apple EULA", destination: appleEULAURL)
-                    .font(.caption)
-                    .foregroundColor(settingsStore.primaryColor)
-                Link("Privacy Policy", destination: privacyPolicyURL)
-                    .font(.caption)
-                    .foregroundColor(settingsStore.primaryColor)
-            }
         }
         .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white.opacity(0.1))
         .cornerRadius(12)
     }
@@ -578,6 +592,38 @@ struct TierTapPaywallView: View {
     }
 }
 
+private struct PaywallLegalLinkBubble: View {
+    let title: String
+    let destination: URL
+
+    var body: some View {
+        Link(destination: destination) {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                Image(systemName: "arrow.up.right.square")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.white.opacity(0.9))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(Color.white.opacity(0.22))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.45), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 private struct ProBenefitRow: View {
     let icon: String
     let title: String
@@ -618,6 +664,15 @@ private struct PaywallPlanBox: View {
         plan.paywallPeriodTitle
     }
 
+    private var lengthLabel: String {
+        switch plan {
+        case .monthly: return "1 month"
+        case .quarterly: return "3 months"
+        case .yearly: return "1 year"
+        case .credits: return ""
+        }
+    }
+
     private var actionTitle: String {
         if isPurchasing {
             return "Loading…"
@@ -630,9 +685,15 @@ private struct PaywallPlanBox: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
+            Text("TierTap Pro")
+                .font(.caption2.weight(.semibold))
+                .foregroundColor(.white.opacity(0.85))
             Text(periodLabel)
                 .font(.subheadline.weight(.semibold))
                 .foregroundColor(.white)
+            Text(lengthLabel)
+                .font(.caption2)
+                .foregroundColor(.white.opacity(0.75))
             Text(displayPrice)
                 .font(.caption)
                 .foregroundColor(.white.opacity(showsEstimatedPrice ? 0.65 : 0.9))

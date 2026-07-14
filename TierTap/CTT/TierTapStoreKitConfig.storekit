@@ -1,11 +1,11 @@
 {
   "appPolicies" : {
-    "eula" : "",
+    "eula" : "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
     "policies" : [
       {
         "locale" : "en_US",
-        "policyText" : "",
-        "policyURL" : ""
+        "policyText" : "Privacy Policy",
+        "policyURL" : "https://travelzork.com/privacy-policy/"
       }
     ]
   },
@@ -20,7 +20,7 @@
       "internalID" : "E7A41C82",
       "localizations" : [
         {
-          "description" : "Adds 250,000 AI tokens to your balance. Tokens are spent as you use AI features and can be replenished by purchasing again.",
+          "description" : "Adds AI tokens to your balance. Tokens are spent as you use AI features and can be replenished by purchasing again.",
           "displayName" : "TierTapSession",
           "locale" : "en_US"
         }
@@ -48,7 +48,11 @@
     {
       "id" : "CF1ED390",
       "localizations" : [
-
+        {
+          "description" : "TierTap Pro subscription plans",
+          "displayName" : "TierTap Pro",
+          "locale" : "en_US"
+        }
       ],
       "name" : "com.app.subs.tiertap",
       "subscriptions" : [
@@ -66,8 +70,8 @@
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "Three months of TierTap Pro — AI-powered play guidance and advanced features.",
+              "displayName" : "TierTap Pro Quarterly",
               "locale" : "en_US"
             }
           ],
@@ -94,8 +98,8 @@
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "One year of TierTap Pro — AI-powered play guidance and advanced features.",
+              "displayName" : "TierTap Pro Yearly",
               "locale" : "en_US"
             }
           ],
@@ -122,8 +126,8 @@
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "One month of TierTap Pro — AI-powered play guidance and advanced features.",
+              "displayName" : "TierTap Pro Monthly",
               "locale" : "en_US"
             }
           ],

@@ -475,6 +475,7 @@ struct CommunityAuthSheet: View {
     @State private var isShowingLibraryPicker = false
     @State private var showSubscriptionPaywall = false
     @State private var isPurchasingCreditsPack = false
+    @State private var isConfirmingDeleteAccount = false
 
     private var hasProAccess: Bool {
         subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
@@ -677,6 +678,23 @@ struct CommunityAuthSheet: View {
         }
         .task {
             await subscriptionStore.loadProducts()
+        }
+        .confirmationDialog(
+            "Delete your TierTap account?",
+            isPresented: $isConfirmingDeleteAccount,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Account", role: .destructive) {
+                Task {
+                    await authStore.deleteAccount()
+                    if !authStore.isSignedIn {
+                        onDismiss()
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            L10nText("This permanently deletes your TierTap account, Community profile, and synced cloud data. Sessions and settings stored only on this device are not deleted. This cannot be undone.")
         }
         .presentationDetents([.large])
     }
@@ -894,13 +912,31 @@ struct CommunityAuthSheet: View {
                 .background(Color(.systemGray6).opacity(0.18))
                 .cornerRadius(12)
 
-                Button("Log out", role: .destructive) {
-                    authStore.signOut()
-                    onDismiss()
+                HStack(spacing: 10) {
+                    Button("Log out", role: .destructive) {
+                        authStore.signOut()
+                        onDismiss()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .tint(.red)
+                    .disabled(authStore.isLoading)
+
+                    Button("Delete Account", role: .destructive) {
+                        isConfirmingDeleteAccount = true
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.red)
+                    .disabled(authStore.isLoading)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
-                .tint(.red)
+
+                if let msg = authStore.errorMessage {
+                    Text(msg)
+                        .font(.caption2)
+                        .foregroundColor(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             } else {
                 TierTapAccountSignInSection(
                     emailInput: $emailInput,

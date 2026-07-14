@@ -375,6 +375,7 @@ struct TierTapAccountView: View {
     @EnvironmentObject var subscriptionStore: SubscriptionStore
 
     @State private var isConfirmingSignOut = false
+    @State private var isConfirmingDeleteAccount = false
     @State private var signInEmailInput = ""
 
     private var hasProAccess: Bool {
@@ -410,6 +411,18 @@ struct TierTapAccountView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             L10nText("You’ll need to sign in again for account features. This does not delete your sessions or settings stored on this device.")
+        }
+        .confirmationDialog(
+            "Delete your TierTap account?",
+            isPresented: $isConfirmingDeleteAccount,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Account", role: .destructive) {
+                Task { await authStore.deleteAccount() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            L10nText("This permanently deletes your TierTap account, Community profile, and synced cloud data. Sessions and settings stored only on this device are not deleted. This cannot be undone.")
         }
     }
 
@@ -453,13 +466,57 @@ struct TierTapAccountView: View {
                         isConfirmingSignOut = true
                     }
                     .font(.subheadline)
+                    .disabled(authStore.isLoading)
                 }
                 .padding(.vertical, 4)
+
+                if let msg = authStore.errorMessage {
+                    Text(msg)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Divider()
+                    .background(Color.white.opacity(0.25))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    L10nText("Delete account")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    L10nText("Permanently remove your TierTap account and associated cloud data. This cannot be undone.")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.85))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button(role: .destructive) {
+                        isConfirmingDeleteAccount = true
+                    } label: {
+                        HStack {
+                            if authStore.isLoading {
+                                ProgressView()
+                                    .tint(.red)
+                            }
+                            Text("Delete Account")
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                    .disabled(authStore.isLoading)
+                }
             } else {
                 VStack(alignment: .leading, spacing: 12) {
                     L10nText("You're not signed in. Sign in with Apple, Google, or a magic link email.")
                         .font(.subheadline)
                         .foregroundColor(.gray)
+
+                    if let info = authStore.infoMessage {
+                        Text(info)
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
 
                     TierTapAccountSignInSection(emailInput: $signInEmailInput)
                 }

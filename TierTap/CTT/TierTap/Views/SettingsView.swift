@@ -1371,7 +1371,7 @@ struct SettingsView: View {
                 Link(destination: URL(string: "https://travelzork.com/privacy-policy/")!) {
                     HStack {
                         Image(systemName: "hand.raised.fill")
-                        L10nText("Privacy")
+                        L10nText("Privacy Policy")
                             .font(.subheadline.bold())
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
@@ -1393,7 +1393,7 @@ struct SettingsView: View {
                 Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
                     HStack {
                         Image(systemName: "doc.text.fill")
-                        L10nText("EULA")
+                        L10nText("Terms of Use (EULA)")
                             .font(.subheadline.bold())
                         Spacer()
                         Image(systemName: "arrow.up.right.square")

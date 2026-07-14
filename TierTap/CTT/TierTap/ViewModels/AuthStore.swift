@@ -405,6 +405,78 @@ final class AuthStore: ObservableObject {
         }
     }
 
+    /// Permanently deletes the signed-in TierTap account and associated cloud profile data.
+    /// Local session history and device settings are not erased (same as signing out).
+    func deleteAccount() async {
+        guard let client = supabase else {
+            errorMessage = "Supabase is not configured."
+            return
+        }
+        guard let currentSession = session else {
+            errorMessage = "You must be signed in to delete your account."
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        infoMessage = nil
+        defer { isLoading = false }
+
+        let userId = currentSession.user.id
+
+        // Best-effort cleanup before the auth user is removed.
+        try? await deleteProfilePhoto()
+        try? deleteLocalProfilePhoto()
+        try? await UserScreenNamesAPI.deleteRegisteredScreenName(userId: userId)
+
+        do {
+            try await deleteAuthUserViaGoTrue(accessToken: currentSession.accessToken)
+        } catch {
+            do {
+                try await client.database.rpc("delete_own_account").execute()
+            } catch {
+                errorMessage =
+                    "Couldn’t delete your account. Check your connection and try again. "
+                    + error.localizedDescription
+                return
+            }
+        }
+
+        rememberedAccounts.removeAccount(id: userId)
+        session = nil
+        localProfilePhoto = nil
+        otpSent = false
+        infoMessage = "Your TierTap account has been deleted."
+
+        // Clear any remaining local auth session without re-recording the account.
+        try? await client.auth.signOut()
+    }
+
+    /// Deletes the authenticated user via GoTrue `DELETE /user` (user JWT, not service role).
+    private func deleteAuthUserViaGoTrue(accessToken: String) async throws {
+        guard let baseURL = SupabaseConfig.url, let anonKey = SupabaseConfig.anonKey else {
+            throw AuthError.notSignedIn
+        }
+        let root = baseURL.absoluteString.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard let url = URL(string: "\(root)/auth/v1/user") else {
+            throw AuthError.accountDeletionFailed(statusCode: -1, detail: "Invalid Supabase URL")
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue(anonKey, forHTTPHeaderField: "apikey")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw AuthError.accountDeletionFailed(statusCode: -1, detail: "Invalid response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let detail = String(data: data, encoding: .utf8) ?? "HTTP \(http.statusCode)"
+            throw AuthError.accountDeletionFailed(statusCode: http.statusCode, detail: detail)
+        }
+    }
+
     /// Sign in with Google via OAuth (opens in-app browser). Callback is handled by handleOpenURL.
     func signInWithGoogle() {
         guard let client = supabase else {
@@ -542,10 +614,14 @@ final class AuthStore: ObservableObject {
 
 enum AuthError: LocalizedError {
     case notSignedIn
+    case accountDeletionFailed(statusCode: Int, detail: String)
 
     var errorDescription: String? {
         switch self {
-        case .notSignedIn: return "You must be signed in to perform this action."
+        case .notSignedIn:
+            return "You must be signed in to perform this action."
+        case .accountDeletionFailed(let statusCode, let detail):
+            return "Account deletion failed (\(statusCode)): \(detail)"
         }
     }
 }
