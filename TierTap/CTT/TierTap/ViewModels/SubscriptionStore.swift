@@ -3,9 +3,10 @@ import StoreKit
 
 /// Product identifiers for TierTap subscriptions and consumables (must match App Store Connect / `.storekit`).
 enum TierTapProductId: String, CaseIterable {
-    case monthly = "com.app.subs.tiertap.monthly"
-    case quarterly = "com.app.subs.tiertap.quarterly"
-    case yearly = "com.app.subs.tiertap.yearly"
+    /// Must match App Store Connect Product IDs (not Reference Names).
+    case monthly = "pro.monthly"
+    case quarterly = "pro"
+    case yearly = "pro.yearly"
     case credits = "Credits"
 
     var subscriptionGroupId: String { "com.app.subs.tiertap" }

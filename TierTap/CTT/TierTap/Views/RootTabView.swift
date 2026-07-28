@@ -565,9 +565,9 @@ struct CommunityAuthSheet: View {
             }
 
             if !hasProAccess {
-                L10nText("Subscribe to TierTap Pro to use AI, then you can buy token packs here.")
+                L10nText("An active TierTap Pro plan is required before you can buy token packs.")
                     .font(.caption2)
-                    .foregroundColor(.orange.opacity(0.95))
+                    .foregroundColor(.white.opacity(0.75))
             }
         }
         .padding(12)
@@ -590,31 +590,49 @@ struct CommunityAuthSheet: View {
     }
 
     private var subscriptionAccessRow: some View {
-        HStack(alignment: .center, spacing: 8) {
-            HStack(spacing: 4) {
-                L10nText("Subscription:")
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.85))
-                Text(subscriptionPlanLabel)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 8) {
+                HStack(spacing: 4) {
+                    L10nText("Subscription:")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.85))
+                    Text(subscriptionPlanLabel)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
+                }
+                Spacer(minLength: 4)
+                if hasProAccess {
+                    Button {
+                        showSubscriptionPaywall = true
+                    } label: {
+                        L10nText("Manage")
+                            .font(.caption2.weight(.bold))
+                            .underline()
+                            .foregroundColor(.white)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            Spacer(minLength: 4)
-            Button {
-                showSubscriptionPaywall = true
-            } label: {
-                L10nText(hasProAccess ? "Manage" : "Subscribe")
-                    .font(.caption2.weight(.bold))
-                    .underline()
-                    .foregroundColor(.white)
+
+            if !hasProAccess {
+                Button {
+                    showSubscriptionPaywall = true
+                } label: {
+                    HStack(alignment: .center, spacing: 8) {
+                        Image(systemName: "crown.fill")
+                        L10nText("Subscribe")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .tierTapPlusPurchaseButtonChrome(compact: false)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.tr("Subscribe", language: appLanguage))
             }
-            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.white.opacity(0.1))
         .cornerRadius(10)
     }

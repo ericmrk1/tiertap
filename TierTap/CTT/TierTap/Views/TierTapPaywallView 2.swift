@@ -482,10 +482,12 @@ struct TierTapPaywallView: View {
     }
 
     private func productSortOrder(_ id: String) -> Int {
-        if id.contains("monthly") { return 0 }
-        if id.contains("quarterly") { return 1 }
-        if id.contains("yearly") { return 2 }
-        return 3
+        switch TierTapProductId(rawValue: id) {
+        case .monthly: return 0
+        case .quarterly: return 1
+        case .yearly: return 2
+        default: return 3
+        }
     }
 
     private func isPurchaseDisabled(for product: Product) -> Bool {

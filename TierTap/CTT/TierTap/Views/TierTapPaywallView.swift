@@ -235,10 +235,12 @@ struct TierTapPaywallView: View {
     }
 
     private func productSortOrder(_ id: String) -> Int {
-        if id.contains("monthly") { return 0 }
-        if id.contains("quarterly") { return 1 }
-        if id.contains("yearly") { return 2 }
-        return 3
+        switch TierTapProductId(rawValue: id) {
+        case .monthly: return 0
+        case .quarterly: return 1
+        case .yearly: return 2
+        default: return 3
+        }
     }
 
     private func isPurchaseDisabled(for product: Product) -> Bool {
@@ -330,9 +332,11 @@ private struct PaywallPlanBox: View {
     let action: () -> Void
 
     private var periodLabel: String {
-        if product.id.contains("yearly") { return "Yearly" }
-        if product.id.contains("quarterly") { return "3 Months" }
-        return "Monthly"
+        switch TierTapProductId(rawValue: product.id) {
+        case .yearly: return "Yearly"
+        case .quarterly: return "3 Months"
+        default: return "Monthly"
+        }
     }
 
     private var actionTitle: String {

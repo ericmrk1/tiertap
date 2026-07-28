@@ -9,10 +9,6 @@
 /* Begin PBXBuildFile section */
 		0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */; };
 		2DA3CE7309FB1E9CEFBCDE5F /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2D86C8432C78C1F310B3E /* HistoryView.swift */; };
-		HISTGRDB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */; };
-		HISTGRNGB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */; };
-		TAXPPREPB01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */; };
-		ZIPTAXPR01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */; };
 		2E255BF22F5B695C00CAF0D7 /* SessionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */; };
 		2E255C192F5E726A00CAF0D7 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = SUPAPROD1E2F3A4B5C6D7E8F9A0B1 /* Supabase */; };
 		2E255D0F2F5FC0FF00CAF0D7 /* Sensitive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E255D0E2F5FC0FB00CAF0D7 /* Sensitive.swift */; };
@@ -31,14 +27,9 @@
 		2E9D7BC42F650004004015F4 /* SessionAttachedPhotoStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */; };
 		2E9D7BC52F650005004015F4 /* SessionPhotosSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC22F650002004015F4 /* SessionPhotosSheet.swift */; };
 		2E9D7BC62F650006004015F4 /* HistoryPhotoFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */; };
+		2EF0E3063012BFCC00712BDE /* com.app.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 2EF0E3053012BFCC00712BDE /* com.app.storekit */; };
 		363A6D9DA62587287363A8D0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E68A7C0EAF309AC9F041237 /* HomeView.swift */; };
-		SCRNGBLD01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */; };
-		HSMWGBLD01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */; };
 		4049A588F76583281B4B28A7 /* CasinoTimerWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */; };
-		AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */; };
-		AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */; };
-		AA0000000000000000000003 /* TierTapWatchComplications.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000035 /* TierTapWatchComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		AA0000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		4669C50222DDB776D1422FD4 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
 		4DE904DFE36CBBB338FB08AB /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */; };
 		5D3C168B9CE3435A704BCBEC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282155DBCB51F96C8840E98B /* SessionDetailView.swift */; };
@@ -49,6 +40,10 @@
 		8B3D849204B1B8C397297758 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AACDC5094128715EAA64A9 /* LiveSessionView.swift */; };
 		8BB8382F211EA6C5D116D2F1 /* TierTapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692681C1D425214EB9F4B3A2 /* TierTapApp.swift */; };
 		8DF0D438CA150700D1E471C0 /* CloseoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */; };
+		AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */; };
+		AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */; };
+		AA0000000000000000000003 /* TierTapWatchComplications.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000035 /* TierTapWatchComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA0000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		ANV1E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */; };
 		APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */; };
 		APPLOCKSVC01B2C3D4E5F6A7B8C9D0 /* AppLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */; };
@@ -56,7 +51,6 @@
 		ARCT1E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */; };
 		ARPTJ2E2F3A4B5C6D7E8F9A0B1 /* Airports.json in Resources */ = {isa = PBXBuildFile; fileRef = ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */; };
 		AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */; };
-		RMACC2E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */; };
 		BRDB1E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRDB2E2F3A4B5C6D7E8F9A0B1 /* BankrollDatabase.swift */; };
 		BRV2E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BRV1E2F3A4B5C6D7E8F9A0B1 /* BankrollView.swift */; };
 		C76C3D9C2E48B9A7792CCB65 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
@@ -66,12 +60,6 @@
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
-		WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */; };
-		WGTRSS2B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */; };
-		WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */; };
-		WGTSNP2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
-		WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
-		WGTSBLD2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
 		EF2B864E24E60E38490A66D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E7914876B5DF969011894CE /* Assets.xcassets */; };
@@ -80,6 +68,9 @@
 		GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */; };
 		GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */; };
 		GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */; };
+		HISTGRDB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */; };
+		HISTGRNGB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */; };
+		HSMWGBLD01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */; };
 		L10NB1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */; };
 		L10NB2E2F3A4B5C6D7E8F9A0B1 /* Strings.json in Resources */ = {isa = PBXBuildFile; fileRef = L10NJS1E2F3A4B5C6D7E8F9A0B1 /* Strings.json */; };
 		L10NB3E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */; };
@@ -90,13 +81,14 @@
 		PPCV1E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */; };
 		PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */; };
 		PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */ = {isa = PBXBuildFile; fileRef = PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */; };
+		RMACC2E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */; };
 		ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */; };
 		ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */; };
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
-		TTPBUBLD1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTPBUBRE1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift */; };
 		SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */; };
+		SCRNGBLD01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */; };
 		SHR2E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */; };
 		SLTSL01B2C3D4E5F6A7B8C9D0 /* SlotsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */; };
 		SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */; };
@@ -109,10 +101,11 @@
 		SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */; };
 		SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
 		SYNC3E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */; };
-		THM2E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
-		THM3E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
+		TAXPPREPB01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */; };
 		TDTA1E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */; };
 		TEDR1E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */; };
+		THM2E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
+		THM3E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */; };
 		TLSK1E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */; };
 		TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */; };
 		TMDL1E2F3A4B5C6D7E8F9A0B1 /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */; };
@@ -120,9 +113,10 @@
 		TSCD1E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */; };
 		TSTO1E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */; };
 		TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */; };
+		TTAI2E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */; };
+		TTPBUBLD1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTPBUBRE1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift */; };
 		TTWLV02B2C3D4E5F678901234 /* TierTapWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */; };
 		TTWMOD02B2C3D4E5F678901234 /* RewardWalletCardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */; };
-		TTAI2E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */; };
 		TTWRPP02B2C3D4E5F678901234 /* RewardProgramPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */; };
 		TWND2E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */; };
 		UGCTBUILD01B2C3D4E5F6789012 /* UserGuideContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */; };
@@ -133,15 +127,22 @@
 		WCH4E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH3E2F3A4B5C6D7E8F9A0B1 /* WatchContentView.swift */; };
 		WCH6E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */; };
 		WCH8E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */; };
-		WCHAE2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */; };
-		WTHM2E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */; };
-		WTHM4E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */; };
-		WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */; };
-		WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */; };
 		WCHA1B2C3D4E5F6A7B8C9D0 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F66565AB34E6CAAC5CF584C /* Session.swift */; };
+		WCHAE2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */; };
 		WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */; };
 		WCHB1B2C3D4E5F6A7B8C9D0 /* GamesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528BE1A3C52FE346B3217D97 /* GamesList.swift */; };
 		WCHC1B2C3D4E5F6A7B8C9D0 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */; };
+		WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */; };
+		WGTRSS2B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */; };
+		WGTSBLD2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */; };
+		WGTSHM2B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */; };
+		WGTSNP2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
+		WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */; };
+		WNDPK02B2C3D4E5F6789ABC1 /* WatchNumericKeypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */; };
+		WRNC02B2C3D4E5F6789ABE1 /* WatchRainingCoinsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */; };
+		WTHM2E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */; };
+		WTHM4E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */; };
+		ZIPTAXPR01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -152,19 +153,19 @@
 			remoteGlobalIDString = 03F1CD5F275B834E8C24AFB1;
 			remoteInfo = CasinoTimerWidget;
 		};
-		WCHI1B2C3D4E5F6A7B8C9D0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 07F404DF93F9889DBB33E522 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = WCHJ1B2C3D4E5F6A7B8C9D0;
-			remoteInfo = "TierTap Watch App";
-		};
 		AA0000000000000000000010 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 07F404DF93F9889DBB33E522 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AA0000000000000000000060;
 			remoteInfo = TierTapWatchComplications;
+		};
+		WCHI1B2C3D4E5F6A7B8C9D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07F404DF93F9889DBB33E522 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = WCHJ1B2C3D4E5F6A7B8C9D0;
+			remoteInfo = "TierTap Watch App";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -196,11 +197,6 @@
 /* Begin PBXFileReference section */
 		12AACDC5094128715EAA64A9 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
 		225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerLiveActivity.swift; sourceTree = "<group>"; };
-		WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapHomeWidget.swift; sourceTree = "<group>"; };
-		WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapRecentSessionsWidget.swift; sourceTree = "<group>"; };
-		WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetIntents.swift; sourceTree = "<group>"; };
-		WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshot.swift; sourceTree = "<group>"; };
-		WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshotBuilder.swift; sourceTree = "<group>"; };
 		282155DBCB51F96C8840E98B /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		2AFACC62D4FCEDB93AF500B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E1876422F9FF5EC009D42A3 /* CasinoTimerWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CasinoTimerWidget.entitlements; sourceTree = "<group>"; };
@@ -209,12 +205,6 @@
 		2E1876452FA0036A009D42A3 /* TierTapRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapRelease.entitlements; sourceTree = "<group>"; };
 		2E255BEF2F5B436F00CAF0D7 /* TierTap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTap.entitlements; sourceTree = "<group>"; };
 		2E255BF02F5B438600CAF0D7 /* TierTap Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "TierTap Watch App.entitlements"; sourceTree = "<group>"; };
-		AA0000000000000000000030 /* TierTapWatchComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplications.entitlements; sourceTree = "<group>"; };
-		AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplicationsRelease.entitlements; sourceTree = "<group>"; };
-		AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchComplicationsBundle.swift; sourceTree = "<group>"; };
-		AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchCornerComplicationWidget.swift; sourceTree = "<group>"; };
-		AA0000000000000000000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA0000000000000000000035 /* TierTapWatchComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TierTapWatchComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E255BF12F5B695C00CAF0D7 /* SessionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCalendarView.swift; sourceTree = "<group>"; };
 		2E255D0E2F5FC0FB00CAF0D7 /* Sensitive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sensitive.swift; sourceTree = "<group>"; };
 		2E255D452F61FAF900CAF0D7 /* boodoodaloop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = boodoodaloop.wav; sourceTree = "<group>"; };
@@ -232,6 +222,7 @@
 		2E9D7BC12F650001004015F4 /* SessionAttachedPhotoStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAttachedPhotoStorage.swift; sourceTree = "<group>"; };
 		2E9D7BC22F650002004015F4 /* SessionPhotosSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPhotosSheet.swift; sourceTree = "<group>"; };
 		2E9D7BC72F650007004015F4 /* HistoryPhotoFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPhotoFeedView.swift; sourceTree = "<group>"; };
+		2EF0E3053012BFCC00712BDE /* com.app.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = com.app.storekit; sourceTree = "<group>"; };
 		3033F08B21E05E979C40C043 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3F66565AB34E6CAAC5CF584C /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		4E7914876B5DF969011894CE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -241,10 +232,14 @@
 		6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CasinoTimerWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692681C1D425214EB9F4B3A2 /* TierTapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapApp.swift; sourceTree = "<group>"; };
 		7E68A7C0EAF309AC9F041237 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionClosingMetricsRingsView.swift; sourceTree = "<group>"; };
-		HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSessionsMetricsWidget.swift; sourceTree = "<group>"; };
 		9BD76C0A3AE68DFB2FD713FE /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		9EF2D68C4D068D03A5AD0E99 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000030 /* TierTapWatchComplications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplications.entitlements; sourceTree = "<group>"; };
+		AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TierTapWatchComplicationsRelease.entitlements; sourceTree = "<group>"; };
+		AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchComplicationsBundle.swift; sourceTree = "<group>"; };
+		AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWatchCornerComplicationWidget.swift; sourceTree = "<group>"; };
+		AA0000000000000000000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000035 /* TierTapWatchComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TierTapWatchComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		ANV2E2F3A4B5C6D7E8F9A0B1 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockGateView.swift; sourceTree = "<group>"; };
 		APPLOCKSVC02B2C3D4E5F6A7B8C9D0 /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
@@ -252,7 +247,6 @@
 		ARCT2E2F3A4B5C6D7E8F9A0B1 /* AirlineCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirlineCatalog.swift; sourceTree = "<group>"; };
 		ARPTJ1E2F3A4B5C6D7E8F9A0B1 /* Airports.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Airports.json; sourceTree = "<group>"; };
 		AUTHST1E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthStore.swift; sourceTree = "<group>"; };
-		RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RememberedAccountsStore.swift; sourceTree = "<group>"; };
 		B21770C30ED23561A6D19424 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
 		B89A89EFB8A3238E20A9044B /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPastSessionView.swift; sourceTree = "<group>"; };
@@ -263,10 +257,6 @@
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
 		COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityPublisher.swift; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
-		HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridView.swift; sourceTree = "<group>"; };
-		HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridEngine.swift; sourceTree = "<group>"; };
-		TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTaxPrepView.swift; sourceTree = "<group>"; };
-		ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxPrepZipArchive.swift; sourceTree = "<group>"; };
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
 		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
 		F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseoutView.swift; sourceTree = "<group>"; };
@@ -275,6 +265,9 @@
 		GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASupportSheet.swift; sourceTree = "<group>"; };
 		GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiRouterThrottle.swift; sourceTree = "<group>"; };
 		GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSharePhrasesGenerated.swift; sourceTree = "<group>"; };
+		HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridView.swift; sourceTree = "<group>"; };
+		HISTGRNGF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridEngine.swift; sourceTree = "<group>"; };
+		HSMWGFIL01B2C3D4E5F6A7B8C9D0 /* HomeSessionsMetricsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSessionsMetricsWidget.swift; sourceTree = "<group>"; };
 		L10NJS1E2F3A4B5C6D7E8F9A0B1 /* Strings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Strings.json; sourceTree = "<group>"; };
 		L10NSW1E2F3A4B5C6D7E8F9A0B1 /* TierTapLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapLocalization.swift; sourceTree = "<group>"; };
 		LOC2E2F3A4B5C6D7E8F9A0B1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
@@ -283,13 +276,14 @@
 		PPCV2E2F3A4B5C6D7E8F9A0B1 /* ProfilePhotoCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePhotoCaptureView.swift; sourceTree = "<group>"; };
 		PROFCK1E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfanityChecker.swift; sourceTree = "<group>"; };
 		PROFWORDS1E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ProfanityWords.txt; sourceTree = "<group>"; };
+		RMACC1E2F3A4B5C6D7E8F9A0B1 /* RememberedAccountsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RememberedAccountsStore.swift; sourceTree = "<group>"; };
 		ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuin.swift; sourceTree = "<group>"; };
 		ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
 		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
-		TTPBUBRE1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapPlusTokenStatBubbles.swift; sourceTree = "<group>"; };
 		SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtGeneratorView.swift; sourceTree = "<group>"; };
+		SCRNGFIL01B2C3D4E5F6A7B8C9D0 /* SessionClosingMetricsRingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionClosingMetricsRingsView.swift; sourceTree = "<group>"; };
 		SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionShareFormatter.swift; sourceTree = "<group>"; };
 		SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotsList.swift; sourceTree = "<group>"; };
 		SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMoodPickerView.swift; sourceTree = "<group>"; };
@@ -300,9 +294,10 @@
 		SUPAC1E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		SUPKEYS1E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SupabaseKeys.plist; sourceTree = "<group>"; };
 		SYNC1E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSyncManager.swift; sourceTree = "<group>"; };
-		THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapThemeSettings.swift; sourceTree = "<group>"; };
+		TAXPPREPF01B2C3D4E5F6A7B8C9 /* HistoryTaxPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTaxPrepView.swift; sourceTree = "<group>"; };
 		TDTA2E2F3A4B5C6D7E8F9A0B1 /* TripDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDetailView.swift; sourceTree = "<group>"; };
 		TEDR2E2F3A4B5C6D7E8F9A0B1 /* TripEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripEditorView.swift; sourceTree = "<group>"; };
+		THM1E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapThemeSettings.swift; sourceTree = "<group>"; };
 		TLSK2E2F3A4B5C6D7E8F9A0B1 /* TripLinkSessionsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLinkSessionsSheet.swift; sourceTree = "<group>"; };
 		TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapLevel.swift; sourceTree = "<group>"; };
 		TMDL2E2F3A4B5C6D7E8F9A0B1 /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
@@ -310,9 +305,10 @@
 		TSCD2E2F3A4B5C6D7E8F9A0B1 /* TripShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShareCardView.swift; sourceTree = "<group>"; };
 		TSTO2E2F3A4B5C6D7E8F9A0B1 /* TripStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripStore.swift; sourceTree = "<group>"; };
 		TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAccountView.swift; sourceTree = "<group>"; };
+		TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAIAnalysisModels.swift; sourceTree = "<group>"; };
+		TTPBUBRE1E2F3A4B5C6D7E8F9A0B1 /* TierTapPlusTokenStatBubbles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapPlusTokenStatBubbles.swift; sourceTree = "<group>"; };
 		TTWLV01B2C3D4E5F678901234 /* TierTapWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWalletView.swift; sourceTree = "<group>"; };
 		TTWMOD01B2C3D4E5F678901234 /* RewardWalletCardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardWalletCardModels.swift; sourceTree = "<group>"; };
-		TTAI1E2F3A4B5C6D7E8F9A0B1 /* TierTapAIAnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapAIAnalysisModels.swift; sourceTree = "<group>"; };
 		TTWRPP01B2C3D4E5F678901234 /* RewardProgramPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardProgramPicker.swift; sourceTree = "<group>"; };
 		TWND1E2F3A4B5C6D7E8F9A0B1 /* TripMagicWandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripMagicWandView.swift; sourceTree = "<group>"; };
 		UGCTFILE01B2C3D4E5F6789012 /* UserGuideContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideContent.swift; sourceTree = "<group>"; };
@@ -324,12 +320,18 @@
 		WCH5E2F3A4B5C6D7E8F9A0B1 /* WatchStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStartView.swift; sourceTree = "<group>"; };
 		WCH7E2F3A4B5C6D7E8F9A0B1 /* WatchLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLiveView.swift; sourceTree = "<group>"; };
 		WCH9E2F3A4B5C6D7E8F9A0B1 /* WatchTierTapLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTierTapLogo.swift; sourceTree = "<group>"; };
-		WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchThemeColorPicker.swift; sourceTree = "<group>"; };
-		WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
-		WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNumericKeypad.swift; sourceTree = "<group>"; };
-		WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRainingCoinsOverlay.swift; sourceTree = "<group>"; };
 		WCHASSETFILE1B2C3D4E5F6A7B8C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TierTap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		WGTINT1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetIntents.swift; sourceTree = "<group>"; };
+		WGTRSS1B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapRecentSessionsWidget.swift; sourceTree = "<group>"; };
+		WGTSBLD1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshotBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshotBuilder.swift; sourceTree = "<group>"; };
+		WGTSHM1B2C3D4E5F6A7B8C9D0 /* TierTapHomeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapHomeWidget.swift; sourceTree = "<group>"; };
+		WGTSNP1B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TierTapWidgetSnapshot.swift; sourceTree = "<group>"; };
+		WNDPK01B2C3D4E5F6789ABC0 /* WatchNumericKeypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNumericKeypad.swift; sourceTree = "<group>"; };
+		WRNC01B2C3D4E5F6789ABE0 /* WatchRainingCoinsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRainingCoinsOverlay.swift; sourceTree = "<group>"; };
+		WTHM1E2F3A4B5C6D7E8F9A0B1 /* WatchThemeColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchThemeColorPicker.swift; sourceTree = "<group>"; };
+		WTHM3E2F3A4B5C6D7E8F9A0B1 /* WatchTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTheme.swift; sourceTree = "<group>"; };
+		ZIPTAXPRF01B2C3D4E5F6A7B8C9 /* TaxPrepZipArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxPrepZipArchive.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -343,6 +345,13 @@
 			files = (
 				2E255C192F5E726A00CAF0D7 /* Supabase in Frameworks */,
 				SQ3_1E2F3A4B5C6D7E8F9A0B1 /* libsqlite3.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,19 +369,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA0000000000000000000040 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		012CA1DD049612F01FD14100 = {
 			isa = PBXGroup;
 			children = (
+				2EF0E3053012BFCC00712BDE /* com.app.storekit */,
 				2E9D7B952F646B91004015F4 /* TierTapStoreKitConfig.storekit */,
 				F83566B140DB1139A064E7D0 /* TierTap */,
 				884F94035CBDFFAC738CD223 /* CasinoTimerWidget */,
@@ -514,6 +517,18 @@
 			path = CasinoTimerWidget;
 			sourceTree = "<group>";
 		};
+		AA0000000000000000000050 /* TierTapWatchComplications */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */,
+				AA0000000000000000000030 /* TierTapWatchComplications.entitlements */,
+				AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */,
+				AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */,
+				AA0000000000000000000034 /* Info.plist */,
+			);
+			path = TierTapWatchComplications;
+			sourceTree = "<group>";
+		};
 		BRDBGRP1E2F3A4B5C6D7E8F9A0B1 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -621,18 +636,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		AA0000000000000000000050 /* TierTapWatchComplications */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000000000000000000031 /* TierTapWatchComplicationsRelease.entitlements */,
-				AA0000000000000000000030 /* TierTapWatchComplications.entitlements */,
-				AA0000000000000000000032 /* TierTapWatchComplicationsBundle.swift */,
-				AA0000000000000000000033 /* TierTapWatchCornerComplicationWidget.swift */,
-				AA0000000000000000000034 /* Info.plist */,
-			);
-			path = TierTapWatchComplications;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -651,6 +654,23 @@
 			name = CasinoTimerWidget;
 			productName = CasinoTimerWidget;
 			productReference = 6284434301FEFC6B712F8C85 /* CasinoTimerWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AA0000000000000000000060 /* TierTapWatchComplications */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00000000000000000000B0 /* Build configuration list for PBXNativeTarget "TierTapWatchComplications" */;
+			buildPhases = (
+				AA0000000000000000000080 /* Sources */,
+				AA0000000000000000000040 /* Frameworks */,
+				AA0000000000000000000070 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TierTapWatchComplications;
+			productName = TierTapWatchComplications;
+			productReference = AA0000000000000000000035 /* TierTapWatchComplications.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		F72D60A227DE777C5EC16A58 /* TierTap */ = {
@@ -700,23 +720,6 @@
 			productReference = WCHE1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AA0000000000000000000060 /* TierTapWatchComplications */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = AA00000000000000000000B0 /* Build configuration list for PBXNativeTarget "TierTapWatchComplications" */;
-			buildPhases = (
-				AA0000000000000000000080 /* Sources */,
-				AA0000000000000000000040 /* Frameworks */,
-				AA0000000000000000000070 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TierTapWatchComplications;
-			productName = TierTapWatchComplications;
-			productReference = AA0000000000000000000035 /* TierTapWatchComplications.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -730,10 +733,10 @@
 					03F1CD5F275B834E8C24AFB1 = {
 						CreatedOnToolsVersion = 15.3;
 					};
-					F72D60A227DE777C5EC16A58 = {
+					AA0000000000000000000060 = {
 						CreatedOnToolsVersion = 15.3;
 					};
-					AA0000000000000000000060 = {
+					F72D60A227DE777C5EC16A58 = {
 						CreatedOnToolsVersion = 15.3;
 					};
 				};
@@ -780,6 +783,7 @@
 				0FB77BEA365A80289B878F9D /* Assets.xcassets in Resources */,
 				PROFWORDS2E2F3A4B5C6D7E8F9A0B1 /* ProfanityWords.txt in Resources */,
 				SUPKEYS2E2F3A4B5C6D7E8F9A0B1 /* SupabaseKeys.plist in Resources */,
+				2EF0E3063012BFCC00712BDE /* com.app.storekit in Resources */,
 				2E255D4A2F61FAF900CAF0D7 /* cash_register_sfx.wav in Resources */,
 				2E9D7B962F646B91004015F4 /* TierTapStoreKitConfig.storekit in Resources */,
 				2E255D4B2F61FAF900CAF0D7 /* coins_clinking.wav in Resources */,
@@ -799,20 +803,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0000000000000000000070 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000004 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		WCHO1B2C3D4E5F6A7B8C9D0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				WCHASSETBUILD1B2C3D4E5F6A7B8C9 /* Assets.xcassets in Resources */,
 				L10NB4E2F3A4B5C6D7E8F9A0B1 /* Strings.json in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AA0000000000000000000070 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AA0000000000000000000004 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,6 +875,15 @@
 				WGTRSS2B2C3D4E5F6A7B8C9D0 /* TierTapRecentSessionsWidget.swift in Sources */,
 				WGTINT2B2C3D4E5F6A7B8C9D0 /* TierTapWidgetIntents.swift in Sources */,
 				WGTSNP3B2C3D4E5F6A7B8C9D0 /* TierTapWidgetSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000080 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */,
+				AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,15 +1008,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA0000000000000000000080 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				AA0000000000000000000001 /* TierTapWatchComplicationsBundle.swift in Sources */,
-				AA0000000000000000000002 /* TierTapWatchCornerComplicationWidget.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1012,15 +1016,15 @@
 			target = 03F1CD5F275B834E8C24AFB1 /* CasinoTimerWidget */;
 			targetProxy = 13641607A338B0A3E51D1FC7 /* PBXContainerItemProxy */;
 		};
-		WCHK1B2C3D4E5F6A7B8C9D0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = WCHJ1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */;
-			targetProxy = WCHI1B2C3D4E5F6A7B8C9D0 /* PBXContainerItemProxy */;
-		};
 		AA0000000000000000000090 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA0000000000000000000060 /* TierTapWatchComplications */;
 			targetProxy = AA0000000000000000000010 /* PBXContainerItemProxy */;
+		};
+		WCHK1B2C3D4E5F6A7B8C9D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = WCHJ1B2C3D4E5F6A7B8C9D0 /* TierTap Watch App */;
+			targetProxy = WCHI1B2C3D4E5F6A7B8C9D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1129,7 +1133,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1201,6 +1205,50 @@
 			};
 			name = Debug;
 		};
+		AA00000000000000000000A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplications.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		AA00000000000000000000A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplicationsRelease.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		B6595FEB3DD1557C76FCF2B2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1256,7 +1304,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LE_SWIFT_VERSION = 5.0;
-				MARKETING_VERSION = 2.0;
+				MARKETING_VERSION = 3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1321,50 +1369,6 @@
 			};
 			name = Release;
 		};
-		AA00000000000000000000A0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplications.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
-				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Debug;
-		};
-		AA00000000000000000000A1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = TierTapWatchComplications/TierTapWatchComplicationsRelease.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = TierTapWatchComplications/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = TierTapWatchComplications;
-				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.tiertap.watchkitapp.watchcomplications;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1395,20 +1399,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		WCHL1B2C3D4E5F6A7B8C9D0 /* Build configuration list for PBXNativeTarget "TierTap Watch App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				WCHP1B2C3D4E5F6A7B8C9D0 /* Debug */,
-				WCHQ1B2C3D4E5F6A7B8C9D0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		AA00000000000000000000B0 /* Build configuration list for PBXNativeTarget "TierTapWatchComplications" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA00000000000000000000A0 /* Debug */,
 				AA00000000000000000000A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		WCHL1B2C3D4E5F6A7B8C9D0 /* Build configuration list for PBXNativeTarget "TierTap Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				WCHP1B2C3D4E5F6A7B8C9D0 /* Debug */,
+				WCHQ1B2C3D4E5F6A7B8C9D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

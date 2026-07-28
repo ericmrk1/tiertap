@@ -90,7 +90,7 @@ private struct HomeSessionsMetricsPageIndicator: View {
     }
 }
 
-/// Horizontally scrollable recent-session tiles for the home hero.
+/// Horizontally scrollable recent-session tiles for the home hero (two compact rows).
 private struct HomeRecentSessionsStripView: View {
     var onSessionTap: (Session) -> Void = { _ in }
 
@@ -98,9 +98,10 @@ private struct HomeRecentSessionsStripView: View {
     @State private var autoScrollEnabled = false
 
     private let maxTiles = 20
-    private let cardTileWidth: CGFloat = 148
-    private let tickerTileWidth: CGFloat = 168
-    private let tileSpacing: CGFloat = 10
+    private let cardTileWidth: CGFloat = 74
+    private let tickerTileWidth: CGFloat = 84
+    private let tileSpacing: CGFloat = 8
+    private let rowSpacing: CGFloat = 8
     private let carouselHeight: CGFloat = 148
 
     private var recentSessions: [Session] {
@@ -108,6 +109,20 @@ private struct HomeRecentSessionsStripView: View {
             .sorted { $0.startTime > $1.startTime }
             .prefix(maxTiles)
             .map { $0 }
+    }
+
+    /// Interleave into two rows so both fill evenly while scrolling together.
+    private var sessionRows: (top: [Session], bottom: [Session]) {
+        var top: [Session] = []
+        var bottom: [Session] = []
+        for (index, session) in recentSessions.enumerated() {
+            if index.isMultiple(of: 2) {
+                top.append(session)
+            } else {
+                bottom.append(session)
+            }
+        }
+        return (top, bottom)
     }
 
     /// Changes when sessions are added, deleted, or edited so the ticker rebuilds instead of showing stale tiles.
@@ -118,11 +133,13 @@ private struct HomeRecentSessionsStripView: View {
                 String(session.startTime.timeIntervalSince1970),
                 session.casino,
                 session.game,
-                String(session.winLoss ?? 0),
-                String(session.tierPointsEarned ?? 0),
-                session.effectiveTierPointsVerification.rawValue
+                String(session.winLoss ?? 0)
             ].joined(separator: ";")
         }.joined(separator: "|")
+    }
+
+    private var tileHeight: CGFloat {
+        (carouselHeight - rowSpacing) / 2
     }
 
     var body: some View {
@@ -135,11 +152,13 @@ private struct HomeRecentSessionsStripView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if autoScrollEnabled {
                     HomeSessionTickerStrip(
-                        sessions: recentSessions,
+                        topSessions: sessionRows.top,
+                        bottomSessions: sessionRows.bottom,
                         sessionsRevision: sessionsRevision,
                         tileWidth: tickerTileWidth,
-                        tileHeight: carouselHeight,
+                        tileHeight: tileHeight,
                         tileSpacing: tileSpacing,
+                        rowSpacing: rowSpacing,
                         onSessionTap: onSessionTap
                     )
                     .id(sessionsRevision)
@@ -169,29 +188,38 @@ private struct HomeRecentSessionsStripView: View {
 
     private var manualSessionsScroll: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: tileSpacing) {
-                ForEach(recentSessions) { session in
-                    HomeRecentSessionTile(sessionID: session.id, style: .card)
-                        .frame(width: cardTileWidth, height: carouselHeight)
-                        .onTapGesture {
-                            if let current = store.sessions.first(where: { $0.id == session.id }) {
-                                onSessionTap(current)
-                            }
-                        }
-                }
+            VStack(alignment: .leading, spacing: rowSpacing) {
+                sessionRow(sessionRows.top)
+                sessionRow(sessionRows.bottom)
             }
             .padding(.horizontal, 2)
         }
     }
+
+    private func sessionRow(_ sessions: [Session]) -> some View {
+        HStack(spacing: tileSpacing) {
+            ForEach(sessions) { session in
+                HomeRecentSessionTile(sessionID: session.id)
+                    .frame(width: cardTileWidth, height: tileHeight)
+                    .onTapGesture {
+                        if let current = store.sessions.first(where: { $0.id == session.id }) {
+                            onSessionTap(current)
+                        }
+                    }
+            }
+        }
+    }
 }
 
-/// Auto-scrolling ticker — one tile per session (no duplicated strip) so deleted sessions cannot linger off-screen.
+/// Auto-scrolling two-row ticker with a duplicated strip so the first column follows the last without a blank gap.
 private struct HomeSessionTickerStrip: View {
-    let sessions: [Session]
+    let topSessions: [Session]
+    let bottomSessions: [Session]
     let sessionsRevision: String
     let tileWidth: CGFloat
     let tileHeight: CGFloat
     let tileSpacing: CGFloat
+    let rowSpacing: CGFloat
     var onSessionTap: (Session) -> Void = { _ in }
 
     @EnvironmentObject private var store: SessionStore
@@ -200,30 +228,39 @@ private struct HomeSessionTickerStrip: View {
     private let pointsPerSecond: CGFloat = 22
     private let tickerTimer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
 
-    private var liveSessions: [Session] {
+    private var liveTop: [Session] {
         let validIDs = Set(store.sessions.map(\.id))
-        return sessions.filter { validIDs.contains($0.id) }
+        return topSessions.filter { validIDs.contains($0.id) }
     }
 
+    private var liveBottom: [Session] {
+        let validIDs = Set(store.sessions.map(\.id))
+        return bottomSessions.filter { validIDs.contains($0.id) }
+    }
+
+    private var liveSessionCount: Int {
+        liveTop.count + liveBottom.count
+    }
+
+    /// Width of one copy of the two-row strip (no trailing gap).
+    private var stripWidth: CGFloat {
+        let maxCount = CGFloat(max(liveTop.count, liveBottom.count))
+        guard maxCount > 0 else { return 0 }
+        return maxCount * tileWidth + max(0, maxCount - 1) * tileSpacing
+    }
+
+    /// Distance to shift before the duplicated strip lines up with the first (includes inter-copy spacing).
     private var loopWidth: CGFloat {
-        let count = CGFloat(liveSessions.count)
-        guard count > 0 else { return 0 }
-        return count * tileWidth + max(0, count - 1) * tileSpacing
+        guard stripWidth > 0 else { return 0 }
+        return stripWidth + tileSpacing
     }
 
     var body: some View {
-        GeometryReader { geo in
-            HStack(spacing: tileSpacing) {
-                ForEach(liveSessions) { session in
-                    HomeRecentSessionTile(sessionID: session.id, style: .ticker)
-                        .frame(width: tileWidth, height: geo.size.height)
-                        .id("\(session.id.uuidString)-\(sessionsRevision)")
-                        .onTapGesture {
-                            if let current = store.sessions.first(where: { $0.id == session.id }) {
-                                onSessionTap(current)
-                            }
-                        }
-                }
+        GeometryReader { _ in
+            HStack(alignment: .top, spacing: tileSpacing) {
+                tickerStrip(copyIndex: 0)
+                // Second copy makes the loop seamless: first column follows the last immediately.
+                tickerStrip(copyIndex: 1)
             }
             .offset(x: scrollOffset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -254,10 +291,11 @@ private struct HomeSessionTickerStrip: View {
         .clipped()
         .onReceive(tickerTimer) { _ in
             let width = loopWidth
-            guard width > 0, liveSessions.count > 1 else { return }
+            guard width > 0, liveSessionCount > 1 else { return }
             scrollOffset -= pointsPerSecond / 60.0
-            if scrollOffset <= -width {
-                scrollOffset = 0
+            // Jump by exactly one strip so the duplicate lands on the original with no blank gap.
+            while scrollOffset <= -width {
+                scrollOffset += width
             }
         }
         .onChange(of: sessionsRevision) { _ in
@@ -267,78 +305,38 @@ private struct HomeSessionTickerStrip: View {
             scrollOffset = 0
         }
     }
-}
 
-private enum HomeSessionTileStyle {
-    case card
-    case ticker
-}
-
-/// Pulsing emphasis for ticker metrics — peaks briefly like a stock price flash.
-private struct HomeTickerPopMetric: View {
-    let text: String
-    let color: Color
-    let animationSeed: Double
-    let windowStart: Double
-
-    private let cycleDuration = 5.2
-    private let windowWidth = 0.14
-
-    private func emphasis(at phase: Double) -> Double {
-        let local = (phase - windowStart + 1).truncatingRemainder(dividingBy: 1)
-        guard local < windowWidth else { return 0 }
-        let center = windowWidth / 2
-        let distance = abs(local - center) / max(center, 0.001)
-        return max(0, 1 - distance)
+    private func tickerStrip(copyIndex: Int) -> some View {
+        VStack(alignment: .leading, spacing: rowSpacing) {
+            tickerRow(liveTop, copyIndex: copyIndex)
+            tickerRow(liveBottom, copyIndex: copyIndex)
+        }
     }
 
-    var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
-            let elapsed = context.date.timeIntervalSinceReferenceDate + animationSeed
-            let phase = elapsed.truncatingRemainder(dividingBy: cycleDuration) / cycleDuration
-            let pop = emphasis(at: phase)
-
-            Text(text)
-                .font(.system(.subheadline, design: .rounded).weight(.bold).monospacedDigit())
-                .foregroundColor(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .scaleEffect(1 + pop * 0.24, anchor: .leading)
-                .opacity(0.72 + pop * 0.28)
-                .shadow(color: color.opacity(pop * 0.55), radius: pop * 8, y: pop * 2)
+    private func tickerRow(_ sessions: [Session], copyIndex: Int) -> some View {
+        HStack(spacing: tileSpacing) {
+            ForEach(sessions) { session in
+                HomeRecentSessionTile(sessionID: session.id)
+                    .frame(width: tileWidth, height: tileHeight)
+                    .id("\(copyIndex)-\(session.id.uuidString)-\(sessionsRevision)")
+                    .onTapGesture {
+                        if let current = store.sessions.first(where: { $0.id == session.id }) {
+                            onSessionTap(current)
+                        }
+                    }
+            }
         }
     }
 }
 
 private struct HomeRecentSessionTile: View {
     let sessionID: UUID
-    var style: HomeSessionTileStyle = .card
-    var animationSeed: Double = 0
 
     @EnvironmentObject private var store: SessionStore
     @EnvironmentObject private var settingsStore: SettingsStore
 
     private var session: Session? {
         store.sessions.first(where: { $0.id == sessionID })
-    }
-
-    private var verificationLabel: String {
-        guard let session else { return "" }
-        return session.effectiveTierPointsVerification == .verified ? "Verified" : "Unverified"
-    }
-
-    private var verificationForeground: Color {
-        guard let session else { return .white.opacity(0.45) }
-        return session.effectiveTierPointsVerification == .verified
-            ? Color(red: 0.28, green: 0.92, blue: 0.48)
-            : Color.yellow.opacity(0.95)
-    }
-
-    private var verificationBackground: Color {
-        guard let session else { return .clear }
-        return session.effectiveTierPointsVerification == .verified
-            ? Color(red: 0.28, green: 0.92, blue: 0.48).opacity(0.18)
-            : Color.yellow.opacity(0.18)
     }
 
     private var winLossText: String? {
@@ -348,19 +346,22 @@ private struct HomeRecentSessionTile: View {
             : "-\(settingsStore.currencySymbol)\(abs(wl).formatted(.number.grouping(.automatic)))"
     }
 
-    private var winLossColor: Color {
-        guard let session, let wl = session.winLoss else { return .white.opacity(0.45) }
-        return wl >= 0 ? .green : .red
+    private var tileTint: Color {
+        guard let session, let wl = session.winLoss else {
+            return Color.white.opacity(0.08)
+        }
+        return wl >= 0
+            ? Color.green.opacity(0.28)
+            : Color.red.opacity(0.28)
     }
 
-    private var tierPointsText: String? {
-        guard let session, let earned = session.tierPointsEarned else { return nil }
-        return "\(earned >= 0 ? "+" : "")\(earned.formatted(.number.grouping(.automatic))) pts"
-    }
-
-    private var tierPointsColor: Color {
-        guard let session, let earned = session.tierPointsEarned else { return .white.opacity(0.45) }
-        return earned >= 0 ? .green : .orange
+    private var tileStroke: Color {
+        guard let session, let wl = session.winLoss else {
+            return Color.white.opacity(0.12)
+        }
+        return wl >= 0
+            ? Color.green.opacity(0.45)
+            : Color.red.opacity(0.45)
     }
 
     private var sessionStartedToday: Bool {
@@ -368,162 +369,61 @@ private struct HomeRecentSessionTile: View {
         return Calendar.current.isDateInToday(session.startTime)
     }
 
-    @ViewBuilder
-    private var sessionStartLabel: some View {
-        if let session {
-            if sessionStartedToday {
-                Text(session.startTime, style: .time)
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.55))
-            } else {
-                Text(session.startTime, style: .date)
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.55))
-            }
-        }
-    }
-
-    /// Location, game, and time/date stacked so each line can use the full tile width.
-    @ViewBuilder
-    private var sessionDetailsColumn: some View {
-        if let session {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(session.casino.isEmpty ? "Session" : session.casino)
-                    .font(style == .ticker ? .caption.weight(.bold) : .subheadline.weight(.semibold))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Text(session.game.isEmpty ? "—" : session.game)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(style == .ticker ? 0.78 : 0.72))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                sessionStartLabel
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
     var body: some View {
         Group {
             if let session {
-                Group {
-                    switch style {
-                    case .card:
-                        cardBody
-                    case .ticker:
-                        tickerBody
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(session.game.isEmpty ? "—" : session.game)
+                        .font(.caption.weight(.bold))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+
+                    Text(session.casino.isEmpty ? "Session" : session.casino)
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.72))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+
+                    if sessionStartedToday {
+                        Text(session.startTime, style: .time)
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.55))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    } else {
+                        Text(session.startTime, style: .date)
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.55))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                     }
+
+                    Spacer(minLength: 0)
+
+                    if let winLossText {
+                        Text(winLossText)
+                            .font(.caption.weight(.bold).monospacedDigit())
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                    } else {
+                        Text("—")
+                            .font(.caption.weight(.bold))
+                            .foregroundColor(.white.opacity(0.45))
+                    }
+                }
+                .padding(7)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .background(tileTint, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(tileStroke, lineWidth: 1)
                 }
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(session.casino), \(session.game), \(verificationLabel)")
+                .accessibilityLabel("\(session.game), \(session.casino), \(winLossText ?? "no result")")
             }
         }
-    }
-
-    private var cardBody: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sessionDetailsColumn
-
-            Spacer(minLength: 0)
-
-            HStack(alignment: .firstTextBaseline) {
-                if let winLossText {
-                    Text(winLossText)
-                        .font(.subheadline.bold())
-                        .foregroundColor(winLossColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                } else {
-                    Text("—")
-                        .font(.subheadline.bold())
-                        .foregroundColor(.white.opacity(0.45))
-                }
-                Spacer(minLength: 0)
-                if let tierPointsText {
-                    Text(tierPointsText)
-                        .font(.caption2.bold())
-                        .foregroundColor(tierPointsColor)
-                        .lineLimit(1)
-                }
-            }
-
-            verificationBadge
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-        }
-    }
-
-    private var tickerBody: some View {
-        HStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 7) {
-                sessionDetailsColumn
-
-                HStack(spacing: 10) {
-                    if let winLossText {
-                        HomeTickerPopMetric(
-                            text: winLossText,
-                            color: winLossColor,
-                            animationSeed: animationSeed,
-                            windowStart: 0.04
-                        )
-                    }
-
-                    if let tierPointsText {
-                        HomeTickerPopMetric(
-                            text: tierPointsText,
-                            color: tierPointsColor,
-                            animationSeed: animationSeed,
-                            windowStart: 0.2
-                        )
-                    }
-                }
-
-                if let session, session.hoursPlayed > 0 {
-                    HomeTickerPopMetric(
-                        text: String(format: "%.1f hr", session.hoursPlayed),
-                        color: .white.opacity(0.82),
-                        animationSeed: animationSeed,
-                        windowStart: 0.36
-                    )
-                }
-
-                verificationBadge
-            }
-            .padding(.leading, 10)
-            .padding(.trailing, 6)
-            .padding(.vertical, 10)
-
-            Rectangle()
-                .fill(Color.white.opacity(0.16))
-                .frame(width: 1)
-                .padding(.vertical, 12)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        }
-    }
-
-    private var verificationBadge: some View {
-        Text(verificationLabel)
-            .font(.caption2.bold())
-            .foregroundColor(verificationForeground)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(verificationBackground)
-            .cornerRadius(4)
     }
 }
 

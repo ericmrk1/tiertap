@@ -54,14 +54,14 @@ Reviewers saw “Subscription plans aren’t available…” when StoreKit retur
 
 ### Product IDs (must match exactly)
 
-| Product | ID | Type |
+| Product | Product ID (ASC) | Type |
 |--------|----|------|
-| Monthly | `com.app.subs.tiertap.monthly` | Auto-renewable |
-| 3 Months | `com.app.subs.tiertap.quarterly` | Auto-renewable |
-| Yearly | `com.app.subs.tiertap.yearly` | Auto-renewable |
+| Monthly | `pro.monthly` | Auto-renewable |
+| 3 Months | `pro` | Auto-renewable |
+| Yearly | `pro.yearly` | Auto-renewable |
 | Token pack | `Credits` | Consumable |
 
-Subscription group: `com.app.subs.tiertap`
+Subscription group: `com.app.subs.tiertap` (ASC reference names still use `com.app.subs.tiertap.*`; StoreKit uses **Product ID**, not reference name.)
 
 ### App Store Connect checklist
 
@@ -77,7 +77,7 @@ Subscription group: `com.app.subs.tiertap`
 ### Review Notes for IAP
 
 ```text
-IAP sandbox: products com.app.subs.tiertap.monthly / .quarterly / .yearly and consumable Credits.
+IAP sandbox: products pro.monthly / pro / pro.yearly and consumable Credits.
 Paywall: Settings → Upgrade/Manage TierTap Pro (or any gated Pro entry).
 Pull down on the paywall to refresh the catalog.
 Paid Apps Agreement: Active.
