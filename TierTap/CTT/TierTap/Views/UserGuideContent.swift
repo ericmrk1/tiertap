@@ -353,15 +353,15 @@ enum UserGuideContent {
     private static func tierTapPlusRows(_ language: AppLanguage) -> [UserGuideRow] {
         [
             .h1(loc("TierTap+", language)),
-            .paragraph(loc("TierTap+ is the optional token-pack add-on for subscribers who want more AI capacity beyond the monthly allowance included with TierTap Pro. TierTap AI features spend model tokens; your subscription covers a per-calendar-month pool first, then any TierTap+ tokens you have purchased.", language)),
+            .paragraph(loc("TierTap+ is an optional token-pack purchase for more AI capacity. You can buy packs with or without a TierTap Pro subscription. With Pro, your subscription covers a per-calendar-month pool first, then any TierTap+ tokens you have purchased; without Pro, AI draws from your TierTap+ balance.", language)),
             .h2(loc("Why add tokens", language)),
-            .bullet(loc("More headroom for Ask TierTap, image generation, chip and comp estimation, slot reading, trip magic wand, and other TierTap AI calls without waiting for the next monthly reset.", language)),
+            .bullet(loc("More headroom for Ask TierTap, image generation, chip and comp estimation, slot reading, trip magic wand, and other TierTap AI calls—without waiting for the next monthly reset if you have Pro, or as standalone AI capacity if you do not.", language)),
             .bullet(loc("Purchased tokens accumulate in your TierTap+ balance until used; usage charts help you see day-to-day trends.", language)),
             .h2(loc("Where to buy TierTap+ packs", language)),
             .bullet(loc("Settings tab → expand the TierTap+ section (labeled TierTap Plus in text-to-speech) → Buy TierTap+ Tokens when the pack appears with a store price.", language)),
             .bullet(loc("TierTap Account (Settings → TierTap Account) → AI token packs card has the same purchase control and shows balances.", language)),
             .h2(loc("Requirements", language)),
-            .bullet(loc("You need an active TierTap Pro subscription before token packs can be purchased; the app explains this if the buy button is disabled.", language)),
+            .bullet(loc("TierTap+ packs can be purchased independently of a TierTap Pro subscription.", language)),
             .bullet(loc("Token packs are normal App Store consumables—use Restore Purchases on the TierTap Pro paywall if Apple confirms a sale but the balance did not update.", language)),
             .h2(loc("Track balances and usage", language)),
             .bullet(loc("Settings → TierTap+ section: switch the chart between sessions, tokens, and TierTap AI views for the selected month.", language)),

@@ -79,6 +79,7 @@ Subscription group: `com.app.subs.tiertap` (ASC reference names still use `com.a
 ```text
 IAP sandbox: products pro.monthly / pro / pro.yearly and consumable Credits.
 Paywall: Settings → Upgrade/Manage TierTap Pro (or any gated Pro entry).
+Credits (TierTap+): purchasable without an active Pro subscription from the paywall, Settings → TierTap+, or Account → AI token packs.
 Pull down on the paywall to refresh the catalog.
 Paid Apps Agreement: Active.
 ```

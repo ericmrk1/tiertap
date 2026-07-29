@@ -412,7 +412,7 @@ struct TierTapPaywallView: View {
                         .foregroundColor(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    L10nText("Need more AI power? Add token packs to extend usage beyond your TierTap Pro plan.")
+                    L10nText("Need more AI power? Buy TierTap+ token packs anytime—no subscription required. With Pro, packs extend usage beyond your monthly plan.")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
@@ -458,18 +458,11 @@ struct TierTapPaywallView: View {
                             creditsProduct.displayPrice
                         )
                     )
-                    .disabled(!hasProAccess || isPurchasingCreditsPack || purchasingProductId != nil || subscriptionStore.isLoading)
+                    .disabled(isPurchasingCreditsPack || purchasingProductId != nil || subscriptionStore.isLoading)
                 } else {
                     L10nText("Token packs aren’t available in the store yet. Check back after the Credits product is configured.")
                         .font(.caption2)
                         .foregroundColor(.white.opacity(0.75))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if !hasProAccess {
-                    L10nText("Subscribe to TierTap Pro to use AI features, then you can buy token packs here.")
-                        .font(.caption2)
-                        .foregroundColor(.orange.opacity(0.95))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -576,7 +569,6 @@ struct TierTapPaywallView: View {
     }
 
     private func purchaseCreditsPack(_ product: Product) {
-        guard hasProAccess else { return }
         guard purchasingProductId == nil, !subscriptionStore.isLoading, !isPurchasingCreditsPack else { return }
         isPurchasingCreditsPack = true
         Task {

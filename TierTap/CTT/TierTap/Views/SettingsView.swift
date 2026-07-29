@@ -1249,23 +1249,16 @@ struct SettingsView: View {
                         product.displayPrice
                     )
                 )
-                .disabled(!hasProAccess || isPurchasingCreditsPack || subscriptionStore.isLoading)
+                .disabled(isPurchasingCreditsPack || subscriptionStore.isLoading)
             } else {
                 L10nText("Token packs aren’t available in the store yet.")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.75))
             }
-
-            if !hasProAccess {
-                L10nText("Subscribe to TierTap Pro to use AI, then you can buy token packs here.")
-                    .font(.caption2)
-                    .foregroundColor(.orange.opacity(0.95))
-            }
         }
     }
 
     private func purchaseTierTapPlusTokensPack(_ product: Product) async {
-        guard hasProAccess else { return }
         guard !isPurchasingCreditsPack, !subscriptionStore.isLoading else { return }
         isPurchasingCreditsPack = true
         if let tid = await subscriptionStore.purchase(product) {

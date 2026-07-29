@@ -860,7 +860,7 @@ final class SettingsStore: ObservableObject {
     /// Per-day AI token usage and feature invocations (all tiers), for Settings charts.
     @Published private(set) var aiDayTelemetry: [String: AIDayTelemetry] = [:]
 
-    /// Remaining TierTap Plus token balance from **Credits** consumable IAP. Drawn down only after the monthly Pro plan allowance is used (see ``consumeAIPurchasedTokensIfNeeded``).
+    /// Remaining TierTap Plus token balance from **Credits** consumable IAP. With Pro, drawn down after the monthly plan allowance; without Pro, drawn down directly for AI usage.
     @Published private(set) var aiPurchasedTokenBalance: Int = 0
 
     /// Lifetime total of TierTap Plus (`Credits`) tokens granted from IAP (running sum of pack sizes).
@@ -915,7 +915,7 @@ final class SettingsStore: ObservableObject {
         #endif
     }
 
-    /// Whether the user may invoke TierTap AI features (free daily quota or Pro monthly + pack budget).
+    /// Whether the user may invoke TierTap AI features (free daily quota, Pro monthly + pack budget, or purchased pack balance alone).
     func canInvokeTierTapAIFeatures(hasProAccess: Bool) -> Bool {
         if isSubscriptionOverrideActive { return true }
         #if targetEnvironment(simulator)
@@ -923,6 +923,9 @@ final class SettingsStore: ObservableObject {
         #else
         if hasProAccess {
             return !isProAITokenBudgetExhausted
+        }
+        if aiPurchasedTokenBalance > 0 {
+            return true
         }
         return canUseAI()
         #endif
@@ -1420,7 +1423,8 @@ final class SettingsStore: ObservableObject {
     }
 
     /// Called after each successful remote AI request (Gemini text/image or Imagen). Adds token totals when known.
-    /// When `hasProAccess` is true, usage counts against the monthly Pro included allowance first, then against ``aiPurchasedTokenBalance``.
+    /// With Pro, usage counts against the monthly included allowance first, then ``aiPurchasedTokenBalance``.
+    /// Without Pro, usage draws from ``aiPurchasedTokenBalance`` when a pack balance is available.
     func recordAITelemetry(invocationTokens: Int, hasProAccess: Bool = false) {
         let key = Self.telemetryDayKey(for: Date())
         var next = aiDayTelemetry
@@ -1464,24 +1468,26 @@ final class SettingsStore: ObservableObject {
     }
 
     private func applyProAndPurchasedGeminiTokenSpend(invocationTokens: Int, hasProAccess: Bool) {
-        guard hasProAccess else { return }
         let tokens = max(0, invocationTokens)
         guard tokens > 0 else { return }
 
-        let monthKey = Self.proPlanMonthKey(for: Date())
-        let storedMonth = UserDefaults.standard.string(forKey: keyAIProPlanTokenMonth) ?? ""
-        if storedMonth != monthKey {
-            proPlanTokensConsumedThisMonth = 0
-            UserDefaults.standard.set(monthKey, forKey: keyAIProPlanTokenMonth)
-            UserDefaults.standard.set(0, forKey: keyAIProPlanTokensConsumed)
-        }
+        var fromPlan = 0
+        if hasProAccess {
+            let monthKey = Self.proPlanMonthKey(for: Date())
+            let storedMonth = UserDefaults.standard.string(forKey: keyAIProPlanTokenMonth) ?? ""
+            if storedMonth != monthKey {
+                proPlanTokensConsumedThisMonth = 0
+                UserDefaults.standard.set(monthKey, forKey: keyAIProPlanTokenMonth)
+                UserDefaults.standard.set(0, forKey: keyAIProPlanTokensConsumed)
+            }
 
-        let allowance = effectiveProPlanIncludedTokensPerCalendarMonth
-        let allowanceRemaining = max(0, allowance - proPlanTokensConsumedThisMonth)
-        let fromPlan = min(tokens, allowanceRemaining)
-        if fromPlan > 0 {
-            proPlanTokensConsumedThisMonth += fromPlan
-            UserDefaults.standard.set(proPlanTokensConsumedThisMonth, forKey: keyAIProPlanTokensConsumed)
+            let allowance = effectiveProPlanIncludedTokensPerCalendarMonth
+            let allowanceRemaining = max(0, allowance - proPlanTokensConsumedThisMonth)
+            fromPlan = min(tokens, allowanceRemaining)
+            if fromPlan > 0 {
+                proPlanTokensConsumedThisMonth += fromPlan
+                UserDefaults.standard.set(proPlanTokensConsumedThisMonth, forKey: keyAIProPlanTokensConsumed)
+            }
         }
 
         let fromPurchasedNeed = tokens - fromPlan

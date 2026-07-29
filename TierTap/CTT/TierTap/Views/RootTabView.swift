@@ -557,16 +557,10 @@ struct CommunityAuthSheet: View {
                         product.displayPrice
                     )
                 )
-                .disabled(!hasProAccess || isPurchasingCreditsPack || subscriptionStore.isLoading)
+                .disabled(isPurchasingCreditsPack || subscriptionStore.isLoading)
             } else {
                 L10nText("Token packs aren’t available in the store yet.")
                     .font(.caption)
-                    .foregroundColor(.white.opacity(0.75))
-            }
-
-            if !hasProAccess {
-                L10nText("An active TierTap Pro plan is required before you can buy token packs.")
-                    .font(.caption2)
                     .foregroundColor(.white.opacity(0.75))
             }
         }
@@ -577,7 +571,6 @@ struct CommunityAuthSheet: View {
     }
 
     private func purchaseCreditsPackFromAccount(_ product: Product) async {
-        guard hasProAccess else { return }
         guard !isPurchasingCreditsPack, !subscriptionStore.isLoading else { return }
         isPurchasingCreditsPack = true
         if let tid = await subscriptionStore.purchase(product) {
