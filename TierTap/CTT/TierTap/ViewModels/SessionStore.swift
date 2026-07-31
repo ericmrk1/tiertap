@@ -265,6 +265,7 @@ class SessionStore: ObservableObject {
         saveSessions()
         #if os(iOS)
         LiveActivityManager.shared.end()
+        NotificationCenter.default.post(name: .tierTapSessionCompletedForReviewPrompt, object: nil)
         #endif
         pushContext()
         return [:]
@@ -658,6 +659,7 @@ class SessionStore: ObservableObject {
         #endif
         #if os(iOS)
         pushContext()
+        NotificationCenter.default.post(name: .tierTapSessionCompletedForReviewPrompt, object: nil)
         if presentPostCloseoutSharePrompt {
             schedulePostCloseoutSharePrompt(sessionId: s.id)
         }
@@ -1206,6 +1208,7 @@ class SessionStore: ObservableObject {
         saveSessions()
         #if os(iOS)
         pushContext()
+        NotificationCenter.default.post(name: .tierTapSessionCompletedForReviewPrompt, object: nil)
         #endif
     }
 
@@ -1221,6 +1224,7 @@ class SessionStore: ObservableObject {
         saveSessions()
         #if os(iOS)
         if prev.status == .requiringMoreInfo && s.status == .complete {
+            NotificationCenter.default.post(name: .tierTapSessionCompletedForReviewPrompt, object: nil)
             schedulePostCloseoutSharePrompt(sessionId: s.id)
         }
         pushContext()

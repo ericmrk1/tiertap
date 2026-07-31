@@ -49,6 +49,7 @@ struct SettingsView: View {
     @State private var showDenominationDialPad = false
     @State private var denominationDialPadDraft = ""
     @State private var showSessionReminderSettings = false
+    @State private var showAppFeedbackSheet = false
 
     var body: some View {
         NavigationStack {
@@ -155,6 +156,10 @@ struct SettingsView: View {
                 SessionReminderSettingsSheet()
                     .environmentObject(settingsStore)
                     .environmentObject(sessionStore)
+            }
+            .halfScreenSheet(isPresented: $showAppFeedbackSheet) {
+                AppFeedbackSheet()
+                    .environmentObject(settingsStore)
             }
         }
     }
@@ -1339,6 +1344,23 @@ struct SettingsView: View {
                         Image(systemName: "chevron.right")
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.7))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    showAppFeedbackSheet = true
+                } label: {
+                    HStack {
+                        Image(systemName: "star.bubble.fill")
+                        L10nText("Leave Feedback")
+                            .font(.subheadline.bold())
+                        Spacer()
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()

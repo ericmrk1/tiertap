@@ -23,6 +23,8 @@ private let keySecondaryColorHex = "ctt_secondary_color_hex"
 private let keySelectedLocationFilter = "ctt_selected_location_filter"
 private let keyThemePresets = "ctt_theme_presets"
 private let keyPromptSessionMood = "ctt_prompt_session_mood"
+private let keyHasLeftAppReview = "ctt_has_left_app_review"
+private let keyCompletedSessionsForReview = "ctt_completed_sessions_for_review"
 private let keyAITone = "ctt_ai_tone"
 private let keyAITypingSpeed = "ctt_ai_typing_speed"
 private let keyAICallsDate = "ctt_ai_calls_date"
@@ -546,9 +548,31 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(promptSessionMood, forKey: keyPromptSessionMood) }
     }
 
+    /// True after the user submits a star rating in the app feedback sheet (stops auto-prompts).
+    @Published var hasLeftAppReview: Bool {
+        didSet { UserDefaults.standard.set(hasLeftAppReview, forKey: keyHasLeftAppReview) }
+    }
+
+    /// Lifetime count of completed play sessions used for the every-5-sessions feedback prompt.
+    @Published var completedSessionsForReview: Int {
+        didSet { UserDefaults.standard.set(completedSessionsForReview, forKey: keyCompletedSessionsForReview) }
+    }
+
     /// When true (default), play casino-style chimes and haptics for key actions like check-in, buy-ins, closing out, and sharing.
     @Published var enableCasinoFeedback: Bool {
         didSet { UserDefaults.standard.set(enableCasinoFeedback, forKey: keyEnableCasinoFeedback) }
+    }
+
+    /// Increments completed-session count. Returns true when feedback should auto-prompt (every 5 completions if not reviewed).
+    @discardableResult
+    func recordCompletedSessionAndShouldPromptFeedback() -> Bool {
+        completedSessionsForReview += 1
+        guard !hasLeftAppReview else { return false }
+        return completedSessionsForReview > 0 && completedSessionsForReview % 5 == 0
+    }
+
+    func markAppFeedbackSubmitted() {
+        hasLeftAppReview = true
     }
 
     enum SoundProfile: String, CaseIterable, Identifiable, Codable {
@@ -1024,6 +1048,8 @@ final class SettingsStore: ObservableObject {
         } else {
             self.promptSessionMood = true
         }
+        self.hasLeftAppReview = UserDefaults.standard.bool(forKey: keyHasLeftAppReview)
+        self.completedSessionsForReview = UserDefaults.standard.integer(forKey: keyCompletedSessionsForReview)
         if UserDefaults.standard.object(forKey: keyEnableCasinoFeedback) != nil {
             self.enableCasinoFeedback = UserDefaults.standard.bool(forKey: keyEnableCasinoFeedback)
         } else {

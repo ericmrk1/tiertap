@@ -66,6 +66,7 @@
 		FCHK01E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */; };
 		FMAP1E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */; };
 		GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */; };
+		AFBKS2E2F3A4B5C6D7E8F9A0B1 /* AppFeedbackSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFBKS1E2F3A4B5C6D7E8F9A0B1 /* AppFeedbackSheet.swift */; };
 		GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */; };
 		GEN2E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift in Sources */ = {isa = PBXBuildFile; fileRef = GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */; };
 		HISTGRDB01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */; };
@@ -263,6 +264,7 @@
 		FCHK02E2F3A4B5C6D7E8F9A0B1 /* FastCheckInBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastCheckInBar.swift; sourceTree = "<group>"; };
 		FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightRouteMapView.swift; sourceTree = "<group>"; };
 		GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GASupportSheet.swift; sourceTree = "<group>"; };
+		AFBKS1E2F3A4B5C6D7E8F9A0B1 /* AppFeedbackSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeedbackSheet.swift; sourceTree = "<group>"; };
 		GEMTH1E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiRouterThrottle.swift; sourceTree = "<group>"; };
 		GEN1E2F3A4B5C6D7E8F9A0B1 /* SessionSharePhrasesGenerated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSharePhrasesGenerated.swift; sourceTree = "<group>"; };
 		HISTGRDF01B2C3D4E5F6A7B8C9 /* HistoryActivityGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryActivityGridView.swift; sourceTree = "<group>"; };
@@ -431,6 +433,7 @@
 				CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */,
 				SMPV1E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift */,
 				GASUP1E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift */,
+				AFBKS1E2F3A4B5C6D7E8F9A0B1 /* AppFeedbackSheet.swift */,
 				ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */,
 				APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */,
 				TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */,
@@ -960,6 +963,7 @@
 				CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */,
 				SMPV2E2F3A4B5C6D7E8F9A0B1 /* SessionMoodPickerView.swift in Sources */,
 				GASUP2E2F3A4B5C6D7E8F9A0B1 /* GASupportSheet.swift in Sources */,
+				AFBKS2E2F3A4B5C6D7E8F9A0B1 /* AppFeedbackSheet.swift in Sources */,
 				674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */,
 				CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */,
 				ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */,

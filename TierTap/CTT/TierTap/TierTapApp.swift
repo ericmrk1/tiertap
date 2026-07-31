@@ -59,6 +59,7 @@ private struct TierTapAppRoot: View {
     @State private var appSessionUnlocked = true
     /// Matches previous behavior: auto-present sign-in sheet at most once per launch (unless triggered by notification).
     @State private var didOfferWelcomeThisSession = false
+    @State private var showAppFeedbackPrompt = false
 
     var body: some View {
         ZStack {
@@ -173,6 +174,21 @@ private struct TierTapAppRoot: View {
                 .environmentObject(settingsStore)
                 .environmentObject(authStore)
         }
+        #if os(iOS)
+        .halfScreenSheet(isPresented: $showAppFeedbackPrompt) {
+            AppFeedbackSheet()
+                .environmentObject(settingsStore)
+                .environment(\.appLanguage, settingsStore.appLanguage)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .tierTapSessionCompletedForReviewPrompt)) { _ in
+            guard settingsStore.recordCompletedSessionAndShouldPromptFeedback() else { return }
+            // Wait for close-out / mood / share sheets to finish so this can appear over any tab.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                guard !showSplash, appSessionUnlocked, !settingsStore.hasLeftAppReview else { return }
+                showAppFeedbackPrompt = true
+            }
+        }
+        #endif
     }
 
     private var postCloseoutShareSheetBinding: Binding<PostCloseoutSessionRef?> {
