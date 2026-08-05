@@ -1,0 +1,212 @@
+import SwiftUI
+
+struct RiskOfRuinView: View {
+    @EnvironmentObject var sessionStore: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+
+    private var result: RiskOfRuinResult {
+        return RiskOfRuinMath.compute(
+            sessions: sessionStore.sessions,
+            bankroll: settingsStore.bankroll,
+            targetAveragePerSession: settingsStore.targetAveragePerSession,
+            useExpectedValue: settingsStore.analyticsUseExpectedValue
+        )
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        chanceOfBustingCard
+                        averageVsTargetCard
+                        sessionsCard
+                        mathNoteCard
+                    }
+                    .padding()
+                }
+            }
+            .localizedNavigationTitle("Risk of Ruin")
+            .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                    } label: {
+                        HStack(spacing: 6) {
+                            if authStore.isSignedIn,
+                               let uiImage = authStore.localProfilePhotoImage {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 24, height: 24)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                    )
+                            } else {
+                                Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                            }
+                            if authStore.isSignedIn {
+                                if authStore.localProfilePhotoImage == nil,
+                                   let emojis = authStore.userProfileEmojis,
+                                   !emojis.isEmpty {
+                                    Text(emojis)
+                                        .font(.caption)
+                                }
+                                Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
+                                    .lineLimit(1)
+                                    .font(.caption)
+                            } else {
+                                L10nText("Account")
+                                    .font(.caption)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.18))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                    }
+                }
+            }
+        }
+    }
+
+    private var chanceOfBustingCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                LocalizedLabel(title: "Chance of busting out", systemImage: "exclamationmark.triangle.fill")
+                    .font(.headline).foregroundColor(.white)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                ZStack {
+                    Circle()
+                        .fill(Color(.systemGray6).opacity(0.35))
+                        .overlay(Circle().stroke(rorColor.opacity(0.6), lineWidth: 3))
+                    Text(rorPercentString)
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .foregroundColor(rorColor)
+                }
+                .frame(width: 160, height: 160)
+                Spacer()
+            }
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "risk of ruin — based on table‑game sessions (poker excluded), using EV (cash net plus logged comps) for win/loss per session, with your bankroll settings."
+                 : "risk of ruin — probability of losing your entire bankroll based on your table‑game session history (poker sessions are excluded) and current bankroll settings, using cash net per session.")
+                .font(.caption).foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private var rorPercentString: String {
+        if result.sessionCount == 0 {
+            return "—"
+        }
+        let pct = result.riskOfRuin * 100
+        if pct >= 99.5 { return "~100%" }
+        if pct <= 0.5 { return "<1%" }
+        return String(format: "%.1f%%", pct)
+    }
+
+    private var rorColor: Color {
+        if result.sessionCount == 0 { return .gray }
+        if result.riskOfRuin >= 0.25 { return .red }
+        if result.riskOfRuin >= 0.10 { return .orange }
+        return .green
+    }
+
+    private var averageVsTargetCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Average vs target", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.headline).foregroundColor(.white)
+            if result.sessionCount == 0 {
+                L10nText("Add closed sessions to see your average win/loss per session and compare to your target.")
+                    .font(.subheadline).foregroundColor(.gray)
+            } else {
+                HStack {
+                    L10nText("Actual average")
+                        .font(.subheadline).foregroundColor(.gray)
+                    Spacer()
+                    Text(formatDollars(result.actualAveragePerSession))
+                        .font(.subheadline.bold())
+                        .foregroundColor((result.actualAveragePerSession ?? 0) >= 0 ? .green : .red)
+                }
+                if let target = result.targetAveragePerSession {
+                    HStack {
+                        L10nText("Target average")
+                            .font(.subheadline).foregroundColor(.gray)
+                        Spacer()
+                        Text(formatDollars(target))
+                            .font(.subheadline.bold()).foregroundColor(.white)
+                    }
+                    if let actual = result.actualAveragePerSession {
+                        let gap = actual - target
+                        HStack {
+                            L10nText("Gap")
+                                .font(.subheadline).foregroundColor(.gray)
+                            Spacer()
+                            Text((gap >= 0 ? "+" : "") + formatDollars(gap))
+                                .font(.subheadline.bold())
+                                .foregroundColor(gap >= 0 ? .green : .orange)
+                        }
+                    }
+                } else {
+                    L10nText("Set a target in Settings to compare.")
+                        .font(.caption).foregroundColor(.gray)
+                }
+                if let wr = result.winRate {
+                    HStack {
+                        L10nText("Win rate (sessions)")
+                            .font(.subheadline).foregroundColor(.gray)
+                        Spacer()
+                        Text(String(format: "%.0f%%", wr * 100))
+                            .font(.subheadline.bold()).foregroundColor(.white)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private var sessionsCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            DetailRow(label: "Bankroll", value: "\(settingsStore.currencySymbol)\(settingsStore.bankroll)")
+            DetailRow(label: "Sessions used", value: "\(result.sessionCount)")
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private var mathNoteCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            L10nText("How it's calculated")
+                .font(.caption.bold()).foregroundColor(.gray)
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p and q use EV (cash net + comps) per table session. Poker sessions are not included. With negative or break-even edge, ruin is certain over time. Set bankroll in Settings. Match “Results basis” on Analytics."
+                 : "Risk of ruin uses the session-based formula: RoR = (q/p)^(bankroll/unit), where p = proportion of winning sessions and q = proportion of losing sessions from your table‑game history only (poker sessions are not included). With negative or break-even edge, ruin is certain over time. Set bankroll in Settings.")
+                .font(.caption).foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.1))
+        .cornerRadius(12)
+    }
+
+    private func formatDollars(_ value: Double?) -> String {
+        guard let v = value else { return "—" }
+        let sign = v >= 0 ? "+" : ""
+        return sign + settingsStore.currencySymbol + "\(Int(round(v)))"
+    }
+}

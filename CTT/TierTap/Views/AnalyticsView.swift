@@ -1,0 +1,3654 @@
+import SwiftUI
+import UIKit
+import Supabase
+import CryptoKit
+
+struct AnalyticsShareSelection {
+    let includeBetCaptureDiff: Bool
+    let includeVenn: Bool
+    let includeWinLoss: Bool
+    let includeTierProgress: Bool
+    let includeGameBreakdown: Bool
+    let includeTierByLoyaltyProgram: Bool
+    let includeSessionMoods: Bool
+}
+
+struct AnalyticsView: View {
+    @EnvironmentObject var sessionStore: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    
+    @State private var isAISheetPresented: Bool = false
+    @State private var isPaywallPresented: Bool = false
+    
+    @State private var selectedGraphKind: GraphKind = .venn
+    @State private var isShareSelectionPresented: Bool = false
+    @State private var isShareSheetPresented: Bool = false
+    @State private var analyticsFromDate: Date? = nil
+    @State private var analyticsToDate: Date? = nil
+    @State private var isFiltersExpanded: Bool = false
+    @State private var isOverviewExpanded: Bool = true
+    @State private var isMonthlyChartExpanded: Bool = false
+    @State private var isBasicResultsExpanded: Bool = false
+
+#if os(iOS)
+    @State private var shareImages: [UIImage] = []
+    @State private var shareURLs: [URL] = []
+    @State private var pendingShareSelection: AnalyticsShareSelection?
+#endif
+
+    @State private var selectedAnalyticsCategory: SessionGameCategory = .table
+    @State private var isRiskOfRuinPresented: Bool = false
+
+    private var allClosedSessions: [Session] {
+        sessionStore.sessions.filter { $0.winLoss != nil }
+    }
+
+    /// Whether there are any closed sessions at all, regardless of category.
+    private var hasAnyClosedSessions: Bool {
+        !allClosedSessions.isEmpty
+    }
+
+    /// Table-only closed sessions (excludes poker and slots).
+    private var tableClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory != .poker && $0.gameCategory != .slots }
+    }
+
+    /// Slots-only closed sessions.
+    private var slotsClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory == .slots }
+    }
+
+    /// Poker-only closed sessions.
+    private var pokerClosedSessions: [Session] {
+        allClosedSessions.filter { $0.gameCategory == .poker }
+    }
+
+    /// Closed sessions for the currently selected analytics category.
+    private var closedSessions: [Session] {
+        let baseAll: [Session]
+        switch selectedAnalyticsCategory {
+        case .table:
+            baseAll = tableClosedSessions
+        case .slots:
+            baseAll = slotsClosedSessions
+        case .poker:
+            baseAll = pokerClosedSessions
+        }
+        var base = baseAll
+        if let filter = settingsStore.selectedLocationFilter, !filter.isEmpty {
+            base = base.filter { $0.casino == filter }
+        }
+        let cal = Calendar.current
+        if let from = analyticsFromDate {
+            let startOfFrom = cal.startOfDay(for: from)
+            base = base.filter { $0.startTime >= startOfFrom }
+        }
+        if let to = analyticsToDate {
+            let endOfTo = cal.date(bySettingHour: 23, minute: 59, second: 59, of: cal.startOfDay(for: to)) ?? cal.startOfDay(for: to)
+            base = base.filter { $0.startTime <= endOfTo }
+        }
+        return base
+    }
+
+    private var analyticsSessionOverviewTitle: String {
+        switch selectedAnalyticsCategory {
+        case .table: return "Table Session Overview"
+        case .slots: return "Slots Session Overview"
+        case .poker: return "Poker Session Overview"
+        }
+    }
+
+    /// Table and slots share the same charts (vs poker-specific cards).
+    private var usesTableStyleAnalytics: Bool {
+        selectedAnalyticsCategory == .table || selectedAnalyticsCategory == .slots
+    }
+
+    private var availableCasinos: [String] {
+        Array(Set(allClosedSessions.map { $0.casino })).sorted()
+    }
+
+    /// Per-session result for charts and win rate: cash net or EV (net + comps).
+    private func sessionOutcome(_ session: Session) -> Int {
+        session.analyticsOutcome(useExpectedValue: settingsStore.analyticsUseExpectedValue) ?? 0
+    }
+
+    private var winningSessions: [Session] {
+        closedSessions.filter { sessionOutcome($0) > 0 }
+    }
+
+    private var losingSessions: [Session] {
+        closedSessions.filter { sessionOutcome($0) < 0 }
+    }
+
+    private var breakEvenSessions: [Session] {
+        closedSessions.filter { sessionOutcome($0) == 0 }
+    }
+
+    private var sessionsWithTierGain: [Session] {
+        closedSessions.filter { ($0.tierPointsEarned ?? 0) > 0 }
+    }
+
+    private var vennIntersectionCount: Int {
+        closedSessions.filter { sessionOutcome($0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
+    }
+
+    private var totalProfit: Int {
+        closedSessions.map { sessionOutcome($0) }.filter { $0 > 0 }.reduce(0, +)
+    }
+
+    private var totalLoss: Int {
+        abs(closedSessions.map { sessionOutcome($0) }.filter { $0 < 0 }.reduce(0, +))
+    }
+
+    private var vennLeftLabel: String {
+        settingsStore.analyticsUseExpectedValue ? "Positive EV" : "Winning sessions"
+    }
+
+    /// Sessions that have a mood set (for mood bar chart).
+    private var sessionsWithMood: [Session] {
+        closedSessions.filter { $0.sessionMood != nil }
+    }
+
+    /// Count per mood, ordered for display (positive first, then neutral, then negative).
+    private var moodCounts: [(mood: SessionMood, count: Int)] {
+        let grouped = Dictionary(grouping: sessionsWithMood, by: { $0.sessionMood! })
+            .mapValues { $0.count }
+        return SessionMood.allCases
+            .compactMap { mood in (grouped[mood]).map { (mood: mood, count: $0) } }
+            .filter { $0.count > 0 }
+            .sorted { $0.count > $1.count }
+    }
+
+    private var betCaptureDiffByDate: [(date: Date, diff: Int)] {
+        let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
+            guard let actual = session.avgBetActual,
+                  let rated = session.avgBetRated else { return nil }
+            // Positive diff means rated (captured) > actual, which is good
+            return (date: session.startTime, diff: rated - actual)
+        }
+        return withBothBets.sorted(by: { lhs, rhs in
+            lhs.date < rhs.date
+        })
+    }
+    
+    private var betCaptureGoodBadCounts: (good: Int, bad: Int) {
+        let diffs = betCaptureDiffByDate.map { $0.diff }
+        let good = diffs.filter { $0 >= 0 }.count
+        let bad = diffs.filter { $0 < 0 }.count
+        return (good, bad)
+    }
+
+    private var cumulativePointsByDate: [(date: Date, total: Int)] {
+        let sorted = closedSessions.sorted { $0.startTime < $1.startTime }
+        var running = 0
+        return sorted.map { session in
+            running += session.tierPointsEarned ?? 0
+            return (date: session.startTime, total: running)
+        }
+    }
+
+    private var analyticsDateRangeText: String? {
+        guard !closedSessions.isEmpty,
+              let first = closedSessions.map(\.startTime).min(),
+              let last = closedSessions.map(\.startTime).max() else { return nil }
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        return "\(df.string(from: first)) – \(df.string(from: last))"
+    }
+
+    private var monthlyProfitLossAggregates: [MonthlyProfitLossAggregate] {
+        let cal = Calendar.current
+        var byMonth: [Date: [Session]] = [:]
+        for session in closedSessions {
+            let comps = cal.dateComponents([.year, .month], from: session.startTime)
+            guard let monthStart = cal.date(from: comps) else { continue }
+            byMonth[monthStart, default: []].append(session)
+        }
+        let labelFormatter = DateFormatter()
+        labelFormatter.dateFormat = "MMM yy"
+
+        return byMonth.map { monthStart, sessions in
+            let cashNets = sessions.compactMap(\.winLoss)
+            let evNets = sessions.compactMap(\.expectedValue)
+            let profit = cashNets.filter { $0 > 0 }.reduce(0, +)
+            let loss = abs(cashNets.filter { $0 < 0 }.reduce(0, +))
+            let profitCash = profit
+            let profitEV = evNets.filter { $0 > 0 }.reduce(0, +)
+            let profitComp = max(0, profitEV - profitCash)
+            let lossCash = loss
+            let lossEV = abs(evNets.filter { $0 < 0 }.reduce(0, +))
+            let lossCompOffset = max(0, lossCash - lossEV)
+            let cashNet = cashNets.reduce(0, +)
+            let evNet = evNets.reduce(0, +)
+            let initialSum = sessions.compactMap(\.initialBuyIn).reduce(0, +)
+            let cashROI = initialSum > 0 ? (Double(cashNet) / Double(initialSum)) * 100.0 : nil
+            let evROI = initialSum > 0 ? (Double(evNet) / Double(initialSum)) * 100.0 : nil
+            return MonthlyProfitLossAggregate(
+                id: monthStart,
+                monthLabel: labelFormatter.string(from: monthStart),
+                profit: profit,
+                loss: loss,
+                profitCash: profitCash,
+                profitComp: profitComp,
+                lossCash: lossCash,
+                lossCompOffset: lossCompOffset,
+                cashROIPercent: cashROI,
+                evROIPercent: evROI
+            )
+        }
+        .sorted { $0.id < $1.id }
+    }
+
+    private var analyticsLocationFilterText: String? {
+        guard let filter = settingsStore.selectedLocationFilter, !filter.isEmpty else { return nil }
+        return "Location: \(filter)"
+    }
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                if !hasAnyClosedSessions {
+                    emptyState
+                } else {
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            if TierTapProductEnhancements.isSprint2Active {
+                                analyticsPresetRangeChips
+                            }
+                            filtersSection
+                            gameCategoryToggle
+                            overviewSection
+                            monthlyProfitLossChartSection
+                            if TierTapProductEnhancements.isEnabled {
+                                LoyaltyInsightsSection(
+                                    sessions: closedSessions,
+                                    currencySymbol: settingsStore.currencySymbol,
+                                    gradient: settingsStore.primaryGradient,
+                                    dateRangeText: analyticsDateRangeText,
+                                    locationFilterText: analyticsLocationFilterText
+                                )
+                            }
+                            basicResultsAnalysisSection
+                        }
+                        .padding()
+                        // Extra room so the last section clears the floating tab pill.
+                        .padding(.bottom, 72)
+                    }
+                }
+            }
+            .localizedNavigationTitle("Analytics")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        if hasProAccess && authStore.isSignedIn {
+                            if settingsStore.requiresTierTapAIFeaturePaywall(
+                                isSignedIn: authStore.isSignedIn,
+                                hasProAccess: hasProAccess
+                            ) {
+                                isPaywallPresented = true
+                            } else {
+                                isAISheetPresented = true
+                            }
+                        } else {
+                            isPaywallPresented = true
+                        }
+                    } label: {
+                        Image(systemName: "wand.and.stars")
+                            .imageScale(.medium)
+                            .padding(8)
+                            .background(Color.green)
+                            .clipShape(Circle())
+                    }
+                    .foregroundColor(.black)
+                    .accessibilityLabel("AI analysis")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: 8) {
+                        if !closedSessions.isEmpty {
+                            Button {
+                                if settingsStore.enableCasinoFeedback {
+                                    CelebrationPlayer.shared.playQuickChime()
+                                }
+                                isShareSelectionPresented = true
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                    .imageScale(.medium)
+                            }
+                            .foregroundColor(.white)
+                        }
+
+                        Button {
+                            NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                        } label: {
+                            HStack(spacing: 6) {
+                                if authStore.isSignedIn,
+                                   let uiImage = authStore.localProfilePhotoImage {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 24, height: 24)
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                        )
+                                } else {
+                                    Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
+                                }
+                                if authStore.isSignedIn {
+                                    if authStore.localProfilePhotoImage == nil,
+                                       let emojis = authStore.userProfileEmojis,
+                                       !emojis.isEmpty {
+                                        Text(emojis)
+                                            .font(.caption)
+                                    }
+                                    Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
+                                        .lineLimit(1)
+                                        .font(.caption)
+                                } else {
+                                    L10nText("Account")
+                                        .font(.caption)
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.18))
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                        }
+                    }
+                }
+            }
+        }
+        .adaptiveSheet(isPresented: $isAISheetPresented) {
+            AIAnalyticsSheet()
+                .environmentObject(sessionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
+                .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $isPaywallPresented) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $isRiskOfRuinPresented) {
+            RiskOfRuinView()
+                .environmentObject(sessionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $isShareSelectionPresented) {
+            AnalyticsShareSelectionSheet(
+                closedSessions: closedSessions,
+                gradient: settingsStore.primaryGradient,
+                onShare: { selection in
+                    pendingShareSelection = selection
+                }
+            )
+            .environmentObject(settingsStore)
+        }
+#if os(iOS)
+        .onChange(of: isShareSelectionPresented) { newValue in
+            if !newValue, let selection = pendingShareSelection {
+                shareImages = buildAnalyticsShareImages(
+                    selection: selection,
+                    closedSessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
+                )
+                pendingShareSelection = nil
+
+                if !shareImages.isEmpty {
+                    shareURLs = writeShareImagesToTempFiles(shareImages)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isShareSheetPresented = true
+                    }
+                }
+            }
+        }
+        .adaptiveSheet(isPresented: $isShareSheetPresented) {
+            ShareSheet(items: shareURLs)
+        }
+        .onChange(of: isShareSheetPresented) { newValue in
+            if !newValue {
+                for url in shareURLs { try? FileManager.default.removeItem(at: url) }
+                shareURLs = []
+                shareImages = []
+            }
+        }
+#endif
+    }
+
+#if os(iOS)
+    private func shareSelectedGraphOnly() {
+        if settingsStore.enableCasinoFeedback {
+            CelebrationPlayer.shared.playQuickChime()
+        }
+        let selection: AnalyticsShareSelection
+        switch selectedGraphKind {
+        case .betCaptureDiff:
+            selection = AnalyticsShareSelection(
+                includeBetCaptureDiff: true,
+                includeVenn: false,
+                includeWinLoss: false,
+                includeTierProgress: false,
+                includeGameBreakdown: false,
+                includeTierByLoyaltyProgram: false,
+                includeSessionMoods: false
+            )
+        case .venn:
+            selection = AnalyticsShareSelection(
+                includeBetCaptureDiff: false,
+                includeVenn: true,
+                includeWinLoss: false,
+                includeTierProgress: false,
+                includeGameBreakdown: false,
+                includeTierByLoyaltyProgram: false,
+                includeSessionMoods: false
+            )
+        case .winLossBars:
+            selection = AnalyticsShareSelection(
+                includeBetCaptureDiff: false,
+                includeVenn: false,
+                includeWinLoss: true,
+                includeTierProgress: false,
+                includeGameBreakdown: false,
+                includeTierByLoyaltyProgram: false,
+                includeSessionMoods: false
+            )
+        case .tierProgress:
+            selection = AnalyticsShareSelection(
+                includeBetCaptureDiff: false,
+                includeVenn: false,
+                includeWinLoss: false,
+                includeTierProgress: true,
+                includeGameBreakdown: false,
+                includeTierByLoyaltyProgram: false,
+                includeSessionMoods: false
+            )
+        }
+        shareImages = buildAnalyticsShareImages(
+            selection: selection,
+            closedSessions: closedSessions,
+            gradient: settingsStore.primaryGradient,
+            currencySymbol: settingsStore.currencySymbol,
+            locationFilterText: analyticsLocationFilterText,
+            useExpectedValue: settingsStore.analyticsUseExpectedValue
+        )
+        guard !shareImages.isEmpty else { return }
+        shareURLs = writeShareImagesToTempFiles(shareImages)
+        isShareSheetPresented = true
+    }
+#endif
+
+    private var filtersSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isFiltersExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    L10nText("Filters")
+                        .font(.subheadline.bold())
+                        .foregroundColor(.white)
+                    Spacer()
+                    Image(systemName: isFiltersExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isFiltersExpanded {
+                VStack(spacing: 16) {
+                    locationFilterBar
+                    dateFilterBar
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
+
+    private var locationFilterBar: some View {
+        Group {
+            if !availableCasinos.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        L10nText("Filter by location")
+                            .font(.subheadline.bold())
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            Button {
+                                settingsStore.selectedLocationFilter = nil
+                            } label: {
+                                L10nText("All")
+                                    .font(.caption)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(settingsStore.selectedLocationFilter == nil || settingsStore.selectedLocationFilter?.isEmpty == true ? Color.green : Color(.systemGray6).opacity(0.25))
+                                    .foregroundColor(settingsStore.selectedLocationFilter == nil || settingsStore.selectedLocationFilter?.isEmpty == true ? .black : .white)
+                                    .cornerRadius(8)
+                            }
+                            ForEach(availableCasinos, id: \.self) { casino in
+                                Button {
+                                    settingsStore.selectedLocationFilter = casino
+                                } label: {
+                                    Text(casino)
+                                        .font(.caption)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(settingsStore.selectedLocationFilter == casino ? Color.green : Color(.systemGray6).opacity(0.25))
+                                        .foregroundColor(settingsStore.selectedLocationFilter == casino ? .black : .white)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var dateFilterBar: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                L10nText("Date range")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            if TierTapProductEnhancements.isSprint2Active {
+                Text("Presets also appear above Filters — Loyalty Insights follow the same range.")
+                    .font(.caption2)
+                    .foregroundColor(.white.opacity(0.55))
+            }
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    L10nText("From")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                    DatePicker("", selection: Binding(
+                        get: { analyticsFromDate ?? Calendar.current.date(from: DateComponents(year: Calendar.current.component(.year, from: Date()), month: 1, day: 1)) ?? Date() },
+                        set: { analyticsFromDate = $0 }
+                    ), displayedComponents: .date)
+                        .labelsHidden()
+                        .colorScheme(.dark)
+                        .font(.caption2)
+                    FilterPanelPillButton(title: analyticsFromDate == nil ? "All" : "Clear Filter") {
+                        analyticsFromDate = nil
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.22))
+                    .frame(width: 1)
+                    .padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    L10nText("To")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                    DatePicker("", selection: Binding(
+                        get: { analyticsToDate ?? Date() },
+                        set: { analyticsToDate = $0 }
+                    ), displayedComponents: .date)
+                        .labelsHidden()
+                        .colorScheme(.dark)
+                        .font(.caption2)
+                    FilterPanelPillButton(title: analyticsToDate == nil ? "All" : "Clear Filter") {
+                        analyticsToDate = nil
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(10)
+            .background(Color(.systemGray6).opacity(0.15))
+            .cornerRadius(12)
+        }
+    }
+
+    private var analyticsPresetRangeChips: some View {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let presets: [(label: String, days: Int)] = [
+            ("7D", 7),
+            ("30D", 30),
+            ("90D", 90),
+            ("120D", 120)
+        ]
+        return HStack(spacing: 8) {
+            ForEach(presets, id: \.label) { preset in
+                let from = cal.date(byAdding: .day, value: -(preset.days - 1), to: today) ?? today
+                let isSelected = isPresetSelected(days: preset.days, from: from, to: today, calendar: cal)
+                Button {
+                    analyticsFromDate = from
+                    analyticsToDate = today
+                } label: {
+                    Text(preset.label)
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
+                        .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(isSelected ? .black : .white)
+                        .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+            }
+            Button {
+                analyticsFromDate = nil
+                analyticsToDate = nil
+            } label: {
+                Text("All")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(analyticsFromDate == nil && analyticsToDate == nil ? Color.green : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(analyticsFromDate == nil && analyticsToDate == nil ? .black : .white)
+                    .cornerRadius(8)
+            }
+            .buttonStyle(.plain)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func isPresetSelected(days: Int, from: Date, to: Date, calendar: Calendar) -> Bool {
+        guard let currentFrom = analyticsFromDate, let currentTo = analyticsToDate else { return false }
+        return calendar.isDate(currentFrom, inSameDayAs: from)
+            && calendar.isDate(currentTo, inSameDayAs: to)
+            && calendar.dateComponents([.day], from: calendar.startOfDay(for: currentFrom), to: calendar.startOfDay(for: currentTo)).day == (days - 1)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "chart.xyaxis.line")
+                .font(.system(size: 52))
+                .foregroundStyle(settingsStore.primaryGradient)
+            L10nText("No Analytics Yet")
+                .font(.title3)
+                .foregroundColor(.gray)
+            L10nText("Play and complete a few sessions to unlock win/loss, tier point, and pace-of-play analytics.")
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.gray.opacity(0.7))
+                .padding(.horizontal)
+        }
+    }
+
+    private var overviewSection: some View {
+        AnalyticsCollapsibleSection(
+            title: analyticsSessionOverviewTitle,
+            systemImage: "chart.bar.doc.horizontal",
+            isExpanded: $isOverviewExpanded
+        ) {
+            headerSummaryContent
+        }
+    }
+
+    private var monthlyProfitLossChartSection: some View {
+        AnalyticsCollapsibleSection(
+            title: "Monthly Profit & Loss",
+            systemImage: "chart.bar.fill",
+            isExpanded: $isMonthlyChartExpanded
+        ) {
+            MonthlyProfitLossChartCard(
+                aggregates: monthlyProfitLossAggregates,
+                gradient: settingsStore.primaryGradient,
+                currencySymbol: settingsStore.currencySymbol,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+        }
+    }
+
+    private var headerSummaryContent: some View {
+        let total = closedSessions.count
+        let wins = winningSessions.count
+        let losses = losingSessions.count
+        let breakeven = breakEvenSessions.count
+        let winRate = total > 0 ? Double(wins) / Double(total) : 0
+        let isTableOverview = selectedAnalyticsCategory == .table || selectedAnalyticsCategory == .slots
+        let grossPL = totalProfit + totalLoss
+        let profitVolumePct: Int? = (isTableOverview && grossPL > 0)
+            ? Int((Double(totalProfit) / Double(grossPL) * 100).rounded())
+            : nil
+        let lossVolumePct: Int? = (isTableOverview && grossPL > 0)
+            ? Int((Double(totalLoss) / Double(grossPL) * 100).rounded())
+            : nil
+
+        func sessionShareLabel(_ count: Int) -> String {
+            guard isTableOverview, total > 0 else { return "\(count)" }
+            let p = Int((Double(count) / Double(total) * 100).rounded())
+            return "\(count) (\(p)%)"
+        }
+
+        let profitPillValue: String = {
+            if isTableOverview, let p = profitVolumePct {
+                return "\(settingsStore.currencySymbol)\(totalProfit) (\(p)%)"
+            }
+            return "\(settingsStore.currencySymbol)\(totalProfit)"
+        }()
+
+        let lossPillValue: String = {
+            if isTableOverview, let p = lossVolumePct {
+                return "-\(settingsStore.currencySymbol)\(totalLoss) (\(p)%)"
+            }
+            return "-\(settingsStore.currencySymbol)\(totalLoss)"
+        }()
+
+        let riskOfRuinHeaderPercent: String = {
+            guard isTableOverview else { return "" }
+            let ror = RiskOfRuinMath.compute(
+                sessions: closedSessions,
+                bankroll: settingsStore.bankroll,
+                targetAveragePerSession: settingsStore.targetAveragePerSession,
+                useExpectedValue: settingsStore.analyticsUseExpectedValue
+            )
+            if ror.sessionCount == 0 { return "—" }
+            let pct = ror.riskOfRuin * 100
+            if pct >= 99.5 { return "~100%" }
+            if pct <= 0.5 { return "<1%" }
+            return String(format: "%.1f%%", pct)
+        }()
+
+        return VStack(spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(settingsStore.analyticsUseExpectedValue
+                         ? "Results use EV (cash net + logged comps). Free play excluded."
+                         : "Results use cash net (comps and free play excluded).")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(total) sessions")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    if let filter = settingsStore.selectedLocationFilter, !filter.isEmpty {
+                        Text(filter)
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    } else {
+                        L10nText("All locations")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+
+            HStack(spacing: 12) {
+                MetricPill(title: "Win rate", value: String(format: "%.0f%%", winRate * 100), color: .green)
+                MetricPill(title: "Profit", value: profitPillValue, color: .green)
+                MetricPill(title: "Loss", value: lossPillValue, color: .red)
+            }
+
+            HStack(spacing: 12) {
+                MetricPill(title: "Wins", value: sessionShareLabel(wins), color: .green)
+                MetricPill(title: "Losses", value: sessionShareLabel(losses), color: .red)
+                MetricPill(title: "Even", value: sessionShareLabel(breakeven), color: .gray)
+            }
+
+            if closedSessions.contains(where: { $0.totalFreePlay > 0 }) {
+                FreePlaySummaryCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText
+                )
+            }
+
+            if usesTableStyleAnalytics {
+                Button {
+                    isRiskOfRuinPresented = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chart.bar.doc.horizontal")
+                        L10nText("Risk of Ruin")
+                            .font(.caption.weight(.semibold))
+                        Spacer(minLength: 8)
+                        Text(riskOfRuinHeaderPercent)
+                            .font(.caption.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.95))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.22))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Risk of Ruin")
+                .accessibilityValue("Overall estimated risk of ruin \(riskOfRuinHeaderPercent)")
+            }
+        }
+    }
+
+    private var selectableGraphKinds: [GraphKind] {
+        GraphKind.allCases.filter { $0 != .betCaptureDiff }
+    }
+
+    private var basicResultsAnalysisSection: some View {
+        AnalyticsCollapsibleSection(
+            title: "Basic Results Analysis",
+            systemImage: "slider.horizontal.3",
+            isExpanded: $isBasicResultsExpanded
+        ) {
+            VStack(alignment: .leading, spacing: 16) {
+                resultsBasisSection
+                graphTypePicker
+                graphStyleSelectedGraph
+                basicResultsAnalysisCharts
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var basicResultsAnalysisCharts: some View {
+        VStack(spacing: 16) {
+            BetCaptureDiffLineChartCard(
+                series: betCaptureDiffByDate,
+                goodBadCounts: betCaptureGoodBadCounts,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if !moodCounts.isEmpty {
+                SessionMoodBarChartCard(
+                    moodCounts: moodCounts,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if usesTableStyleAnalytics {
+                GameBreakdownBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                TierPointsByLoyaltyProgramBars(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                PokerPerformanceSummaryCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                PokerROITrendChartCard(
+                    sessions: closedSessions,
+                    gradient: settingsStore.primaryGradient,
+                    currencySymbol: settingsStore.currencySymbol,
+                    dateRangeText: analyticsDateRangeText,
+                    locationFilterText: analyticsLocationFilterText,
+                    useExpectedValue: settingsStore.analyticsUseExpectedValue
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var graphTypePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                L10nText("Graph style")
+                    .font(.subheadline.bold())
+                    .foregroundColor(.white)
+                Spacer()
+                #if os(iOS)
+                if !closedSessions.isEmpty {
+                    Button {
+                        shareSelectedGraphOnly()
+                    } label: {
+                        Label("Share this chart", systemImage: "square.and.arrow.up")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundColor(.green)
+                    .buttonStyle(.plain)
+                }
+                #endif
+            }
+            Picker("Graph style", selection: $selectedGraphKind) {
+                ForEach(selectableGraphKinds) { kind in
+                    Text(L10n.tr(kind.displayName, language: settingsStore.appLanguage)).tag(kind)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    @ViewBuilder
+    private var graphStyleSelectedGraph: some View {
+        switch selectedGraphKind {
+        case .betCaptureDiff:
+            EmptyView()
+        case .venn:
+            VennDiagramCard(
+                leftLabel: vennLeftLabel,
+                rightLabel: "Tier gain",
+                leftCount: winningSessions.count,
+                rightCount: sessionsWithTierGain.count,
+                intersectionCount: vennIntersectionCount,
+                total: closedSessions.count,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+        case .winLossBars:
+            WinLossBarChartCard(
+                totalProfit: totalProfit,
+                totalLoss: totalLoss,
+                totalSessions: closedSessions.count,
+                gradient: settingsStore.primaryGradient,
+                currencySymbol: settingsStore.currencySymbol,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText,
+                chartTitle: settingsStore.analyticsUseExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
+                basisCaption: settingsStore.analyticsUseExpectedValue
+                    ? "Totals use expected value (cash net + comps)."
+                    : "Totals use cash net (comps excluded)."
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+        case .tierProgress:
+            TierProgressLineChartCard(
+                pointsByDate: cumulativePointsByDate,
+                gradient: settingsStore.primaryGradient,
+                dateRangeText: analyticsDateRangeText,
+                locationFilterText: analyticsLocationFilterText
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// Table / Slots / Poker — horizontal bubble (matches Check In).
+    private var gameCategoryToggle: some View {
+        GameCategoryWheelPicker(
+            selection: $selectedAnalyticsCategory,
+            heading: "Game Type",
+            compactHeading: true
+        )
+        .environmentObject(settingsStore)
+    }
+
+    private var resultsBasisSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            L10nText("Results basis")
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+            Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
+                L10nText("Cash net").tag(false)
+                L10nText("EV (incl. comps)").tag(true)
+            }
+            .pickerStyle(.segmented)
+            Text(settingsStore.analyticsUseExpectedValue
+                 ? "Win rate, profit/loss bars, Venn “wins”, and poker cards include logged comps. Free play is never included."
+                 : "Win rate and dollar totals reflect cash buy-in/out only; comps and free play are ignored.")
+                .font(.caption2)
+                .foregroundColor(.gray)
+        }
+    }
+}
+
+// MARK: - AI Analysis gemini-router cache (this screen only)
+
+/// Caches the last successful AI Analysis response so repeated “Ask TierTap” taps
+/// with the same or very similar inputs skip an extra gemini-router call.
+private actor AIAnalysisGeminiCache {
+    static let shared = AIAnalysisGeminiCache()
+
+    private var lastExactPromptHash: String?
+    private var lastRelaxedFingerprint: String?
+    private var lastResponseText: String?
+
+    enum Hit {
+        /// Prompt byte-for-byte match since the last stored response.
+        case exact
+        /// Same question, scope, and coarsely similar session snapshot.
+        case similar
+    }
+
+    func lookup(exactPromptHash: String, relaxedFingerprint: String) -> (text: String, hit: Hit)? {
+        if let h = lastExactPromptHash, h == exactPromptHash, let t = lastResponseText {
+            return (t, .exact)
+        }
+        if let f = lastRelaxedFingerprint, f == relaxedFingerprint, let t = lastResponseText {
+            return (t, .similar)
+        }
+        return nil
+    }
+
+    func store(exactPromptHash: String, relaxedFingerprint: String, text: String) {
+        lastExactPromptHash = exactPromptHash
+        lastRelaxedFingerprint = relaxedFingerprint
+        lastResponseText = text
+    }
+}
+
+private func aiAnalysisPromptHash(_ prompt: String) -> String {
+    let digest = SHA256.hash(data: Data(prompt.utf8))
+    return digest.map { String(format: "%02x", $0) }.joined()
+}
+
+/// Buckets dollar outcomes so tiny edits don’t force a new API round-trip.
+private func aiAnalysisRelaxedOutcomeBucket(_ value: Int) -> Int {
+    let magnitude = max(25, abs(value) / 8)
+    return (value / magnitude) * magnitude
+}
+
+private func aiAnalysisRelaxedFingerprint(
+    questionRaw: String,
+    contextRaw: String,
+    category: SessionGameCategory,
+    useEV: Bool,
+    tone: String,
+    outputLanguage: String,
+    bankroll: Int,
+    total: Int,
+    wins: Int,
+    losses: Int,
+    breakeven: Int,
+    net: Int,
+    recentSessions: [Session],
+    sessionOutcome: (Session) -> Int
+) -> String {
+    let bankrollBucket = (bankroll / 500) * 500
+    let netBucket = aiAnalysisRelaxedOutcomeBucket(net)
+    // Order by id so recency (timestamps) does not affect the fingerprint.
+    let recentSig = recentSessions
+        .sorted { $0.id.uuidString < $1.id.uuidString }
+        .map { session in
+            let o = sessionOutcome(session)
+            let b = aiAnalysisRelaxedOutcomeBucket(o)
+            return String(session.id.uuidString.prefix(8)) + ":" + String(b)
+        }
+        .joined(separator: "|")
+    return [
+        questionRaw,
+        contextRaw,
+        category.rawValue,
+        useEV ? "ev" : "cash",
+        tone,
+        "lang:\(outputLanguage)",
+        "br:\(bankrollBucket)",
+        "t:\(total)",
+        "w:\(wins)-\(losses)-\(breakeven)",
+        "net:\(netBucket)",
+        recentSig
+    ].joined(separator: "\n")
+}
+
+struct AIAnalyticsSheet: View {
+    @EnvironmentObject var sessionStore: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var authStore: AuthStore
+    @Environment(\.dismiss) private var dismiss
+    
+    enum TierTapAIQuestion: String, CaseIterable, Identifiable {
+        // Table-focused questions
+        case whereEarnTiersFastest
+        case rankProgramsByTierEfficiency
+        case rankPropertiesByTierEfficiency
+        case bestGamePropertyCombos
+        case optimizeForFastestTierGain
+        
+        case showRatedVsActualGaps
+        case whereUnderRated
+        case trendGapByProperty
+        case trendGapByGame
+        case ratingInsightsConfidence
+        
+        case moodVsPlay
+        case whenTiltedOrOff
+        case gentleBreakMoments
+        
+        case highVolatilitySessions
+        case riskVolatilityProfile
+        case stopLossAndBreakNudges
+        
+        case tapPointsEarningLately
+        case nextBadgeOrLevel
+        case consistencyTapPointsIdeas
+        case bestFittingRewards
+
+        case tableCompsVsCashNet
+        case tableEvHotspots
+
+        case freePlayLoggedOverview
+        case freePlayVsOutcomes
+        case freePlayByProperty
+
+        case tableWinRateOverview
+        case tableResultsByGame
+        case tableResultsTrend
+        case tableSessionPatterns
+
+        // Poker-focused questions
+        case pokerProfitabilityOverview
+        case pokerWinrateByGame
+        case pokerROITrends
+        case pokerSessionPatterns
+        case pokerRiskProfile
+        case pokerCompsVsCashNet
+        case pokerEvVsCashRoi
+
+        var id: String { rawValue }
+        
+        /// Questions intended when analyzing non‑poker (table) sessions.
+        static var tableQuestions: [TierTapAIQuestion] {
+            [
+                .whereEarnTiersFastest,
+                .rankProgramsByTierEfficiency,
+                .rankPropertiesByTierEfficiency,
+                .bestGamePropertyCombos,
+                .optimizeForFastestTierGain,
+                .showRatedVsActualGaps,
+                .whereUnderRated,
+                .trendGapByProperty,
+                .trendGapByGame,
+                .ratingInsightsConfidence,
+                .moodVsPlay,
+                .whenTiltedOrOff,
+                .gentleBreakMoments,
+                .highVolatilitySessions,
+                .riskVolatilityProfile,
+                .stopLossAndBreakNudges,
+                .tapPointsEarningLately,
+                .nextBadgeOrLevel,
+                .consistencyTapPointsIdeas,
+                .bestFittingRewards,
+                .tableCompsVsCashNet,
+                .tableEvHotspots,
+                .freePlayLoggedOverview,
+                .freePlayVsOutcomes,
+                .freePlayByProperty,
+                .tableWinRateOverview,
+                .tableResultsByGame,
+                .tableResultsTrend,
+                .tableSessionPatterns
+            ]
+        }
+        
+        /// Questions intended when analyzing poker sessions only.
+        static var pokerQuestions: [TierTapAIQuestion] {
+            [
+                .pokerProfitabilityOverview,
+                .pokerWinrateByGame,
+                .pokerROITrends,
+                .pokerSessionPatterns,
+                .pokerRiskProfile,
+                .pokerCompsVsCashNet,
+                .pokerEvVsCashRoi,
+                .moodVsPlay,
+                .whenTiltedOrOff,
+                .gentleBreakMoments,
+                .highVolatilitySessions,
+                .riskVolatilityProfile,
+                .stopLossAndBreakNudges,
+                .freePlayLoggedOverview,
+                .freePlayVsOutcomes,
+                .freePlayByProperty
+            ]
+        }
+
+        var context: TierTapAIContext {
+            switch self {
+            case .whereEarnTiersFastest, .rankProgramsByTierEfficiency, .rankPropertiesByTierEfficiency,
+                 .bestGamePropertyCombos, .optimizeForFastestTierGain,
+                 .tapPointsEarningLately, .nextBadgeOrLevel, .consistencyTapPointsIdeas, .bestFittingRewards:
+                return .tierAnalysis
+            case .pokerProfitabilityOverview, .pokerWinrateByGame, .pokerROITrends,
+                 .tableWinRateOverview, .tableResultsByGame, .tableResultsTrend:
+                return .winRates
+            case .pokerSessionPatterns, .tableSessionPatterns:
+                return .playAnalysis
+            case .showRatedVsActualGaps, .whereUnderRated, .trendGapByProperty, .trendGapByGame,
+                 .ratingInsightsConfidence, .moodVsPlay, .whenTiltedOrOff, .gentleBreakMoments:
+                return .moodAndProperties
+            case .highVolatilitySessions, .riskVolatilityProfile, .stopLossAndBreakNudges, .pokerRiskProfile:
+                return .riskOfRuin
+            case .tableCompsVsCashNet, .tableEvHotspots, .pokerCompsVsCashNet, .pokerEvVsCashRoi:
+                return .comps
+            case .freePlayLoggedOverview, .freePlayVsOutcomes, .freePlayByProperty:
+                return .freePlay
+            }
+        }
+
+        static func builtInQuestions(
+            context: TierTapAIContext,
+            category: SessionGameCategory
+        ) -> [TierTapAIQuestion] {
+            let pool: [TierTapAIQuestion]
+            switch category {
+            case .table, .slots:
+                pool = tableQuestions
+            case .poker:
+                pool = pokerQuestions
+            }
+            return pool.filter { $0.context == context }
+        }
+        
+        var title: String {
+            switch self {
+            case .whereEarnTiersFastest: return "Where do I earn tiers fastest?"
+            case .rankProgramsByTierEfficiency: return "Rank my casino programs by tier efficiency"
+            case .rankPropertiesByTierEfficiency: return "Rank my properties by tier efficiency"
+            case .bestGamePropertyCombos: return "Best game and property combos for tiers"
+            case .optimizeForFastestTierGain: return "Optimize my play for fastest tier gain"
+            case .showRatedVsActualGaps: return "Show my rated vs actual gaps"
+            case .whereUnderRated: return "Where am I consistently under-rated?"
+            case .trendGapByProperty: return "Trend my rating gaps by property"
+            case .trendGapByGame: return "Trend my rating gaps by game"
+            case .ratingInsightsConfidence: return "How confident are my rating insights?"
+            case .moodVsPlay: return "How does my mood relate to my play?"
+            case .whenTiltedOrOff: return "When do I tend to feel tilted or off?"
+            case .gentleBreakMoments: return "When might a gentle break reminder help?"
+            case .highVolatilitySessions: return "Show my high-volatility sessions"
+            case .riskVolatilityProfile: return "Explain my typical risk/volatility profile"
+            case .stopLossAndBreakNudges: return "When should I see stop-loss or break nudges?"
+            case .tapPointsEarningLately: return "How am I earning TapPoints lately?"
+            case .nextBadgeOrLevel: return "What do I need for my next badge or level?"
+            case .consistencyTapPointsIdeas: return "Easy ways to earn more TapPoints through consistency"
+            case .bestFittingRewards: return "Which rewards best fit my habits?"
+            case .tableCompsVsCashNet: return "How do comps change my table results vs. cash net?"
+            case .tableEvHotspots: return "Where do EV (with comps) and cash net disagree most?"
+            case .pokerProfitabilityOverview: return "How is my poker profitability overall?"
+            case .pokerWinrateByGame: return "How do my poker results vary by game type?"
+            case .pokerROITrends: return "How is my poker ROI trending over time?"
+            case .pokerSessionPatterns: return "What patterns show up in my poker sessions?"
+            case .pokerRiskProfile: return "What is my risk/volatility profile in poker?"
+            case .pokerCompsVsCashNet: return "How do comps change my poker results vs. cash net?"
+            case .pokerEvVsCashRoi: return "How does EV-based ROI compare to cash ROI in poker?"
+            case .freePlayLoggedOverview: return "How much free play have I logged recently?"
+            case .freePlayVsOutcomes: return "Do sessions with more free play line up with better or worse outcomes?"
+            case .freePlayByProperty: return "Where do I log the most free play by property or casino?"
+            case .tableWinRateOverview: return "How are my overall win rate and net results?"
+            case .tableResultsByGame: return "How do my results vary by table game?"
+            case .tableResultsTrend: return "How are my net results trending over time?"
+            case .tableSessionPatterns: return "What patterns show up in my table sessions?"
+            }
+        }
+        
+        func instruction(toneLabel: String) -> String {
+            switch self {
+            case .whereEarnTiersFastest:
+                return "From non‑poker sessions only, show where the player earns tiers fastest by program, property, and game, using tiers per hour and tiers per unit of rated bet. Keep it \(toneLabel), concise, and specific to this history."
+            case .rankProgramsByTierEfficiency:
+                return "Using table sessions (excluding poker), rank casino loyalty programs by tier‑earning efficiency and briefly note why the top few stand out, in \(toneLabel)."
+            case .rankPropertiesByTierEfficiency:
+                return "Rank properties from table play by how efficiently they earn tiers. Highlight only a few clear leaders, using \(toneLabel)."
+            case .bestGamePropertyCombos:
+                return "From non‑poker play, list the best property + game combinations for earning tiers efficiently, summarizing patterns in \(toneLabel)."
+            case .optimizeForFastestTierGain:
+                return "Given the existing non‑poker play, suggest a few realistic ways to focus on faster tier gain using programs, properties, and games they already use. Keep it \(toneLabel) and non‑prescriptive."
+            case .showRatedVsActualGaps:
+                return "Analyze gaps between rated and actual average bet in table sessions. Summarize where gaps appear and their rough size, in \(toneLabel), staying factual."
+            case .whereUnderRated:
+                return "From non‑poker sessions, look for places where rated average bet is consistently below actual. Gently describe any properties or games that look under‑rated, using \(toneLabel)."
+            case .trendGapByProperty:
+                return "Describe how the rating gap between actual and rated bet in table play has trended by property over time (better, worse, similar), in \(toneLabel)."
+            case .trendGapByGame:
+                return "Describe how the rating gap between actual and rated bet in table play has trended by game over time, focusing on patterns in \(toneLabel)."
+            case .ratingInsightsConfidence:
+                return "Assess how strong or weak the table rating insights are based on sample size and consistency. Explain confidence levels briefly in \(toneLabel)."
+            case .moodVsPlay:
+                return "Correlate recorded moods with how sessions went (length, net, volatility, tiers) for the selected game set. Use \(toneLabel) and focus on gentle self‑awareness."
+            case .whenTiltedOrOff:
+                return "Look for situations where the player reports feeling 'off' or 'tilted' and describe patterns in games, properties, or session characteristics, using \(toneLabel) and soft language."
+            case .gentleBreakMoments:
+                return "Suggest a few circumstances from the selected game set where a soft 'take a break' nudge could have helped (very long sessions, repeated negative moods), in gentle \(toneLabel)."
+            case .highVolatilitySessions:
+                return "Identify sessions that look high‑volatility (large swings, big buy‑ins or adds, long durations) and describe them with calm variance/risk framing in \(toneLabel)."
+            case .riskVolatilityProfile:
+                return "Using the selected game set, describe the player's typical risk and volatility profile in simple terms, using \(toneLabel) and avoiding betting advice."
+            case .stopLossAndBreakNudges:
+                return "Based on the selected game set, suggest a few gentle time‑ or loss‑based moments where a stop‑loss or break reminder could make sense, in \(toneLabel)."
+            case .tapPointsEarningLately:
+                return "Using recent engagement patterns (sessions logged, streaks, consistency), describe how they appear to be earning engagement‑style rewards such as TapPoints, in \(toneLabel)."
+            case .nextBadgeOrLevel:
+                return "Given how often and how consistently the player engages with the app, suggest a few realistic next‑badge or level‑style milestones, emphasizing healthy, track‑focused behavior in \(toneLabel)."
+            case .consistencyTapPointsIdeas:
+                return "Recommend simple ways to earn more engagement rewards through consistency (logging sessions promptly, maintaining streaks), using \(toneLabel) and avoiding any push to gamble more."
+            case .bestFittingRewards:
+                return "Based on travel and play patterns, suggest reward or perk styles that would likely fit them best (e.g., travel or status perks), keeping the focus on engagement and experience in \(toneLabel)."
+            case .tableCompsVsCashNet:
+                return "Using non‑poker table sessions only, compare cash net results to expected value (net + logged comps). Summarize how comps shift the picture (win rate, totals, a few standout sessions) in \(toneLabel)."
+            case .tableEvHotspots:
+                return "From table sessions only, call out properties or games where EV (with comps) looks meaningfully better or worse than cash net—without naming specific dollar amounts as advice, in \(toneLabel)."
+            case .pokerProfitabilityOverview:
+                return "Using only poker sessions, summarize overall poker profitability, win/loss counts, and any clear patterns by property or game, in \(toneLabel)."
+            case .pokerWinrateByGame:
+                return "From poker sessions only, compare results by poker game type (e.g., cash vs tournaments, game variants) and highlight where results look stronger or weaker, in \(toneLabel)."
+            case .pokerROITrends:
+                return "Using only poker sessions, describe how poker ROI and net results have trended over time, calling out any clear upswings or downswings, in \(toneLabel)."
+            case .pokerSessionPatterns:
+                return "From poker sessions only, describe patterns in session length, stakes, and outcomes, and what that might suggest about pacing and game selection, using \(toneLabel)."
+            case .pokerRiskProfile:
+                return "Using just poker sessions, explain the player's risk and volatility profile in poker (swings, buy‑ins, adds) in simple terms, in \(toneLabel), without giving betting strategy."
+            case .pokerCompsVsCashNet:
+                return "Using poker sessions only, compare cash net to EV (including comps). Summarize how comps change profitability and win‑rate‑style session counts, in \(toneLabel)."
+            case .pokerEvVsCashRoi:
+                return "Using poker sessions only, contrast ROI using cash net vs. ROI using EV (comps included) per session, and describe what that implies about the mix of comps vs. felt results, in \(toneLabel)."
+            case .freePlayLoggedOverview:
+                return "Summarize how much free play the player has logged in the selected game set (totals and recent trend). Note that free play is excluded from win/loss and tax; keep the focus on promotional value context, in \(toneLabel)."
+            case .freePlayVsOutcomes:
+                return "Look for patterns between logged free play and session outcomes (cash net or selected results basis) in the selected game set. Stay factual and \(toneLabel); do not suggest gambling more for promos."
+            case .freePlayByProperty:
+                return "Break down free play logging by property or casino for the selected game set. Highlight where free play is most common, in \(toneLabel)."
+            case .tableWinRateOverview:
+                return "Using non‑poker table/slots sessions in the selected scope, summarize win rate, W/L counts, net results, and average per session for the selected results basis, in \(toneLabel)."
+            case .tableResultsByGame:
+                return "From table/slots sessions in the selected scope, compare results by game type and highlight stronger or weaker games, in \(toneLabel)."
+            case .tableResultsTrend:
+                return "Describe how net results and win rate for table/slots play have trended over time in the selected scope, in \(toneLabel)."
+            case .tableSessionPatterns:
+                return "From table/slots sessions in the selected scope, describe patterns in session length, stakes, and outcomes, in \(toneLabel)."
+            }
+        }
+    }
+
+    private enum AIQuestionPick: Equatable, Identifiable {
+        case builtIn(TierTapAIQuestion)
+        case saved(UUID)
+
+        var id: String {
+            switch self {
+            case .builtIn(let q): return "builtin:\(q.rawValue)"
+            case .saved(let id): return "saved:\(id.uuidString)"
+            }
+        }
+    }
+    
+    @State private var isLoading = false
+    @State private var fullAnswer: String?
+    @State private var displayedAnswer: String = ""
+    @State private var errorMessage: String?
+    @State private var isPaywallPresented = false
+    
+    @State private var selectedContext: TierTapAIContext = .winRates
+    @State private var selectedQuestionPick: AIQuestionPick = .builtIn(.pokerProfitabilityOverview)
+    @State private var selectedAnalyticsCategory: SessionGameCategory = .table
+    @State private var isGeneratingQuestions = false
+    @State private var generateQuestionsError: String?
+    @State private var generatedDrafts: [TierTapAIGeneratedQuestionDraft] = []
+    @State private var isGeneratedQuestionsSheetPresented = false
+    @State private var isResultsBasisExpanded = true
+    @State private var isContextExpanded = true
+    @State private var isQuestionExpanded = true
+    @State private var isShareSheetPresented = false
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var shareableAnswerText: String? {
+        let text = (fullAnswer ?? displayedAnswer).trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? nil : text
+    }
+
+    private var isShowingAnswer: Bool {
+        fullAnswer != nil || !displayedAnswer.isEmpty
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            L10nText("AI Analysis")
+                                .font(.title2.bold())
+                                .foregroundColor(.white)
+                            GameCategoryWheelPicker(
+                                selection: $selectedAnalyticsCategory,
+                                heading: "Session scope",
+                                compactHeading: true
+                            )
+                            .environmentObject(settingsStore)
+                            .onChange(of: selectedAnalyticsCategory) { _ in
+                                syncSelectedQuestionPick()
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        aiCollapsibleSection(title: "Results basis", isExpanded: $isResultsBasisExpanded) {
+                            Picker("Results basis", selection: $settingsStore.analyticsUseExpectedValue) {
+                                L10nText("Cash net").tag(false)
+                                L10nText("EV (incl. comps)").tag(true)
+                            }
+                            .pickerStyle(.segmented)
+                            L10nText("AI summaries and win/loss stats use this setting, matching the Analytics tab.")
+                                .font(.caption2)
+                                .foregroundColor(.white.opacity(0.55))
+                        }
+
+                        aiCollapsibleSection(title: "Context", isExpanded: $isContextExpanded) {
+                            aiPickerMenu(
+                                title: selectedContext.title,
+                                options: TierTapAIContext.allCases.map { ctx in
+                                    (ctx.title, { selectedContext = ctx; syncSelectedQuestionPick() })
+                                }
+                            )
+                        }
+
+                        aiCollapsibleSection(title: "Question", isExpanded: $isQuestionExpanded) {
+                            aiPickerMenu(
+                                title: selectedQuestionDisplayTitle,
+                                options: availableQuestionPicks.map { pick in
+                                    (questionTitle(for: pick), { selectedQuestionPick = pick })
+                                }
+                            )
+                            if availableQuestionPicks.isEmpty {
+                                L10nText("No questions for this context and session scope yet. Generate new questions below.")
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.55))
+                            }
+
+                            Button {
+                                Task { await generateQuestionsForContext() }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    if isGeneratingQuestions {
+                                        ProgressView()
+                                            .tint(.white)
+                                    } else {
+                                        Image(systemName: "arrow.triangle.2.circlepath")
+                                    }
+                                    L10nText("Generate new questions")
+                                        .font(.caption.weight(.semibold))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(Color.white.opacity(0.15))
+                                .cornerRadius(12)
+                            }
+                            .disabled(isGeneratingQuestions || isLoading)
+
+                            if let generateQuestionsError {
+                                Text(generateQuestionsError)
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                        
+                        if isLoading {
+                            ProgressView("Asking TierTap AI…")
+                                .tint(.white)
+                        }
+                        
+                        if isShowingAnswer {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    L10nText("Answer")
+                                        .font(.caption.bold())
+                                        .foregroundColor(.white.opacity(0.8))
+                                    Spacer()
+                                    if shareableAnswerText != nil {
+                                        Button {
+                                            isShareSheetPresented = true
+                                        } label: {
+                                            Label {
+                                                L10nText("Share")
+                                            } icon: {
+                                                Image(systemName: "square.and.arrow.up")
+                                            }
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundColor(.white)
+                                        }
+                                        .disabled(isLoading)
+                                    }
+                                }
+                                ScrollView {
+                                    Text(displayedAnswer)
+                                        .font(.body)
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding()
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(Color.black.opacity(0.35))
+                                .cornerRadius(12)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        } else if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        } else if !hasProAccess {
+                            L10nText("AI Analysis is part of TierTap Pro. Subscribe on the Settings tab to unlock Ask TierTap.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        } else {
+                            L10nText("Ask TierTap as often as you like with your TierTap Pro subscription.")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    
+                    Button {
+                        Task { await callAI() }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if isLoading {
+                                ProgressView()
+                                    .tint(.white)
+                            } else {
+                                Image(systemName: "sparkles")
+                                L10nText("Ask TierTap AI")
+                                    .fontWeight(.semibold)
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 3)
+                    }
+                    .disabled(isLoading)
+                }
+                .padding()
+            }
+            .localizedNavigationTitle("AI Analysis")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+            }
+        }
+        .adaptiveSheet(isPresented: $isPaywallPresented) {
+            TierTapPaywallView()
+                .environmentObject(subscriptionStore)
+                .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $isGeneratedQuestionsSheetPresented) {
+            generatedQuestionsSheet
+        }
+        .adaptiveSheet(isPresented: $isShareSheetPresented) {
+            if let shareableAnswerText {
+                ShareSheet(items: [shareableAnswerText])
+            }
+        }
+        .onAppear {
+            syncSelectedQuestionPick()
+        }
+        .onChange(of: selectedContext) { _ in
+            syncSelectedQuestionPick()
+        }
+    }
+
+    private func collapseSectionsForAnswerFocus() {
+        withAnimation(.easeInOut) {
+            isResultsBasisExpanded = false
+            isContextExpanded = false
+            isQuestionExpanded = false
+        }
+    }
+
+    @ViewBuilder
+    private func aiCollapsibleSection<Content: View>(
+        title: String,
+        isExpanded: Binding<Bool>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isExpanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    L10nText(title)
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.8))
+                    Spacer()
+                    Image(systemName: isExpanded.wrappedValue ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded.wrappedValue {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var selectedQuestionDisplayTitle: String {
+        questionTitle(for: selectedQuestionPick)
+    }
+
+    private var availableQuestionPicks: [AIQuestionPick] {
+        let builtIn = TierTapAIQuestion.builtInQuestions(
+            context: selectedContext,
+            category: selectedAnalyticsCategory
+        ).map { AIQuestionPick.builtIn($0) }
+        let saved = settingsStore.savedAIAnalysisQuestions
+            .filter { $0.context == selectedContext }
+            .sorted { $0.createdAt > $1.createdAt }
+            .map { AIQuestionPick.saved($0.id) }
+        return builtIn + saved
+    }
+
+    private func questionTitle(for pick: AIQuestionPick) -> String {
+        switch pick {
+        case .builtIn(let q):
+            return q.title
+        case .saved(let id):
+            return settingsStore.savedAIAnalysisQuestions.first(where: { $0.id == id })?.title ?? "Saved question"
+        }
+    }
+
+    private func syncSelectedQuestionPick() {
+        let picks = availableQuestionPicks
+        guard !picks.isEmpty else { return }
+        if !picks.contains(selectedQuestionPick) {
+            selectedQuestionPick = picks[0]
+        }
+    }
+
+    @ViewBuilder
+    private func aiPickerMenu(
+        title: String,
+        options: [(String, () -> Void)]
+    ) -> some View {
+        Menu {
+            ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+                Button(action: option.1) {
+                    Text(option.0)
+                        .font(.caption)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        } label: {
+            HStack(alignment: .top, spacing: 8) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.top, 1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color.black.opacity(0.25))
+            .cornerRadius(12)
+        }
+    }
+
+    private var generatedQuestionsSheet: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                VStack(spacing: 16) {
+                    VStack(spacing: 4) {
+                        L10nText("Save questions for")
+                            .font(.headline)
+                        Text(selectedContext.title)
+                            .font(.headline)
+                    }
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                    if generatedDrafts.isEmpty {
+                        L10nText("No questions were generated. Try again.")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 12) {
+                                ForEach($generatedDrafts) { $draft in
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Toggle(isOn: $draft.isSelectedForSave) {
+                                            Text(draft.title)
+                                                .font(.subheadline.weight(.semibold))
+                                                .foregroundColor(.white)
+                                                .multilineTextAlignment(.leading)
+                                        }
+                                        .tint(.green)
+                                        Text(draft.instruction)
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.65))
+                                    }
+                                    .padding()
+                                    .background(Color.black.opacity(0.25))
+                                    .cornerRadius(12)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+
+                    Button {
+                        saveSelectedGeneratedQuestions()
+                    } label: {
+                        L10nText("Save selected questions")
+                            .fontWeight(.semibold)
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                    }
+                    .disabled(generatedDrafts.filter(\.isSelectedForSave).isEmpty)
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        isGeneratedQuestionsSheetPresented = false
+                    }
+                    .foregroundColor(.green)
+                }
+            }
+        }
+    }
+
+    private func saveSelectedGeneratedQuestions() {
+        let toSave = generatedDrafts
+            .filter(\.isSelectedForSave)
+            .map { TierTapAISavedQuestion(context: selectedContext, title: $0.title, instruction: $0.instruction) }
+        settingsStore.addSavedAIAnalysisQuestions(toSave)
+        if let first = toSave.first {
+            selectedQuestionPick = .saved(first.id)
+        }
+        isGeneratedQuestionsSheetPresented = false
+        generateQuestionsError = nil
+    }
+
+    private func resolvedQuestionTitle() -> String {
+        questionTitle(for: selectedQuestionPick)
+    }
+
+    private func resolvedQuestionInstruction(toneLabel: String) -> String {
+        switch selectedQuestionPick {
+        case .builtIn(let q):
+            return q.instruction(toneLabel: toneLabel)
+        case .saved(let id):
+            guard let saved = settingsStore.savedAIAnalysisQuestions.first(where: { $0.id == id }) else {
+                return "Answer using the player's saved question, in \(toneLabel)."
+            }
+            return saved.instruction
+        }
+    }
+
+    private func resolvedQuestionCacheKey() -> String {
+        switch selectedQuestionPick {
+        case .builtIn(let q):
+            return q.rawValue
+        case .saved(let id):
+            return "saved:\(id.uuidString)"
+        }
+    }
+    
+    private func callAI() async {
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run {
+                errorMessage = "Supabase is not configured. Add your project keys to SupabaseKeys.plist."
+            }
+            return
+        }
+        
+        // Enforce daily AI usage limit only for non‑Pro users.
+        if !hasProAccess && !settingsStore.canUseAI() {
+            await MainActor.run {
+                errorMessage = "You have reached the daily limit of 5 AI calls on the free version of TierTap. Upgrade to the PRO version to unlock unlimited AI analysis."
+            }
+            return
+        }
+
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run {
+                isPaywallPresented = true
+            }
+            return
+        }
+        
+        let allSessions = sessionStore.sessions
+        
+        // Filter sessions by selected AI category.
+        let closedSessions: [Session] = allSessions.filter { session in
+            guard session.winLoss != nil else { return false }
+            switch selectedAnalyticsCategory {
+            case .table:
+                return session.gameCategory != .poker && session.gameCategory != .slots
+            case .slots:
+                return session.gameCategory == .slots
+            case .poker:
+                return session.gameCategory == .poker
+            }
+        }
+        
+        if closedSessions.isEmpty {
+            await MainActor.run {
+                switch selectedAnalyticsCategory {
+                case .poker:
+                    errorMessage = "You do not have any completed poker sessions yet. Switch to Table or Slots or log some poker sessions first."
+                case .slots:
+                    errorMessage = "You do not have any completed slots sessions yet. Switch to Table or log slots play from Check In first."
+                case .table:
+                    errorMessage = "You do not have any completed table sessions yet for AI to analyze."
+                }
+            }
+            return
+        }
+        
+        let sortedRecent = closedSessions.sorted { $0.startTime > $1.startTime }
+        let recentSessions = Array(sortedRecent.prefix(20))
+        
+        let useEV = settingsStore.analyticsUseExpectedValue
+        func outcome(_ s: Session) -> Int {
+            s.analyticsOutcome(useExpectedValue: useEV) ?? 0
+        }
+
+        let total = closedSessions.count
+        let wins = closedSessions.filter { outcome($0) > 0 }.count
+        let losses = closedSessions.filter { outcome($0) < 0 }.count
+        let breakeven = closedSessions.filter { outcome($0) == 0 }.count
+        let net = closedSessions.map { outcome($0) }.reduce(0, +)
+        let avgPerSession: Double? = total > 0 ? Double(net) / Double(total) : nil
+        let winRate: Double? = total > 0 ? Double(wins) / Double(total) : nil
+
+        let netCashTotal = closedSessions.compactMap { $0.winLoss }.reduce(0, +)
+        let netEVTotal = closedSessions.compactMap { $0.expectedValue }.reduce(0, +)
+        let compsLoggedTotal = closedSessions.map { $0.totalComp }.reduce(0, +)
+        let freePlayLoggedTotal = closedSessions.map { $0.totalFreePlay }.reduce(0, +)
+        
+        let rorResult = RiskOfRuinMath.compute(
+            sessions: closedSessions,
+            bankroll: settingsStore.bankroll,
+            targetAveragePerSession: settingsStore.targetAveragePerSession,
+            useExpectedValue: useEV
+        )
+        
+        let currency = settingsStore.currencySymbol
+        let netString: String = {
+            if net == 0 { return "break-even" }
+            let sign = net > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(net))"
+        }()
+        let avgString: String = {
+            guard let avg = avgPerSession else { return "n/a" }
+            let rounded = Int(round(abs(avg)))
+            let sign = avg > 0 ? "+" : (avg < 0 ? "-" : "")
+            return "\(sign)\(currency)\(rounded) per session"
+        }()
+        let winRateString: String = {
+            guard let wr = winRate else { return "n/a" }
+            return String(format: "%.0f%%", wr * 100)
+        }()
+        let rorPercentString: String = {
+            let pct = rorResult.riskOfRuin * 100
+            if rorResult.sessionCount == 0 { return "n/a" }
+            if pct >= 99.5 { return "~100%" }
+            if pct <= 0.5 { return "<1%" }
+            return String(format: "%.1f%%", pct)
+        }()
+        
+        let df = DateFormatter()
+        df.dateStyle = .short
+        
+        func recentSessionLineCore(_ session: Session) -> String {
+            let wl = session.winLoss ?? 0
+            let wlSign = wl > 0 ? "+" : (wl < 0 ? "-" : "")
+            let wlText = wl == 0 ? "even" : "\(wlSign)\(currency)\(abs(wl))"
+            let comps = session.totalComp
+            let ev = session.expectedValue.map { v in
+                let sgn = v > 0 ? "+" : (v < 0 ? "-" : "")
+                return v == 0 ? "even" : "\(sgn)\(currency)\(abs(v))"
+            } ?? "n/a"
+            let basisLine: String = {
+                let v = outcome(session)
+                let sgn = v > 0 ? "+" : (v < 0 ? "-" : "")
+                return v == 0 ? "even" : "\(sgn)\(currency)\(abs(v))"
+            }()
+            let points = session.tierPointsEarned ?? 0
+            let mood = session.sessionMood?.label ?? "none"
+            let hours = String(format: "%.1f hrs", session.hoursPlayed)
+            let ratedBet = session.avgBetRated.map { "\(currency)\($0)" } ?? "n/a"
+            let actualBet = session.avgBetActual.map { "\(currency)\($0)" } ?? "n/a"
+            let ratingGapText: String = {
+                if let rated = session.avgBetRated, let actual = session.avgBetActual {
+                    let diff = rated - actual
+                    let sign = diff > 0 ? "+" : (diff < 0 ? "-" : "")
+                    return "\(sign)\(currency)\(abs(diff))"
+                } else {
+                    return "n/a"
+                }
+            }()
+            return "\(session.casino) — \(session.game), cash \(wlText), comps \(currency)\(comps), EV \(ev), result for selected basis \(basisLine), \(points) pts, mood: \(mood), \(hours), rated avg bet: \(ratedBet), actual avg bet: \(actualBet), rating gap: \(ratingGapText)"
+        }
+        
+        let recentLineCores: [String] = recentSessions.map { recentSessionLineCore($0) }
+        let recentLines: String = zip(recentSessions, recentLineCores).map { session, core in
+            "\(df.string(from: session.startTime)): \(core)"
+        }.joined(separator: "\n")
+
+        let basisName = useEV ? "EV (includes comps)" : "Cash net"
+        let cashNetAggString: String = {
+            if netCashTotal == 0 { return "break-even" }
+            let sign = netCashTotal > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(netCashTotal))"
+        }()
+        let evAggString: String = {
+            if netEVTotal == 0 { return "break-even" }
+            let sign = netEVTotal > 0 ? "+" : "-"
+            return "\(sign)\(currency)\(abs(netEVTotal))"
+        }()
+        
+        let statsBlock = """
+        Settings: bankroll \(currency)\(settingsStore.bankroll)
+        Results basis for counts/net/win rate below: \(basisName) (user-selected in Analytics).
+        Summary (\(basisName)): sessions \(total), W \(wins), L \(losses), even \(breakeven), net \(netString), avg \(avgString), win rate \(winRateString), est. risk of ruin \(rorPercentString) (table games only; poker excluded from RoR).
+        Aggregates for comparison: cash net total \(cashNetAggString), EV total \(evAggString), comps logged \(currency)\(compsLoggedTotal), free play logged \(currency)\(freePlayLoggedTotal) (free play excluded from win/loss and tax; use for promotional-value context only).
+        """
+        
+        let toneInstruction = settingsStore.aiTone.promptLabel
+        let questionTitle = resolvedQuestionTitle()
+        let questionPrompt = resolvedQuestionInstruction(toneLabel: toneInstruction)
+        let contextLabel = selectedContext.title
+        let gameLabel: String = {
+            switch selectedAnalyticsCategory {
+            case .poker: return "poker"
+            case .table: return "table"
+            case .slots: return "slots"
+            }
+        }()
+        
+        let prompt = """
+        You are an analytics assistant for TierTap.
+        Analysis context: \(contextLabel)
+        Question: \"\(questionTitle)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history. Frame the answer around the \(contextLabel) context.
+        Task: \(questionPrompt)
+        Data summary:
+        \(statsBlock)
+        Recent \(gameLabel) sessions (most recent first):
+        \(recentLines)
+        """
+        
+        let promptForExactCache = """
+        You are an analytics assistant for TierTap.
+        Analysis context: \(contextLabel)
+        Question: \"\(questionTitle)\"
+        Style: \(toneInstruction). Keep answers concise, grounded in data, and specific to this player's \(gameLabel) history. Frame the answer around the \(contextLabel) context.
+        Task: \(questionPrompt)
+        Data summary:
+        \(statsBlock)
+        Recent \(gameLabel) sessions (most recent first):
+        \(recentLineCores.joined(separator: "\n"))
+        __tt_lang=\(settingsStore.appLanguage.rawValue)__
+        """
+        let promptHash = aiAnalysisPromptHash(promptForExactCache)
+        let relaxedFingerprint = aiAnalysisRelaxedFingerprint(
+            questionRaw: resolvedQuestionCacheKey(),
+            contextRaw: selectedContext.rawValue,
+            category: selectedAnalyticsCategory,
+            useEV: useEV,
+            tone: toneInstruction,
+            outputLanguage: settingsStore.appLanguage.rawValue,
+            bankroll: settingsStore.bankroll,
+            total: total,
+            wins: wins,
+            losses: losses,
+            breakeven: breakeven,
+            net: net,
+            recentSessions: recentSessions,
+            sessionOutcome: outcome
+        )
+        
+        if let cached = await AIAnalysisGeminiCache.shared.lookup(
+            exactPromptHash: promptHash,
+            relaxedFingerprint: relaxedFingerprint
+        ) {
+            let noteEN = "Over time, more logged sessions help TierTap give sharper analysis. This answer was reused because your data barely changed since the last run, so we skipped another AI call."
+            let moreDataNote = "\n\n—\n" + L10n.tr(noteEN, language: settingsStore.appLanguage)
+            let textToShow = cached.hit == .similar ? (cached.text + moreDataNote) : cached.text
+            await MainActor.run {
+                errorMessage = nil
+                fullAnswer = textToShow
+                isLoading = false
+                collapseSectionsForAnswerFocus()
+            }
+            await typeOut(textToShow)
+            return
+        }
+        
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            fullAnswer = nil
+            displayedAnswer = ""
+            collapseSectionsForAnswerFocus()
+        }
+        
+        struct GeminiRequest: Encodable {
+            struct Part: Encodable { let text: String }
+            struct Content: Encodable {
+                let role: String
+                let parts: [Part]
+            }
+            let contents: [Content]
+        }
+        let routerBody = GeminiProxyBody(
+            contents: [
+                GeminiRequest.Content(role: "user", parts: [.init(text: prompt)])
+            ],
+            language: settingsStore.appLanguage
+        )
+        do {
+            // Record usage only when we actually call the Gemini router (cache hits do not consume quota).
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
+                await MainActor.run {
+                    settingsStore.registerAICall()
+                }
+            }
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+                try await client.functions.invoke(
+                    "gemini-router",
+                    options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+                )
+            }
+            let text = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n")
+                ?? L10n.tr("No text response from Gemini.", language: settingsStore.appLanguage)
+            await AIAnalysisGeminiCache.shared.store(
+                exactPromptHash: promptHash,
+                relaxedFingerprint: relaxedFingerprint,
+                text: text
+            )
+            await MainActor.run {
+                fullAnswer = text
+                isLoading = false
+            }
+            await typeOut(text)
+        } catch {
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                isLoading = false
+            }
+        }
+    }
+    
+    private func typeOut(_ text: String) async {
+        let delayNs = settingsStore.aiTypingSpeed.nanosecondsPerCharacter
+        await MainActor.run {
+            displayedAnswer = ""
+        }
+        for character in text {
+            try? await Task.sleep(nanoseconds: delayNs)
+            await MainActor.run {
+                displayedAnswer.append(character)
+            }
+        }
+    }
+
+    private func generateQuestionsForContext() async {
+        guard SupabaseConfig.isConfigured, let client = supabase else {
+            await MainActor.run {
+                generateQuestionsError = "Supabase is not configured."
+            }
+            return
+        }
+
+        if !hasProAccess && !settingsStore.canUseAI() {
+            await MainActor.run {
+                generateQuestionsError = "You have reached the daily AI limit. Upgrade to Pro for more AI calls."
+            }
+            return
+        }
+
+        if settingsStore.requiresTierTapAIFeaturePaywall(
+            isSignedIn: authStore.isSignedIn,
+            hasProAccess: hasProAccess
+        ) {
+            await MainActor.run { isPaywallPresented = true }
+            return
+        }
+
+        let gameLabel: String = {
+            switch selectedAnalyticsCategory {
+            case .poker: return "poker"
+            case .table: return "table"
+            case .slots: return "slots"
+            }
+        }()
+        let toneLabel = settingsStore.aiTone.promptLabel
+        let existingTitles = (
+            TierTapAIQuestion.builtInQuestions(context: selectedContext, category: selectedAnalyticsCategory).map(\.title)
+            + settingsStore.savedAIAnalysisQuestions.filter { $0.context == selectedContext }.map(\.title)
+        ).joined(separator: "; ")
+
+        let genPrompt = """
+        You help TierTap, a casino session tracking app, suggest fresh analytics questions.
+        Generate exactly 5 NEW short questions for the "\(selectedContext.title)" context (\(selectedContext.generationTopic)).
+        Session scope: \(gameLabel) sessions only.
+        Tone for eventual answers: \(toneLabel).
+        Do NOT repeat or closely paraphrase these existing questions: \(existingTitles.isEmpty ? "(none)" : existingTitles).
+        Return ONLY a JSON array of objects with keys "title" (user-facing question, one line) and "instruction" (2-3 sentences telling an analyst what to compute from session logs; use \(toneLabel) tone; no betting advice).
+        Example: [{"title":"...","instruction":"..."}]
+        """
+
+        await MainActor.run {
+            isGeneratingQuestions = true
+            generateQuestionsError = nil
+        }
+
+        struct GeminiRequest: Encodable {
+            struct Part: Encodable { let text: String }
+            struct Content: Encodable {
+                let role: String
+                let parts: [Part]
+            }
+            let contents: [Content]
+        }
+
+        let routerBody = GeminiProxyBody(
+            contents: [
+                GeminiRequest.Content(role: "user", parts: [.init(text: genPrompt)])
+            ],
+            language: settingsStore.appLanguage
+        )
+
+        do {
+            if !subscriptionStore.isPro && !settingsStore.isSubscriptionOverrideActive {
+                await MainActor.run { settingsStore.registerAICall() }
+            }
+            let response: GeminiRouterAPIResponse = try await GeminiRouterThrottle.shared.executeWithRetries {
+                try await client.functions.invoke(
+                    "gemini-router",
+                    options: FunctionInvokeOptions(body: routerBody)
+                )
+            }
+            await MainActor.run {
+                settingsStore.recordAITelemetry(
+                    invocationTokens: response.telemetryTokenTotal,
+                    hasProAccess: hasProAccess
+                )
+            }
+            let raw = response.candidates?
+                .first?
+                .content?
+                .parts?
+                .compactMap { $0.text }
+                .joined(separator: "\n") ?? ""
+            let drafts = parseGeneratedQuestionDrafts(from: raw)
+            await MainActor.run {
+                isGeneratingQuestions = false
+                if drafts.isEmpty {
+                    generateQuestionsError = "Could not parse generated questions. Try again."
+                } else {
+                    generatedDrafts = drafts
+                    isGeneratedQuestionsSheetPresented = true
+                }
+            }
+        } catch {
+            await MainActor.run {
+                isGeneratingQuestions = false
+                generateQuestionsError = error.localizedDescription
+            }
+        }
+    }
+
+    private func parseGeneratedQuestionDrafts(from raw: String) -> [TierTapAIGeneratedQuestionDraft] {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let jsonSlice: String = {
+            if let start = trimmed.firstIndex(of: "["),
+               let end = trimmed.lastIndex(of: "]") {
+                return String(trimmed[start...end])
+            }
+            return trimmed
+        }()
+        guard let data = jsonSlice.data(using: .utf8) else { return [] }
+        struct Row: Decodable {
+            let title: String
+            let instruction: String
+        }
+        guard let rows = try? JSONDecoder().decode([Row].self, from: data) else { return [] }
+        return rows.compactMap { row in
+            let title = row.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            let instruction = row.instruction.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !title.isEmpty, !instruction.isEmpty else { return nil }
+            return TierTapAIGeneratedQuestionDraft(title: title, instruction: instruction)
+        }
+    }
+}
+
+// MARK: - Graph kinds
+
+enum GraphKind: String, CaseIterable, Identifiable {
+    case betCaptureDiff
+    case venn
+    case winLossBars
+    case tierProgress
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .betCaptureDiff: return "Bet Rating"
+        case .venn: return "Venn"
+        case .winLossBars: return "Win/Loss"
+        case .tierProgress: return "Tier curve"
+        }
+    }
+}
+
+// MARK: - Reusable components
+
+struct MonthlyProfitLossAggregate: Identifiable {
+    let id: Date
+    let monthLabel: String
+    let profit: Int
+    let loss: Int
+    let profitCash: Int
+    let profitComp: Int
+    let lossCash: Int
+    let lossCompOffset: Int
+    let cashROIPercent: Double?
+    let evROIPercent: Double?
+}
+
+struct AnalyticsCollapsibleSection<Content: View>: View {
+    let title: String
+    let systemImage: String
+    @Binding var isExpanded: Bool
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.easeInOut) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Label(title, systemImage: systemImage)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Spacer()
+                    Image(systemName: isExpanded ? "rectangle.compress.vertical" : "rectangle.expand.vertical")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct MonthlyProfitLossChartCard: View {
+    let aggregates: [MonthlyProfitLossAggregate]
+    let gradient: LinearGradient
+    let currencySymbol: String
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    private var maxBarValue: Double {
+        let values = aggregates.flatMap { agg -> [Double] in
+            [
+                Double(agg.profit),
+                Double(agg.loss),
+                Double(agg.profitCash + agg.profitComp),
+                Double(agg.lossCash)
+            ]
+        }
+        return max(values.max() ?? 1, 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if aggregates.isEmpty {
+                L10nText("No closed sessions in the selected range.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                MonthlyProfitLossVerticalChart(
+                    aggregates: aggregates,
+                    maxValue: maxBarValue,
+                    gradient: gradient,
+                    currencySymbol: currencySymbol
+                )
+                .frame(height: 220)
+
+                HStack(spacing: 16) {
+                    legendItem(color: .green, label: "Profit (cash)")
+                    legendItem(color: Color(red: 0.35, green: 0.85, blue: 0.75), label: "Profit (comps)")
+                    legendItem(color: .red, label: "Loss (cash)")
+                    legendItem(color: Color(red: 1.0, green: 0.55, blue: 0.35), label: "Loss (comps offset)")
+                }
+
+                HStack(spacing: 16) {
+                    legendItem(color: .white.opacity(0.85), label: "ROI w/o comps")
+                    legendItem(color: Color.cyan.opacity(0.9), label: "ROI w/ comps")
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+
+    private func legendItem(color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(color)
+                .frame(width: 12, height: 12)
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.gray)
+        }
+    }
+}
+
+struct MonthlyProfitLossVerticalChart: View {
+    let aggregates: [MonthlyProfitLossAggregate]
+    let maxValue: Double
+    let gradient: LinearGradient
+    let currencySymbol: String
+
+    private let profitCashColor = Color.green
+    private let profitCompColor = Color(red: 0.35, green: 0.85, blue: 0.75)
+    private let lossCashColor = Color.red
+    private let lossCompColor = Color(red: 1.0, green: 0.55, blue: 0.35)
+
+    var body: some View {
+        GeometryReader { geo in
+            let chartHeight = geo.size.height - 36
+            let yAxisWidth: CGFloat = 44
+            let plotWidth = max(geo.size.width - yAxisWidth - 8, 1)
+            let columnWidth = aggregates.isEmpty ? 0 : plotWidth / CGFloat(aggregates.count)
+            let barPairWidth = max(8, min(columnWidth * 0.72, 36))
+            let singleBarWidth = max(4, barPairWidth * 0.42)
+
+            HStack(alignment: .bottom, spacing: 0) {
+                yAxisLabels(height: chartHeight, width: yAxisWidth)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .bottom, spacing: max(4, columnWidth * 0.12)) {
+                        ForEach(aggregates) { month in
+                            VStack(spacing: 4) {
+                                HStack(alignment: .bottom, spacing: 3) {
+                                    stackedBar(
+                                        cash: month.profitCash,
+                                        comp: month.profitComp,
+                                        cashColor: profitCashColor,
+                                        compColor: profitCompColor,
+                                        chartHeight: chartHeight,
+                                        barWidth: singleBarWidth
+                                    )
+                                    lossStackedBar(
+                                        lossCash: month.lossCash,
+                                        compOffset: month.lossCompOffset,
+                                        chartHeight: chartHeight,
+                                        barWidth: singleBarWidth
+                                    )
+                                }
+                                roiLabels(for: month)
+                                Text(month.monthLabel)
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                            }
+                            .frame(width: max(columnWidth, barPairWidth + 8))
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func stackedBar(
+        cash: Int,
+        comp: Int,
+        cashColor: Color,
+        compColor: Color,
+        chartHeight: CGFloat,
+        barWidth: CGFloat
+    ) -> some View {
+        let total = max(cash + comp, 0)
+        let totalHeight = CGFloat(Double(total) / maxValue) * chartHeight
+        let cashHeight = total > 0 ? CGFloat(Double(cash) / Double(total)) * totalHeight : 0
+        let compHeight = total > 0 ? totalHeight - cashHeight : 0
+
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if comp > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(compColor)
+                    .frame(width: barWidth, height: max(compHeight, comp > 0 ? 2 : 0))
+            }
+            if cash > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(cashColor)
+                    .frame(width: barWidth, height: max(cashHeight, 2))
+            }
+        }
+        .frame(height: chartHeight, alignment: .bottom)
+    }
+
+    @ViewBuilder
+    private func lossStackedBar(
+        lossCash: Int,
+        compOffset: Int,
+        chartHeight: CGFloat,
+        barWidth: CGFloat
+    ) -> some View {
+        let total = max(lossCash, 0)
+        let totalHeight = CGFloat(Double(total) / maxValue) * chartHeight
+        let remainingLoss = max(0, lossCash - compOffset)
+        let remainingHeight = total > 0 ? CGFloat(Double(remainingLoss) / Double(total)) * totalHeight : 0
+        let offsetHeight = total > 0 ? totalHeight - remainingHeight : 0
+
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if compOffset > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(lossCompColor)
+                    .frame(width: barWidth, height: max(offsetHeight, 2))
+            }
+            if remainingLoss > 0 {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(lossCashColor)
+                    .frame(width: barWidth, height: max(remainingHeight, 2))
+            }
+        }
+        .frame(height: chartHeight, alignment: .bottom)
+    }
+
+    @ViewBuilder
+    private func roiLabels(for month: MonthlyProfitLossAggregate) -> some View {
+        VStack(spacing: 2) {
+            if let cash = month.cashROIPercent {
+                Text(String(format: "%.0f%%", cash))
+                    .font(.system(size: 8, weight: .semibold).monospacedDigit())
+                    .foregroundColor(.white.opacity(0.85))
+            }
+            if let ev = month.evROIPercent {
+                Text(String(format: "%.0f%%", ev))
+                    .font(.system(size: 8, weight: .semibold).monospacedDigit())
+                    .foregroundColor(.cyan.opacity(0.9))
+            }
+        }
+    }
+
+    private func yAxisLabels(height: CGFloat, width: CGFloat) -> some View {
+        let ticks = 4
+        return VStack {
+            ForEach((0...ticks).reversed(), id: \.self) { i in
+                let value = Int((maxValue * Double(i) / Double(ticks)).rounded())
+                Text("\(currencySymbol)\(value)")
+                    .font(.system(size: 8).monospacedDigit())
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                if i > 0 { Spacer(minLength: 0) }
+            }
+        }
+        .frame(width: width, height: height, alignment: .trailing)
+    }
+}
+
+struct MetricPill: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title.uppercased())
+                .font(.caption2)
+                .foregroundColor(.gray)
+            Text(value)
+                .font(.subheadline.bold())
+                .foregroundColor(color)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(12)
+    }
+}
+
+struct BetCaptureDiffLineChartCard: View {
+    let series: [(date: Date, diff: Int)]
+    let goodBadCounts: (good: Int, bad: Int)
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+    
+    private var hasData: Bool { !series.isEmpty }
+    
+    private var goodPercentageText: String {
+        let total = series.count
+        guard total > 0 else { return "—" }
+        let pct = Double(goodBadCounts.good) / Double(total) * 100.0
+        return String(format: "%.0f%% of sessions", pct)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Bet Rating vs Actual", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            if hasData {
+                LineChart(points: series.map { Double($0.diff) }, gradient: gradient, showValueLabels: true)
+                    .frame(height: 180)
+                
+                HStack(spacing: 8) {
+                    LocalizedLabel(title: "\(goodBadCounts.good) good", systemImage: "hand.thumbsup.fill")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                    LocalizedLabel(title: "\(goodBadCounts.bad) bad", systemImage: "hand.thumbsdown.fill")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    Spacer()
+                    Text(goodPercentageText)
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+            } else {
+                L10nText("No sessions with both actual and rated average bet yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            
+            L10nText("Above 0 means your rated (captured) average bet is higher than your actual average bet, which is good. Below 0 means you’re effectively overbetting relative to what the casino tracks.")
+                .font(.caption)
+                .foregroundColor(.gray)
+            
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct VennDiagramCard: View {
+    let leftLabel: String
+    let rightLabel: String
+    let leftCount: Int
+    let rightCount: Int
+    let intersectionCount: Int
+    let total: Int
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Win vs. Tier Gain", systemImage: "circle.grid.2x1.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            VennDiagramView(
+                leftColor: Color.green.opacity(0.7),
+                rightColor: Color.blue.opacity(0.7),
+                gradient: gradient,
+                leftLabel: leftLabel,
+                rightLabel: rightLabel,
+                leftCount: leftCount,
+                rightCount: rightCount,
+                intersectionCount: intersectionCount
+            )
+            .frame(height: 220)
+
+            L10nText("Shows how often you both have a positive session result (per your results basis) and gain tier points in the same session.")
+                .font(.caption)
+                .foregroundColor(.gray)
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+
+            HStack {
+                L10nText("Intersection")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                Spacer()
+                Text("\(intersectionCount) of \(total) sessions")
+                    .font(.caption.bold())
+                    .foregroundColor(.white)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct VennDiagramView: View {
+    let leftColor: Color
+    let rightColor: Color
+    let gradient: LinearGradient
+    let leftLabel: String
+    let rightLabel: String
+    let leftCount: Int
+    let rightCount: Int
+    let intersectionCount: Int
+
+    var body: some View {
+        GeometryReader { geo in
+            let size = min(geo.size.width, geo.size.height)
+            let radius = size * 0.32
+            let centerY = geo.size.height * 0.45
+            let offset = radius * 0.7
+
+            ZStack {
+                Circle()
+                    .fill(leftColor)
+                    .frame(width: radius * 2, height: radius * 2)
+                    .position(x: geo.size.width * 0.5 - offset, y: centerY)
+                Circle()
+                    .fill(rightColor)
+                    .frame(width: radius * 2, height: radius * 2)
+                    .position(x: geo.size.width * 0.5 + offset, y: centerY)
+
+                Circle()
+                    .fill(gradient)
+                    .opacity(0.8)
+                    .frame(width: radius * 1.6, height: radius * 1.6)
+                    .position(x: geo.size.width * 0.5, y: centerY)
+
+                VStack(spacing: 4) {
+                    Text("\(intersectionCount)")
+                        .font(.title.bold())
+                        .foregroundColor(.white)
+                    L10nText("Both")
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .position(x: geo.size.width * 0.5, y: centerY)
+
+                VStack(alignment: .center, spacing: 4) {
+                    Text(leftLabel)
+                        .font(.caption)
+                        .foregroundColor(.white)
+                    Text("\(leftCount)")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                .frame(width: radius * 1.3)
+                .position(x: geo.size.width * 0.5 - offset, y: centerY - radius - 10)
+
+                VStack(alignment: .center, spacing: 4) {
+                    Text(rightLabel)
+                        .font(.caption)
+                        .foregroundColor(.white)
+                    Text("\(rightCount)")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                .frame(width: radius * 1.3)
+                .position(x: geo.size.width * 0.5 + offset, y: centerY - radius - 10)
+            }
+        }
+    }
+}
+
+struct WinLossBarChartCard: View {
+    let totalProfit: Int
+    let totalLoss: Int
+    let totalSessions: Int
+    let gradient: LinearGradient
+    let currencySymbol: String
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+    var chartTitle: String = "Win/Loss Distribution"
+    var basisCaption: String? = nil
+
+    var body: some View {
+        let maxValue = max(Double(totalProfit), Double(totalLoss), 1)
+
+        return VStack(alignment: .leading, spacing: 12) {
+            Label(chartTitle, systemImage: "chart.bar.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            VStack(spacing: 10) {
+                BarRow(label: "Total profit", value: Double(totalProfit), maxValue: maxValue, gradient: gradient, currencySymbol: currencySymbol)
+                BarRow(label: "Total loss", value: Double(totalLoss), maxValue: maxValue, gradient: LinearGradient(colors: [.red, .orange], startPoint: .leading, endPoint: .trailing), currencySymbol: currencySymbol)
+            }
+
+            Text(basisCaption ?? "How much you’ve won vs. lost across all completed sessions.")
+                .font(.caption)
+                .foregroundColor(.gray)
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct BarRow: View {
+    let label: String
+    let value: Double
+    let maxValue: Double
+    let gradient: LinearGradient
+    let currencySymbol: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                Spacer()
+                Text("\(currencySymbol)\(Int(value))")
+                    .font(.caption2.bold())
+                    .foregroundColor(.white)
+            }
+            GeometryReader { geo in
+                let width = max(2, geo.size.width * CGFloat(value / maxValue))
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.systemGray6).opacity(0.4))
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(gradient)
+                        .frame(width: width)
+                }
+            }
+            .frame(height: 10)
+        }
+    }
+}
+
+struct TierProgressLineChartCard: View {
+    let pointsByDate: [(date: Date, total: Int)]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Tier Progress Over Time", systemImage: "chart.line.uptrend.xyaxis")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if pointsByDate.isEmpty {
+                L10nText("No tier point data yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                LineChart(points: pointsByDate.map { Double($0.total) }, gradient: gradient)
+                    .frame(height: 180)
+            }
+
+            L10nText("Cumulative tier points earned across your recorded sessions.")
+                .font(.caption)
+                .foregroundColor(.gray)
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct LineChart: View {
+    let points: [Double]
+    let gradient: LinearGradient
+    let showValueLabels: Bool
+
+    init(points: [Double], gradient: LinearGradient, showValueLabels: Bool = false) {
+        self.points = points
+        self.gradient = gradient
+        self.showValueLabels = showValueLabels
+    }
+
+    /// Indices of points that should show a value label so labels don't overlap (evenly spaced, max 8).
+    private var valueLabelIndices: Set<Int> {
+        let n = points.count
+        let maxLabels = 8
+        if n <= maxLabels { return Set(0..<n) }
+        return Set((0..<maxLabels).map { i in (i * (n - 1)) / max(1, maxLabels - 1) })
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let maxVal = max(points.max() ?? 1, 1)
+            let minVal = min(points.min() ?? 0, 0)
+            let span = max(maxVal - minVal, 1)
+
+            let stepX = points.count > 1 ? geo.size.width / CGFloat(points.count - 1) : 0
+            let showLabelForIndex = valueLabelIndices
+
+            let path = Path { p in
+                for (idx, value) in points.enumerated() {
+                    let x = CGFloat(idx) * stepX
+                    let normalized = (value - minVal) / span
+                    let y = geo.size.height * (1 - CGFloat(normalized))
+                    if idx == 0 {
+                        p.move(to: CGPoint(x: x, y: y))
+                    } else {
+                        p.addLine(to: CGPoint(x: x, y: y))
+                    }
+                }
+            }
+
+            ZStack {
+                path
+                    .stroke(gradient, style: StrokeStyle(lineWidth: 3, lineJoin: .round))
+                ForEach(Array(points.enumerated()), id: \.offset) { idx, value in
+                    let x = CGFloat(idx) * stepX
+                    let normalized = (value - minVal) / span
+                    let y = geo.size.height * (1 - CGFloat(normalized))
+                    let showLabel = showValueLabels && showLabelForIndex.contains(idx)
+
+                    VStack(spacing: 2) {
+                        Circle()
+                            .fill(Color.white.opacity(0.9))
+                            .frame(width: 4, height: 4)
+                        if showLabel {
+                            let intValue = Int(value.rounded())
+                            let signPrefix = intValue > 0 ? "+" : ""
+                            Text("\(signPrefix)\(intValue)")
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .position(x: x, y: y)
+                }
+            }
+        }
+    }
+}
+
+struct SessionMoodBarChartCard: View {
+    let moodCounts: [(mood: SessionMood, count: Int)]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Session moods", systemImage: "face.smiling.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if moodCounts.isEmpty {
+                L10nText("No session moods recorded yet. Enable \"Prompt for session mood\" in Settings → Sessions and end a session to record how each session felt.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let maxCount = max(moodCounts.map { Double($0.count) }.max() ?? 1, 1)
+                ForEach(moodCounts, id: \.mood) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(row.mood.label)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("\(row.count)")
+                                .font(.caption2.bold())
+                                .foregroundColor(.gray)
+                        }
+                        GeometryReader { geo in
+                            let width = max(2, geo.size.width * CGFloat(Double(row.count) / maxCount))
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(.systemGray6).opacity(0.4))
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(gradient)
+                                    .frame(width: width)
+                            }
+                        }
+                        .frame(height: 10)
+                    }
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct GameBreakdownBars: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    private var totalsByGame: [(game: String, count: Int)] {
+        let counts = Dictionary(grouping: sessions, by: { $0.game })
+            .mapValues { $0.count }
+        return counts
+            .map { ($0.key, $0.value) }
+            .sorted { $0.count > $1.count }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Sessions by Game", systemImage: "square.grid.2x2.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if totalsByGame.isEmpty {
+                L10nText("No game breakdown yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let maxCount = max(totalsByGame.map { Double($0.count) }.max() ?? 1, 1)
+                ForEach(totalsByGame.prefix(5), id: \.game) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(row.game)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("\(row.count)x")
+                                .font(.caption2.bold())
+                                .foregroundColor(.gray)
+                        }
+                        GeometryReader { geo in
+                            let width = max(2, geo.size.width * CGFloat(Double(row.count) / maxCount))
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(.systemGray6).opacity(0.4))
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(gradient)
+                                    .frame(width: width)
+                            }
+                        }
+                        .frame(height: 10)
+                    }
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+struct TierPointsByLoyaltyProgramBars: View {
+    let sessions: [Session]
+    let gradient: LinearGradient
+    var dateRangeText: String? = nil
+    var locationFilterText: String? = nil
+
+    // Simple mapping from casino name keywords to loyalty programs.
+    private let loyaltyProgramRules: [(keyword: String, program: String)] = [
+        ("MGM", "MGM Rewards"),
+        ("Bellagio", "MGM Rewards"),
+        ("Aria", "MGM Rewards"),
+        ("Cosmopolitan", "Identity Rewards"),
+        ("Caesars", "Caesars Rewards"),
+        ("Harrah", "Caesars Rewards"),
+        ("Paris", "Caesars Rewards"),
+        ("Wynn", "Wynn Rewards"),
+        ("Encore", "Wynn Rewards"),
+        ("Venetian", "Grazie Rewards"),
+        ("Palazzo", "Grazie Rewards"),
+        ("Palms", "Club Serrano"),
+        ("Boyd", "B Connected")
+    ]
+
+    private func loyaltyProgram(for casino: String) -> String {
+        for rule in loyaltyProgramRules {
+            if casino.localizedCaseInsensitiveContains(rule.keyword) {
+                return rule.program
+            }
+        }
+        return "Other loyalty programs"
+    }
+
+    private var totalsByProgram: [(program: String, points: Int)] {
+        let rows: [(String, Int)] = sessions.compactMap { session in
+            guard let points = session.tierPointsEarned, points > 0 else { return nil }
+            let program = loyaltyProgram(for: session.casino)
+            return (program, points)
+        }
+
+        let grouped = Dictionary(grouping: rows, by: { $0.0 })
+        return grouped
+            .map { key, values in
+                let total = values.reduce(0) { $0 + $1.1 }
+                return (program: key, points: total)
+            }
+            .sorted { $0.points > $1.points }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            LocalizedLabel(title: "Tier Points by Loyalty Program", systemImage: "star.circle.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+
+            if totalsByProgram.isEmpty {
+                L10nText("No tier point data yet.")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } else {
+                let maxPoints = max(totalsByProgram.map { Double($0.points) }.max() ?? 1, 1)
+                ForEach(totalsByProgram.prefix(5), id: \.program) { row in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(row.program)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                            Spacer(minLength: 8)
+                            Text("\(row.points) pts")
+                                .font(.caption2.bold())
+                                .foregroundColor(.gray)
+                        }
+                        GeometryReader { geo in
+                            let width = max(2, geo.size.width * CGFloat(Double(row.points) / maxPoints))
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(.systemGray6).opacity(0.4))
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(gradient)
+                                    .frame(width: width)
+                            }
+                        }
+                        .frame(height: 10)
+                    }
+                }
+            }
+
+            if let range = dateRangeText {
+                Text("Date range: \(range)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+            if let loc = locationFilterText {
+                Text(loc)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+}
+
+#if os(iOS)
+@MainActor
+private func buildAnalyticsShareImages(
+    selection: AnalyticsShareSelection,
+    closedSessions: [Session],
+    gradient: LinearGradient,
+    currencySymbol: String,
+    locationFilterText: String? = nil,
+    useExpectedValue: Bool = false
+) -> [UIImage] {
+    var images: [UIImage] = []
+
+    func outcome(_ s: Session) -> Int {
+        s.analyticsOutcome(useExpectedValue: useExpectedValue) ?? 0
+    }
+
+    let winningSessions = closedSessions.filter { outcome($0) > 0 }
+    let sessionsWithTierGain = closedSessions.filter { ($0.tierPointsEarned ?? 0) > 0 }
+    let vennIntersectionCount = closedSessions.filter { outcome($0) > 0 && ($0.tierPointsEarned ?? 0) > 0 }.count
+    let totalProfit = closedSessions.map { outcome($0) }.filter { $0 > 0 }.reduce(0, +)
+    let totalLoss = abs(closedSessions.map { outcome($0) }.filter { $0 < 0 }.reduce(0, +))
+    let vennLeftLabel = useExpectedValue ? "Positive EV" : "Winning sessions"
+
+    let betCaptureDiffByDate: [(date: Date, diff: Int)] = {
+        let withBothBets: [(date: Date, diff: Int)] = closedSessions.compactMap { session -> (date: Date, diff: Int)? in
+            guard let actual = session.avgBetActual,
+                  let rated = session.avgBetRated else { return nil }
+            return (date: session.startTime, diff: rated - actual)
+        }
+        return withBothBets.sorted(by: { lhs, rhs in
+            lhs.date < rhs.date
+        })
+    }()
+
+    let betCaptureGoodBadCounts: (good: Int, bad: Int) = {
+        let diffs = betCaptureDiffByDate.map { $0.diff }
+        let good = diffs.filter { $0 >= 0 }.count
+        let bad = diffs.filter { $0 < 0 }.count
+        return (good, bad)
+    }()
+
+    let cumulativePointsByDate: [(date: Date, total: Int)] = {
+        let sorted = closedSessions.sorted { $0.startTime < $1.startTime }
+        var running = 0
+        return sorted.map { session in
+            running += session.tierPointsEarned ?? 0
+            return (date: session.startTime, total: running)
+        }
+    }()
+
+    let dateRangeText: String? = {
+        guard !closedSessions.isEmpty,
+              let first = closedSessions.map(\.startTime).min(),
+              let last = closedSessions.map(\.startTime).max() else { return nil }
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        return "\(df.string(from: first)) – \(df.string(from: last))"
+    }()
+
+    // Treat this share as poker-focused when all sessions are explicitly marked as poker.
+    let isPokerAnalytics: Bool = {
+        guard !closedSessions.isEmpty else { return false }
+        return closedSessions.allSatisfy { $0.gameCategory == .poker }
+    }()
+
+    if selection.includeBetCaptureDiff && !betCaptureDiffByDate.isEmpty {
+        let card = BetCaptureDiffLineChartCard(
+            series: betCaptureDiffByDate,
+            goodBadCounts: betCaptureGoodBadCounts,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
+    if selection.includeVenn {
+        let card = VennDiagramCard(
+            leftLabel: vennLeftLabel,
+            rightLabel: "Tier gain",
+            leftCount: winningSessions.count,
+            rightCount: sessionsWithTierGain.count,
+            intersectionCount: vennIntersectionCount,
+            total: closedSessions.count,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
+    if selection.includeWinLoss {
+        let card = WinLossBarChartCard(
+            totalProfit: totalProfit,
+            totalLoss: totalLoss,
+            totalSessions: closedSessions.count,
+            gradient: gradient,
+            currencySymbol: currencySymbol,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText,
+            chartTitle: useExpectedValue ? "EV Distribution" : "Win/Loss Distribution",
+            basisCaption: useExpectedValue
+                ? "Totals use expected value (cash net + comps)."
+                : "Totals use cash net (comps excluded)."
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
+    if selection.includeTierProgress && !cumulativePointsByDate.isEmpty {
+        let card = TierProgressLineChartCard(
+            pointsByDate: cumulativePointsByDate,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
+    if selection.includeGameBreakdown {
+        if isPokerAnalytics {
+            let card = PokerPerformanceSummaryCard(
+                sessions: closedSessions,
+                gradient: gradient,
+                currencySymbol: currencySymbol,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText,
+                useExpectedValue: useExpectedValue
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        } else {
+            let card = GameBreakdownBars(
+                sessions: closedSessions,
+                gradient: gradient,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        }
+    }
+
+    if selection.includeTierByLoyaltyProgram {
+        if isPokerAnalytics {
+            let card = PokerROITrendChartCard(
+                sessions: closedSessions,
+                gradient: gradient,
+                currencySymbol: currencySymbol,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText,
+                useExpectedValue: useExpectedValue
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        } else {
+            let card = TierPointsByLoyaltyProgramBars(
+                sessions: closedSessions,
+                gradient: gradient,
+                dateRangeText: dateRangeText,
+                locationFilterText: locationFilterText
+            )
+            if let image = renderAnalyticsCard(card) {
+                images.append(image)
+            }
+        }
+    }
+
+    let moodCountsForShare: [(mood: SessionMood, count: Int)] = {
+        let withMood = closedSessions.filter { $0.sessionMood != nil }
+        let grouped = Dictionary(grouping: withMood, by: { $0.sessionMood! }).mapValues { $0.count }
+        return SessionMood.allCases
+            .compactMap { mood in (grouped[mood]).map { (mood: mood, count: $0) } }
+            .filter { $0.count > 0 }
+            .sorted { $0.count > $1.count }
+    }()
+    if selection.includeSessionMoods && !moodCountsForShare.isEmpty {
+        let card = SessionMoodBarChartCard(
+            moodCounts: moodCountsForShare,
+            gradient: gradient,
+            dateRangeText: dateRangeText,
+            locationFilterText: locationFilterText
+        )
+        if let image = renderAnalyticsCard(card) {
+            images.append(image)
+        }
+    }
+
+    return images
+}
+
+private func writeShareImagesToTempFiles(_ images: [UIImage]) -> [URL] {
+    let df = DateFormatter()
+    df.dateFormat = "yyyyMMddHHmmss"
+    let timestamp = df.string(from: Date())
+    let tempDir = FileManager.default.temporaryDirectory
+    var urls: [URL] = []
+    for (index, image) in images.enumerated() {
+        let name = images.count > 1 ? "TierTap\(timestamp)-\(index + 1).png" : "TierTap\(timestamp).png"
+        let url = tempDir.appendingPathComponent(name)
+        guard let data = image.pngData() else { continue }
+        try? data.write(to: url)
+        urls.append(url)
+    }
+    return urls
+}
+
+@MainActor
+private func renderAnalyticsCard<V: View>(_ view: V) -> UIImage? {
+    let width = ShareImageExportQuality.wideCardWidthPoints
+    let height: CGFloat = 480
+
+    if #available(iOS 16.0, *) {
+        let wrapped = view
+            .padding()
+            .frame(width: width, height: height)
+            .background(Color.black)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+        let renderer = ImageRenderer(content: wrapped)
+        renderer.scale = ShareImageExportQuality.imageRendererScale
+        renderer.proposedSize = ProposedViewSize(width: width, height: height)
+        return renderer.uiImage
+    } else {
+        let controller = UIHostingController(
+            rootView: view
+                .padding()
+                .frame(width: width, height: height)
+                .background(Color.black)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+        )
+
+        let size = CGSize(width: width, height: height)
+        controller.view.bounds = CGRect(origin: .zero, size: size)
+        controller.view.backgroundColor = .clear
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+    }
+}
+#endif
+
+struct AnalyticsShareSelectionSheet: View {
+    let closedSessions: [Session]
+    let gradient: LinearGradient
+    let onShare: (AnalyticsShareSelection) -> Void
+
+    @EnvironmentObject var settingsStore: SettingsStore
+    @Environment(\.dismiss) var dismiss
+
+    @State private var includeBetCaptureDiff = true
+    @State private var includeVenn = true
+    @State private var includeWinLoss = true
+    @State private var includeTierProgress = true
+    @State private var includeGameBreakdown = true
+    @State private var includeTierByLoyaltyProgram = true
+    @State private var includeSessionMoods = true
+
+    private var hasTierData: Bool {
+        !closedSessions
+            .filter { ($0.tierPointsEarned ?? 0) != 0 }
+            .isEmpty
+    }
+
+    private var hasMoodData: Bool {
+        !closedSessions.filter { $0.sessionMood != nil }.isEmpty
+    }
+
+    private var canShare: Bool {
+        includeBetCaptureDiff
+        || includeVenn
+        || includeWinLoss
+        || (includeTierProgress && hasTierData)
+        || includeGameBreakdown
+        || (includeTierByLoyaltyProgram && hasTierData)
+        || (includeSessionMoods && hasMoodData)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                List {
+                    Section(header: L10nText("Include in share").foregroundColor(.white)) {
+                        HStack {
+                            Button {
+                                includeBetCaptureDiff = true
+                                includeVenn = true
+                                includeWinLoss = true
+                                includeTierProgress = true
+                                includeGameBreakdown = true
+                                includeTierByLoyaltyProgram = true
+                                includeSessionMoods = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                    L10nText("Select All")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .buttonStyle(.plain)
+
+                            Spacer()
+
+                            Button {
+                                includeBetCaptureDiff = false
+                                includeVenn = false
+                                includeWinLoss = false
+                                includeTierProgress = false
+                                includeGameBreakdown = false
+                                includeTierByLoyaltyProgram = false
+                                includeSessionMoods = false
+                            } label: {
+                                HStack {
+                                    Image(systemName: "xmark.circle")
+                                        .foregroundColor(.red)
+                                    L10nText("Deselect All")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .listRowBackground(Color(.systemGray6).opacity(0.2))
+
+                        AnalyticsShareToggleRow(title: "Bet Rating vs Actual", isOn: $includeBetCaptureDiff)
+                        AnalyticsShareToggleRow(title: "Win vs. Tier Gain (Venn)", isOn: $includeVenn)
+                        AnalyticsShareToggleRow(title: "Win/Loss Distribution", isOn: $includeWinLoss)
+                        AnalyticsShareToggleRow(title: "Tier Progress Over Time", isOn: $includeTierProgress, disabled: !hasTierData)
+                        AnalyticsShareToggleRow(title: "Sessions by Game", isOn: $includeGameBreakdown)
+                        AnalyticsShareToggleRow(title: "Tier Points by Loyalty Program", isOn: $includeTierByLoyaltyProgram, disabled: !hasTierData)
+                        AnalyticsShareToggleRow(title: "Session moods", isOn: $includeSessionMoods, disabled: !hasMoodData)
+                    }
+
+                    Section(
+                        footer: L10nText("We’ll generate images for the selected analytics and open the system share sheet so you can send them however you like.")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                    ) {
+                        EmptyView()
+                    }
+                }
+                .listStyle(.plain)
+                .listRowSpacing(10)
+                .scrollContentBackground(.hidden)
+            }
+            .localizedNavigationTitle("Share Analytics")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.green)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Share") {
+                        #if os(iOS)
+                        if settingsStore.enableCasinoFeedback {
+                            CelebrationPlayer.shared.playQuickChime()
+                        }
+                        let selection = AnalyticsShareSelection(
+                            includeBetCaptureDiff: includeBetCaptureDiff,
+                            includeVenn: includeVenn,
+                            includeWinLoss: includeWinLoss,
+                            includeTierProgress: includeTierProgress,
+                            includeGameBreakdown: includeGameBreakdown,
+                            includeTierByLoyaltyProgram: includeTierByLoyaltyProgram,
+                            includeSessionMoods: includeSessionMoods
+                        )
+                        onShare(selection)
+                        #endif
+                        dismiss()
+                    }
+                    .disabled(!canShare)
+                    .foregroundColor(canShare ? .green : .gray)
+                }
+            }
+        }
+    }
+}
+
+private struct AnalyticsShareToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    var disabled: Bool = false
+
+    var body: some View {
+        Toggle(title, isOn: $isOn)
+            .disabled(disabled)
+            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+            .listRowBackground(
+                AnalyticsShareToggleRowBackground(selected: isOn && !disabled)
+            )
+            .listRowSeparator(.hidden)
+    }
+}
+
+private struct AnalyticsShareToggleRowBackground: View {
+    let selected: Bool
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(Color(.systemGray6).opacity(selected ? 0.28 : 0.15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(selected ? Color.green.opacity(0.65) : .clear, lineWidth: 1.5)
+            )
+            .shadow(color: selected ? Color.green.opacity(0.55) : .clear, radius: 14, x: 0, y: 0)
+            .shadow(color: selected ? Color.green.opacity(0.38) : .clear, radius: 8, x: 0, y: 4)
+            .padding(.vertical, 4)
+    }
+}

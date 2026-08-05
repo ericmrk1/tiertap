@@ -1,0 +1,485 @@
+import SwiftUI
+import StoreKit
+
+private let appleEULAURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
+private let privacyPolicyURL = URL(string: "https://travelzork.com/privacy-policy/")!
+
+/// Subscription paywall for TierTap Pro.
+struct TierTapPaywallView: View {
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var sessionStore: SessionStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var purchasingProductId: String?
+    @State private var showConfetti = false
+    @State private var showAccountSheet = false
+    @State private var emailInput: String = ""
+
+    private var hasProAccess: Bool {
+        subscriptionStore.isPro || settingsStore.isSubscriptionOverrideActive
+    }
+
+    private var socialProofLines: [TierTapProductEnhancements.PaywallSocialProofLine] {
+        TierTapProductEnhancements.paywallSocialProofLines(
+            from: sessionStore.sessions,
+            currencySymbol: settingsStore.currencySymbol
+        )
+    }
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                settingsStore.primaryGradient
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        headerSection
+                        if !socialProofLines.isEmpty {
+                            socialProofSection
+                        }
+                        requirementsSection
+                        benefitsSection
+                        productsSection
+                        restoreSection
+                        legalSection
+
+                        if let message = subscriptionStore.errorMessage {
+                            Text(message)
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    .padding(.bottom, 28)
+                }
+            }
+            .localizedNavigationTitle("TierTap Pro")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                    .foregroundColor(.white)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Account page") {
+                        showAccountSheet = true
+                    }
+                    .foregroundColor(.white)
+                }
+            }
+        }
+        .navigationViewStyle(.stack)
+        .adaptiveSheet(isPresented: $showAccountSheet) {
+            CommunityAuthSheet(
+                emailInput: $emailInput,
+                onDismiss: { showAccountSheet = false }
+            )
+            .environmentObject(authStore)
+            .environmentObject(settingsStore)
+            .environmentObject(subscriptionStore)
+        }
+    }
+
+    private var socialProofSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("From your sessions")
+                .font(.caption.weight(.semibold))
+                .foregroundColor(.white.opacity(0.7))
+            ForEach(socialProofLines) { line in
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .padding(.top, 2)
+                    Text(line.text)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.92))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.12))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.green.opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            L10nText("Unlock TierTap Pro")
+                .font(.title2.weight(.bold))
+                .foregroundColor(.white)
+            if TierTapProductEnhancements.isEnabled {
+                L10nText("Loyalty ROI for serious players — status pace, rated capture, comps, trips, and tax.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+            } else {
+                L10nText("Smarter play decisions, powered by AI.")
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.9))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var requirementsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            LocalizedLabel(title: "Requirements", systemImage: "lock.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Image(systemName: hasProAccess ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(hasProAccess ? .green : .white.opacity(0.8))
+                    L10nText("Active TierTap Pro subscription.")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+                HStack(spacing: 8) {
+                    Image(systemName: authStore.isSignedIn ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(authStore.isSignedIn ? .green : .white.opacity(0.8))
+                    L10nText("Signed in with a valid TierTap account (email, Apple, or Google).")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.9))
+                }
+
+                if !authStore.isSignedIn {
+                    Button {
+                        showAccountSheet = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "person.crop.circle")
+                            L10nText("Go to Account to sign in")
+                                .font(.caption.weight(.semibold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.18))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 4)
+                }
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.15))
+        .cornerRadius(14)
+        // Extend the requirements "bubble" to the screen edges.
+        .padding(.horizontal, -16)
+    }
+
+    private var benefitsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            L10nText("What you get")
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+
+            VStack(alignment: .leading, spacing: 6) {
+                if TierTapProductEnhancements.isEnabled {
+                    ProBenefitRow(
+                        icon: "target",
+                        title: "Tier Goals & Pace Forecasts",
+                        subtitle: "Track points to your next status and project when you’ll get there."
+                    )
+                    ProBenefitRow(
+                        icon: "chart.line.uptrend.xyaxis",
+                        title: "Rated Capture Reports",
+                        subtitle: "See where host rating beats (or misses) what you actually bet."
+                    )
+                    ProBenefitRow(
+                        icon: "dollarsign.arrow.circlepath",
+                        title: "Comp ROI & True EV",
+                        subtitle: "Cash + comps clarity by property — soft-play value, not just win/loss."
+                    )
+                    ProBenefitRow(
+                        icon: "doc.text.fill",
+                        title: "Tax Preparation Documentation",
+                        subtitle: "Generate US-focused tax assistance summaries and export PDF or CSV for your records."
+                    )
+                    ProBenefitRow(
+                        icon: "suitcase.cart.fill",
+                        title: "Trip Recaps & Magic Wand",
+                        subtitle: "Plan and summarize destination trips with Pro trip intelligence."
+                    )
+                    ProBenefitRow(
+                        icon: "camera.viewfinder",
+                        title: "AI Estimators at the Table",
+                        subtitle: "Chip, comp, and slot photo estimators when you need speed."
+                    )
+                    ProBenefitRow(
+                        icon: "person.3.sequence.fill",
+                        title: "Publish to Community",
+                        subtitle: "Browse for free when signed in — Pro unlocks publishing and reacting (like, dislike, heart)."
+                    )
+                    ProBenefitRow(
+                        icon: "wand.and.stars",
+                        title: "AI Play Analysis & Session Art",
+                        subtitle: "Ask TierTap for narratives and premium share images."
+                    )
+                } else {
+                    ProBenefitRow(
+                        icon: "wand.and.stars",
+                        title: "AI Play Analysis",
+                        subtitle: "Ask TierTap to analyze your sessions and patterns."
+                    )
+                    ProBenefitRow(
+                        icon: "photo.badge.sparkles",
+                        title: "AI Session Image Generation",
+                        subtitle: "Create premium session share images with TierTap AI."
+                    )
+                    ProBenefitRow(
+                        icon: "camera.viewfinder",
+                        title: "Chip Estimator at Close Out",
+                        subtitle: "Estimate chip stacks from a photo with AI before you cash out."
+                    )
+                    ProBenefitRow(
+                        icon: "photo",
+                        title: "Comp Estimator",
+                        subtitle: "Estimate comps from a photo with AI."
+                    )
+                    ProBenefitRow(
+                        icon: "text.viewfinder",
+                        title: "Slot Reader",
+                        subtitle: "Read slot machine details from a photo with AI."
+                    )
+                    ProBenefitRow(
+                        icon: "person.3.sequence.fill",
+                        title: "Community Feed",
+                        subtitle: "See and share real-world sessions from other players."
+                    )
+                    ProBenefitRow(
+                        icon: "doc.text.fill",
+                        title: "Tax Preparation Documentation",
+                        subtitle: "Generate US-focused tax assistance summaries and export PDF or CSV for your records."
+                    )
+                }
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.15))
+        .cornerRadius(16)
+        // Extend the "What you get" bubble to the screen edges.
+        .padding(.horizontal, -16)
+    }
+
+    private var productsSection: some View {
+        Group {
+            if subscriptionStore.isLoading && subscriptionStore.products.isEmpty {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                        .tint(.white)
+                    Spacer()
+                }
+                .padding()
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
+                    L10nText("Choose your plan")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white)
+
+                    HStack(alignment: .top, spacing: 8) {
+                        ForEach(sortedProducts, id: \.id) { product in
+                            PaywallPlanBox(
+                            product: product,
+                            isCurrent: subscriptionStore.purchasedProductIds.contains(product.id),
+                            isPurchasing: purchasingProductId == product.id,
+                            isBusy: purchasingProductId != nil || subscriptionStore.isLoading,
+                            hasProAccess: hasProAccess,
+                            accentColor: settingsStore.primaryColor
+                        ) {
+                            purchase(product)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .top)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private var sortedProducts: [Product] {
+        subscriptionStore.products.sorted { lhs, rhs in
+            productSortOrder(lhs.id) < productSortOrder(rhs.id)
+        }
+    }
+
+    private func productSortOrder(_ id: String) -> Int {
+        switch TierTapProductId(rawValue: id) {
+        case .monthly: return 0
+        case .quarterly: return 1
+        case .yearly: return 2
+        default: return 3
+        }
+    }
+
+    private func isPurchaseDisabled(for product: Product) -> Bool {
+        if purchasingProductId != nil || subscriptionStore.isLoading { return true }
+        if subscriptionStore.purchasedProductIds.contains(product.id) { return true }
+        return false
+    }
+
+    private var restoreSection: some View {
+        Button("Restore Purchases") {
+            Task {
+                await subscriptionStore.restorePurchases()
+            }
+        }
+        .font(.footnote)
+        .foregroundColor(settingsStore.primaryColor)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var legalSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            L10nText("Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage and cancel subscriptions in your device Settings under Apple ID → Subscriptions.")
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.85))
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 16) {
+                Link("Apple EULA", destination: appleEULAURL)
+                    .font(.caption)
+                    .foregroundColor(settingsStore.primaryColor)
+                Link("Privacy Policy", destination: privacyPolicyURL)
+                    .font(.caption)
+                    .foregroundColor(settingsStore.primaryColor)
+            }
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(12)
+    }
+
+    private func purchase(_ product: Product) {
+        guard !isPurchaseDisabled(for: product) else { return }
+        purchasingProductId = product.id
+        Task {
+            let success = await subscriptionStore.purchase(product)
+            await MainActor.run {
+                purchasingProductId = nil
+                if success {
+                    showConfetti = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct ProBenefitRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.subheadline)
+                .foregroundColor(.green)
+                .frame(width: 20, alignment: .center)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(.white)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.85))
+            }
+        }
+    }
+}
+
+private struct PaywallPlanBox: View {
+    let product: Product
+    let isCurrent: Bool
+    let isPurchasing: Bool
+    let isBusy: Bool
+    let hasProAccess: Bool
+    let accentColor: Color
+    let action: () -> Void
+
+    private var periodLabel: String {
+        switch TierTapProductId(rawValue: product.id) {
+        case .yearly: return "Yearly"
+        case .quarterly: return "3 Months"
+        default: return "Monthly"
+        }
+    }
+
+    private var actionTitle: String {
+        hasProAccess ? "Change plan" : "Subscribe"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(periodLabel)
+                .font(.subheadline.weight(.semibold))
+                .foregroundColor(.white)
+            Text(product.displayPrice)
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.9))
+
+            Spacer(minLength: 0)
+
+            if isCurrent {
+                Text("Current plan")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(8)
+            } else {
+                Button(action: action) {
+                    HStack(spacing: 6) {
+                        if isPurchasing {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text(actionTitle)
+                                .font(.caption.weight(.semibold))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.14))
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                .buttonStyle(.plain)
+                .disabled(isBusy)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 130, alignment: .topLeading)
+        .padding(10)
+        .background(isCurrent ? accentColor.opacity(0.34) : Color.white.opacity(0.15))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isCurrent ? accentColor : Color.white.opacity(0.2), lineWidth: isCurrent ? 2 : 1)
+        )
+    }
+}
+

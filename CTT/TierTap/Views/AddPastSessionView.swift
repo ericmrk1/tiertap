@@ -1,0 +1,835 @@
+import SwiftUI
+
+struct AddPastSessionView: View {
+    @EnvironmentObject var store: SessionStore
+    @EnvironmentObject var settingsStore: SettingsStore
+    @EnvironmentObject var rewardWalletStore: RewardWalletStore
+    @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var subscriptionStore: SubscriptionStore
+    @Environment(\.dismiss) var dismiss
+
+    @State private var selectedGame = ""
+    @State private var casino = ""
+    @State private var isCasinoPublic = true
+    @State private var date = Date()
+    @State private var startTime = Date()
+    @State private var endTime = Date().addingTimeInterval(3600)
+    @State private var totalBuyIn = ""
+    @State private var totalFreePlay = ""
+    @State private var freePlayType = ""
+    @State private var cashOut = ""
+    @State private var startingTier = "0"
+    @State private var endingTier = ""
+    @State private var avgBetActual = ""
+    @State private var avgBetRated = ""
+    @State private var selectedRewardsProgram = ""
+
+    @State private var showGamePicker = false
+    @State private var showCasinoLocationPicker = false
+    @State private var showBuyInPicker = false
+    @State private var showFreePlayPicker = false
+
+    // Casino game type metadata
+    @State private var gameCategory: SessionGameCategory = .table
+    @State private var pokerGameKind: SessionPokerGameKind = .cash
+    @State private var pokerAllowsRebuy: Bool = false
+    @State private var pokerAllowsAddOn: Bool = false
+    @State private var pokerHasFreezeOut: Bool = false
+    @State private var pokerVariant: String = "No Limit Texas Hold’em"
+    @State private var pokerSmallBlind: Int = 0
+    @State private var pokerBigBlind: Int = 0
+    @State private var pokerAnte: Int = 0
+    @State private var pokerLevelMinutesText: String = ""
+    @State private var pokerStartingStackText: String = ""
+    @State private var pokerTournamentCostText: String = "0"
+    @State private var slotNotes: String = ""
+
+    @State private var casinoLatitude: Double?
+    @State private var casinoLongitude: Double?
+
+    /// Games to show as main grid: favorites only; fallback to pinned if no favorites set.
+    private var displayGames: [String] {
+        if !settingsStore.favoriteGames.isEmpty { return settingsStore.favoriteGames }
+        return GamesList.pinned
+    }
+
+    private var displaySlots: [String] {
+        if !settingsStore.favoriteSlotGames.isEmpty { return settingsStore.favoriteSlotGames }
+        return SlotsList.pinned
+    }
+
+    private var activeGameGridTitles: [String] {
+        switch gameCategory {
+        case .table: return displayGames
+        case .slots: return displaySlots
+        case .poker: return []
+        }
+    }
+
+    private var isGameInDisplayList: Bool {
+        let list = gameCategory == .slots ? displaySlots : displayGames
+        return selectedGame.isEmpty || list.contains(selectedGame)
+    }
+
+    var isValid: Bool {
+        let hasGame: Bool = (gameCategory == .poker) ? true : !selectedGame.isEmpty
+        let buyOK = (Int(totalBuyIn) ?? 0) > 0
+        return hasGame && !casino.isEmpty &&
+            endTime > startTime &&
+            buyOK && Int(cashOut) != nil &&
+            (Int(startingTier) ?? 0) > 0 && Int(endingTier) != nil
+        // Avg bet fields are optional; buy-in and cash-out are the required money fields.
+    }
+
+    private let blindPickerValues: [Int] = [0, 1, 2, 3, 5, 10, 20, 40, 80, 100, 200, 300, 400, 500, 600, 800, 1000]
+
+    /// Quick denominations pulled from Settings, falling back to sensible defaults.
+    private var quickDenominations: [Int] {
+        let base = settingsStore.effectiveDenominations
+        return base.isEmpty ? [20, 100, 500, 1000, 10_000] : base
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                settingsStore.primaryGradient.ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 16) {
+                        gameSection
+                        casinoAndTimeSection
+                        startingTierSection
+                        totalBuyInSection
+                        endingTierSection
+                        moneyAndBetsSection
+                        saveButton
+                    }
+                    .padding()
+                }
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .localizedNavigationTitle("Add Past Session")
+            .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(settingsStore.primaryGradient, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundColor(.green)
+                }
+            }
+            .adaptiveSheet(isPresented: $showGamePicker) {
+                GamePickerView(selectedGame: $selectedGame, mode: gameCategory == .slots ? .slots : .table)
+                    .environmentObject(settingsStore)
+                    .environmentObject(authStore)
+                    .environmentObject(subscriptionStore)
+                    .gamePickerSheetPresentation()
+            }
+            .fullScreenCover(isPresented: $showCasinoLocationPicker) {
+                NavigationStack {
+                    CasinoLocationPickerView(selectedCasino: $casino, selectedLatitude: $casinoLatitude, selectedLongitude: $casinoLongitude)
+                        .environmentObject(settingsStore)
+                        .environmentObject(authStore)
+                        .environmentObject(subscriptionStore)
+                }
+            }
+            .adaptiveSheet(isPresented: $showBuyInPicker) {
+                BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $totalBuyIn)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.fraction(0.7), .large])
+                    .presentationDragIndicator(.visible)
+            }
+            .adaptiveSheet(isPresented: $showFreePlayPicker) {
+                BuyInGridSheet(amounts: settingsStore.buyInGridAmounts, selected: $totalFreePlay, mode: .freePlay)
+                    .environmentObject(settingsStore)
+                    .presentationDetents([.fraction(0.7), .large])
+                    .presentationDragIndicator(.visible)
+            }
+            .onChange(of: selectedGame) { newGame in
+                guard !newGame.isEmpty else { return }
+                let defaults = store.defaultAvgBets(for: newGame)
+                if avgBetActual.isEmpty, let a = defaults.actual {
+                    avgBetActual = "\(a)"
+                }
+                if avgBetRated.isEmpty, let r = defaults.rated {
+                    avgBetRated = "\(r)"
+                }
+            }
+            .onChange(of: pokerSmallBlind) { newValue in
+                if newValue == 5 && pokerBigBlind != 10 {
+                    pokerBigBlind = 10
+                }
+            }
+            .onChange(of: pokerBigBlind) { newValue in
+                if newValue == 10 && pokerSmallBlind != 5 {
+                    pokerSmallBlind = 5
+                }
+            }
+            .onAppear {
+                if casino.isEmpty, let recent = store.mostRecentCasino() {
+                    casino = recent
+                }
+                gameCategory = settingsStore.defaultGameCategory
+                applyLastSavedGameDefaults()
+                applyCasinoHistoryDefaults()
+            }
+            .onChange(of: casino) { _ in
+                applyCasinoHistoryDefaults()
+            }
+            .onChange(of: gameCategory) { newCat in
+                if newCat != .slots {
+                    slotNotes = ""
+                }
+                applyLastSavedGameDefaults()
+            }
+        }
+    }
+
+    private func applyCasinoHistoryDefaults() {
+        guard store.hasSessionHistory(forExactCasino: casino) else { return }
+        if let tier = store.defaultEndingTierPoints(for: casino) {
+            startingTier = "\(tier)"
+        }
+        if let buy = store.defaultInitialBuyIn(for: casino) {
+            totalBuyIn = "\(buy)"
+        }
+    }
+
+    private func applyLastSavedGameDefaults() {
+        if gameCategory == .table {
+            if !settingsStore.lastTableGameName.isEmpty {
+                selectedGame = settingsStore.lastTableGameName
+            }
+            return
+        }
+        if gameCategory == .slots {
+            if !settingsStore.lastSlotGameName.isEmpty {
+                selectedGame = settingsStore.lastSlotGameName
+            }
+            if let d = settingsStore.lastSlotSessionDefaults {
+                slotNotes = d.slotNotes
+            } else {
+                slotNotes = ""
+            }
+            return
+        }
+        guard let d = settingsStore.lastPokerSessionDefaults else { return }
+        pokerGameKind = d.pokerGameKind
+        pokerAllowsRebuy = d.pokerAllowsRebuy
+        pokerAllowsAddOn = d.pokerAllowsAddOn
+        pokerHasFreezeOut = d.pokerHasFreezeOut
+        pokerVariant = d.pokerVariant
+        pokerSmallBlind = d.pokerSmallBlind
+        pokerBigBlind = d.pokerBigBlind
+        pokerAnte = d.pokerAnte
+        pokerLevelMinutesText = d.pokerLevelMinutesText
+        pokerStartingStackText = d.pokerStartingStackText
+        pokerTournamentCostText = d.pokerTournamentCostText
+    }
+
+    @ViewBuilder private var gameSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            LocalizedLabel(title: "Casino Game", systemImage: "suit.club.fill")
+                .font(.headline).foregroundColor(.white)
+
+            GameCategoryWheelPicker(selection: $gameCategory, heading: "Game Type")
+                .environmentObject(settingsStore)
+
+            if gameCategory == .table || gameCategory == .slots {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                    ForEach(activeGameGridTitles, id: \.self) { g in
+                        GameButton(title: g, isSelected: selectedGame == g) { selectedGame = g }
+                    }
+                }
+                GamePickerSelectorRow(
+                    title: isGameInDisplayList && selectedGame.isEmpty
+                        ? "More games..." : selectedGame,
+                    accentHighlighted: !isGameInDisplayList,
+                    isPlaceholder: isGameInDisplayList && selectedGame.isEmpty,
+                    showSearchIcon: true
+                ) { showGamePicker = true }
+                    .environmentObject(settingsStore)
+                if gameCategory == .slots {
+                    SlotSessionNotesOnlySection(slotNotes: $slotNotes)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .center, spacing: 8) {
+                        HStack(spacing: 8) {
+                            GameTypePill(title: "Cash", isSelected: pokerGameKind == .cash) {
+                                pokerGameKind = .cash
+                            }
+                            GameTypePill(title: "Tournament", isSelected: pokerGameKind == .tournament) {
+                                pokerGameKind = .tournament
+                            }
+                        }
+                        Spacer()
+                        Picker("Type of Game", selection: $pokerVariant) {
+                            L10nText("No Limit Texas Hold’em").tag("No Limit Texas Hold’em")
+                            L10nText("Pot Limit Omaha").tag("Pot Limit Omaha")
+                            L10nText("Pot Limit Omaha Hi-Lo").tag("Pot Limit Omaha Hi-Lo")
+                            L10nText("Fixed Limit Hold’em").tag("Fixed Limit Hold’em")
+                            L10nText("Spread Limit Hold’em").tag("Spread Limit Hold’em")
+                            L10nText("Short Deck Hold’em (6+)").tag("Short Deck Hold’em (6+)")
+                            L10nText("Omaha Hi").tag("Omaha Hi")
+                            L10nText("Omaha Hi-Lo").tag("Omaha Hi-Lo")
+                            L10nText("5 Card Omaha").tag("5 Card Omaha")
+                            L10nText("5 Card Omaha Hi-Lo").tag("5 Card Omaha Hi-Lo")
+                            L10nText("7 Card Stud").tag("7 Card Stud")
+                            L10nText("7 Card Stud Hi-Lo").tag("7 Card Stud Hi-Lo")
+                            L10nText("Razz").tag("Razz")
+                            L10nText("5 Card Draw").tag("5 Card Draw")
+                            L10nText("2-7 Triple Draw").tag("2-7 Triple Draw")
+                            L10nText("2-7 Single Draw").tag("2-7 Single Draw")
+                            L10nText("Chinese Poker").tag("Chinese Poker")
+                            L10nText("Open Face Chinese").tag("Open Face Chinese")
+                            L10nText("Mixed Game (H.O.R.S.E.)").tag("Mixed Game (H.O.R.S.E.)")
+                            L10nText("Mixed Game (8-Game)").tag("Mixed Game (8-Game)")
+                            L10nText("Other Poker").tag("Other Poker")
+                        }
+                        .pickerStyle(.menu)
+                        .tint(.white)
+                    }
+
+                    if pokerGameKind == .tournament {
+                        HStack(spacing: 8) {
+                            OptionChip(title: "Re-buy", isOn: pokerAllowsRebuy) {
+                                pokerAllowsRebuy.toggle()
+                            }
+                            OptionChip(title: "Add-On", isOn: pokerAllowsAddOn) {
+                                pokerAllowsAddOn.toggle()
+                            }
+                            OptionChip(title: "Freeze-Out", isOn: pokerHasFreezeOut) {
+                                pokerHasFreezeOut.toggle()
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        L10nText("Blinds & Structure")
+                            .font(.caption.bold())
+                            .foregroundColor(.white)
+
+                        HStack(alignment: .center, spacing: 12) {
+                            VStack(spacing: 4) {
+                                L10nText("SB")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Picker("SB", selection: $pokerSmallBlind) {
+                                    ForEach(blindPickerValues, id: \.self) { value in
+                                        Text(value == 0 ? "-" : "\(value)")
+                                            .tag(value)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(height: 80)
+                            }
+                            VStack(spacing: 4) {
+                                L10nText("BB")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Picker("BB", selection: $pokerBigBlind) {
+                                    ForEach(blindPickerValues, id: \.self) { value in
+                                        Text(value == 0 ? "-" : "\(value)")
+                                            .tag(value)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(height: 80)
+                            }
+                            VStack(spacing: 4) {
+                                L10nText("Ante")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                                Picker("Ante", selection: $pokerAnte) {
+                                    ForEach(blindPickerValues, id: \.self) { value in
+                                        Text(value == 0 ? "-" : "\(value)")
+                                            .tag(value)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(height: 80)
+                            }
+                        }
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 6) {
+                                blindPresetButton("$1/$2", sb: 1, bb: 2, ante: 0)
+                                blindPresetButton("$1/$3", sb: 1, bb: 3, ante: 0)
+                                blindPresetButton("$2/$5", sb: 2, bb: 5, ante: 0)
+                                blindPresetButton("$5/$10", sb: 5, bb: 10, ante: 0)
+                                blindPresetButton("$10/$20", sb: 10, bb: 20, ante: 0)
+                                blindPresetButton("$20/$40", sb: 20, bb: 40, ante: 0)
+                                blindPresetButton("$40/$80", sb: 40, bb: 80, ante: 0)
+                                blindPresetButton("$100/$200", sb: 100, bb: 200, ante: 0)
+                                blindPresetButton("$200/$400", sb: 200, bb: 400, ante: 0)
+                                blindPresetButton("$300/$600", sb: 300, bb: 600, ante: 0)
+                                blindPresetButton("$400/$800", sb: 400, bb: 800, ante: 0)
+                                blindPresetButton("$500/$1000", sb: 500, bb: 1000, ante: 0)
+                                blindPresetButton("$1/$3/$5", sb: 1, bb: 3, ante: 5)
+                            }
+                        }
+
+                        if pokerGameKind == .tournament {
+                            HStack(spacing: 8) {
+                                NumericEntryWithDialPad(
+                                    placeholder: "Level mins",
+                                    text: $pokerLevelMinutesText,
+                                    dialPadNavigationTitle: "Level minutes"
+                                )
+                                NumericEntryWithDialPad(
+                                    placeholder: "Starting stack",
+                                    text: $pokerStartingStackText,
+                                    dialPadNavigationTitle: "Starting stack"
+                                )
+                                NumericEntryWithDialPad(
+                                    placeholder: "Cost",
+                                    text: $pokerTournamentCostText,
+                                    dialPadNavigationTitle: "Tournament cost"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private func blindPresetButton(_ title: String, sb: Int, bb: Int, ante: Int) -> some View {
+        Button(title) {
+            pokerSmallBlind = sb
+            pokerBigBlind = bb
+            pokerAnte = ante
+        }
+        .font(.caption)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color(.systemGray6).opacity(0.35))
+        .foregroundColor(.white)
+        .cornerRadius(8)
+    }
+
+    @ViewBuilder private var casinoAndTimeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                LocalizedLabel(title: "Casino Location", systemImage: "building.columns")
+                    .font(.headline).foregroundColor(.white)
+                Spacer()
+                Toggle(isOn: $isCasinoPublic) {
+                    Text(isCasinoPublic ? "Public" : "Private")
+                        .font(.caption)
+                }
+                .toggleStyle(SwitchToggleStyle(tint: .green))
+            }
+            if !settingsStore.favoriteCasinos.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(settingsStore.favoriteCasinos, id: \.self) { name in
+                            Button(name) { casino = name }
+                                .font(.subheadline)
+                                .padding(.horizontal, 12).padding(.vertical, 8)
+                                .background(casino == name ? Color.green : Color(.systemGray6).opacity(0.25))
+                                .foregroundColor(casino == name ? .black : .white)
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+            }
+            TextField("Enter casino name", text: $casino)
+                .textFieldStyle(DarkTextFieldStyle())
+            Button {
+                showCasinoLocationPicker = true
+            } label: {
+                HStack {
+                    Image(systemName: "location.circle")
+                    L10nText("Find casino near me")
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+                .padding(12)
+                .background(Color(.systemGray6).opacity(0.25))
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+
+            DatePicker("Date", selection: $date, displayedComponents: .date)
+                .colorScheme(.dark)
+            HStack(spacing: 12) {
+                DatePicker("Start", selection: $startTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+                DatePicker("End", selection: $endTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var startingTierSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 8) {
+                LocalizedLabel(title: "Starting Tier Points", systemImage: "star.circle")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+                RewardsProgramPickerRow(
+                    casino: casino,
+                    selectedProgram: $selectedRewardsProgram,
+                    tierPointsText: $startingTier,
+                    linkedWalletCardId: .constant(nil)
+                )
+                .environmentObject(settingsStore)
+                .environmentObject(rewardWalletStore)
+            }
+            L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
+                .font(.caption).foregroundColor(.gray)
+            TierPointsQuickPickRow(tierPointsText: $startingTier)
+                .environmentObject(settingsStore)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var totalBuyInSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            LocalizedLabel(title: "Total Buy-In", systemImage: "dollarsign.circle")
+                .font(.headline).foregroundColor(.white)
+            HStack(alignment: .top, spacing: 12) {
+                Button { showBuyInPicker = true } label: {
+                    HStack {
+                        Image(systemName: "square.grid.2x2.fill")
+                        Text(totalBuyIn.isEmpty ? "Choose cash" : "\(settingsStore.currencySymbol)\(totalBuyIn)")
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .frame(maxWidth: .infinity)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    NumericEntryWithDialPad(
+                        placeholder: "Exact amount",
+                        text: $totalBuyIn,
+                        dialPadNavigationTitle: "Buy-In"
+                    )
+                }
+                .frame(maxWidth: .infinity)
+            }
+
+            Divider().background(Color.gray.opacity(0.35))
+
+            LocalizedLabel(title: "Free Play", systemImage: "ticket.fill")
+                .font(.subheadline.weight(.semibold)).foregroundColor(.white)
+            Text("Optional. Not counted in win/loss or tax.")
+                .font(.caption).foregroundColor(.gray)
+            HStack(alignment: .top, spacing: 12) {
+                Button { showFreePlayPicker = true } label: {
+                    HStack {
+                        Image(systemName: "square.grid.2x2.fill")
+                        Text(totalFreePlay.isEmpty ? "0" : "\(settingsStore.currencySymbol)\(totalFreePlay)")
+                            .lineLimit(1)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+                .frame(maxWidth: .infinity)
+                NumericEntryWithDialPad(
+                    placeholder: "0",
+                    text: $totalFreePlay,
+                    dialPadNavigationTitle: "Free Play"
+                )
+                .environmentObject(settingsStore)
+                .frame(maxWidth: .infinity)
+            }
+            TextField("Type (e.g. match play)", text: $freePlayType)
+                .textFieldStyle(DarkTextFieldStyle())
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var endingTierSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            LocalizedLabel(title: "Ending Tier Points", systemImage: "star.circle.fill")
+                .font(.headline)
+                .foregroundColor(.white)
+            L10nText("Check your casino loyalty app. Quick pick 1,000–50,000 or type any exact amount (not zero).")
+                .font(.caption).foregroundColor(.gray)
+            TierPointsQuickPickRow(tierPointsText: $endingTier)
+                .environmentObject(settingsStore)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    private struct GameTypePill: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isSelected ? Color.green : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isSelected ? .black : .white)
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    private struct OptionChip: View {
+        let title: String
+        let isOn: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.caption)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(isOn ? Color.green.opacity(0.2) : Color(.systemGray6).opacity(0.25))
+                    .foregroundColor(isOn ? .green : .white)
+                    .cornerRadius(8)
+            }
+        }
+    }
+
+    @ViewBuilder private var moneyAndBetsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            L10nText("Cash Out & Avg Bets")
+                .font(.headline)
+                .foregroundColor(.white)
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 10) {
+                GridRow {
+                    compactNumberField(
+                        label: "Cash Out (\(settingsStore.currencySymbol))",
+                        placeholder: "Amount cashed out",
+                        text: $cashOut,
+                        dialPadTitle: "Cash Out"
+                    )
+                }
+                GridRow {
+                    compactNumberField(
+                        label: "Avg Bet Actual (\(settingsStore.currencySymbol))",
+                        placeholder: "Actual avg bet",
+                        text: $avgBetActual,
+                        dialPadTitle: "Avg bet actual"
+                    )
+                    compactNumberField(
+                        label: "Avg Bet Rated (\(settingsStore.currencySymbol))",
+                        placeholder: "Rated avg bet",
+                        text: $avgBetRated,
+                        dialPadTitle: "Avg bet rated"
+                    )
+                }
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                L10nText("Common amounts").font(.caption.bold()).foregroundColor(.gray)
+                CommonAmountButtons(amounts: quickDenominations, selected: $avgBetActual)
+                CommonAmountButtons(amounts: quickDenominations, selected: $avgBetRated)
+            }
+            quickAddButtons
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.15))
+        .cornerRadius(16)
+    }
+
+    @ViewBuilder private var quickAddButtons: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            L10nText("Quick add amounts")
+                .font(.caption.bold())
+                .foregroundColor(.gray)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickDenominations, id: \.self) { amt in
+                        Button("+\(settingsStore.currencySymbol)\(amt)") {
+                            let current = Int(totalBuyIn) ?? 0
+                            totalBuyIn = String(current + amt)
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.green.opacity(0.2))
+                        .foregroundColor(.green)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(quickDenominations, id: \.self) { amt in
+                        Button("+\(settingsStore.currencySymbol)\(amt) cash out") {
+                            let current = Int(cashOut) ?? 0
+                            cashOut = String(current + amt)
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color(.systemGray6).opacity(0.25))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var saveButton: some View {
+        Button { save() } label: {
+            L10nText("Save Session")
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 32)
+                .font(.headline)
+                .foregroundColor(isValid ? .white : .white.opacity(0.85))
+                .background {
+                    if isValid {
+                        GameCategoryBubbleBackground(cornerRadius: 14)
+                    } else {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color.gray)
+                    }
+                }
+        }
+        .disabled(!isValid)
+    }
+
+    private func compactNumberField(label: String, placeholder: String, text: Binding<String>, dialPadTitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.white)
+            NumericEntryWithDialPad(
+                placeholder: placeholder,
+                text: text,
+                dialPadNavigationTitle: dialPadTitle
+            )
+        }
+    }
+
+    func save() {
+        if gameCategory == .poker {
+            var parts: [String] = []
+            let kindLabel = (pokerGameKind == .cash) ? "Cash" : "Tournament"
+            parts.append("Poker \(kindLabel)")
+            if !pokerVariant.isEmpty {
+                parts.append(pokerVariant)
+            }
+            if pokerGameKind == .tournament {
+                var opts: [String] = []
+                if pokerAllowsRebuy { opts.append("Re-buy") }
+                if pokerAllowsAddOn { opts.append("Add-On") }
+                if pokerHasFreezeOut { opts.append("Freeze-Out") }
+                if !opts.isEmpty {
+                    parts.append(opts.joined(separator: ", "))
+                }
+            }
+            selectedGame = parts.joined(separator: " - ")
+        }
+
+        guard let bi = Int(totalBuyIn), let co = Int(cashOut),
+              let st = Int(startingTier), st > 0, let et = Int(endingTier) else { return }
+        let program = selectedRewardsProgram.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cal = Calendar.current
+        let dc = cal.dateComponents([.year,.month,.day], from: date)
+        let sc = cal.dateComponents([.hour,.minute], from: startTime)
+        let ec = cal.dateComponents([.hour,.minute], from: endTime)
+        var s1 = DateComponents(); s1.year=dc.year; s1.month=dc.month; s1.day=dc.day; s1.hour=sc.hour; s1.minute=sc.minute
+        var e1 = DateComponents(); e1.year=dc.year; e1.month=dc.month; e1.day=dc.day; e1.hour=ec.hour; e1.minute=ec.minute
+        let start = cal.date(from: s1) ?? date
+        let end = cal.date(from: e1) ?? date.addingTimeInterval(3600)
+        let ev = BuyInEvent(amount: bi, timestamp: start)
+        let fpAmount = max(0, Int(totalFreePlay.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0)
+        let fpTypeTrim = freePlayType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fpEvents: [FreePlayEvent] = fpAmount > 0
+            ? [FreePlayEvent(amount: fpAmount, timestamp: start, playType: fpTypeTrim.isEmpty ? "Free play" : fpTypeTrim)]
+            : []
+        let sb: Int? = (gameCategory == .poker && pokerSmallBlind > 0) ? pokerSmallBlind : nil
+        let bb: Int? = (gameCategory == .poker && pokerBigBlind > 0) ? pokerBigBlind : nil
+        let ante: Int? = (gameCategory == .poker && pokerAnte > 0) ? pokerAnte : nil
+        let levelMinutes: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerLevelMinutesText) : nil
+        let startingStack: Int? = (gameCategory == .poker && pokerGameKind == .tournament) ? Int(pokerStartingStackText) : nil
+        let slotMeta = Session.persistedSlotMetadata(
+            gameCategory: gameCategory,
+            format: nil,
+            formatOther: "",
+            feature: nil,
+            featureOther: "",
+            notes: slotNotes
+        )
+        let session = Session(
+            game: selectedGame,
+            casino: casino,
+            casinoLatitude: casinoLatitude,
+            casinoLongitude: casinoLongitude,
+            startTime: start,
+            endTime: end,
+            startingTierPoints: st,
+            endingTierPoints: et,
+            buyInEvents: [ev],
+            freePlayEvents: fpEvents,
+            cashOut: co,
+            avgBetActual: Int(avgBetActual),
+            avgBetRated: Int(avgBetRated),
+            isLive: false,
+            status: .complete,
+            sessionMood: nil,
+            privateNotes: nil,
+            rewardsProgramName: program.isEmpty ? nil : program,
+            chipEstimatorImageFilename: nil,
+            gameCategory: gameCategory,
+            pokerGameKind: gameCategory == .poker ? pokerGameKind : nil,
+            pokerAllowsRebuy: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsRebuy : nil,
+            pokerAllowsAddOn: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerAllowsAddOn : nil,
+            pokerHasFreeOut: (gameCategory == .poker && pokerGameKind == .tournament) ? pokerHasFreezeOut : nil,
+            pokerVariant: gameCategory == .poker ? pokerVariant : nil,
+            pokerSmallBlind: sb,
+            pokerBigBlind: bb,
+            pokerAnte: ante,
+            pokerLevelMinutes: levelMinutes,
+            pokerStartingStack: startingStack,
+            slotFormat: slotMeta.format,
+            slotFormatOther: slotMeta.formatOther,
+            slotFeature: slotMeta.feature,
+            slotFeatureOther: slotMeta.featureOther,
+            slotNotes: slotMeta.notes
+        )
+        settingsStore.recordLastCheckInGameSelection(
+            gameCategory: gameCategory,
+            selectedGame: selectedGame,
+            pokerGameKind: pokerGameKind,
+            pokerAllowsRebuy: pokerAllowsRebuy,
+            pokerAllowsAddOn: pokerAllowsAddOn,
+            pokerHasFreezeOut: pokerHasFreezeOut,
+            pokerVariant: pokerVariant,
+            pokerSmallBlind: pokerSmallBlind,
+            pokerBigBlind: pokerBigBlind,
+            pokerAnte: pokerAnte,
+            pokerLevelMinutesText: pokerLevelMinutesText,
+            pokerStartingStackText: pokerStartingStackText,
+            pokerTournamentCostText: pokerTournamentCostText,
+            slotNotes: slotMeta.notes ?? ""
+        )
+        store.addPastSession(session)
+        dismiss()
+    }
+}

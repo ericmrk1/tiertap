@@ -1,0 +1,43 @@
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+
+
+# Supabase keys - copy from SupabaseKeys.example.plist and fill in
+CTT/TierTap/SupabaseKeys.plist
+
+# Profanity word list - populated by Scripts/download_profanity_list.sh
+CTT/TierTap/ProfanityWords.txt
+
+# Xcode local build graph / fingerprints (regenerated each build)
+CTT/build/XCBuildData/
+
+# Local/intermediate build outputs (never commit)
+CTT/.tmp-dd/
+CTT/.asc-verify-dd/
+CTT/.final-verify-dd/
+CTT/.derivedData/
+CTT/build/
+CTT/**/*.xcarchive/
+CTT/**/*.dSYM/
+CTT/**/*.pcm
+CTT/**/*.pack
+CTT/**/*.idx
+trendai/*
+
+# Xcode
+DerivedData/
+.derivedData/
+.tmp-dd/
+build/
+Build/
+*.xcarchive
+*.dSYM
+ModuleCache.noindex/
+
+# SwiftPM
+SourcePackages/
+
+# User data
+*.xcuserstate
+xcuserdata/

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TierTap — Stickiness & Retention Recommendations</title>
+  <style>
+    @page {
+      size: letter landscape;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      color: #1a1a2e;
+      background: #0f0f1a;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .slide {
+      width: 11in;
+      height: 8.5in;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 0.55in 0.7in 0.5in;
+    }
+
+    .slide:last-child {
+      page-break-after: auto;
+    }
+
+    /* Slide backgrounds */
+    .slide-cover {
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 40%, #0d3d2e 100%);
+      color: #fff;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide-section {
+      background: linear-gradient(160deg, #1a0a2e 0%, #16213e 100%);
+      color: #fff;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide-content {
+      background: #fafafa;
+    }
+
+    .slide-summary {
+      background: linear-gradient(160deg, #0d3d2e 0%, #1a0a2e 100%);
+      color: #fff;
+    }
+
+    /* Cover */
+    .cover-logo {
+      font-size: 14pt;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #4ade80;
+      margin-bottom: 0.3in;
+      font-weight: 600;
+    }
+
+    .cover-title {
+      font-size: 36pt;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 0.2in;
+      max-width: 8.5in;
+    }
+
+    .cover-subtitle {
+      font-size: 16pt;
+      color: rgba(255,255,255,0.82);
+      max-width: 7in;
+      line-height: 1.5;
+      margin-bottom: 0.45in;
+    }
+
+    .cover-meta {
+      font-size: 11pt;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .cover-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #4ade80, #22d3ee, #a78bfa);
+    }
+
+    /* Section divider */
+    .section-num {
+      font-size: 72pt;
+      font-weight: 800;
+      color: rgba(74, 222, 128, 0.25);
+      line-height: 1;
+      margin-bottom: 0.1in;
+    }
+
+    .section-title {
+      font-size: 28pt;
+      font-weight: 700;
+      margin-bottom: 0.15in;
+    }
+
+    .section-desc {
+      font-size: 13pt;
+      color: rgba(255,255,255,0.75);
+      max-width: 7in;
+      line-height: 1.55;
+    }
+
+    /* Content slides */
+    .slide-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 0.28in;
+      padding-bottom: 0.15in;
+      border-bottom: 3px solid #4ade80;
+    }
+
+    .slide-num {
+      font-size: 42pt;
+      font-weight: 800;
+      color: #4ade80;
+      line-height: 1;
+      min-width: 0.7in;
+    }
+
+    .slide-title-block {
+      flex: 1;
+      padding-left: 0.15in;
+    }
+
+    .slide-title {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #1a0a2e;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .slide-tag {
+      font-size: 9pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #059669;
+    }
+
+    .slide-brand {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #9ca3af;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .slide-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.28in;
+      flex: 1;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 0.2in 0.22in;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .card-label {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .card p, .card li {
+      font-size: 10pt;
+      line-height: 1.5;
+      color: #374151;
+    }
+
+    .card ul {
+      padding-left: 1.1em;
+      margin-top: 4px;
+    }
+
+    .card li {
+      margin-bottom: 3px;
+    }
+
+    .card-highlight {
+      border-left: 4px solid #4ade80;
+      background: #f0fdf4;
+    }
+
+    .card-inspire {
+      border-left: 4px solid #818cf8;
+      background: #f5f3ff;
+    }
+
+    .card-why {
+      border-left: 4px solid #22d3ee;
+      background: #ecfeff;
+    }
+
+    .card-full {
+      grid-column: 1 / -1;
+    }
+
+    .effort-pill {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: #1a0a2e;
+      color: #4ade80;
+      margin-top: 6px;
+    }
+
+    /* Context slide */
+    .context-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25in;
+      flex: 1;
+    }
+
+    .context-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 0.22in;
+      border: 1px solid #e5e7eb;
+    }
+
+    .context-card h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #059669;
+      margin-bottom: 8px;
+    }
+
+    .context-card p, .context-card li {
+      font-size: 9.5pt;
+      line-height: 1.5;
+      color: #374151;
+    }
+
+    .context-card ul {
+      padding-left: 1.1em;
+    }
+
+    .context-card li {
+      margin-bottom: 3px;
+    }
+
+    .gap-callout {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #1a0a2e, #2d1b4e);
+      color: #fff;
+      border: none;
+      padding: 0.22in 0.28in;
+      border-radius: 10px;
+    }
+
+    .gap-callout h3 {
+      color: #4ade80;
+      font-size: 11pt;
+      margin-bottom: 6px;
+    }
+
+    .gap-callout p {
+      color: rgba(255,255,255,0.88);
+      font-size: 10pt;
+      line-height: 1.55;
+    }
+
+    /* Summary table */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      margin-top: 0.15in;
+    }
+
+    .summary-table th {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 8pt;
+      border-bottom: 2px solid rgba(74, 222, 128, 0.4);
+    }
+
+    .summary-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.9);
+      vertical-align: top;
+    }
+
+    .summary-table tr:nth-child(even) td {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .summary-principle {
+      margin-top: 0.25in;
+      padding: 0.2in 0.25in;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      border-left: 4px solid #4ade80;
+    }
+
+    .summary-principle h3 {
+      font-size: 11pt;
+      color: #4ade80;
+      margin-bottom: 6px;
+    }
+
+    .summary-principle p {
+      font-size: 10pt;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .page-footer {
+      position: absolute;
+      bottom: 0.35in;
+      left: 0.7in;
+      right: 0.7in;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #9ca3af;
+    }
+
+    .slide-cover .page-footer,
+    .slide-section .page-footer,
+    .slide-summary .page-footer {
+      color: rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: Cover -->
+  <div class="slide slide-cover">
+    <div class="cover-logo">TierTap</div>
+    <h1 class="cover-title">Stickiness &amp; Retention<br>Recommendations</h1>
+    <p class="cover-subtitle">Ten opportunities to deepen engagement, build habits between casino visits, and turn TierTap from a session utility into a lasting player companion.</p>
+    <p class="cover-meta">UI Evaluation &nbsp;·&nbsp; June 2026 &nbsp;·&nbsp; For presentation</p>
+    <div class="cover-accent"></div>
+  </div>
+
+  <!-- SLIDE 2: Context -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num" style="color:#1a0a2e; opacity:0.15;">—</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Executive Summary</div>
+        <h2 class="slide-title">Where TierTap Stands Today</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="context-grid">
+      <div class="context-card">
+        <h3>Strengths (In-Session)</h3>
+        <ul>
+          <li>Live Activity &amp; Apple Watch sync during play</li>
+          <li>Fast check-in presets for repeat visits</li>
+          <li>Tap Level progression (1–1,000) with celebrations</li>
+          <li>Play Reminders during live sessions</li>
+          <li>Post-closeout confetti, session art &amp; community publish</li>
+          <li>Wallet tier sync toast at close-out</li>
+        </ul>
+      </div>
+      <div class="context-card">
+        <h3>Gaps (Between Sessions)</h3>
+        <ul>
+          <li>No guided onboarding — splash → optional auth → Check In</li>
+          <li>No logging streaks or consistency rewards</li>
+          <li>No off-session push notifications or home screen widget</li>
+          <li>History buried in a sheet; no journal-style tab</li>
+          <li>Tier goals ephemeral — no persistent progress tracker</li>
+          <li>Trips lack pre-trip prep and post-trip recap hooks</li>
+          <li>Analytics empty until many sessions; insights are pull-only</li>
+        </ul>
+      </div>
+      <div class="gap-callout">
+        <h3>Core Opportunity</h3>
+        <p>The biggest retention upside is <strong>between-session value</strong> — trip bookends, tier progress, monthly recaps, widgets, and a browsable journal — while keeping responsible-gaming framing (reward <em>tracking</em> and awareness, not more play). Apps like Strava, Duolingo, and Apple Fitness succeed by creating recurring reasons to open the app when the core activity isn't happening.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>2</span></div>
+  </div>
+
+  <!-- SLIDE 3: Section -->
+  <div class="slide slide-section">
+    <div class="section-num">10</div>
+    <h2 class="section-title">Recommended Enhancements</h2>
+    <p class="section-desc">Each recommendation includes the opportunity, a concrete proposal, inspiration from proven apps, and why it drives retention.</p>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>3</span></div>
+  </div>
+
+  <!-- SLIDE 4: Rec 1 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">01</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Activation</div>
+        <h2 class="slide-title">Guided Activation Onboarding</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>New users land on a large logo and "Check In" with no guided path. Wallet, bankroll, fast check-in, and analytics stay undiscovered unless users dig.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Add a lightweight 3–5 step activation checklist on Home until complete:</p>
+        <ul>
+          <li>Link a wallet card</li>
+          <li>Set bankroll</li>
+          <li>Log first session &amp; close out with tier points</li>
+          <li>Configure one fast check-in preset</li>
+        </ul>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Duolingo</strong> first lesson, <strong>YNAB</strong> setup wizard, <strong>Notion</strong> "Get started" checklist — all optimize for time-to-first-win, not feature tours.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Users who complete one full session loop are far more likely to return. A checklist turns abstract value ("track tier points") into concrete, completable actions.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>4</span></div>
+  </div>
+
+  <!-- SLIDE 5: Rec 2 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">02</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Habit Loop</div>
+        <h2 class="slide-title">Tracking Consistency Streaks</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Tap Level rewards logging consistency and AI prompts mention streaks — but no visible streak system exists. Nothing celebrates "you tracked every session on your last 3 trips."</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Introduce <strong>logging streaks</strong>: consecutive casino visits with at least one logged session, or consecutive weeks with any session. Surface on the Tap Level card with a streak indicator. Optional gentle nudge before a planned trip.</p>
+        <span class="effort-pill">Effort: Low–Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Duolingo</strong> streaks, <strong>Apple Fitness</strong> "Close your rings," <strong>Strava</strong> "week active." Frame as discipline and record-keeping — not play frequency.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Streaks are among the strongest habit loops in consumer apps — as long as they reward <em>tracking</em>, not gambling more.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>5</span></div>
+  </div>
+
+  <!-- SLIDE 6: Rec 3 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">03</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Loyalty</div>
+        <h2 class="slide-title">Persistent Loyalty Tier Goal Tracker</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Wallet tier sync shows a brief toast at close-out, then disappears. There is no always-visible "X points to next tier" progress anywhere in the app.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Add a <strong>tier goal ring</strong> on Home and in Wallet: current points, next tier threshold, projected date at recent pace. Before trips: "At your usual pace, you'll reach [tier] by day 3 of Vegas."</p>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Apple Fitness</strong> activity rings, <strong>Chase/Amex</strong> rewards trackers, <strong>airline status</strong> progress bars.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Tier progression is a core motivator for casino players. Making it ambient — not buried in close-out — gives a reason to open the app even when not playing.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>6</span></div>
+  </div>
+
+  <!-- SLIDE 7: Rec 4 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">04</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Events</div>
+        <h2 class="slide-title">Trip-Mode: Pre-Trip Prep &amp; Post-Trip Recap</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Trips exist with AI suggestions, but no proactive hooks. Upcoming trips don't surface on Home; there's no post-trip summary or shareable recap.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <ul>
+          <li><strong>Pre-trip (7 days out):</strong> Home card with countdown, fast check-in presets for that property, bankroll reminder, linked wallet cards</li>
+          <li><strong>Post-trip:</strong> Auto-generated recap — sessions, P&amp;L, tier points, best/worst session, photo highlights. Shareable like session art.</li>
+        </ul>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>TripIt</strong> pre-trip alerts, <strong>Spotify Wrapped</strong>, <strong>Strava</strong> "Your week in sport." Casino trips are emotional peaks — TierTap should bookend them.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Trips are natural re-engagement anchors: plan → play → reminisce. Three distinct open-the-app moments per trip.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>7</span></div>
+  </div>
+
+  <!-- SLIDE 8: Rec 5 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">05</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Re-engagement</div>
+        <h2 class="slide-title">Between-Session Notifications</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Notifications today are in-session only (Play Reminders). Nothing pulls users back when they're home between casino visits.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Add opt-in, value-driven pushes:</p>
+        <ul>
+          <li>Monthly recap ready</li>
+          <li>Trip starts tomorrow</li>
+          <li>Incomplete session needing close-out (Watch → iPhone)</li>
+          <li>Tier milestone within reach</li>
+          <li>Soft monthly check-in if no sessions logged</li>
+        </ul>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Strava</strong> weekly summaries, <strong>Apple Health</strong> monthly trends, banking apps ("Your statement is ready").</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Most users aren't in a live session most of the time. Off-session touchpoints create habitual check-ins without requiring a casino visit.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>8</span></div>
+  </div>
+
+  <!-- SLIDE 9: Rec 6 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">06</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Presence</div>
+        <h2 class="slide-title">iOS Home Screen Widget (Off-Session)</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Live Activity and Watch complications work during play. There is no home screen presence when idle — no passive reminder that TierTap holds your data.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Small/medium widgets showing: Tap Level + progress bar, next trip countdown, YTD tier points, last session result, or "Ready to check in?" with fast-check-in deep link.</p>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Robinhood</strong> portfolio glance, weather/calendar widgets, <strong>Strava</strong> weekly mileage widget.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Widgets are passive billboards. Every phone unlock is a micro-reminder — without opening the app.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>9</span></div>
+  </div>
+
+  <!-- SLIDE 10: Rec 7 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">07</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Retention</div>
+        <h2 class="slide-title">Elevate History + Photo Feed to a Tab</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>History is a sheet from Home; photo feed is a toolbar icon. <code>MainTab.history</code> exists in code but isn't wired to the tab bar. Past sessions are hard to browse.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Replace or supplement a tab with <strong>Journal</strong> (History + Photo Feed + trip-linked sessions). Make revisiting past play as easy as starting a new session.</p>
+        <span class="effort-pill">Effort: Low (mostly navigation)</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Day One</strong> journal, <strong>Apple Photos</strong> Memories, <strong>Strava</strong> activity feed. Emotional recall drives retention more than utility features.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Users who build a rich history have high switching costs. A journal tab turns TierTap from a utility into a personal casino diary.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>10</span></div>
+  </div>
+
+  <!-- SLIDE 11: Rec 8 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">08</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Calendar Moment</div>
+        <h2 class="slide-title">Monthly "TierTap Wrapped" Insight Cards</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Analytics is powerful but empty until many sessions exist. Insights are pull-only; Pro AI analysis requires user initiation and a paywall.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>Auto-generate a monthly insight card on the 1st: sessions played, tier points earned, most efficient game, mood trend, biggest win/loss. Shareable image. Free = basic card; Pro = AI narrative summary.</p>
+        <span class="effort-pill">Effort: Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Spotify Wrapped</strong>, <strong>Apple Music Replay</strong>, <strong>Strava Year in Sport</strong>, <strong>Monzo/Revolut</strong> year-in-review.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Creates a recurring calendar moment to open the app even in slow play months. Shareability drives acquisition loops too.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>11</span></div>
+  </div>
+
+  <!-- SLIDE 12: Rec 9 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">09</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Data Quality</div>
+        <h2 class="slide-title">Close-Out Completeness Score</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Tap Level scoring rewards tier gains and rated/actual bet alignment, but users don't know incomplete close-outs cost progression. History has verified vs. unverified tier tabs — data quality is a known issue.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <p>At close-out and on incomplete sessions, show: "+15 Tap Level progress available if you add ending tier + avg bet." A profile-strength-style meter on Home for data completeness.</p>
+        <span class="effort-pill">Effort: Low–Medium</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>LinkedIn</strong> profile strength, <strong>Apple Watch</strong> activity rings "close your move ring," fitness apps' form-quality scores.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Turns data entry from chore into game mechanic. Better data → better analytics → more reason to return and explore insights.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>12</span></div>
+  </div>
+
+  <!-- SLIDE 13: Rec 10 -->
+  <div class="slide slide-content">
+    <div class="slide-header">
+      <div class="slide-num">10</div>
+      <div class="slide-title-block">
+        <div class="slide-tag">Streamlining</div>
+        <h2 class="slide-title">Smart Home + Reduce Auth &amp; Social Friction</h2>
+      </div>
+      <div class="slide-brand">TierTap</div>
+    </div>
+    <div class="slide-body">
+      <div class="card">
+        <div class="card-label">Opportunity</div>
+        <p>Returning users with presets still see a large logo and generic "Check In." Auth is offered once per launch when unsigned in. Community is Pro-gated with an often-empty feed.</p>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-label">Recommendation</div>
+        <ul>
+          <li><strong>Smart Home:</strong> If fast check-in presets exist, make the preset bar the primary CTA; demote logo on repeat visits</li>
+          <li><strong>Auth:</strong> Prompt after value (e.g., 3rd session or first trip), not every cold launch</li>
+          <li><strong>Community:</strong> Read-only free feed or trip-buddy co-tracking; story-ready session art templates with deep links</li>
+        </ul>
+        <span class="effort-pill">Effort: Low–High (varies)</span>
+      </div>
+      <div class="card card-inspire">
+        <div class="card-label">Inspiration</div>
+        <p><strong>Uber</strong> recent destinations home, <strong>Instagram</strong> share-to-stories flow, <strong>Splitwise</strong> trip groups.</p>
+      </div>
+      <div class="card card-why">
+        <div class="card-label">Why It Sticks</div>
+        <p>Every tap removed from check-in increases use at the high-intent moment (sitting at a table). Social and share loops turn solo tracking into identity and community.</p>
+      </div>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>13</span></div>
+  </div>
+
+  <!-- SLIDE 14: Summary -->
+  <div class="slide slide-summary">
+    <div class="slide-header" style="border-bottom-color: rgba(74,222,128,0.5);">
+      <div class="slide-num" style="color:#4ade80;">✓</div>
+      <div class="slide-title-block">
+        <div class="slide-tag" style="color:#4ade80;">Summary</div>
+        <h2 class="slide-title" style="color:#fff;">Priority Matrix &amp; Guiding Principle</h2>
+      </div>
+      <div class="slide-brand" style="color:rgba(255,255,255,0.4);">TierTap</div>
+    </div>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th style="width:5%">#</th>
+          <th style="width:28%">Enhancement</th>
+          <th style="width:32%">Stickiness Lever</th>
+          <th style="width:15%">Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Activation onboarding</td><td>Time-to-first-value</td><td>Medium</td></tr>
+        <tr><td>2</td><td>Logging streaks</td><td>Habit loop</td><td>Low–Medium</td></tr>
+        <tr><td>3</td><td>Tier goal tracker</td><td>Ambient motivation</td><td>Medium</td></tr>
+        <tr><td>4</td><td>Trip prep + recap</td><td>Event-based re-engagement</td><td>Medium</td></tr>
+        <tr><td>5</td><td>Off-session notifications</td><td>Pull-back</td><td>Medium</td></tr>
+        <tr><td>6</td><td>Home screen widget</td><td>Passive presence</td><td>Medium</td></tr>
+        <tr><td>7</td><td>Journal tab</td><td>Emotional retention / switching cost</td><td>Low</td></tr>
+        <tr><td>8</td><td>Monthly Wrapped</td><td>Calendar moment + virality</td><td>Medium</td></tr>
+        <tr><td>9</td><td>Close-out completeness</td><td>Gamified data quality</td><td>Low–Medium</td></tr>
+        <tr><td>10</td><td>Smart Home + social</td><td>Friction reduction + loops</td><td>Low–High</td></tr>
+      </tbody>
+    </table>
+    <div class="summary-principle">
+      <h3>Cross-Cutting Principle</h3>
+      <p>Create recurring moments to open the app when casino play isn't happening. TierTap's in-session experience is already strong — the biggest upside is between-session value while keeping responsible-gaming framing: reward tracking and awareness, not more play.</p>
+    </div>
+    <div class="page-footer"><span>TierTap Stickiness Recommendations</span><span>14</span></div>
+  </div>
+
+  <!-- SLIDE 15: Closing -->
+  <div class="slide slide-cover">
+    <div class="cover-logo">TierTap</div>
+    <h1 class="cover-title" style="font-size:28pt;">Questions &amp; Discussion</h1>
+    <p class="cover-subtitle" style="font-size:14pt;">Each recommendation can be scoped into a phased roadmap with UI placement, data model notes, and success metrics.</p>
+    <p class="cover-meta">TierTap UI Evaluation &nbsp;·&nbsp; June 2026</p>
+    <div class="cover-accent"></div>
+  </div>
+
+</body>
+</html>
