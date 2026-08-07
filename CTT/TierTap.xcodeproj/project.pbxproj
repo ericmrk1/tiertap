@@ -61,6 +61,7 @@
 		CLP1E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */; };
 		CMP2E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */; };
 		COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */; };
+		CMPSHARE2E2F3A4B5C6D7E8F9A0B1 /* CommunityPostShareKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CMPSHARE1E2F3A4B5C6D7E8F9A0B1 /* CommunityPostShareKit.swift */; };
 		E6F64AD6052E4E36610FEAD6 /* CasinoTimerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225E7D763D8DAA7463C4C6D4 /* CasinoTimerLiveActivity.swift */; };
 		E854A04D944B020CC4AED936 /* AddPastSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA1A5F4DF459E659D6137F81 /* AddPastSessionView.swift */; };
 		EDT1E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */; };
@@ -275,6 +276,7 @@
 		CLP2E2F3A4B5C6D7E8F9A0B1 /* CasinoLocationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoLocationPickerView.swift; sourceTree = "<group>"; };
 		CMP1E2F3A4B5C6D7E8F9A0B1 /* CompleteSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteSessionView.swift; sourceTree = "<group>"; };
 		COMMUNITYPUB1E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityPublisher.swift; sourceTree = "<group>"; };
+		CMPSHARE1E2F3A4B5C6D7E8F9A0B1 /* CommunityPostShareKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityPostShareKit.swift; sourceTree = "<group>"; };
 		E4D2D86C8432C78C1F310B3E /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		E59784185C66795D64D20143 /* CasinoTimerWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CasinoTimerWidgetBundle.swift; sourceTree = "<group>"; };
 		EDT2E2F3A4B5C6D7E8F9A0B1 /* EditSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSessionView.swift; sourceTree = "<group>"; };
@@ -451,6 +453,7 @@
 				12AACDC5094128715EAA64A9 /* LiveSessionView.swift */,
 				F4BD724325F4B81E2A7D4A2D /* CloseoutView.swift */,
 				PCLOFILE02B2C3D4E5F678901234 /* PostCloseoutShareFlowView.swift */,
+				CMPSHARE1E2F3A4B5C6D7E8F9A0B1 /* CommunityPostShareKit.swift */,
 				SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */,
 				SARTKITFILE02B2C3D4E5F67890 /* SessionArtShareKit.swift */,
 				SARTQSFILE02B2C3D4E5F678901 /* SessionArtQuickShareSheet.swift */,
@@ -1042,6 +1045,7 @@
 				GEMTH2E2F3A4B5C6D7E8F9A0B1 /* GeminiRouterThrottle.swift in Sources */,
 				SUPAC2E2F3A4B5C6D7E8F9A0B1 /* SupabaseClient.swift in Sources */,
 				COMMUNITYPUB2E2F3A4B5C6D7E8F9A0B1 /* CommunityPublisher.swift in Sources */,
+				CMPSHARE2E2F3A4B5C6D7E8F9A0B1 /* CommunityPostShareKit.swift in Sources */,
 				PROFCK2E2F3A4B5C6D7E8F9A0B1 /* ProfanityChecker.swift in Sources */,
 				2E9D7B922F646A24004015F4 /* SubscriptionStore 2.swift in Sources */,
 				AUTHST2E2F3A4B5C6D7E8F9A0B1 /* AuthStore.swift in Sources */,

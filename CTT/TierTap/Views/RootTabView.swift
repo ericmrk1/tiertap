@@ -721,6 +721,7 @@ struct CommunitySessionsView: View {
                                             }
                                         )
                                             .environmentObject(settingsStore)
+                                            .environmentObject(authStore)
                                             .padding(.horizontal)
                                     }
                                 }
@@ -1484,6 +1485,7 @@ extension CommunitySessionsView {
                 onReactBlocked: nil
             )
                 .environmentObject(settingsStore)
+                .environmentObject(authStore)
                 .blur(radius: 7)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .allowsHitTesting(false)
@@ -1901,6 +1903,28 @@ struct CommunityFeedRow: View {
     var onReactBlocked: (() -> Void)?
 
     @EnvironmentObject private var settingsStore: SettingsStore
+    @EnvironmentObject private var authStore: AuthStore
+
+    #if os(iOS)
+    @State private var sharePreviewItem: ShareableImageItem?
+    @State private var shareSheetItem: CommunityPostShareMediaItem?
+    @State private var pendingShareImage: UIImage?
+    @State private var pendingShareText: String?
+    @State private var shouldPresentShareAfterPreviewDismiss = false
+    @State private var isPreparingShare = false
+    #endif
+
+    private var isOwnPost: Bool {
+        guard let postUserId = item.user_id,
+              let currentUserId = authStore.session?.user.id else {
+            return false
+        }
+        return postUserId == currentUserId
+    }
+
+    private var anonymousFeedLabel: String {
+        L10n.tr("Anonymous", language: settingsStore.appLanguage)
+    }
 
     private var metrics: TableGamePostMetrics? {
         item.metrics
@@ -2176,6 +2200,41 @@ struct CommunityFeedRow: View {
         .padding(.horizontal, 12)
         .background(Color.black.opacity(0.35))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        #if os(iOS)
+        .sheet(item: $sharePreviewItem, onDismiss: {
+            guard shouldPresentShareAfterPreviewDismiss,
+                  let image = pendingShareImage,
+                  let text = pendingShareText else {
+                pendingShareImage = nil
+                pendingShareText = nil
+                return
+            }
+            shouldPresentShareAfterPreviewDismiss = false
+            pendingShareImage = nil
+            pendingShareText = nil
+            shareSheetItem = CommunityPostShareMediaItem(activityItems: [image, text])
+        }) { preview in
+            CommunityPostSharePreviewSheet(
+                image: preview.image,
+                caption: pendingShareText ?? "",
+                gradient: settingsStore.primaryGradient,
+                onShare: {
+                    pendingShareImage = preview.image
+                    shouldPresentShareAfterPreviewDismiss = true
+                    sharePreviewItem = nil
+                },
+                onClose: {
+                    shouldPresentShareAfterPreviewDismiss = false
+                    pendingShareImage = nil
+                    pendingShareText = nil
+                    sharePreviewItem = nil
+                }
+            )
+        }
+        .sheet(item: $shareSheetItem) { item in
+            ShareSheet(items: item.activityItems)
+        }
+        #endif
     }
 
     private var communityAvatar: some View {
@@ -2220,10 +2279,61 @@ struct CommunityFeedRow: View {
             reactionButton(for: .like)
             reactionButton(for: .dislike)
             Spacer(minLength: 0)
+            #if os(iOS)
+            if isOwnPost {
+                ownPostShareButton
+            }
+            #endif
         }
         .padding(.top, 2)
         .opacity(isReactionBusy ? 0.65 : 1)
     }
+
+    #if os(iOS)
+    private var ownPostShareButton: some View {
+        Button {
+            Task { await prepareAndPresentShare() }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(.white.opacity(0.7))
+                .opacity(isPreparingShare ? 0.45 : 1)
+        }
+        .buttonStyle(.plain)
+        .disabled(isPreparingShare)
+        .accessibilityLabel("Share post")
+        .accessibilityHint("Share this Community post to X, Instagram, and other apps")
+    }
+
+    @MainActor
+    private func prepareAndPresentShare() async {
+        guard !isPreparingShare else { return }
+        isPreparingShare = true
+        defer { isPreparingShare = false }
+
+        let currency = currencySymbolForMetrics
+        let caption = CommunityPostShareExporter.caption(
+            for: item,
+            currencySymbol: currency,
+            anonymousLabel: anonymousFeedLabel
+        )
+        let avatar = await CommunityPostShareExporter.loadAvatarImage(from: avatarURL)
+        guard let image = CommunityPostShareExporter.renderShareImage(
+            item: item,
+            currencySymbol: currency,
+            gradient: settingsStore.primaryGradient,
+            avatarImage: avatar,
+            anonymousLabel: anonymousFeedLabel
+        ) else {
+            return
+        }
+
+        pendingShareText = caption
+        pendingShareImage = image
+        shareSheetItem = nil
+        sharePreviewItem = ShareableImageItem(image: image)
+    }
+    #endif
 
     private func reactionButton(for type: CommunityReactionType) -> some View {
         let count = reactionSummary.count(for: type)
@@ -2356,6 +2466,7 @@ struct CommunityAuthorProfileView: View {
                                     onReactBlocked: onReactBlocked
                                 )
                                 .environmentObject(settingsStore)
+                                .environmentObject(authStore)
                             }
 
                             if let loadError {
@@ -2627,7 +2738,7 @@ struct CommunityAuthorProfileView: View {
 }
 
 /// Wraps metric chips left-to-right and onto new rows to keep the community feed card short.
-private struct CommunityFeedChipFlowLayout: Layout {
+struct CommunityFeedChipFlowLayout: Layout {
     var horizontalSpacing: CGFloat = 6
     var verticalSpacing: CGFloat = 6
 
