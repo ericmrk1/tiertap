@@ -41,3 +41,4 @@ SourcePackages/
 # User data
 *.xcuserstate
 xcuserdata/
+.DS_Store
