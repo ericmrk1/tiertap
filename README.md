@@ -1,4 +1,4 @@
-# TierTap — MVP v1.0
+# TierTap — MVP v2.0
 
 ## Setup in Xcode
 
