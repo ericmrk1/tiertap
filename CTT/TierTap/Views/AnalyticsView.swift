@@ -40,6 +40,7 @@ struct AnalyticsView: View {
 
     @State private var selectedAnalyticsCategory: SessionGameCategory = .table
     @State private var isRiskOfRuinPresented: Bool = false
+    @State private var isLoyaltyCalculatorPresented: Bool = false
 
     private var allClosedSessions: [Session] {
         sessionStore.sessions.filter { $0.winLoss != nil }
@@ -328,44 +329,16 @@ struct AnalyticsView: View {
                         }
 
                         Button {
-                            NotificationCenter.default.post(name: NSNotification.Name("ShowAccountSheet"), object: nil)
+                            isLoyaltyCalculatorPresented = true
                         } label: {
-                            HStack(spacing: 6) {
-                                if authStore.isSignedIn,
-                                   let uiImage = authStore.localProfilePhotoImage {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 24, height: 24)
-                                        .clipShape(Circle())
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
-                                        )
-                                } else {
-                                    Image(systemName: authStore.isSignedIn ? "person.crop.circle.fill" : "person.crop.circle")
-                                }
-                                if authStore.isSignedIn {
-                                    if authStore.localProfilePhotoImage == nil,
-                                       let emojis = authStore.userProfileEmojis,
-                                       !emojis.isEmpty {
-                                        Text(emojis)
-                                            .font(.caption)
-                                    }
-                                    Text(authStore.signedInSummary ?? authStore.userEmail ?? "Account")
-                                        .lineLimit(1)
-                                        .font(.caption)
-                                } else {
-                                    L10nText("Account")
-                                        .font(.caption)
-                                }
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.18))
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
+                            Image(systemName: "plus.forwardslash.minus")
+                                .imageScale(.medium)
+                                .padding(8)
+                                .background(Color.green)
+                                .clipShape(Circle())
                         }
+                        .foregroundColor(.black)
+                        .accessibilityLabel("Loyalty Calculator")
                     }
                 }
             }
@@ -387,6 +360,12 @@ struct AnalyticsView: View {
             RiskOfRuinView()
                 .environmentObject(sessionStore)
                 .environmentObject(settingsStore)
+                .environmentObject(authStore)
+        }
+        .adaptiveSheet(isPresented: $isLoyaltyCalculatorPresented) {
+            LoyaltyCalculatorView()
+                .environmentObject(settingsStore)
+                .environmentObject(subscriptionStore)
                 .environmentObject(authStore)
         }
         .adaptiveSheet(isPresented: $isShareSelectionPresented) {

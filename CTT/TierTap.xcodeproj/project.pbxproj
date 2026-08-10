@@ -89,6 +89,8 @@
 		ROR003A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */; };
 		ROR005A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */; };
 		ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */; };
+		LYCMATH2E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = LYCMATH1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorMath.swift */; };
+		LYCVIEW2E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LYCVIEW1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorView.swift */; };
 		RTV1E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */; };
 		SARTBLD02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */; };
 		SARTKITBLD02B2C3D4E5F678901 /* SessionArtShareKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = SARTKITFILE02B2C3D4E5F67890 /* SessionArtShareKit.swift */; };
@@ -302,6 +304,8 @@
 		ROR004A1B2C3D4E5F6A7B8C9D0 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		ROR006A1B2C3D4E5F6A7B8C9D0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskOfRuinView.swift; sourceTree = "<group>"; };
+		LYCMATH1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoyaltyCalculatorMath.swift; sourceTree = "<group>"; };
+		LYCVIEW1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoyaltyCalculatorView.swift; sourceTree = "<group>"; };
 		RTV2E2F3A4B5C6D7E8F9A0B1 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		SARTFILE02B2C3D4E5F678901234 /* SessionArtGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtGeneratorView.swift; sourceTree = "<group>"; };
 		SARTKITFILE02B2C3D4E5F67890 /* SessionArtShareKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionArtShareKit.swift; sourceTree = "<group>"; };
@@ -482,6 +486,7 @@
 				APPLOCKGV02B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift */,
 				TTACCV02B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift */,
 				ROR008A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift */,
+				LYCVIEW1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorView.swift */,
 				TRIPF1E2F3A4B5C6D7E8F9A0B1 /* TripsView.swift */,
 				MPCK2E2F3A4B5C6D7E8F9A0B1 /* MapPlacePickerView.swift */,
 				FMAP2E2F3A4B5C6D7E8F9A0B1 /* FlightRouteMapView.swift */,
@@ -509,6 +514,7 @@
 				528BE1A3C52FE346B3217D97 /* GamesList.swift */,
 				SLTSL02B2C3D4E5F6A7B8C9D0 /* SlotsList.swift */,
 				ROR002A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift */,
+				LYCMATH1E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorMath.swift */,
 				TLVL2E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift */,
 				TPE01MODB2C3D4E5F678901234 /* TierTapProductEnhancements.swift */,
 				SHR1E2F3A4B5C6D7E8F9A0B1 /* SessionShareFormatter.swift */,
@@ -1022,6 +1028,7 @@
 				674CB1E13D01FF5CF36F976E /* TimerActivityAttributes.swift in Sources */,
 				CB114299AE356748C9F4F699 /* LiveActivityManager.swift in Sources */,
 				ROR001A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuin.swift in Sources */,
+				LYCMATH2E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorMath.swift in Sources */,
 				TLVL1E2F3A4B5C6D7E8F9A0B1 /* TapLevel.swift in Sources */,
 				TPE02MODB2C3D4E5F678901234 /* TierTapProductEnhancements.swift in Sources */,
 				TPE02VIEWB2C3D4E5F678901A1 /* LoyaltyInsightsCards.swift in Sources */,
@@ -1036,6 +1043,7 @@
 				APPLOCKGV01B2C3D4E5F6A7B8C9D0 /* AppLockGateView.swift in Sources */,
 				TTACCV01B2C3D4E5F6A7B8C9D0 /* TierTapAccountView.swift in Sources */,
 				ROR007A1B2C3D4E5F6A7B8C9D0 /* RiskOfRuinView.swift in Sources */,
+				LYCVIEW2E2F3A4B5C6D7E8F9A0B1 /* LoyaltyCalculatorView.swift in Sources */,
 				SYNC2E2F3A4B5C6D7E8F9A0B1 /* SessionSyncManager.swift in Sources */,
 				WTGS02B2C3D4E5F6789A0B1 /* WatchTierGoalSync.swift in Sources */,
 				THM2E2F3A4B5C6D7E8F9A0B1 /* TierTapThemeSettings.swift in Sources */,

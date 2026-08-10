@@ -296,6 +296,7 @@ enum UserGuideContent {
             .bullet(loc("Browse overview stats, graph styles (distribution, tier curve, bet rating, mood distribution, tier by loyalty program, and poker-specific cards when applicable).", language)),
             .bullet(loc("Loyalty Insights (when enabled): Rated Capture Scorecard; Where You Earn Tiers Fastest (property + game by tiers/hour); and Comp ROI + True EV (cash net + comps; free play excluded from EV).", language)),
             .bullet(loc("Open Risk of Ruin to compare play to your bankroll and target averages (table-focused; poker is handled separately in copy inside the app).", language)),
+            .bullet(loc("Loyalty Calculator (toolbar calculator control): estimate blackjack, baccarat, roulette, craps, and slot theo, plus ADT, comps, and tier points. A few calculators are free; Pro unlocks the full set. When inputs are complete, TierTap AI Insights opens theo win/loss bubbles and an AI take.", language)),
             .bullet(loc("With TierTap Pro, use Ask TierTap for natural-language style summaries of your data and share selected charts as images.", language)),
             .paragraph(loc("Tips: More accurate average bet and tier fields make analytics and loyalty insights more useful.", language)),
 
@@ -370,6 +371,7 @@ enum UserGuideContent {
             .bullet(loc("Some screens show an upgrade prompt that opens the TierTap Pro paywall directly.", language)),
             .h2(loc("What TierTap Pro includes", language)),
             .bullet(loc("Ask TierTap (AI Play Analysis): Analytics tab → Ask TierTap for natural-language summaries of your saved play data.", language)),
+            .bullet(loc("Loyalty Calculators with TierTap AI Insights: Analytics tab → calculator control. Estimate blackjack/baccarat/roulette/craps/slot theo, ADT, comps, and tier points. Free users get a few calculators; Pro unlocks the full set. After filling inputs, TierTap AI Insights shows theo win/loss bubbles plus an AI insight.", language)),
             .bullet(loc("AI session share images: After close-out or from session sharing flows, generate premium session art with TierTap AI where the app offers Generate Session Art or similar.", language)),
             .bullet(loc("Chip Estimator: During close-out, use the Chip Estimator camera flow to estimate stacks from a table photo (signed-in TierTap account required).", language)),
             .bullet(loc("Comp Estimator: When adding comps during a live session, capture a comp slip, receipt, or screen so TierTap AI can suggest a dollar value you can accept or edit.", language)),

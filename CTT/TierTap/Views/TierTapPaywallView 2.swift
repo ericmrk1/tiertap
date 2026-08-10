@@ -243,6 +243,11 @@ struct TierTapPaywallView: View {
                     subtitle: "Ask TierTap to analyze your sessions and patterns."
                 )
                 ProBenefitRow(
+                    icon: "plus.forwardslash.minus",
+                    title: "Loyalty Calculators + AI Insights",
+                    subtitle: "Theo, ADT, comps, and tier calculators with TierTap AI Insights on Analytics."
+                )
+                ProBenefitRow(
                     icon: "camera.viewfinder",
                     title: "Chip Estimator",
                     subtitle: "Estimate chip stacks from a photo with AI before you cash out."

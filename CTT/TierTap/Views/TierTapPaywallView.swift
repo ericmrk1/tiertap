@@ -228,6 +228,11 @@ struct TierTapPaywallView: View {
                         subtitle: "Browse for free when signed in — Pro unlocks publishing and reacting (like, dislike, heart)."
                     )
                     ProBenefitRow(
+                        icon: "plus.forwardslash.minus",
+                        title: "Loyalty Calculators + AI Insights",
+                        subtitle: "Theo, ADT, comps, and tier calculators with TierTap AI Insights on Analytics."
+                    )
+                    ProBenefitRow(
                         icon: "wand.and.stars",
                         title: "AI Play Analysis & Session Art",
                         subtitle: "Ask TierTap for narratives and premium share images."
@@ -237,6 +242,11 @@ struct TierTapPaywallView: View {
                         icon: "wand.and.stars",
                         title: "AI Play Analysis",
                         subtitle: "Ask TierTap to analyze your sessions and patterns."
+                    )
+                    ProBenefitRow(
+                        icon: "plus.forwardslash.minus",
+                        title: "Loyalty Calculators + AI Insights",
+                        subtitle: "Theo, ADT, comps, and tier calculators with TierTap AI Insights on Analytics."
                     )
                     ProBenefitRow(
                         icon: "photo.badge.sparkles",
